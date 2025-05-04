@@ -1,0 +1,37 @@
+.hide-create-button .fi-fo-select-create-button {
+    display: none !important;
+}
+
+.custom-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    text-align: left !important; /* Aligns text properly */
+    font-size: 0.875rem; /* Matches Filament table text size */
+    font-weight: 400; /* Matches Filament default text weight */
+    color: #1a202c; /* Matches Filament text color */
+}
+
+.custom-tooltip .tooltip-content {
+    visibility: hidden;
+    width: max-content;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    padding: 8px 12px;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 999;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.custom-tooltip:hover .tooltip-content {
+    visibility: visible;
+    opacity: 1;
+}

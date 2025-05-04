@@ -1,0 +1,102 @@
+.hide-create-button .fi-fo-select-create-button {
+    display: none !important;
+}
+
+.custom-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.custom-tooltip .tooltip-content {
+    visibility: hidden;
+    width: max-content;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    padding: 8px 12px;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 999;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.custom-tooltip:hover .tooltip-content {
+    visibility: visible;
+    opacity: 1;
+}
+
+[x-cloak] { display: none !important; }
+
+.right-sidebar {
+    transition: transform 0.3s ease-in-out;
+}
+
+.right-sidebar.closed {
+    transform: translateX(100%);
+}
+
+.custom-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.custom-tooltip .tooltip-content {
+    visibility: hidden;
+    width: max-content;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    padding: 6px 10px;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 999;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.custom-tooltip:hover .tooltip-content {
+    visibility: visible;
+    opacity: 1;
+}
+
+[x-cloak] { display: none !important; }
+
+#right-sidebar {
+    width: 300px;
+    background-color: #f9fafb; /* Light background */
+    border-left: 2px solid #e5e7eb;
+}
+
+#sidebar-toggle {
+    background-color: #4f46e5; /* Primary color */
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#close-sidebar {
+    background-color: transparent;
+    color: #fff;
+    cursor: pointer;
+}
+
+.context-menu {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    z-index: 999;
+}
