@@ -24,12 +24,6 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->timestamps();
         });
-
-        Schema::table('city_pin_codes', function (Blueprint $table) {
-
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-        });
-
     }
 
     /**
