@@ -46,10 +46,11 @@ class DatabaseSeeder extends Seeder
         // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $this->call([
-            // // IndustryTypeSeeder::class,
-            // // LeadSourceSeeder::class,
-            // // LeadStatusSeeder::class,
-            // // RatingTypeSeeder::class,
+            UsersTableSeeder::class,
+            IndustryTypeSeeder::class,
+            LeadSourceSeeder::class,
+            LeadStatusSeeder::class,
+            RatingTypeSeeder::class,
             FollowUpMediaSeeder::class,
             FollowUpResultSeeder::class,
             FollowUpStatusSeeder::class,
@@ -62,12 +63,13 @@ class DatabaseSeeder extends Seeder
             DealStageSeeder::class,
             TypeMasterSeeder::class,
             CategorySeeder::class,
+
         ]);
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
     }
 }
 

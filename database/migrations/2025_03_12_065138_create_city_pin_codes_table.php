@@ -22,7 +22,6 @@ return new class extends Migration
             $table->foreignId('country_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
 
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 
