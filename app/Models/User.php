@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Tenant;
 
-class User extends Authenticatable
+class User extends Authenticatable implements \Filament\Models\Contracts\FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles;
@@ -20,7 +20,7 @@ class User extends Authenticatable
     public function getConnectionName()
     {
         // Check if a tenant is currently set
-        if (Tenant::hasCurrent()) {
+        if (Tenant::current()) {
             return 'tenant'; // Use tenant database connection
         }
 
