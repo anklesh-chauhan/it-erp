@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Artisan;
 use Spatie\Multitenancy\Models\Tenant as BaseTenant;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Seeder;
+use Database\Seeders\DatabaseSeeder;
 
 class Tenant extends BaseTenant
 {
@@ -87,12 +89,14 @@ class Tenant extends BaseTenant
                 $insertedCount = DB::connection('tenant')->table('permissions')->count();
                 Log::info("Total permissions in tenant database after insert: {$insertedCount}");
 
-                // Run tenant-specific seeder
-                Artisan::call('tenants:artisan', [
-                    'artisanCommand' => 'db:seed --class=DatabaseSeeder',
-                    '--tenant' => [$tenant->id],
-                ]);
-                Log::info("Ran db:seed for tenant: {$tenant->name}, tenantId: {$tenant->id}");
+                 // ✅ Run tenant seeder programmatically (not Artisan)
+                 app('db')->setDefaultConnection('tenant');
+                 app(Seeder::class)->call(DatabaseSeeder::class);
+                 Log::info("Seeded tenant database for: {$tenant->name}");
+
+                 // Restore landlord DB connection
+
+                 app('db')->setDefaultConnection(config('database.default'));
 
                 // Switch back to the landlord context
                 $tenant->forgetCurrent();
