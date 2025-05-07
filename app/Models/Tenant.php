@@ -73,7 +73,7 @@ class Tenant extends BaseTenant
                     ];
                 })->toArray();
 
-                Log::info("Fetched {$mainPermissions->count()} permissions from landlord database");
+                Log::info("Fetched permissions from landlord database");
 
                 // Insert permissions into the tenant database using bulk insert
                 if (!empty($mainPermissions)) {
