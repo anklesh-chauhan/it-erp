@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
 use Spatie\Multitenancy\Models\Tenant as BaseTenant;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Log;
 
 class Tenant extends BaseTenant
 {
@@ -18,80 +18,109 @@ class Tenant extends BaseTenant
             $tenant->database = 'tenant_' . uniqid();
         });
 
+        // static::created(function ($tenant) {
+        //     DB::statement("CREATE DATABASE {$tenant->database}");
+
+        //     config(['database.connections.tenant.database' => $tenant->database]);
+
+        //     Artisan::call('migrate', [
+        //         '--database' => 'tenant',
+        //         '--path' => 'database/migrations',
+        //         '--force' => true,
+        //     ]);
+        // });
+
         static::created(function ($tenant) {
-            Log::info("Creating tenant: {$tenant->name}");
+            Log::info("Tenant created: {$tenant->name}, database: {$tenant->database}");
 
             try {
-                // 1. Create tenant database
-                DB::statement("CREATE DATABASE `{$tenant->database}`");
-                Log::info("Created database: {$tenant->database}");
+                // Create the tenant database
+                DB::statement("CREATE DATABASE {$tenant->database}");
+                Log::info("Database created: {$tenant->database}");
 
-                // 2. Configure tenant DB connection
+                // Set the tenant database connection
                 config(['database.connections.tenant.database' => $tenant->database]);
-                DB::purge('tenant');
-                DB::reconnect('tenant');
-                Log::info("Tenant DB connection configured: {$tenant->database}");
+                DB::purge('tenant'); // Clear connection cache
+                Log::info("Tenant connection set to: {$tenant->database}");
 
-                // 3. Run tenant migrations
+                // Run migrations for the tenant database
                 Artisan::call('migrate', [
                     '--database' => 'tenant',
                     '--path' => 'database/migrations',
                     '--force' => true,
                 ]);
-                Log::info("Migrations completed for tenant: {$tenant->name}");
+                Log::info("Migrations run for tenant: {$tenant->name}");
 
-                // 4. Set tenant context
+                // Verify tenant database connection
+                $tenantDb = DB::connection('tenant')->getDatabaseName();
+                Log::info("Current tenant database: {$tenantDb}");
+
+                // Switch to the tenant context
                 $tenant->makeCurrent();
+                Log::info("Tenant context set for: {$tenant->name}", ['tenantId' => $tenant->id]);
 
-                // 5. Clone permissions from landlord DB
-                $landlordPermissions = Permission::on(config('database.default'))->get()->map(function ($permission) {
+                // Verify permissions table exists
+                $tableExists = DB::connection('tenant')->getSchemaBuilder()->hasTable('permissions');
+                Log::info("Permissions table exists in tenant database: " . ($tableExists ? 'Yes' : 'No'));
+
+                // Copy permissions from the current (landlord) database
+                $mainPermissions = Permission::get()->map(function ($permission) {
                     return [
                         'name' => $permission->name,
                         'guard_name' => 'tenant',
-                        'created_at' => now(),
-                        'updated_at' => now(),
+                        'created_at' => $permission->created_at ?: now(),
+                        'updated_at' => $permission->updated_at ?: now(),
                     ];
                 })->toArray();
 
-                if (!empty($landlordPermissions)) {
-                    DB::connection('tenant')->table('permissions')->insertOrIgnore($landlordPermissions);
-                    Log::info("Permissions copied: " . count($landlordPermissions));
+                Log::info("Fetched permissions from landlord database");
+
+                // Insert permissions into the tenant database using bulk insert
+                if (!empty($mainPermissions)) {
+                    DB::connection('tenant')->table('permissions')->insertOrIgnore($mainPermissions);
+                    Log::info("Inserted permissions for tenant: {$tenant->name}, count: " . count($mainPermissions));
                 } else {
-                    Log::warning("No permissions found in landlord DB.");
+                    Log::warning("No permissions found in landlord database to copy for tenant: {$tenant->name}");
                 }
 
-                // 6. Run tenant-specific seeder (if needed)
+                // Verify inserted permissions
+                $insertedCount = DB::connection('tenant')->table('permissions')->count();
+                Log::info("Total permissions in tenant database after insert: {$insertedCount}");
+
+                // Run tenant-specific seeder
                 Artisan::call('tenants:artisan', [
                     'artisanCommand' => 'db:seed --class=DatabaseSeeder',
                     '--tenant' => [$tenant->id],
                 ]);
-                Log::info("Seeder executed for tenant: {$tenant->name}");
+                Log::info("Ran db:seed for tenant: {$tenant->name}, tenantId: {$tenant->id}");
 
-                // 7. Cleanup
+                // Switch back to the landlord context
                 $tenant->forgetCurrent();
-                Log::info("Tenant context cleared: {$tenant->name}");
-            } catch (\Throwable $e) {
-                Log::error("Error creating tenant {$tenant->name}: {$e->getMessage()}", [
-                    'trace' => $e->getTraceAsString()
-                ]);
-                throw $e;
+                Log::info("Tenant context cleared for: {$tenant->name}");
+            } catch (\Exception $e) {
+                Log::error("Error processing tenant {$tenant->name}: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
+                throw $e; // Re-throw to halt seeding if critical
             }
         });
 
         static::deleting(function ($tenant) {
-            DB::statement("DROP DATABASE IF EXISTS `{$tenant->database}`");
-            Log::info("Dropped database: {$tenant->database}");
+            DB::statement("DROP DATABASE {$tenant->database}");
         });
-
         static::updated(function ($tenant) {
             if ($tenant->isDirty('domain')) {
                 $oldDomain = $tenant->getOriginal('domain');
-                Log::info("Domain changed from {$oldDomain} to {$tenant->domain}");
+                $newDomain = $tenant->domain;
+
+                // Update the domain in the database
+                DB::table('tenants')->where('id', $tenant->id)->update(['domain' => $newDomain]);
+
+                // Log the domain change
+                Log::info("Tenant domain changed from {$oldDomain} to {$newDomain}");
             }
         });
-
         static::deleted(function ($tenant) {
-            Log::info("Tenant deleted: {$tenant->name}");
+            // Perform any additional cleanup if needed
+            Log::info("Tenant {$tenant->name} deleted.");
         });
     }
 }
