@@ -55,7 +55,7 @@ class Tenant extends BaseTenant
                 Log::info("Tenant context set for: {$tenant->name}");
 
                 // Copy permissions from the main (landlord) database
-                $mainPermissions = Permission::on('iterp')->get()->map(function ($permission) {
+                $mainPermissions = Permission::get()->map(function ($permission) {
                     return [
                         'name' => $permission->name,
                         'guard_name' => 'tenant',
