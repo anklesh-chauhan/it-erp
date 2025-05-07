@@ -11,6 +11,8 @@ class TenantUser extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
 
+    protected $connection = 'tenant';
+
     protected $guarded = [];
 
     protected $fillable = ['name', 'email', 'password'];
