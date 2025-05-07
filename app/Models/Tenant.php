@@ -87,6 +87,13 @@ class Tenant extends BaseTenant
                 $insertedCount = DB::connection('tenant')->table('permissions')->count();
                 Log::info("Total permissions in tenant database after insert: {$insertedCount}");
 
+                // Run tenant-specific seeder
+                Artisan::call('tenants:artisan', [
+                    'artisanCommand' => 'db:seed --class=DatabaseSeeder',
+                    '--tenant' => [$tenant->id],
+                ]);
+                Log::info("Ran db:seed for tenant: {$tenant->name}, tenantId: {$tenant->id}");
+
                 // Switch back to the landlord context
                 $tenant->forgetCurrent();
                 Log::info("Tenant context cleared for: {$tenant->name}");
