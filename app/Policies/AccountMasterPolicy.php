@@ -12,7 +12,7 @@ class AccountMasterPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the User|TenantUser wwcan view any models.
+     * Determine whether the User|TenantUser can view any models.
      */
     public function viewAny(User|TenantUser $user): bool
     {
