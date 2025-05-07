@@ -13,6 +13,8 @@ class TenantUser extends Authenticatable implements FilamentUser
 
     protected $connection = 'tenant';
 
+    protected $table = 'users';
+
     protected $guarded = [];
 
     protected $fillable = ['name', 'email', 'password'];
