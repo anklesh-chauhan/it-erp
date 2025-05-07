@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Models\TenantUser;
 use App\Models\State;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -13,7 +14,7 @@ class StatePolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(User|TenantUser $user): bool
     {
         return $user->can('view_any_state');
     }
@@ -21,7 +22,7 @@ class StatePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, State $state): bool
+    public function view(User|TenantUser $user, State $state): bool
     {
         return $user->can('view_state');
     }
@@ -29,7 +30,7 @@ class StatePolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User|TenantUser $user): bool
     {
         return $user->can('create_state');
     }
@@ -37,7 +38,7 @@ class StatePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, State $state): bool
+    public function update(User|TenantUser $user, State $state): bool
     {
         return $user->can('update_state');
     }
@@ -45,7 +46,7 @@ class StatePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, State $state): bool
+    public function delete(User|TenantUser $user, State $state): bool
     {
         return $user->can('delete_state');
     }
@@ -53,7 +54,7 @@ class StatePolicy
     /**
      * Determine whether the user can bulk delete.
      */
-    public function deleteAny(User $user): bool
+    public function deleteAny(User|TenantUser $user): bool
     {
         return $user->can('delete_any_state');
     }
@@ -61,7 +62,7 @@ class StatePolicy
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, State $state): bool
+    public function forceDelete(User|TenantUser $user, State $state): bool
     {
         return $user->can('force_delete_state');
     }
@@ -69,7 +70,7 @@ class StatePolicy
     /**
      * Determine whether the user can permanently bulk delete.
      */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(User|TenantUser $user): bool
     {
         return $user->can('force_delete_any_state');
     }
@@ -77,7 +78,7 @@ class StatePolicy
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, State $state): bool
+    public function restore(User|TenantUser $user, State $state): bool
     {
         return $user->can('restore_state');
     }
@@ -85,7 +86,7 @@ class StatePolicy
     /**
      * Determine whether the user can bulk restore.
      */
-    public function restoreAny(User $user): bool
+    public function restoreAny(User|TenantUser $user): bool
     {
         return $user->can('restore_any_state');
     }
@@ -93,7 +94,7 @@ class StatePolicy
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, State $state): bool
+    public function replicate(User|TenantUser $user, State $state): bool
     {
         return $user->can('replicate_state');
     }
@@ -101,7 +102,7 @@ class StatePolicy
     /**
      * Determine whether the user can reorder.
      */
-    public function reorder(User $user): bool
+    public function reorder(User|TenantUser $user): bool
     {
         return $user->can('reorder_state');
     }
