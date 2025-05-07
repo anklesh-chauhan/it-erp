@@ -41,6 +41,7 @@ class Tenant extends BaseTenant
                 // Set the tenant database connection
                 config(['database.connections.tenant.database' => $tenant->database]);
                 DB::purge('tenant'); // Clear connection cache
+                Log::info("Tenant connection set to: {$tenant->database}");
 
                 // Run migrations for the tenant database
                 Artisan::call('migrate', [
@@ -50,34 +51,47 @@ class Tenant extends BaseTenant
                 ]);
                 Log::info("Migrations run for tenant: {$tenant->name}");
 
+                // Verify tenant database connection
+                $tenantDb = DB::connection('tenant')->getDatabaseName();
+                Log::info("Current tenant database: {$tenantDb}");
+
                 // Switch to the tenant context
                 $tenant->makeCurrent();
-                Log::info("Tenant context set for: {$tenant->name}");
+                Log::info("Tenant context set for: {$tenant->name}", ['tenantId' => $tenant->id]);
 
-                // Copy permissions from the main (landlord) database
+                // Verify permissions table exists
+                $tableExists = DB::connection('tenant')->getSchemaBuilder()->hasTable('permissions');
+                Log::info("Permissions table exists in tenant database: " . ($tableExists ? 'Yes' : 'No'));
+
+                // Copy permissions from the current (landlord) database
                 $mainPermissions = Permission::get()->map(function ($permission) {
                     return [
                         'name' => $permission->name,
                         'guard_name' => 'tenant',
-                        'created_at' => $permission->created_at,
-                        'updated_at' => $permission->updated_at,
+                        'created_at' => $permission->created_at ?: now(),
+                        'updated_at' => $permission->updated_at ?: now(),
                     ];
                 })->toArray();
 
-                // Insert permissions into the tenant database
-                foreach ($mainPermissions as $permission) {
-                    Permission::updateOrCreate(
-                        ['name' => $permission['name'], 'guard_name' => 'tenant'],
-                        $permission
-                    );
+                Log::info("Fetched {$mainPermissions->count()} permissions from landlord database");
+
+                // Insert permissions into the tenant database using bulk insert
+                if (!empty($mainPermissions)) {
+                    DB::connection('tenant')->table('permissions')->insertOrIgnore($mainPermissions);
+                    Log::info("Inserted permissions for tenant: {$tenant->name}, count: " . count($mainPermissions));
+                } else {
+                    Log::warning("No permissions found in landlord database to copy for tenant: {$tenant->name}");
                 }
-                Log::info("Permissions copied for tenant: {$tenant->name}, count: " . count($mainPermissions));
+
+                // Verify inserted permissions
+                $insertedCount = DB::connection('tenant')->table('permissions')->count();
+                Log::info("Total permissions in tenant database after insert: {$insertedCount}");
 
                 // Switch back to the landlord context
                 $tenant->forgetCurrent();
                 Log::info("Tenant context cleared for: {$tenant->name}");
             } catch (\Exception $e) {
-                Log::error("Error processing tenant {$tenant->name}: {$e->getMessage()}");
+                Log::error("Error processing tenant {$tenant->name}: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
                 throw $e; // Re-throw to halt seeding if critical
             }
         });
