@@ -7,26 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Tenant;
 
-class User extends Authenticatable implements \Filament\Models\Contracts\FilamentUser
+class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles;
-
-    /**
-     * Dynamically determine the connection.
-     */
-    public function getConnectionName()
-    {
-        // Check if a tenant is currently set
-        if (Tenant::current()) {
-            return 'tenant'; // Use tenant database connection
-        }
-
-        // Fall back to the default (landlord) connection
-        return config('database.default'); // e.g., 'landlord'
-    }
 
     /**
      * The attributes that are mass assignable.
@@ -62,8 +47,4 @@ class User extends Authenticatable implements \Filament\Models\Contracts\Filamen
         ];
     }
 
-    public function canAccessPanel(\Filament\Panel $panel): bool
-    {
-        return true; // Allow access to the Filament panel
-    }
 }

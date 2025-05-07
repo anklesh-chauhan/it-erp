@@ -28,13 +28,4 @@ class Tenant extends BaseTenant
             ]);
         });
     }
-
-    public function configure(): self
-    {
-        config([
-            'database.connections.tenant.database' => $this->database,
-        ]);
-
-        return $this;
-    }
 }
