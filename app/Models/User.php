@@ -13,8 +13,6 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles;
 
-    protected $connection = 'tenant';
-
     /**
      * The attributes that are mass assignable.
      *
@@ -49,8 +47,4 @@ class User extends Authenticatable
         ];
     }
 
-    public function canAccessPanel(\Filament\Panel $panel): bool
-    {
-        return true; // Allow access to the Filament panel
-    }
 }
