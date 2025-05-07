@@ -42,7 +42,7 @@ return [
         ],
         'tenant' => [ // Ensure this guard exists
             'driver' => 'session',
-            'provider' => 'tenants',
+            'provider' => 'users',
         ],
     ],
 

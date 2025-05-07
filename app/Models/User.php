@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Tenant;
 
 class User extends Authenticatable
 {
@@ -18,13 +19,13 @@ class User extends Authenticatable
      */
     public function getConnectionName()
     {
-        // If a tenant is set, return the tenant connection
-        if (Tenant::checkCurrent()) {
-            return 'tenant';
+        // Check if a tenant is currently set
+        if (Tenant::hasCurrent()) {
+            return 'tenant'; // Use tenant database connection
         }
 
-        // Otherwise fall back to landlord (default) connection
-        return parent::getConnectionName(); // or return null;
+        // Fall back to the default (landlord) connection
+        return config('database.default'); // e.g., 'landlord'
     }
 
     /**
