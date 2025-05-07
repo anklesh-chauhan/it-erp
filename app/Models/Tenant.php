@@ -91,7 +91,8 @@ class Tenant extends BaseTenant
 
                  // ✅ Run tenant seeder programmatically (not Artisan)
                  app('db')->setDefaultConnection('tenant');
-                 app(Seeder::class)->call(DatabaseSeeder::class);
+                 $seeder = new \Database\Seeders\DatabaseSeeder();
+                 $seeder->run();
                  Log::info("Seeded tenant database for: {$tenant->name}");
 
                  // Restore landlord DB connection
