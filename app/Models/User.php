@@ -14,6 +14,20 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasRoles;
 
     /**
+     * Dynamically determine the connection.
+     */
+    public function getConnectionName()
+    {
+        // If a tenant is set, return the tenant connection
+        if (Tenant::checkCurrent()) {
+            return 'tenant';
+        }
+
+        // Otherwise fall back to landlord (default) connection
+        return parent::getConnectionName(); // or return null;
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -47,4 +61,8 @@ class User extends Authenticatable
         ];
     }
 
+    public function canAccessPanel(\Filament\Panel $panel): bool
+    {
+        return true; // Allow access to the Filament panel
+    }
 }
