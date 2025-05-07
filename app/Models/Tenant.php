@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Multitenancy\Models\Tenant as BaseTenant;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Log;
 
 class Tenant extends BaseTenant
 {
@@ -16,16 +18,88 @@ class Tenant extends BaseTenant
             $tenant->database = 'tenant_' . uniqid();
         });
 
+        // static::created(function ($tenant) {
+        //     DB::statement("CREATE DATABASE {$tenant->database}");
+
+        //     config(['database.connections.tenant.database' => $tenant->database]);
+
+        //     Artisan::call('migrate', [
+        //         '--database' => 'tenant',
+        //         '--path' => 'database/migrations',
+        //         '--force' => true,
+        //     ]);
+        // });
+
         static::created(function ($tenant) {
-            DB::statement("CREATE DATABASE {$tenant->database}");
+            Log::info("Tenant created: {$tenant->name}, database: {$tenant->database}");
 
-            config(['database.connections.tenant.database' => $tenant->database]);
+            try {
+                // Create the tenant database
+                DB::statement("CREATE DATABASE {$tenant->database}");
+                Log::info("Database created: {$tenant->database}");
 
-            Artisan::call('migrate', [
-                '--database' => 'tenant',
-                '--path' => 'database/migrations',
-                '--force' => true,
-            ]);
+                // Set the tenant database connection
+                config(['database.connections.tenant.database' => $tenant->database]);
+                DB::purge('tenant'); // Clear connection cache
+
+                // Run migrations for the tenant database
+                Artisan::call('migrate', [
+                    '--database' => 'tenant',
+                    '--path' => 'database/migrations',
+                    '--force' => true,
+                ]);
+                Log::info("Migrations run for tenant: {$tenant->name}");
+
+                // Switch to the tenant context
+                $tenant->makeCurrent();
+                Log::info("Tenant context set for: {$tenant->name}");
+
+                // Copy permissions from the main (landlord) database
+                $mainPermissions = Permission::on('landlord')->get()->map(function ($permission) {
+                    return [
+                        'name' => $permission->name,
+                        'guard_name' => 'tenant',
+                        'created_at' => $permission->created_at,
+                        'updated_at' => $permission->updated_at,
+                    ];
+                })->toArray();
+
+                // Insert permissions into the tenant database
+                foreach ($mainPermissions as $permission) {
+                    Permission::updateOrCreate(
+                        ['name' => $permission['name'], 'guard_name' => 'tenant'],
+                        $permission
+                    );
+                }
+                Log::info("Permissions copied for tenant: {$tenant->name}, count: " . count($mainPermissions));
+
+                // Switch back to the landlord context
+                $tenant->forgetCurrent();
+                Log::info("Tenant context cleared for: {$tenant->name}");
+            } catch (\Exception $e) {
+                Log::error("Error processing tenant {$tenant->name}: {$e->getMessage()}");
+                throw $e; // Re-throw to halt seeding if critical
+            }
+        });
+
+        static::deleting(function ($tenant) {
+            DB::statement("DROP DATABASE {$tenant->database}");
+        });
+        static::updated(function ($tenant) {
+            if ($tenant->isDirty('domain')) {
+                $oldDomain = $tenant->getOriginal('domain');
+                $newDomain = $tenant->domain;
+
+                // Update the domain in the database
+                DB::table('tenants')->where('id', $tenant->id)->update(['domain' => $newDomain]);
+
+                // Log the domain change
+                Log::info("Tenant domain changed from {$oldDomain} to {$newDomain}");
+            }
+        });
+        static::deleted(function ($tenant) {
+            // Perform any additional cleanup if needed
+            Log::info("Tenant {$tenant->name} deleted.");
         });
     }
 }
