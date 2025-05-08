@@ -32,6 +32,7 @@ class TenantPanelProvider extends PanelProvider
         ->path('tenant')
         ->brandName('Tenant CRM')
         ->login()
+        ->tenant(Tenant::class)
         ->globalSearch(true)
         ->globalSearchKeyBindings(['command + k', 'ctrl + k'])
         ->globalSearchDebounce(500) // ✅ Debounce search requests
