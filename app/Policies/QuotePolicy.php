@@ -14,7 +14,7 @@ class QuotePolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User|TenantUser $user): bool
+    public function viewAny(TenantUser $user): bool
     {
         return $user->can('view_any_quote');
     }
