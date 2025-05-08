@@ -16,7 +16,7 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
-
+use App\Models\Tenant;
 
 class TenantPanelProvider extends PanelProvider
 {
@@ -32,6 +32,7 @@ class TenantPanelProvider extends PanelProvider
         ->path('tenant')
         ->brandName('Tenant CRM')
         ->login()
+        ->tenant(Tenant::class, 'domain')
         ->globalSearch(true)
         ->globalSearchKeyBindings(['command + k', 'ctrl + k'])
         ->globalSearchDebounce(500) // ✅ Debounce search requests
