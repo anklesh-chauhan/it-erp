@@ -14,7 +14,7 @@ class TenantUser extends Authenticatable implements FilamentUser
 
     protected $connection = 'tenant';
 
-    protected $table = 'users';
+    // protected $table = 'users';
 
     protected $guarded = [];
 
