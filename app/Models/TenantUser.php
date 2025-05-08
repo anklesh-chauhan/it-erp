@@ -33,5 +33,31 @@ class TenantUser extends Authenticatable implements FilamentUser
     {
         return true; // Allow access to the Filament panel
     }
+
+    public function guardName()
+    {
+        return 'tenant';
+    }
+
+    /**
+     * Get the tenants accessible by this user (required by Filament).
+     */
+    public function getTenants(\Filament\Panel $panel): \Illuminate\Support\Collection
+    {
+        // Return the current tenant for this user
+        $tenant = Tenant::current();
+        return $tenant ? collect([$tenant]) : collect();
+    }
+
+    /**
+     * Determine if the user can access the given tenant.
+     */
+    public function canAccessTenant($tenant): bool
+    {
+        // Check if the tenant matches the current tenant
+        $currentTenant = Tenant::current();
+        return $currentTenant && $currentTenant->id === ($tenant->id ?? $tenant);
+    }
+
 }
 
