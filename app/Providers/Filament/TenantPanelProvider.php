@@ -17,6 +17,7 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use App\Models\Tenant;
+use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
 
 class TenantPanelProvider extends PanelProvider
 {
@@ -50,6 +51,9 @@ class TenantPanelProvider extends PanelProvider
             IdentifyTenant::class,
             'web',
         ])
+        ->tenantMiddleware([
+            SyncShieldTenant::class, // ✅ Add Filament Shield tenant middleware
+        ], isPersistent: true)
         ->authGuard('tenant')
         ->navigationGroups([
             NavigationGroup::make()->label('Tenant Dashboard'),
