@@ -39,5 +39,26 @@ class TenantUser extends Authenticatable implements FilamentUser
         return 'tenant';
     }
 
+    public function getTenants()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+    public function getTenantId()
+    {
+        return $this->getTenants()->first()->id;
+    }
+    public function getTenantName()
+    {
+        return $this->getTenants()->first()->name;
+    }
+    public function getTenantDomain()
+    {
+        return $this->getTenants()->first()->domain;
+    }
+    public function getTenantDatabase()
+    {
+        return $this->getTenants()->first()->database;
+    }
+
 }
 
