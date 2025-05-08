@@ -64,7 +64,7 @@ class TenantPanelProvider extends PanelProvider
         ->topNavigation()
         ->renderHook('panels::body.start', function () {
             // Check if the current route is an authentication route
-            $authRoutes = ['filament.admin.auth.login', 'filament.admin.auth.logout', 'filament.admin.auth.register', 'filament.admin.auth.password-reset.request', 'filament.admin.auth.password-reset.reset'];
+            $authRoutes = ['filament.tenant.auth.login', 'filament.tenant.auth.logout', 'filament.tenant.auth.register', 'filament.tenant.auth.password-reset.request', 'filament.tenant.auth.password-reset.reset'];
             $isAuthPage = in_array(Route::currentRouteName(), $authRoutes);
 
             // On auth pages, render no sidebar
