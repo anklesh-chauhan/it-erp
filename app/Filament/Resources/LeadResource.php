@@ -57,6 +57,12 @@ class LeadResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'reference_code';
 
+    public static function canViewAny(): bool
+    {
+        return true;
+    }
+
+
     public static function form(Form $form): Form
     {
         return $form
