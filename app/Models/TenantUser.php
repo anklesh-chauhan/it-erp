@@ -39,25 +39,5 @@ class TenantUser extends Authenticatable implements FilamentUser
         return 'tenant';
     }
 
-    /**
-     * Get the tenants accessible by this user (required by Filament).
-     */
-    public function getTenants(\Filament\Panel $panel): \Illuminate\Support\Collection
-    {
-        // Get the current tenant using App\Models\Tenant
-        $tenant = Tenant::where('id', \Spatie\Multitenancy\Models\Tenant::current()?->id)->first();
-        return $tenant ? collect([$tenant]) : collect();
-    }
-
-    /**
-     * Determine if the user can access the given tenant.
-     */
-    public function canAccessTenant($tenant): bool
-    {
-        // Get the current tenant using App\Models\Tenant
-        $currentTenant = Tenant::where('id', \Spatie\Multitenancy\Models\Tenant::current()?->id)->first();
-        return $currentTenant && $currentTenant->id === ($tenant->id ?? $tenant);
-    }
-
 }
 
