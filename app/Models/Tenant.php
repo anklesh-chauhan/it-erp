@@ -14,6 +14,20 @@ class Tenant extends BaseTenant
 {
     protected $fillable = ['name', 'domain', 'database'];
 
+    public function users()
+    {
+        return $this->hasMany(TenantUser::class, 'tenant_id');
+    }
+
+    public function configure()
+    {
+        if ($this->database) {
+            config(['database.connections.tenant.database' => $this->database]);
+            DB::purge('tenant');
+            DB::reconnect('tenant');
+        }
+    }
+
     protected static function booted()
     {
         static::creating(function ($tenant) {
