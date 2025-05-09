@@ -18,8 +18,6 @@ class TenantUser extends Authenticatable
 
     protected $guard_name = 'tenant';
 
-    protected $guarded = [];
-
     protected $fillable = ['name', 'email', 'password'];
 
     protected $hidden = [
