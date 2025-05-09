@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\DB;
 
 class CurrentDatabase extends BaseWidget
 {
-    protected function getCards(): array
+    protected static string $view = 'filament.widgets.current-database';
+
+    protected function getViewData(): array
     {
         return [
-            Stat::make('Tenant DB', DB::connection()->getDatabaseName()),
+            'databaseName' => DB::connection()->getDatabaseName(),
         ];
     }
 }
