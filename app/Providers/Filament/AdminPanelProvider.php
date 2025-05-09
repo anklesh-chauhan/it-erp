@@ -31,6 +31,7 @@ use App\Models\Lead;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use App\Filament\Widgets\CurrentDatabase;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -56,6 +57,9 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Dashboard::class,
+            ])
+            ->widgets([
+                CurrentDatabase::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->resources([
