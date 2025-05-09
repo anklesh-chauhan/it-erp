@@ -14,10 +14,10 @@ class Tenant extends BaseTenant
 {
     protected $fillable = ['name', 'domain', 'database'];
 
-    public function users()
-    {
-        return $this->hasMany(TenantUser::class, 'tenant_id');
-    }
+    // public function users()
+    // {
+    //     return $this->hasMany(TenantUser::class, 'tenant_id');
+    // }
 
     public function configure()
     {
