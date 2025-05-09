@@ -2,6 +2,11 @@
 
 return [
 
+    'defaults' => [
+        'guard' => 'web',
+    ],
+
+
     'models' => [
 
         /*
@@ -27,6 +32,9 @@ return [
         'role' => Spatie\Permission\Models\Role::class,
 
     ],
+
+
+    'guards' => ['web', 'tenant'],
 
     'table_names' => [
 
