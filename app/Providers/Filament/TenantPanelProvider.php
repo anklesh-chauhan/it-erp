@@ -17,6 +17,7 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use App\Models\Tenant;
+use App\Filament\Widgets\CurrentDatabase;
 
 class TenantPanelProvider extends PanelProvider
 {
@@ -39,6 +40,9 @@ class TenantPanelProvider extends PanelProvider
         ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
         ->resources([
             TenantUserResource::class,
+        ])
+        ->widgets([
+            CurrentDatabase::class,
         ])
         ->pages([
             Dashboard::class,
