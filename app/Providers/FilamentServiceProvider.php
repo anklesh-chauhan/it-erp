@@ -32,9 +32,5 @@ class FilamentServiceProvider extends ServiceProvider
         FilamentIcon::register([
             'custom-icon' => '<svg>...</svg>',
         ]);
-
-        Filament::authUsing(function () {
-            return auth('tenant')->user(); // For tenant panel
-        });
     }
 }
