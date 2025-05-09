@@ -8,7 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Spatie\Permission\Traits\HasRoles;
 
-class TenantUser extends Authenticatable implements FilamentUser
+class TenantUser extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
 
