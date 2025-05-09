@@ -16,6 +16,8 @@ class TenantUser extends Authenticatable
 
     // protected $table = 'users';
 
+    protected $guard_name = 'tenant';
+
     protected $guarded = [];
 
     protected $fillable = ['name', 'email', 'password'];
@@ -34,10 +36,6 @@ class TenantUser extends Authenticatable
         return true; // Allow access to the Filament panel
     }
 
-    public function guardName()
-    {
-        return 'tenant';
-    }
 
 }
 
