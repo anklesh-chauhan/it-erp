@@ -8,6 +8,8 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Filament\Support\Assets\Css;
 use App\Filament\Resources\LeadResource;
+use Illuminate\Support\Facades\DB;
+use Filament\Navigation\MenuItem;
 
 class FilamentServiceProvider extends ServiceProvider
 {
@@ -32,5 +34,14 @@ class FilamentServiceProvider extends ServiceProvider
         FilamentIcon::register([
             'custom-icon' => '<svg>...</svg>',
         ]);
+
+        Filament::serving(function () {
+            Filament::userMenuItems([
+                MenuItem::make()
+                    ->label('DB: ' . DB::connection()->getDatabaseName())
+                    ->url('#')
+                    ->icon('heroicon-o-database'),
+            ]);
+        });
     }
 }
