@@ -17,7 +17,6 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use App\Models\Tenant;
-use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
 
 class TenantPanelProvider extends PanelProvider
 {
@@ -33,7 +32,6 @@ class TenantPanelProvider extends PanelProvider
         ->path('tenant')
         ->brandName('Tenant CRM')
         ->login()
-        ->tenant(Tenant::class)
         ->globalSearch(true)
         ->globalSearchKeyBindings(['command + k', 'ctrl + k'])
         ->globalSearchDebounce(500) // ✅ Debounce search requests
@@ -51,9 +49,6 @@ class TenantPanelProvider extends PanelProvider
             IdentifyTenant::class,
             'web',
         ])
-        ->tenantMiddleware([
-            SyncShieldTenant::class, // ✅ Add Filament Shield tenant middleware
-        ], isPersistent: true)
         ->authGuard('tenant')
         ->navigationGroups([
             NavigationGroup::make()->label('Tenant Dashboard'),
@@ -64,7 +59,7 @@ class TenantPanelProvider extends PanelProvider
         ->topNavigation()
         ->renderHook('panels::body.start', function () {
             // Check if the current route is an authentication route
-            $authRoutes = ['filament.tenant.auth.login', 'filament.tenant.auth.logout', 'filament.tenant.auth.register', 'filament.tenant.auth.password-reset.request', 'filament.tenant.auth.password-reset.reset'];
+            $authRoutes = ['filament.admin.auth.login', 'filament.admin.auth.logout', 'filament.admin.auth.register', 'filament.admin.auth.password-reset.request', 'filament.admin.auth.password-reset.reset'];
             $isAuthPage = in_array(Route::currentRouteName(), $authRoutes);
 
             // On auth pages, render no sidebar

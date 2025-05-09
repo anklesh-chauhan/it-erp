@@ -19,14 +19,14 @@ class Tenant extends BaseTenant
     //     return $this->hasMany(TenantUser::class, 'tenant_id');
     // }
 
-    public function configure()
-    {
-        if ($this->database) {
-            config(['database.connections.tenant.database' => $this->database]);
-            DB::purge('tenant');
-            DB::reconnect('tenant');
-        }
-    }
+    // public function configure()
+    // {
+    //     if ($this->database) {
+    //         config(['database.connections.tenant.database' => $this->database]);
+    //         DB::purge('tenant');
+    //         DB::reconnect('tenant');
+    //     }
+    // }
 
     protected static function booted()
     {
