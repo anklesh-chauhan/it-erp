@@ -15,7 +15,7 @@ class TenantUser extends Authenticatable
 
     protected $connection = 'tenant';
 
-    // protected $table = 'users';
+    protected $table = 'users';
 
     protected $guard_name = 'tenant';
 
