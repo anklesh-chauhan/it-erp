@@ -7,10 +7,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class TenantUser extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, UsesTenantConnection;
 
     protected $connection = 'tenant';
 
