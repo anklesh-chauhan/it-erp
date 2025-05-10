@@ -18,31 +18,31 @@ class LeadPolicy
 
     public function view(User|TenantUser $user, Lead $lead): bool
     {
-        return $user->hasPermissionTo('view_lead') && $user->hasAnyRole(['admin', 'general_manager', 'marketing_manager']);
+        return $user->hasPermissionTo('view_lead');
     }
 
     public function create(User|TenantUser $user): bool
     {
-        return $user->hasPermissionTo('create_lead') && $user->hasAnyRole(['admin', 'general_manager', 'marketing_manager']);
+        return $user->hasPermissionTo('create_lead');
     }
 
     public function update(User|TenantUser $user, Lead $lead): bool
     {
-        return $user->hasPermissionTo('update_lead') && $user->hasAnyRole(['admin', 'general_manager', 'marketing_manager']);
+        return $user->hasPermissionTo('update_lead');
     }
 
     public function delete(User|TenantUser $user, Lead $lead): bool
     {
-        return $user->hasPermissionTo('delete_lead') && $user->hasAnyRole(['admin', 'general_manager', 'marketing_manager']);
+        return $user->hasPermissionTo('delete_lead');
     }
 
     public function restore(User|TenantUser $user, Lead $lead): bool
     {
-        return $user->hasPermissionTo('restore_lead') && $user->hasAnyRole(['admin', 'general_manager', 'marketing_manager']);
+        return $user->hasPermissionTo('restore_lead');
     }
 
     public function forceDelete(User|TenantUser $user, Lead $lead): bool
     {
-        return $user->hasPermissionTo('force_delete_lead') && $user->hasAnyRole(['admin', 'general_manager', 'marketing_manager']);
+        return $user->hasPermissionTo('force_delete_lead');
     }
 }
