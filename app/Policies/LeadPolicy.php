@@ -13,7 +13,7 @@ class LeadPolicy
 
     public function viewAny(User|TenantUser $user): bool
     {
-        return $user->hasPermissionTo('view_any_lead') && $user->hasAnyRole(['admin', 'general_manager', 'marketing_manager']);
+        return $user->hasPermissionTo('view_any_lead') && $user->hasAnyRole(['super-admin','admin', 'general_manager', 'marketing_manager']);
     }
 
     public function view(User|TenantUser $user, Lead $lead): bool
