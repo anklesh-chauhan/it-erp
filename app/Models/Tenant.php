@@ -9,9 +9,22 @@ use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Seeder;
 use Database\Seeders\DatabaseSeeder;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class Tenant extends BaseTenant
 {
+    use UsesTenantConnection;
+
+    public function getDatabaseName(): string
+    {
+        return $this->database;
+    }
+
+    public function getConnectionName(): ?string
+    {
+        return 'tenant';
+    }
+
     protected $fillable = ['name', 'domain', 'database'];
 
     // public function users()
