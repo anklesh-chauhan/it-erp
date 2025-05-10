@@ -87,6 +87,7 @@ return [
      * Your custom action should always extend the default one.
      */
     'actions' => [
+        'make_tenant_current_action' => \App\Tasks\CustomSwitchTenantDatabaseTask::class,
         'make_tenant_current_action' => MakeTenantCurrentAction::class,
         'forget_current_tenant_action' => ForgetCurrentTenantAction::class,
         'make_queue_tenant_aware_action' => MakeQueueTenantAwareAction::class,
