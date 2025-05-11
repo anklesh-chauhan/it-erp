@@ -21,6 +21,10 @@ class IdentifyTenant
 
         \Illuminate\Support\Facades\Log::info("Querying tenants table on mysql connection");
         $tenant = Tenant::on('mysql')->where('domain', $host)->first();
+        \Illuminate\Support\Facades\Log::info("Tenant query executed", [
+            'host' => $host,
+            'tenant' => $tenant ? $tenant->toArray() : null,
+        ]);
 
         if ($tenant) {
             \Illuminate\Support\Facades\Log::info("Tenant identified: {$tenant->id} - {$host}", [

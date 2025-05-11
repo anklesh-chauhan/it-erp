@@ -26,6 +26,17 @@ class Tenant extends BaseTenant
         return 'tenant';
     }
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('landlord', function ($builder) {
+            if (! \Spatie\Multitenancy\Models\Tenant::current()) {
+                $builder->getQuery()->connection = DB::connection('mysql')->getName();
+            }
+        });
+    }
+
     protected static function booted()
     {
         static::creating(function ($tenant) {
