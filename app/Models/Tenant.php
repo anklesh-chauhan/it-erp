@@ -26,15 +26,10 @@ class Tenant extends BaseTenant
         return 'tenant';
     }
 
-    public static function boot()
+    // Use mysql connection for landlord queries
+    public static function findByDomain(string $domain): ?self
     {
-        parent::boot();
-
-        static::addGlobalScope('landlord', function ($builder) {
-            if (! \Spatie\Multitenancy\Models\Tenant::current()) {
-                $builder->getQuery()->connection = DB::connection('mysql')->getName();
-            }
-        });
+        return static::on('mysql')->where('domain', $domain)->first();
     }
 
     protected static function booted()
