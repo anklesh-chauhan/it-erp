@@ -31,7 +31,6 @@ use App\Models\Lead;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use App\Filament\Widgets\CurrentDatabase;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -42,16 +41,8 @@ class AdminPanelProvider extends PanelProvider
             Js::make('sidebar-js', asset('js/sidebar.js')),             // Sidebar JavaScript
         ], true); // ✅ Use `isGlobal` to load for all panels
 
-        \Illuminate\Support\Facades\DB::enableQueryLog();
-        \Illuminate\Support\Facades\Log::debug('Starting landlord panel configuration');
-
-        $queries = \Illuminate\Support\Facades\DB::getQueryLog();
-        \Illuminate\Support\Facades\Log::debug('SQL Queries for landlord panel:', $queries);
-        \Illuminate\Support\Facades\DB::disableQueryLog();
-
         return $panel
             ->default()
-            ->brandName('CRM')
             ->globalSearch(true)
             ->globalSearchKeyBindings(['command + k', 'ctrl + k'])
             ->globalSearchDebounce(500) // ✅ Debounce search requests
@@ -65,9 +56,6 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Dashboard::class,
-            ])
-            ->widgets([
-                CurrentDatabase::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->resources([
@@ -135,9 +123,6 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook('panels::body.end', fn () => '</div>')
             ->plugins([
                 FilamentShieldPlugin::make(),
-            ])
-            ;
-
-
+            ]);
     }
 }
