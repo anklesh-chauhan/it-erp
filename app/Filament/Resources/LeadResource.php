@@ -62,7 +62,7 @@ class LeadResource extends Resource
         return true;
     }
 
-    public static function createLad(): bool
+    public static function createLead(): bool
     {
         return true;
     }
