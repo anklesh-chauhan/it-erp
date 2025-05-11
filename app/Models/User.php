@@ -47,4 +47,16 @@ class User extends Authenticatable
         ];
     }
 
+    public function getConnectionName()
+    {
+        return \Spatie\Multitenancy\Models\Tenant::current() ? 'tenant' : 'mysql';
+    }
+
+    protected $guarded = [];
+
+    public function getGuardName()
+    {
+        return \Spatie\Multitenancy\Models\Tenant::current() ? 'tenant' : 'web';
+    }
+
 }
