@@ -44,6 +44,7 @@ class AdminPanelProvider extends PanelProvider
 
         return $panel
             ->default()
+            ->brandName('CRM')
             ->globalSearch(true)
             ->globalSearchKeyBindings(['command + k', 'ctrl + k'])
             ->globalSearchDebounce(500) // ✅ Debounce search requests
