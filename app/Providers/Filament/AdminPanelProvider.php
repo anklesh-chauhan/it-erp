@@ -42,6 +42,13 @@ class AdminPanelProvider extends PanelProvider
             Js::make('sidebar-js', asset('js/sidebar.js')),             // Sidebar JavaScript
         ], true); // ✅ Use `isGlobal` to load for all panels
 
+        \Illuminate\Support\Facades\DB::enableQueryLog();
+        \Illuminate\Support\Facades\Log::debug('Starting landlord panel configuration');
+
+        $queries = \Illuminate\Support\Facades\DB::getQueryLog();
+        \Illuminate\Support\Facades\Log::debug('SQL Queries for landlord panel:', $queries);
+        \Illuminate\Support\Facades\DB::disableQueryLog();
+
         return $panel
             ->default()
             ->brandName('CRM')
@@ -130,5 +137,7 @@ class AdminPanelProvider extends PanelProvider
                 FilamentShieldPlugin::make(),
             ])
             ;
+
+
     }
 }
