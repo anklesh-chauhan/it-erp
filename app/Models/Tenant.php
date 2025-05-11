@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Seeder;
 use Database\Seeders\DatabaseSeeder;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
+use App\Jobs\ManageCloudflareCname;
 
 class Tenant extends BaseTenant
 {
@@ -129,9 +130,25 @@ class Tenant extends BaseTenant
                 // Switch back to the landlord context
                 $tenant->forgetCurrent();
                 Log::info("Tenant context cleared for: {$tenant->name}");
+
+                // Dispatch job to create CNAME record in Cloudflare
+                ManageCloudflareCname::dispatch($tenant, 'create');
+                Log::info("Dispatched Cloudflare CNAME creation job for tenant: {$tenant->name}");
             } catch (\Exception $e) {
                 Log::error("Error processing tenant {$tenant->name}: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
                 throw $e; // Re-throw to halt seeding if critical
+            }
+        });
+
+        static::updating(function ($tenant) {
+            if ($tenant->isDirty('domain')) {
+                $oldDomain = $tenant->getOriginal('domain');
+                $newDomain = $tenant->domain;
+                Log::info("Tenant domain changing from {$oldDomain} to {$newDomain}");
+
+                // Dispatch job to update CNAME record in Cloudflare
+                ManageCloudflareCname::dispatch($tenant, 'update', $oldDomain);
+                Log::info("Dispatched Cloudflare CNAME update job for tenant: {$tenant->name}");
             }
         });
 
@@ -148,11 +165,18 @@ class Tenant extends BaseTenant
 
                 // Log the domain change
                 Log::info("Tenant domain changed from {$oldDomain} to {$newDomain}");
+
+                // Dispatch job to update CNAME record in Cloudflare
+                ManageCloudflareCname::dispatch($tenant, 'update', $oldDomain);
+                Log::info("Dispatched Cloudflare CNAME update job for tenant: {$tenant->name}");
             }
         });
         static::deleted(function ($tenant) {
             // Perform any additional cleanup if needed
             Log::info("Tenant {$tenant->name} deleted.");
+            // Dispatch job to delete CNAME record in Cloudflare
+            ManageCloudflareCname::dispatch($tenant, 'delete');
+            Log::info("Dispatched Cloudflare CNAME deletion job for tenant: {$tenant->name}");
         });
     }
 }
