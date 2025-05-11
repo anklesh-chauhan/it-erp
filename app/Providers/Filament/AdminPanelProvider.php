@@ -121,6 +121,7 @@ class AdminPanelProvider extends PanelProvider
                 return '<div id="main-content" style="transition: margin-right 0.3s; margin-right: 0;">';
             })
             ->renderHook('panels::body.end', fn () => '</div>')
+            ->authGuard('web')
             ->plugins([
                 FilamentShieldPlugin::make(),
             ]);
