@@ -35,7 +35,7 @@ return [
      */
     'switch_tenant_tasks' => [
         // \Spatie\Multitenancy\Tasks\PrefixCacheTask::class,
-        // \App\Tasks\CustomSwitchTenantDatabaseTask::class,
+        \App\Tasks\CustomSwitchTenantDatabaseTask::class,
         // \Spatie\Multitenancy\Tasks\SwitchTenantDatabaseTask::class,
         // \Spatie\Multitenancy\Tasks\SwitchRouteCacheTask::class,
     ],
@@ -88,7 +88,7 @@ return [
      * Your custom action should always extend the default one.
      */
     'actions' => [
-        // 'make_tenant_current_action' => \App\Tasks\CustomSwitchTenantDatabaseTask::class,
+        'make_tenant_current_action' => \App\Tasks\CustomSwitchTenantDatabaseTask::class,
         'make_tenant_current_action' => MakeTenantCurrentAction::class,
         'forget_current_tenant_action' => ForgetCurrentTenantAction::class,
         'make_queue_tenant_aware_action' => MakeQueueTenantAwareAction::class,
