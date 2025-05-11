@@ -34,18 +34,6 @@ class Tenant extends BaseTenant
             $tenant->database = 'tenant_' . uniqid();
         });
 
-        // static::created(function ($tenant) {
-        //     DB::statement("CREATE DATABASE {$tenant->database}");
-
-        //     config(['database.connections.tenant.database' => $tenant->database]);
-
-        //     Artisan::call('migrate', [
-        //         '--database' => 'tenant',
-        //         '--path' => 'database/migrations',
-        //         '--force' => true,
-        //     ]);
-        // });
-
         static::created(function ($tenant) {
             Log::info("Tenant created: {$tenant->name}, database: {$tenant->database}");
 
