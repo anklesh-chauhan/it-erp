@@ -62,6 +62,11 @@ class LeadResource extends Resource
         return true;
     }
 
+    public static function createLad(): bool
+    {
+        return true;
+    }
+
 
     public static function form(Form $form): Form
     {
