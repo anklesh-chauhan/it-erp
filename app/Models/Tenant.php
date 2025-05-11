@@ -26,18 +26,6 @@ class Tenant extends BaseTenant
         return 'tenant';
     }
 
-    // Override to use mysql connection for landlord queries
-    public static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope('landlord', function ($builder) {
-            if (! \Spatie\Multitenancy\Models\Tenant::current()) {
-                $builder->setConnection('mysql');
-            }
-        });
-    }
-
     protected static function booted()
     {
         static::creating(function ($tenant) {
