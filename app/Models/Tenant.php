@@ -26,21 +26,7 @@ class Tenant extends BaseTenant
         return 'tenant';
     }
 
-    protected $fillable = ['name', 'domain', 'database'];
-
-    // public function users()
-    // {
-    //     return $this->hasMany(TenantUser::class, 'tenant_id');
-    // }
-
-    // public function configure()
-    // {
-    //     if ($this->database) {
-    //         config(['database.connections.tenant.database' => $this->database]);
-    //         DB::purge('tenant');
-    //         DB::reconnect('tenant');
-    //     }
-    // }
+    protected $fillable = ['name', 'domain', 'database', 'cloudflare_record_id'];
 
     protected static function booted()
     {
