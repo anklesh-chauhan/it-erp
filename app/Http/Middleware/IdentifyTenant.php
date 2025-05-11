@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Spatie\Multitenancy\Models\Tenant;
-use Illuminate\Support\Facades\Log;
+use App\Models\Tenant;
 use Illuminate\Support\Facades\DB;
 
 class IdentifyTenant
@@ -13,23 +11,32 @@ class IdentifyTenant
     public function handle(Request $request, Closure $next)
     {
         $host = $request->getHost();
-        Log::info("Request Host: {$host}");
+        \Illuminate\Support\Facades\Log::info("Processing host: {$host}");
 
-        if ($host === 'crm.local') {
-            Log::info("Skipping tenant identification for landlord domain.");
+        if ($host === 'iterp.in') {
+            \Illuminate\Support\Facades\Log::info('Skipping tenant identification for landlord domain: iterp.in');
+            DB::setDefaultConnection('mysql');
             return $next($request);
         }
 
-        $tenant = Tenant::where('domain', $host)->first();
+        \Illuminate\Support\Facades\Log::info("Querying tenants table on mysql connection");
+        $tenant = Tenant::on('mysql')->where('domain', $host)->first();
 
-        if (! $tenant) {
-            Log::error("Tenant not found for domain: {$host}");
+        if ($tenant) {
+            \Illuminate\Support\Facades\Log::info("Tenant identified: {$tenant->id} - {$host}", [
+                'tenantId' => $tenant->id,
+                'database' => $tenant->database,
+            ]);
+            config(['database.connections.tenant.database' => $tenant->database]);
+            DB::purge('tenant');
+            DB::setDefaultConnection('tenant');
+            \Illuminate\Support\Facades\Log::info("Switching to tenant database: {$tenant->database}");
+            // Set tenant as current for Spatie Multitenancy
+            $tenant->makeCurrent();
+        } else {
+            \Illuminate\Support\Facades\Log::error("No tenant found for domain: {$host}");
             abort(404, 'Tenant not found');
         }
-
-        Log::info("Tenant identified: {$tenant->id} - {$tenant->domain}");
-        $tenant->makeCurrent();
-        Log::info("Current database connection:" . \Illuminate\Support\Facades\DB::getDefaultConnection());
 
         return $next($request);
     }
