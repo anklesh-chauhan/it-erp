@@ -21,10 +21,10 @@ class Tenant extends BaseTenant
         return $this->database;
     }
 
-    public function getConnectionName(): ?string
-    {
-        return 'tenant';
-    }
+    // public function getConnectionName(): ?string
+    // {
+    //     return 'tenant';
+    // }
 
     protected $fillable = ['name', 'domain', 'database', 'cloudflare_record_id'];
 
