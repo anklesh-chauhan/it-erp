@@ -14,7 +14,7 @@ use App\Jobs\ManageCloudflareCname;
 
 class Tenant extends BaseTenant
 {
-    use UsesTenantConnection;
+    // use UsesTenantConnection;
 
     public function getDatabaseName(): string
     {
