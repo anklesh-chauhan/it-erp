@@ -67,18 +67,6 @@ class Tenant extends BaseTenant
                 $tableExists = DB::connection('tenant')->getSchemaBuilder()->hasTable('permissions');
                 Log::info("Permissions table exists in tenant database: " . ($tableExists ? 'Yes' : 'No'));
 
-                // Copy permissions from the current (landlord) database
-                $mainPermissions = Permission::get()->map(function ($permission) {
-                    return [
-                        'name' => $permission->name,
-                        'guard_name' => 'tenant',
-                        'created_at' => $permission->created_at ?: now(),
-                        'updated_at' => $permission->updated_at ?: now(),
-                    ];
-                })->toArray();
-
-                Log::info("Fetched permissions from landlord database");
-
                 // Copy permissions from landlord database
                 $mainPermissions = \Spatie\Permission\Models\Permission::get()->map(function ($permission) {
                     return [
@@ -138,13 +126,15 @@ class Tenant extends BaseTenant
 
                 app('db')->setDefaultConnection(config('database.default'));
 
+                // Dispatch job to create CNAME record in Cloudflare
+                ManageCloudflareCname::dispatch($tenant, 'create');
+                Log::info("Dispatched Cloudflare CNAME creation job for tenant: {$tenant->name}");
+
                 // Switch back to the landlord context
                 $tenant->forgetCurrent();
                 Log::info("Tenant context cleared for: {$tenant->name}");
 
-                // Dispatch job to create CNAME record in Cloudflare
-                ManageCloudflareCname::dispatch($tenant, 'create');
-                Log::info("Dispatched Cloudflare CNAME creation job for tenant: {$tenant->name}");
+
             } catch (\Exception $e) {
                 Log::error("Error processing tenant {$tenant->name}: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
                 throw $e; // Re-throw to halt seeding if critical
