@@ -54,7 +54,7 @@ return [
 
         'tenants' => [ // Ensure this provider exists
             'driver' => 'eloquent',
-            'model' => App\Models\TenantUser::class, // Update with your tenant user model
+            'model' => App\Models\User::class, // Update with your tenant user model
         ],
 
         // 'users' => [
