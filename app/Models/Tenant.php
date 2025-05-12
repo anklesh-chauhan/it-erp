@@ -79,7 +79,16 @@ class Tenant extends BaseTenant
 
                 Log::info("Fetched permissions from landlord database");
 
-                // Insert permissions into the tenant database using bulk insert
+                // Copy permissions from landlord database
+                $mainPermissions = \Spatie\Permission\Models\Permission::get()->map(function ($permission) {
+                    return [
+                        'name' => $permission->name,
+                        'guard_name' => 'tenant',
+                        'created_at' => $permission->created_at ?: now(),
+                        'updated_at' => $permission->updated_at ?: now(),
+                    ];
+                })->toArray();
+
                 if (!empty($mainPermissions)) {
                     DB::connection('tenant')->table('permissions')->insertOrIgnore($mainPermissions);
                     Log::info("Inserted permissions for tenant: {$tenant->name}, count: " . count($mainPermissions));
@@ -87,19 +96,47 @@ class Tenant extends BaseTenant
                     Log::warning("No permissions found in landlord database to copy for tenant: {$tenant->name}");
                 }
 
-                // Verify inserted permissions
-                $insertedCount = DB::connection('tenant')->table('permissions')->count();
-                Log::info("Total permissions in tenant database after insert: {$insertedCount}");
+                // ⬇️ New: Copy roles and their permissions
+                $landlordRoles = \Spatie\Permission\Models\Role::with('permissions')->get();
+                foreach ($landlordRoles as $role) {
+                    // Create role in tenant DB
+                    DB::connection('tenant')->table('roles')->insertOrIgnore([
+                        'name' => $role->name,
+                        'guard_name' => 'tenant',
+                        'created_at' => $role->created_at ?: now(),
+                        'updated_at' => $role->updated_at ?: now(),
+                    ]);
+
+                    // Attach permissions to roles
+                    foreach ($role->permissions as $perm) {
+                        // Get IDs from tenant DB
+                        $permissionId = DB::connection('tenant')->table('permissions')
+                            ->where('name', $perm->name)
+                            ->value('id');
+
+                        $roleId = DB::connection('tenant')->table('roles')
+                            ->where('name', $role->name)
+                            ->value('id');
+
+                        if ($permissionId && $roleId) {
+                            DB::connection('tenant')->table('role_has_permissions')->insertOrIgnore([
+                                'permission_id' => $permissionId,
+                                'role_id' => $roleId,
+                            ]);
+                        }
+                    }
+                }
+                Log::info("Roles and their permissions synced for tenant: {$tenant->name}");
 
                  // ✅ Run tenant seeder programmatically (not Artisan)
-                 app('db')->setDefaultConnection('tenant');
-                 $seeder = new \Database\Seeders\DatabaseSeeder();
-                 $seeder->run();
-                 Log::info("Seeded tenant database for: {$tenant->name}");
+                app('db')->setDefaultConnection('tenant');
+                $seeder = new \Database\Seeders\DatabaseSeeder();
+                $seeder->run();
+                Log::info("Seeded tenant database for: {$tenant->name}");
 
                  // Restore landlord DB connection
 
-                 app('db')->setDefaultConnection(config('database.default'));
+                app('db')->setDefaultConnection(config('database.default'));
 
                 // Switch back to the landlord context
                 $tenant->forgetCurrent();
