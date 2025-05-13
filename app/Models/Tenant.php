@@ -135,57 +135,15 @@ class Tenant extends BaseTenant
                     Log::warning("No role_has_permissions records to copy for tenant: {$tenant->name}");
                 }
 
-                // Copy model_has_roles from landlord database (e.g., for users)
-                $landlordModelRoles = DB::connection('mysql')->table('model_has_roles')->get();
-                $tenantUsers = DB::connection('tenant')->table('users')->pluck('id')->toArray(); // Get tenant user IDs
+                // Insert specific model_has_roles record (role_id=1, model_type=App\Models\User, model_id=1)
 
-                $modelHasRoles = [];
-                foreach ($landlordModelRoles as $mr) {
-                    $roleName = DB::connection('mysql')->table('roles')->where('id', $mr->role_id)->value('name');
-                    $tenantRoleId = $tenantRolesMap[$roleName] ?? null;
+                DB::connection('tenant')->table('model_has_roles')->insertOrIgnore([
+                    'role_id' => 1,
+                    'model_type' => 'App\\Models\\User',
+                    'model_id' => 1,
+                ]);
+                Log::info("Inserted specific model_has_roles record for tenant: {$tenant->name} (role_id=1, model_id=1)");
 
-                    // Only copy roles for users that exist in the tenant database
-                    if ($tenantRoleId && in_array($mr->model_id, $tenantUsers) && $mr->model_type === 'App\\Models\\User') {
-                        $modelHasRoles[] = [
-                            'role_id' => $tenantRoleId,
-                            'model_id' => $mr->model_id,
-                            'model_type' => $mr->model_type,
-                        ];
-                    }
-                }
-
-                if (!empty($modelHasRoles)) {
-                    DB::connection('tenant')->table('model_has_roles')->insertOrIgnore($modelHasRoles);
-                    Log::info("Inserted model_has_roles for tenant: {$tenant->name}, count: " . count($modelHasRoles));
-                } else {
-                    Log::warning("No model_has_roles records to copy for tenant: {$tenant->name}");
-                }
-
-                // Insert specific model_has_roles record
-                try {
-                    $tenantUsers = DB::connection('tenant')->table('users')->pluck('id')->toArray();
-                    $tenantRoles = DB::connection('tenant')->table('roles')->pluck('id')->toArray();
-
-                    if (in_array(1, $tenantUsers) && in_array(1, $tenantRoles)) {
-                        DB::connection('tenant')->table('model_has_roles')->insertOrIgnore([
-                            'role_id' => 1,
-                            'model_type' => 'App\\Models\\User',
-                            'model_id' => 1,
-                        ]);
-                        Log::info("Inserted specific model_has_roles record for tenant: {$tenant->name} (role_id=1, model_id=1)");
-                    } else {
-                        Log::warning("Could not insert specific model_has_roles record for tenant: {$tenant->name}", [
-                            'user_exists' => in_array(1, $tenantUsers) ? 'Yes' : 'No',
-                            'role_exists' => in_array(1, $tenantRoles) ? 'Yes' : 'No',
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    Log::error("Failed to insert specific model_has_roles record for tenant: {$tenant->name}", [
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                    ]);
-                    throw $e;
-                }
 
                  // ✅ Run tenant seeder programmatically (not Artisan)
                 app('db')->setDefaultConnection('tenant');
