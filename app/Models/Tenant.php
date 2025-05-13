@@ -68,7 +68,7 @@ class Tenant extends BaseTenant
                 Log::info("Permissions table exists in tenant database: " . ($tableExists ? 'Yes' : 'No'));
 
                 // Copy permissions from landlord database
-                $mainPermissions = \Spatie\Permission\Models\Permission::get()->map(function ($permission) {
+                $mainPermissions = Permission::on('mysql')->get()->map(function ($permission) {
                     return [
                         'name' => $permission->name,
                         'guard_name' => 'tenant',
