@@ -88,7 +88,7 @@ class Tenant extends BaseTenant
                 }
 
                 // Copy roles from landlord database
-                $landlordRoles = Role::on('mysql')->get()->map(function ($role) {
+                $landlordRoles = Role::on('mysql')->withoutGlobalScopes()->get()->map(function ($role) {
                     return [
                         'name' => $role->name,
                         'guard_name' => 'tenant',
