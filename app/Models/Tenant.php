@@ -81,40 +81,85 @@ class Tenant extends BaseTenant
                     DB::connection('tenant')->table('permissions')->insertOrIgnore($mainPermissions);
                     Log::info("Inserted permissions for tenant: {$tenant->name}, count: " . count($mainPermissions));
                 } else {
-                    Log::warning("No permissions found in landlord database to copy for tenant: {$tenant->name}");
+                    Log::warning("No permissions found in landlord database to copy for tenant: {$tenant->name}", [
+                        'connection' => config('database.default'),
+                        'database' => DB::connection()->getDatabaseName(),
+                    ]);
                 }
 
-                // ⬇️ New: Copy roles and their permissions
-                $landlordRoles = \Spatie\Permission\Models\Role::with('permissions')->get();
-                foreach ($landlordRoles as $role) {
-                    // Create role in tenant DB
-                    DB::connection('tenant')->table('roles')->insertOrIgnore([
+                // Copy roles from landlord database
+                $landlordRoles = Role::on('mysql')->get()->map(function ($role) {
+                    return [
                         'name' => $role->name,
                         'guard_name' => 'tenant',
                         'created_at' => $role->created_at ?: now(),
                         'updated_at' => $role->updated_at ?: now(),
+                    ];
+                })->toArray();
+
+                if (!empty($landlordRoles)) {
+                    DB::connection('tenant')->table('roles')->insertOrIgnore($landlordRoles);
+                    Log::info("Inserted roles for tenant: {$tenant->name}, count: " . count($landlordRoles));
+                } else {
+                    Log::warning("No roles found in landlord database to copy for tenant: {$tenant->name}", [
+                        'connection' => config('database.default'),
+                        'database' => DB::connection()->getDatabaseName(),
                     ]);
+                }
 
-                    // Attach permissions to roles
-                    foreach ($role->permissions as $perm) {
-                        // Get IDs from tenant DB
-                        $permissionId = DB::connection('tenant')->table('permissions')
-                            ->where('name', $perm->name)
-                            ->value('id');
+                // Copy role_has_permissions from landlord database
+                $landlordRolePermissions = DB::connection('mysql')->table('role_has_permissions')->get();
+                $tenantPermissionsMap = DB::connection('tenant')->table('permissions')->pluck('id', 'name')->toArray();
+                $tenantRolesMap = DB::connection('tenant')->table('roles')->pluck('id', 'name')->toArray();
 
-                        $roleId = DB::connection('tenant')->table('roles')
-                            ->where('name', $role->name)
-                            ->value('id');
+                $roleHasPermissions = [];
+                foreach ($landlordRolePermissions as $rp) {
+                    $permissionName = DB::connection('mysql')->table('permissions')->where('id', $rp->permission_id)->value('name');
+                    $roleName = DB::connection('mysql')->table('roles')->where('id', $rp->role_id)->value('name');
 
-                        if ($permissionId && $roleId) {
-                            DB::connection('tenant')->table('role_has_permissions')->insertOrIgnore([
-                                'permission_id' => $permissionId,
-                                'role_id' => $roleId,
-                            ]);
-                        }
+                    $tenantPermissionId = $tenantPermissionsMap[$permissionName] ?? null;
+                    $tenantRoleId = $tenantRolesMap[$roleName] ?? null;
+
+                    if ($tenantPermissionId && $tenantRoleId) {
+                        $roleHasPermissions[] = [
+                            'permission_id' => $tenantPermissionId,
+                            'role_id' => $tenantRoleId,
+                        ];
                     }
                 }
-                Log::info("Roles and their permissions synced for tenant: {$tenant->name}");
+
+                if (!empty($roleHasPermissions)) {
+                    DB::connection('tenant')->table('role_has_permissions')->insertOrIgnore($roleHasPermissions);
+                    Log::info("Inserted role_has_permissions for tenant: {$tenant->name}, count: " . count($roleHasPermissions));
+                } else {
+                    Log::warning("No role_has_permissions records to copy for tenant: {$tenant->name}");
+                }
+
+                // Copy model_has_roles from landlord database (e.g., for users)
+                $landlordModelRoles = DB::connection('mysql')->table('model_has_roles')->get();
+                $tenantUsers = DB::connection('tenant')->table('users')->pluck('id')->toArray(); // Get tenant user IDs
+
+                $modelHasRoles = [];
+                foreach ($landlordModelRoles as $mr) {
+                    $roleName = DB::connection('mysql')->table('roles')->where('id', $mr->role_id)->value('name');
+                    $tenantRoleId = $tenantRolesMap[$roleName] ?? null;
+
+                    // Only copy roles for users that exist in the tenant database
+                    if ($tenantRoleId && in_array($mr->model_id, $tenantUsers) && $mr->model_type === 'App\\Models\\User') {
+                        $modelHasRoles[] = [
+                            'role_id' => $tenantRoleId,
+                            'model_id' => $mr->model_id,
+                            'model_type' => $mr->model_type,
+                        ];
+                    }
+                }
+
+                if (!empty($modelHasRoles)) {
+                    DB::connection('tenant')->table('model_has_roles')->insertOrIgnore($modelHasRoles);
+                    Log::info("Inserted model_has_roles for tenant: {$tenant->name}, count: " . count($modelHasRoles));
+                } else {
+                    Log::warning("No model_has_roles records to copy for tenant: {$tenant->name}");
+                }
 
                  // ✅ Run tenant seeder programmatically (not Artisan)
                 app('db')->setDefaultConnection('tenant');
