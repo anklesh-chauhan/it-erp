@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\TenantUser;
 use App\Models\ItemBrand;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -14,7 +13,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User|TenantUser $user): bool
+    public function viewAny(User $user): bool
     {
         return $user->can('view_any_item::brand');
     }
@@ -22,7 +21,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User|TenantUser $user, ItemBrand $itemBrand): bool
+    public function view(User $user, ItemBrand $itemBrand): bool
     {
         return $user->can('view_item::brand');
     }
@@ -30,7 +29,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User|TenantUser $user): bool
+    public function create(User $user): bool
     {
         return $user->can('create_item::brand');
     }
@@ -38,7 +37,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User|TenantUser $user, ItemBrand $itemBrand): bool
+    public function update(User $user, ItemBrand $itemBrand): bool
     {
         return $user->can('update_item::brand');
     }
@@ -46,7 +45,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User|TenantUser $user, ItemBrand $itemBrand): bool
+    public function delete(User $user, ItemBrand $itemBrand): bool
     {
         return $user->can('delete_item::brand');
     }
@@ -54,7 +53,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can bulk delete.
      */
-    public function deleteAny(User|TenantUser $user): bool
+    public function deleteAny(User $user): bool
     {
         return $user->can('delete_any_item::brand');
     }
@@ -62,7 +61,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User|TenantUser $user, ItemBrand $itemBrand): bool
+    public function forceDelete(User $user, ItemBrand $itemBrand): bool
     {
         return $user->can('force_delete_item::brand');
     }
@@ -70,7 +69,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can permanently bulk delete.
      */
-    public function forceDeleteAny(User|TenantUser $user): bool
+    public function forceDeleteAny(User $user): bool
     {
         return $user->can('force_delete_any_item::brand');
     }
@@ -78,7 +77,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User|TenantUser $user, ItemBrand $itemBrand): bool
+    public function restore(User $user, ItemBrand $itemBrand): bool
     {
         return $user->can('restore_item::brand');
     }
@@ -86,7 +85,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can bulk restore.
      */
-    public function restoreAny(User|TenantUser $user): bool
+    public function restoreAny(User $user): bool
     {
         return $user->can('restore_any_item::brand');
     }
@@ -94,7 +93,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User|TenantUser $user, ItemBrand $itemBrand): bool
+    public function replicate(User $user, ItemBrand $itemBrand): bool
     {
         return $user->can('replicate_item::brand');
     }
@@ -102,7 +101,7 @@ class ItemBrandPolicy
     /**
      * Determine whether the user can reorder.
      */
-    public function reorder(User|TenantUser $user): bool
+    public function reorder(User $user): bool
     {
         return $user->can('reorder_item::brand');
     }

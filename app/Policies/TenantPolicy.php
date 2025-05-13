@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\TenantUser;
 use App\Models\Tenant;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -94,7 +93,7 @@ class TenantPolicy
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User|TenantUser $user, Tenant $tenant): bool
+    public function replicate(User $user, Tenant $tenant): bool
     {
         return $user->can('replicate_tenant');
     }
@@ -102,7 +101,7 @@ class TenantPolicy
     /**
      * Determine whether the user can reorder.
      */
-    public function reorder(User|TenantUser $user): bool
+    public function reorder(User $user): bool
     {
         return $user->can('reorder_tenant');
     }

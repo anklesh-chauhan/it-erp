@@ -2,47 +2,107 @@
 
 namespace App\Policies;
 
-use App\Models\Lead;
 use App\Models\User;
-use App\Models\TenantUser;
+use App\Models\Lead;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class LeadPolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny(User|TenantUser $user): bool
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('view_any_lead');
+        return $user->can('view_any_lead');
     }
 
-    public function view(User|TenantUser $user, Lead $lead): bool
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user, Lead $lead): bool
     {
-        return $user->hasPermissionTo('view_lead');
+        return $user->can('view_lead');
     }
 
-    public function create(User|TenantUser $user): bool
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create_lead');
+        return $user->can('create_lead');
     }
 
-    public function update(User|TenantUser $user, Lead $lead): bool
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, Lead $lead): bool
     {
-        return $user->hasPermissionTo('update_lead');
+        return $user->can('update_lead');
     }
 
-    public function delete(User|TenantUser $user, Lead $lead): bool
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, Lead $lead): bool
     {
-        return $user->hasPermissionTo('delete_lead');
+        return $user->can('delete_lead');
     }
 
-    public function restore(User|TenantUser $user, Lead $lead): bool
+    /**
+     * Determine whether the user can bulk delete.
+     */
+    public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('restore_lead');
+        return $user->can('delete_any_lead');
     }
 
-    public function forceDelete(User|TenantUser $user, Lead $lead): bool
+    /**
+     * Determine whether the user can permanently delete.
+     */
+    public function forceDelete(User $user, Lead $lead): bool
     {
-        return $user->hasPermissionTo('force_delete_lead');
+        return $user->can('force_delete_lead');
+    }
+
+    /**
+     * Determine whether the user can permanently bulk delete.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->can('force_delete_any_lead');
+    }
+
+    /**
+     * Determine whether the user can restore.
+     */
+    public function restore(User $user, Lead $lead): bool
+    {
+        return $user->can('restore_lead');
+    }
+
+    /**
+     * Determine whether the user can bulk restore.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->can('restore_any_lead');
+    }
+
+    /**
+     * Determine whether the user can replicate.
+     */
+    public function replicate(User $user, Lead $lead): bool
+    {
+        return $user->can('replicate_lead');
+    }
+
+    /**
+     * Determine whether the user can reorder.
+     */
+    public function reorder(User $user): bool
+    {
+        return $user->can('reorder_lead');
     }
 }
