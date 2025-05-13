@@ -135,7 +135,15 @@ class Tenant extends BaseTenant
                     Log::warning("No role_has_permissions records to copy for tenant: {$tenant->name}");
                 }
 
-                // Insert specific model_has_roles record (role_id=1, model_type=App\Models\User, model_id=1)
+                 // ✅ Run tenant seeder programmatically (not Artisan)
+                app('db')->setDefaultConnection('tenant');
+                $seeder = new \Database\Seeders\DatabaseSeeder();
+                $seeder->run();
+                Log::info("Seeded tenant database for: {$tenant->name}");
+
+                 // Restore landlord DB connection
+
+                 // Insert specific model_has_roles record (role_id=1, model_type=App\Models\User, model_id=1)
 
                 DB::connection('tenant')->table('model_has_roles')->insertOrIgnore([
                     'role_id' => 1,
@@ -144,14 +152,6 @@ class Tenant extends BaseTenant
                 ]);
                 Log::info("Inserted specific model_has_roles record for tenant: {$tenant->name} (role_id=1, model_id=1)");
 
-
-                 // ✅ Run tenant seeder programmatically (not Artisan)
-                app('db')->setDefaultConnection('tenant');
-                $seeder = new \Database\Seeders\DatabaseSeeder();
-                $seeder->run();
-                Log::info("Seeded tenant database for: {$tenant->name}");
-
-                 // Restore landlord DB connection
 
                 app('db')->setDefaultConnection(config('database.default'));
 
