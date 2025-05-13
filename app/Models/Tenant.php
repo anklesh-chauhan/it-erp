@@ -161,23 +161,30 @@ class Tenant extends BaseTenant
                     Log::warning("No model_has_roles records to copy for tenant: {$tenant->name}");
                 }
 
-                // Copy model_has_roles from landlord database (optional) and insert specific record
-                $tenantUsers = DB::connection('tenant')->table('users')->pluck('id')->toArray();
-                $tenantRoles = DB::connection('tenant')->table('roles')->pluck('id')->toArray();
+                // Insert specific model_has_roles record
+                try {
+                    $tenantUsers = DB::connection('tenant')->table('users')->pluck('id')->toArray();
+                    $tenantRoles = DB::connection('tenant')->table('roles')->pluck('id')->toArray();
 
-                // Insert specific model_has_roles record (role_id=1, model_type=App\Models\User, model_id=1)
-                if (in_array(1, $tenantUsers) && in_array(1, $tenantRoles)) {
-                    DB::connection('tenant')->table('model_has_roles')->insertOrIgnore([
-                        'role_id' => 1,
-                        'model_type' => 'App\\Models\\User',
-                        'model_id' => 1,
+                    if (in_array(1, $tenantUsers) && in_array(1, $tenantRoles)) {
+                        DB::connection('tenant')->table('model_has_roles')->insertOrIgnore([
+                            'role_id' => 1,
+                            'model_type' => 'App\\Models\\User',
+                            'model_id' => 1,
+                        ]);
+                        Log::info("Inserted specific model_has_roles record for tenant: {$tenant->name} (role_id=1, model_id=1)");
+                    } else {
+                        Log::warning("Could not insert specific model_has_roles record for tenant: {$tenant->name}", [
+                            'user_exists' => in_array(1, $tenantUsers) ? 'Yes' : 'No',
+                            'role_exists' => in_array(1, $tenantRoles) ? 'Yes' : 'No',
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Failed to insert specific model_has_roles record for tenant: {$tenant->name}", [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
                     ]);
-                    Log::info("Inserted specific model_has_roles record for tenant: {$tenant->name} (role_id=1, model_id=1)");
-                } else {
-                    Log::warning("Could not insert specific model_has_roles record for tenant: {$tenant->name}", [
-                        'user_exists' => in_array(1, $tenantUsers) ? 'Yes' : 'No',
-                        'role_exists' => in_array(1, $tenantRoles) ? 'Yes' : 'No',
-                    ]);
+                    throw $e;
                 }
 
                  // ✅ Run tenant seeder programmatically (not Artisan)
