@@ -139,7 +139,7 @@ class Tenant extends BaseTenant
 
                 DB::connection('tenant')->table('model_has_roles')->insertOrIgnore([
                     'role_id' => 1,
-                    'model_type' => 'App\\Models\\User',
+                    'model_type' => 'App\Models\User',
                     'model_id' => 1,
                 ]);
                 Log::info("Inserted specific model_has_roles record for tenant: {$tenant->name} (role_id=1, model_id=1)");
