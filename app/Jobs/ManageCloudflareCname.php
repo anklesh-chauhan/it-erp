@@ -31,7 +31,7 @@ class ManageCloudflareCname implements ShouldQueue
         $zoneId = env('CLOUDFLARE_ZONE_ID');
         $apiToken = env('CLOUDFLARE_API_TOKEN');
         $target = env('CLOUDFLARE_TARGET', 'iterp.in');
-        $baseDomain = env('APP_DOMAIN', 'iterp.in'); // Add APP_DOMAIN to .env for your base domain
+        $baseDomain = 'iterp.in'; // Add APP_DOMAIN to .env for your base domain
 
         try {
             $headers = [
