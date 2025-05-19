@@ -49,6 +49,7 @@ trait SalesDocumentResourceTrait
                     Forms\Components\Select::make('lead_id')
                         ->label('Lead')
                         ->relationship('lead', 'reference_code')
+                        ->preload()
                         ->searchable(),
                     Forms\Components\Select::make('sales_person_id')
                         ->label('Sales Person')
