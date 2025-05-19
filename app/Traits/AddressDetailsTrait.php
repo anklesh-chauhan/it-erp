@@ -58,8 +58,8 @@ trait AddressDetailsTrait
                                 ->nullable()
                                 ->live()
                                 ->createOptionForm([
-                                    Forms\Components\Hidden::make('contact_id')
-                                        ->default(fn (callable $get) => $get('contact_id')) // ✅ Auto-set `contact_id`
+                                    Forms\Components\Hidden::make('contact_detail_id')
+                                        ->default(fn (callable $get) => $get('contact_detail_id')) // ✅ Auto-set `contact_id`
                                         ->dehydrated(),
 
                                     Forms\Components\Hidden::make('company_id')
