@@ -166,7 +166,7 @@ trait SalesDocumentResourceTrait
                                     ->numeric()
                                     ->default(1)
                                     ->required()
-                                    ->live()
+                                    ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         self::updateItemAmount($set, $get);
                                         self::updateTotals($set, $get);
@@ -180,7 +180,7 @@ trait SalesDocumentResourceTrait
                                     ->formatStateUsing(fn ($state) => number_format($state, 2))
                                     ->dehydrateStateUsing(fn ($state) => round($state, 5))
                                     ->extraAttributes(['step' => '0.00001'])
-                                    ->live()
+                                    ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         self::updateItemAmount($set, $get);
                                         self::updateTotals($set, $get);
@@ -190,7 +190,7 @@ trait SalesDocumentResourceTrait
                                     ->label(false)
                                     ->numeric()
                                     ->default(0)
-                                    ->live()
+                                    ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         self::updateItemAmount($set, $get);
                                         self::updateTotals($set, $get);

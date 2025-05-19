@@ -52,8 +52,6 @@ class QuoteResource extends Resource
                 Forms\Components\DatePicker::make('accepted_at'),
 
             ]);
-
-            dd($form->getComponents());
     }
 
     public static function table(Table $table): Table
