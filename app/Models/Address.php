@@ -49,6 +49,11 @@ class Address extends Model
         return $this->morphTo();
     }
 
+    public function addressType()
+    {
+        return $this->belongsTo(\App\Models\TypeMaster::class, 'type_master_id');
+    }
+
     public function accountMasters()
     {
         return $this->belongsToMany(AccountMaster::class, 'account_master_address_details', 'address_id', 'account_master_id');
