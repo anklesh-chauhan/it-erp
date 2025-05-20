@@ -101,15 +101,16 @@ trait ContactDetailsTrait
                                                 ->required(),
 
                                             Forms\Components\TextInput::make('mobile_number')
-                                                ->tel()
                                                 ->required()
                                                 ->label('Primary Phone')
-                                                ->reactive() // ✅ Enables live updates
+                                                ->mask('+919999999999') // ✅ Mask for phone number
+                                                ->live(onBlur: true) // ✅ Enables live updates
                                                 ->debounce(1000)
                                                 ->afterStateUpdated(fn (callable $set, $state) => $set('whatsapp_number', $state)),
 
                                             Forms\Components\TextInput::make('alternate_phone')
-                                                ->tel()
+                                                ->mask('+919999999999')
+                                                ->nullable()
                                                 ->label('Alternate Phone'),
 
                                             ]),
