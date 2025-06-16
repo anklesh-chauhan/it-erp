@@ -100,6 +100,7 @@ trait SalesDocumentResourceTrait
                             ->relationship('items')
                             ->schema([
                                 Forms\Components\Grid::make(2)
+                                    ->extraAttributes(['class' => 'gap-0', 'style' => 'gap: 0 !important;'])
                                     ->schema([
                                         Forms\Components\Select::make('item_master_id')
                                             ->label(false)
@@ -157,7 +158,6 @@ trait SalesDocumentResourceTrait
                                             ->rows(2)
                                             ->placeholder('Enter item description...')
                                             ->columnSpan(2)
-                                            ->extraAttributes(['style' => 'gap: 0 !important;']),
                                     ])
                                     ->extraAttributes(['style' => 'gap: 0 !important;']) // Force inline style with !important
                                     ->columns(2), // Ensure the grid uses 2 columns

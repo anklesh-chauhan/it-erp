@@ -73,6 +73,26 @@ class AccountMaster extends Model
         return $this->belongsTo(RatingType::class);
     }
 
+    public function bankDetail()
+    {
+        return $this->hasMany(AccountMasterBankDetail::class);
+    }
+
+    public function creditDetail()
+    {
+        return $this->hasOne(AccountMasterCreditDetail::class);
+    }
+
+    public function gstDetail()
+    {
+        return $this->hasOne(AccountMasterGSTDetail::class, 'account_master_id', 'id');
+    }
+
+    public function statutoryDetail()
+    {
+        return $this->hasOne(AccountMasterStatutoryDetail::class, 'account_master_id', 'id');
+    }
+
     public function accountOwnership(): BelongsTo
     {
         return $this->belongsTo(AccountOwnership::class);

@@ -10,6 +10,10 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Traits\CreateAccountMasterTrait;
+use App\Filament\Resources\AccountMasterBankDetailResource\RelationManagers\BankDetailRelationManager;
+use App\Filament\Resources\AccountMasterCreditDetailResource\RelationManagers\CreditDetailRelationManager;
+use App\Filament\Resources\AccountMasterGSTDetailResource\RelationManagers\GSTDetailRelationManager;
+use App\Filament\Resources\AccountMasterStatutoryDetailResource\RelationManagers\StatutoryDetailRelationManager;
 
 class AccountMasterResource extends Resource
 {
@@ -77,6 +81,10 @@ class AccountMasterResource extends Resource
         return [
             AccountMasterResource\RelationManagers\ContactDetailsRelationManager::class,
             AccountMasterResource\RelationManagers\AddressesRelationManager::class,
+            BankDetailRelationManager::class,
+            CreditDetailRelationManager::class,
+            GSTDetailRelationManager::class,
+            StatutoryDetailRelationManager::class,
         ];
     }
 
