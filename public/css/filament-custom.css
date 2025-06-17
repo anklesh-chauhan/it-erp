@@ -61,8 +61,6 @@
     opacity: 1;
 }
 
-[x-cloak] { display: none !important; }
-
 
 .custom-text-right {
     text-align: right !important;
