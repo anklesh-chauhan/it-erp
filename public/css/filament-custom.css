@@ -35,14 +35,6 @@
 
 [x-cloak] { display: none !important; }
 
-.right-sidebar {
-    transition: transform 0.3s ease-in-out;
-}
-
-.right-sidebar.closed {
-    transform: translateX(100%);
-}
-
 .custom-tooltip {
     position: relative;
     display: inline-block;
