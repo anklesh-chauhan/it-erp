@@ -33,22 +33,6 @@
     opacity: 1;
 }
 
-[x-cloak] { display: none !important; }
-
-.right-sidebar {
-    transition: transform 0.3s ease-in-out;
-}
-
-.right-sidebar.closed {
-    transform: translateX(100%);
-}
-
-.custom-tooltip {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-}
-
 .custom-tooltip .tooltip-content {
     visibility: hidden;
     width: max-content;
@@ -69,28 +53,6 @@
 .custom-tooltip:hover .tooltip-content {
     visibility: visible;
     opacity: 1;
-}
-
-[x-cloak] { display: none !important; }
-
-#right-sidebar {
-    width: 300px;
-    background-color: #f9fafb; /* Light background */
-    border-left: 2px solid #e5e7eb;
-}
-
-#sidebar-toggle {
-    background-color: #4f46e5; /* Primary color */
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-#close-sidebar {
-    background-color: transparent;
-    color: #fff;
-    cursor: pointer;
 }
 
 .context-menu {

@@ -33,8 +33,6 @@
     opacity: 1;
 }
 
-[x-cloak] { display: none !important; }
-
 .custom-tooltip {
     position: relative;
     display: inline-block;
