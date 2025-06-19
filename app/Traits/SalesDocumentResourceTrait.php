@@ -100,7 +100,6 @@ trait SalesDocumentResourceTrait
                             ->relationship('items')
                             ->schema([
                                 Forms\Components\Grid::make(2)
-                                    ->extraAttributes(['class' => 'gap-0', 'style' => 'gap: 0 !important;'])
                                     ->schema([
                                         Forms\Components\Select::make('item_master_id')
                                             ->label(false)
