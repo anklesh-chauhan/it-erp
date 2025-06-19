@@ -26,6 +26,9 @@ class ContactDetail extends Model
         'twitter',
         'website',
         'notes',
+        'contactable_type',
+        'contactable_id',
+        'account_master_id',
     ];
 
     public function scopeSearch($query, $searchTerm)
