@@ -71,6 +71,16 @@ class Organization extends Model
         return $this->morphMany(Address::class, 'addressable');
     }
 
+    public function employmentDetails()
+    {
+        return $this->hasMany(EmploymentDetail::class, 'organization_id');
+    }
+
+    public function departments()
+    {
+        return $this->hasMany(EmpDeparment::class, 'organization_id');
+    }
+
     /**
      * Get the industry type associated with the organization.
      */

@@ -8,6 +8,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Filament\Panel;
+use App\Models\OrganizationalUnit;
+use Filament\Models\Contracts\FilamentUser;
 
 class User extends Authenticatable
 {
@@ -23,6 +26,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'employee_id',
+        'organizational_unit_id',
     ];
 
     /**
@@ -63,6 +68,52 @@ class User extends Authenticatable
     public function organizationalUnit(): BelongsTo
     {
         return $this->belongsTo(OrganizationalUnit::class);
+    }
+
+    public function employee()
+    {
+        return $this->hasOne(Employee::class, 'login_id');
+    }
+
+    public function employeeViaId()
+    {
+        return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
+    public function createdEmployees()
+    {
+        return $this->hasMany(Employee::class, 'created_by_user_id');
+    }
+
+    public function updatedEmployees()
+    {
+        return $this->hasMany(Employee::class, 'updated_by_user_id');
+    }
+
+    public function deletedEmployees()
+    {
+        return $this->hasMany(Employee::class, 'deleted_by_user_id');
+    }
+
+    public function createdDepartments()
+    {
+        return $this->hasMany(EmpDeparment::class, 'created_by_user_id');
+    }
+
+    public function updatedDepartments()
+    {
+        return $this->hasMany(EmpDeparment::class, 'updated_by_user_id');
+    }
+
+    public function deletedDepartments()
+    {
+        return $this->hasMany(EmpDeparment::class, 'deleted_by_user_id');
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Allow access if user is linked to an active, non-deleted employee via employee_id
+        return $this->employeeViaId && $this->employeeViaId->is_active && !$this->employeeViaId->is_deleted;
     }
 
 }

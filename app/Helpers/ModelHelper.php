@@ -64,7 +64,7 @@ class ModelHelper
             'App\\Models\\Quote' => 'Quote',
             'App\\Models\\SalesOrder' => 'SalesOrder',
             'App\\Models\\SalesInvoice' => 'SalesInvoice',
-
+            'App\\Models\\Territory' => 'Territory',
             );
     }
 }

@@ -60,6 +60,11 @@ class LocationMaster extends Model
                     ->withTimestamps();
     }
 
+    public function employmentDetails()
+    {
+        return $this->hasMany(EmploymentDetail::class, 'work_location_id');
+    }
+
     protected static function boot()
     {
         parent::boot();

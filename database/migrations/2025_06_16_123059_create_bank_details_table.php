@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('account_master_bank_details', function (Blueprint $table) {
+        Schema::create('bank_details', function (Blueprint $table) {
             $table->id();
             $table->string('bank_name');
             $table->string('bank_account_number')->unique(); // Unique account number
@@ -37,7 +37,16 @@ return new class extends Migration
             $table->string('bank_account_rtgs_code')->nullable();
             $table->string('bank_account_ecs_code')->nullable();
             $table->text('remark')->nullable();
-            $table->foreignId('account_master_id')->constrained('account_masters')->onDelete('cascade'); // Link to Account Master
+            $table->string('created_by')->nullable(); // User who created the record
+            $table->string('updated_by')->nullable(); // User who last updated the record
+            $table->string('deleted_by')->nullable(); // User who deleted the record, if applicable
+            $table->boolean('is_deleted')->default(false); // Soft delete flag
+            $table->boolean('is_active')->default(true); // Active status flag
+            $table->boolean('is_default')->default(false); // Flag to indicate if this is the default bank account
+            $table->boolean('is_verified')->default(false); // Flag to indicate if the bank account is verified
+            $table->boolean('is_primary')->default(false); // Flag to indicate
+            $table->nullableMorphs('bankable'); // Polymorphic relation for associating with other models
+            $table->softDeletes(); // For soft delete functionality
             $table->timestamps();
         });
     }
@@ -47,6 +56,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('account_master_bank_details');
+        Schema::dropIfExists('bank_details');
     }
 };

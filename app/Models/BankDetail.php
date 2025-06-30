@@ -3,10 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class AccountMasterBankDetail extends Model
+class BankDetail extends Model
 {
+    use SoftDeletes;
+
+    protected $table = 'bank_details';
+
     protected $fillable = [
         'bank_name',
         'bank_account_number',
@@ -32,14 +37,31 @@ class AccountMasterBankDetail extends Model
         'bank_account_rtgs_code',
         'bank_account_ecs_code',
         'remark',
-        'account_master_id',
+        'created_by',
+        'updated_by',
+        'deleted_by',
+        'is_deleted',
+        'is_active',
+        'is_default',
+        'is_verified',
+        'is_primary',
+        'bankable_id',
+        'bankable_type',
+    ];
+
+    protected $casts = [
+        'is_deleted' => 'boolean',
+        'is_active' => 'boolean',
+        'is_default' => 'boolean',
+        'is_verified' => 'boolean',
+        'is_primary' => 'boolean',
     ];
 
     /**
      * Relationship: Belongs to Account Master.
      */
-    public function accountMaster(): BelongsTo
+    public function bankable(): MorphTo
     {
-        return $this->belongsTo(AccountMaster::class);
+        return $this->morphTo();
     }
 }

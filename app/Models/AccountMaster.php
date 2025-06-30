@@ -73,10 +73,18 @@ class AccountMaster extends Model
         return $this->belongsTo(RatingType::class);
     }
 
+    /**
+     * Get the bank detail associated with the Account Master.
+     */
     public function bankDetail()
     {
-        return $this->hasMany(AccountMasterBankDetail::class);
+        return $this->morphMany(BankDetail::class, 'bankable');
     }
+
+    // public function bankDetail()
+    // {
+    //     return $this->hasMany(AccountMasterBankDetail::class);
+    // }
 
     public function creditDetail()
     {
