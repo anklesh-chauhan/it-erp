@@ -64,6 +64,9 @@ class AdminPanelProvider extends PanelProvider
                 RoleResource::class,
                 PermissionResource::class,
             ])
+            ->plugins([
+                FilamentShieldPlugin::make(),
+            ])
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,

@@ -131,11 +131,16 @@
         },
         {
             "name": "bezhansalleh/filament-shield",
-            "version": "3.3.5",
+            "version": "3.3.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bezhanSalleh/filament-shield.git",
+                "reference": "63d22a764c5dd6682b98ea09abc9930a2872bfbd"
+            },
             "dist": {
                 "type": "zip",
-                "url": "https://mirrors.cloud.tencent.com/repository/composer/bezhansalleh/filament-shield/3.3.5/bezhansalleh-filament-shield-3.3.5.zip",
-                "reference": "88b6714e4d14abcb614ff3ac45114866763d1ba5",
+                "url": "https://api.github.com/repos/bezhanSalleh/filament-shield/zipball/63d22a764c5dd6682b98ea09abc9930a2872bfbd",
+                "reference": "63d22a764c5dd6682b98ea09abc9930a2872bfbd",
                 "shasum": ""
             },
             "require": {
@@ -174,6 +179,7 @@
                     "BezhanSalleh\\FilamentShield\\Database\\Factories\\": "database/factories"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -200,9 +206,15 @@
             ],
             "support": {
                 "issues": "https://github.com/bezhanSalleh/filament-shield/issues",
-                "source": "https://github.com/bezhanSalleh/filament-shield/tree/3.3.5"
+                "source": "https://github.com/bezhanSalleh/filament-shield/tree/3.3.8"
             },
-            "time": "2025-02-17T21:06:24+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/bezhanSalleh",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-06-18T07:51:08+00:00"
         },
         {
             "name": "blade-ui-kit/blade-heroicons",
