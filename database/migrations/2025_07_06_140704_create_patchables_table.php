@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('companies', function (Blueprint $table) {
-            $table->foreignId('account_master_id')->nullable()->constrained()->nullOnDelete();
+        Schema::create('patchables', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('patch_id')->constrained('patches')->onDelete('cascade');
+            $table->morphs('patchable'); // Creates patchable_id and patchable_type
+            $table->timestamps();
         });
     }
 
@@ -21,9 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('companies', function (Blueprint $table) {
-            $table->dropForeign(['account_master_id']);
-            $table->dropColumn('account_master_id');
-        });
+        Schema::dropIfExists('patchables');
     }
 };

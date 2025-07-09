@@ -15,6 +15,7 @@ use App\Models\PackingType;
 use Illuminate\Support\Facades\DB;
 use App\Models\TypeMaster;
 use App\Models\Category;
+use App\Models\CityPinCode;
 use Carbon\Carbon;
 
 
@@ -47,6 +48,10 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             UsersTableSeeder::class,
+            CountrySeeder::class,
+            StateSeeder::class,
+            CitySeeder::class,  
+            CityPinCodeSeeder::class,
             IndustryTypeSeeder::class,
             LeadSourceSeeder::class,
             LeadStatusSeeder::class,

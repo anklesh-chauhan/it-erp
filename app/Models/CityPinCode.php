@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class CityPinCode extends Model
 {
@@ -24,5 +26,12 @@ class CityPinCode extends Model
     public function country()
     {
         return $this->belongsTo(Country::class);
+    }
+
+    public function territories(): BelongsToMany
+    {
+        // Pivot table name and foreign keys should be swapped from the Territory model's definition
+        return $this->belongsToMany(Territory::class, 'territory_city_pin_code_pivots', 'city_pin_code_id', 'territory_id')
+                    ->withTimestamps(); // Include withTimestamps if your pivot table uses them
     }
 }

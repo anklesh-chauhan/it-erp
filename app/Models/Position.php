@@ -28,12 +28,12 @@ class Position extends Model
     protected $fillable = [
         'name',
         'code',
-        'territory_id',
         'division_id',
         'department_id',
         'job_title_id',
         'job_grade_id',
         'reports_to_position_id',
+        'is_multi_territory', // New field to indicate if the position can have multiple territories
         'description',
         'status',
         'location_id',
@@ -52,11 +52,10 @@ class Position extends Model
     /**
      * Get the territory associated with the position.
      */
-    public function territory(): BelongsTo
+    public function territories()
     {
-        return $this->belongsTo(Territory::class);
+        return $this->belongsToMany(Territory::class, 'position_territory_pivot', 'position_id', 'territory_id');
     }
-
     /**
      * Get the division associated with the position.
      */

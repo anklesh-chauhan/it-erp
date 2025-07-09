@@ -4,217 +4,162 @@ namespace App\Filament\Resources;
 
 use App\Enums\TerritoryStatus;
 use App\Filament\Resources\TerritoryResource\Pages;
-use App\Filament\Resources\TerritoryResource\RelationManagers;
-use App\Models\OrganizationalUnit; // Added for relationships
-use App\Models\Position; // Added for relationships
 use App\Models\Territory;
-use App\Models\TypeMaster; // Added for relationships
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log; // Import Log for debugging
-use App\Models\CityPinCode; // Import the CityPinCode model for the lookup functionality
-use Filament\Tables\Filters\TextFilter;
 
 class TerritoryResource extends Resource
 {
     protected static ?string $model = Territory::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-map'; // You can choose a different icon
-
-    protected static ?string $navigationGroup = 'HR & Organization'; // Optional: Group navigation items
+    protected static ?string $navigationIcon = 'heroicon-o-map';
+    protected static ?string $navigationGroup = 'HR & Organization';
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Territory Details')
-                    ->schema([
-                        Forms\Components\Select::make('city_pin_code_id_for_lookup')
-                            ->label('Search Area/Town or Pin Code')
-                            ->searchable()
-                            ->getSearchResultsUsing(function (string $search): array {
-                                if (strlen($search) < 2) {
-                                    return []; // Don't search until at least 2 characters
-                                }
+        return $form->schema([
+            Forms\Components\Section::make('Territory Details')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\TextInput::make('name')
+                        ->required()
+                        ->maxLength(255)
+                        ->unique(ignoreRecord: true),
 
-                                return CityPinCode::query()
-                                    ->where('area_town', 'like', "%{$search}%")
-                                    ->orWhere('pin_code', 'like', "%{$search}%")
-                                    ->limit(20)
-                                    ->get()
-                                    ->mapWithKeys(fn ($record) => [
-                                        $record->id => "{$record->area_town} ({$record->pin_code})",
-                                    ])
-                                    ->toArray();
-                            })
-                            ->getOptionLabelUsing(fn ($value): ?string => CityPinCode::find($value)?->area_town)
-                            ->nullable()
-                            ->live()
-                            ->afterStateUpdated(function (?string $state, Forms\Set $set) {
-                                if ($state) {
-                                    $cityPinCode = CityPinCode::with(['city', 'state', 'country'])->find($state);
-                                    if ($cityPinCode) {
-                                        $set('name', $cityPinCode->area_town);
-                                        $set('postal_code', $cityPinCode->pin_code);
-                                        $set('city', $cityPinCode->city?->name);
-                                        $set('state', $cityPinCode->state?->name);
-                                        $set('country', $cityPinCode->country?->name);
-                                    } else {
-                                        Log::warning('CityPinCode not found for ID: ' . $state);
-                                    }
-                                } else {
-                                    $set('name', null);
-                                    $set('postal_code', null);
-                                    $set('city', null);
-                                    $set('state', null);
-                                    $set('country', null);
-                                }
-                            })
-                            ->columnSpanFull(),
+                    Forms\Components\TextInput::make('code')
+                        ->maxLength(255)
+                        ->unique(ignoreRecord: true)
+                        ->nullable(),
 
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255)
-                            ->columnSpan(1),
-                        Forms\Components\TextInput::make('code')
-                            ->unique(ignoreRecord: true)
-                            ->nullable()
-                            ->maxLength(255)
-                            ->columnSpan(1),
-                        Forms\Components\Select::make('status')
-                            ->options(TerritoryStatus::class) // Using the enum for options
-                            ->default(TerritoryStatus::Active)
-                            ->required()
-                            ->columnSpan(1),
-                        Forms\Components\TextInput::make('postal_code')
-                            ->nullable()
-                            ->maxLength(255)
-                            ->columnSpan(1),
-                        Forms\Components\TextInput::make('city')
-                            ->nullable()
-                            ->maxLength(255)
-                            ->columnSpan(1),
-                        Forms\Components\TextInput::make('state')
-                            ->nullable()
-                            ->maxLength(255)
-                            ->columnSpan(1),
-                        Forms\Components\TextInput::make('country')
-                            ->nullable()
-                            ->maxLength(255)
-                            ->columnSpan(1),
-                        Forms\Components\Textarea::make('description')
-                            ->nullable()
-                            ->maxLength(65535)
-                            ->columnSpanFull(),
-                    ])->columns(2),
+                    Forms\Components\Select::make('status')
+                        ->options(TerritoryStatus::class)
+                        ->default(TerritoryStatus::Active)
+                        ->required(),
 
-                Forms\Components\Section::make('Relationships')
-                    ->schema([
-                        Forms\Components\Select::make('parent_territory_id')
-                            ->label('Parent Territory')
-                            ->relationship('parent', 'name') // Assuming 'name' is the display field
-                            ->searchable()
-                            ->nullable()
-                            ->placeholder('Select a parent territory'),
+                    Forms\Components\Select::make('parent_territory_id')
+                        ->relationship('parentTerritory', 'name')
+                        ->searchable()
+                        ->nullable()
+                        ->placeholder('Select a Parent Territory')
+                        ->label('Parent Territory'),
 
-                        Forms\Components\Select::make('type_master_id')
-                            ->label('Territory Type')
-                            ->options(
-                                \App\Models\TypeMaster::query()
-                                    ->ofType(\App\Models\Territory::class) // Filter by the `Address` model
-                                    ->pluck('name', 'id') // Get the name and ID for the dropdown
-                            )
-                            ->searchable(),
-                        Forms\Components\Select::make('reporting_position_id')
-                            ->label('Reporting Position')
-                            ->relationship('reportingPosition', 'name') // Assuming 'name' is the display field
-                            ->searchable()
-                            ->nullable()
-                            ->placeholder('Select a reporting position'),
-                        // Relationship for Organizational Units (BelongsToMany)
-                        Forms\Components\Select::make('organizationalUnits')
-                            ->multiple()
-                            ->relationship('organizationalUnits', 'name') // Assuming 'name' is the display field
-                            ->searchable()
-                            ->preload()
-                            ->label('Associated Organizational Units'),
-                    ])->columns(1),
-            ]);
+                    Forms\Components\Select::make('type_master_id')
+                        ->relationship('typeMaster', 'name')
+                        ->searchable()
+                        ->nullable()
+                        ->placeholder('Select a Type Master')
+                        ->label('Type Master'),
+
+                    Forms\Components\Textarea::make('description')
+                        ->nullable()
+                        ->columnSpanFull(),
+                ]),
+            
+            Forms\Components\Section::make('Associated Locations')
+                ->schema([
+                    Forms\Components\Select::make('cityPinCodes')
+                        ->multiple()
+                        ->relationship('cityPinCodes', 'id')
+                        ->searchable()
+                        ->getSearchResultsUsing(fn (string $search) => 
+                            \App\Models\CityPinCode::query()
+                                ->whereHas('city', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+                                ->orWhere('area_town', 'like', "%{$search}%")
+                                ->orWhere('pin_code', 'like', "%{$search}%")
+                                ->with('city')
+                                ->limit(50)
+                                ->get()
+                                ->mapWithKeys(fn ($item) => [
+                                    $item->id => "{$item->city->name} - {$item->area_town} ({$item->pin_code})"
+                                ])
+                        )
+                        ->getOptionLabelsUsing(fn ($values) => 
+                            \App\Models\CityPinCode::whereIn('id', $values)
+                                ->with('city')
+                                ->get()
+                                ->mapWithKeys(fn ($item) => [
+                                    $item->id => "{$item->city->name} - {$item->area_town} ({$item->pin_code})"
+                                ])
+                        )
+                        ->label('Cities and Areas')
+                        ->required(),
+                ]),
+            
+            Forms\Components\Section::make('Associated Positions')
+                ->schema([
+                    Forms\Components\Select::make('positions')
+                        ->multiple()
+                        ->relationship('positions', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->label('Positions')
+                        ->placeholder('Select positions linked to this territory'),
+                ]),
+
+            Forms\Components\Section::make('Organizational Linkages')
+                ->schema([
+                    Forms\Components\Select::make('organizationalUnits')
+                        ->multiple()
+                        ->relationship('organizationalUnits', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->placeholder('Select Organizational Units')
+                        ->label('Organizational Units'),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('code')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('postal_code')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('city')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('state')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('country')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('parent.name')
+                Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('code')->searchable()->sortable(),
+
+                Tables\Columns\TextColumn::make('parentTerritory.name')
                     ->label('Parent Territory')
                     ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('typeMaster.name')
-                    ->label('Type')
+                    ->label('Type Master')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('reportingPosition.name')
-                    ->label('Reporting Position')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                // New: Column to display associated Organizational Units
-                Tables\Columns\TextColumn::make('organizationalUnits.name')
-                    ->label('Organizational Units')
-                    ->listWithLineBreaks() // Displays each associated unit on a new line
-                    ->bulleted() // Adds a bullet point for each unit
-                    ->searchable() // Allows searching through associated unit names
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        // Custom sort for many-to-many relationship
-                        // This will sort by the name of the first associated organizational unit
-                        return $query->orderBy(
-                            OrganizationalUnit::select('name')
-                                ->whereColumn('territory_organizational_unit_pivot.organizational_unit_id', 'organizational_units.id')
-                                ->whereColumn('territory_organizational_unit_pivot.territory_id', 'territories.id')
-                                ->limit(1),
-                            $direction
-                        );
-                    })
-                    ->toggleable(isToggledHiddenByDefault: false),
+
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->searchable()
-                    ->sortable(),
+                    ->color(fn (string $state) => TerritoryStatus::from($state)->getColor())
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('cityPinCodes')
+                    ->label('Cities/Areas')
+                    ->formatStateUsing(function (Model $record) {
+                        $record->loadMissing('cityPinCodes.city');
+                        return $record->cityPinCodes
+                            ->map(fn ($pin) => "{$pin->city->name} - {$pin->area_town}")
+                            ->implode(', ');
+                    })
+                    ->wrap()
+                    ->toggleable()
+                    ->searchable(query: fn (Builder $query, string $search) =>
+                        $query->whereHas('cityPinCodes.city', fn ($q) =>
+                            $q->where('name', 'like', "%{$search}%")
+                        )->orWhereHas('cityPinCodes', fn ($q) =>
+                            $q->where('area_town', 'like', "%{$search}%")
+                              ->orWhere('pin_code', 'like', "%{$search}%")
+                        )
+                    ),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -223,20 +168,31 @@ class TerritoryResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options(TerritoryStatus::class)
-                    ->label('Status'),
+                    ->placeholder('Filter by Status'),
+
                 Tables\Filters\SelectFilter::make('type_master_id')
-                    ->label('Type')
-                    ->relationship('typeMaster', 'name'),
+                    ->relationship('typeMaster', 'name')
+                    ->label('Type Master')
+                    ->placeholder('Filter by Type Master')
+                    ->preload(),
+
                 Tables\Filters\SelectFilter::make('parent_territory_id')
+                    ->relationship('parentTerritory', 'name')
                     ->label('Parent Territory')
-                    ->relationship('parent', 'name'),
+                    ->placeholder('Filter by Parent Territory')
+                    ->preload(),
+
                 Tables\Filters\SelectFilter::make('organizationalUnits')
-                    ->relationship('organizationalUnits', 'name')
                     ->multiple()
-                    ->preload()
-                    ->label('Organizational Units'),
+                    ->relationship('organizationalUnits', 'name')
+                    ->label('Organizational Unit')
+                    ->placeholder('Filter by Organizational Unit')
+                    ->preload(),
+
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -244,24 +200,41 @@ class TerritoryResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('name');
     }
 
     public static function getRelations(): array
     {
         return [
-            // You can add Relation Managers here if you need to manage related data directly from the Territory form/page.
-            // For example:
-            // RelationManagers\OrganizationalUnitsRelationManager::class,
+            // Example: RelationManagers\OrganizationalUnitsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTerritories::route('/'),
+            'index'  => Pages\ListTerritories::route('/'),
             'create' => Pages\CreateTerritory::route('/create'),
-            'edit' => Pages\EditTerritory::route('/{record}/edit'),
+            'edit'   => Pages\EditTerritory::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        return $record->name;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'code'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Code'   => $record->code,
+            'Status' => $record->status,
         ];
     }
 }

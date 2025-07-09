@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('city_pin_codes', function (Blueprint $table) {
             $table->id();
             $table->string('area_town')->nullable();
-            $table->string('pin_code'); // To relate with `city_pin_codes`
+            $table->integer('pin_code'); // To relate with `city_pin_codes`
             $table->foreignId('city_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('state_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('country_id')->nullable()->constrained()->onDelete('cascade');

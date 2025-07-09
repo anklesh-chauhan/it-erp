@@ -2,89 +2,74 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Territory extends Model
 {
-    use HasFactory;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    use SoftDeletes;
     protected $fillable = [
-        'postal_code',
         'name',
         'code',
-        'city',
-        'state',
-        'country',
         'parent_territory_id',
         'description',
         'type_master_id',
-        'reporting_position_id', // Added after the third migration
         'status',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
-        'status' => \App\Enums\TerritoryStatus::class, // Assuming you might have an enum for status
+        'status' => 'string', // Ensures enum is cast as string
     ];
 
     /**
-     * Get the parent territory that owns the Territory.
+     * Get the parent territory.
      */
-    public function parent(): BelongsTo
+    public function parentTerritory(): BelongsTo
     {
         return $this->belongsTo(Territory::class, 'parent_territory_id');
     }
 
     /**
-     * Get the child territories for the Territory.
+     * Get the child territories.
      */
-    public function children(): HasMany
+    public function childTerritories(): HasMany
     {
         return $this->hasMany(Territory::class, 'parent_territory_id');
     }
 
     /**
-     * Get the type master associated with the Territory.
-     */
-
-    public function typeMaster()
-    {
-        return $this->belongsTo(TypeMaster::class, 'type_master_id');
-    }
-
-    /**
-     * Get the reporting position associated with the Territory.
-     * This relationship is added based on the third migration.
-     */
-    public function reportingPosition(): BelongsTo
-    {
-        return $this->belongsTo(Position::class, 'reporting_position_id');
-    }
-
-    /**
-     * The organizational units that belong to the territory.
+     * Get the organizational units associated with the territory.
      */
     public function organizationalUnits(): BelongsToMany
     {
         return $this->belongsToMany(OrganizationalUnit::class, 'territory_organizational_unit_pivot', 'territory_id', 'organizational_unit_id')
-                    ->withTimestamps(); // If your pivot table has timestamps
+                    ->withTimestamps();
     }
 
-    public function positions(): HasMany
+    /**
+     * Get the city pin codes associated with the territory.
+     */
+    public function cityPinCodes(): BelongsToMany
     {
-        return $this->hasMany(Position::class, 'territory_id'); // ADDED: Relationship to Position
+        return $this->belongsToMany(CityPinCode::class, 'territory_city_pin_code_pivots', 'territory_id', 'city_pin_code_id')
+                    ->with('city')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get the type master associated with the territory.
+     */
+    public function typeMaster(): BelongsTo
+    {
+        return $this->belongsTo(TypeMaster::class, 'type_master_id');
+    }
+
+    public function positions()
+    {
+        return $this->belongsToMany(Position::class, 'position_territory_pivot', 'territory_id', 'position_id')
+            ->withTimestamps();
     }
 }

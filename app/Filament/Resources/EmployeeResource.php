@@ -83,10 +83,6 @@ class EmployeeResource extends Resource
                                                 'O+' => 'O+', 'O-' => 'O-',
                                             ])
                                             ->nullable(),
-                                        Forms\Components\TextInput::make('age')
-                                            ->numeric()
-                                            ->minValue(18)
-                                            ->nullable(),
                                         Forms\Components\Select::make('country_id')
                                             ->relationship('country', 'name')
                                             ->searchable()
@@ -567,10 +563,6 @@ class EmployeeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true), // Hidden by default
                 Tables\Columns\TextColumn::make('blood_group')
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true), // Hidden by default
-                Tables\Columns\TextColumn::make('age')
-                    ->numeric()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true), // Hidden by default
                 Tables\Columns\TextColumn::make('country.name')
                     ->label('Nationality')

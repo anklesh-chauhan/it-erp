@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('addresses', function (Blueprint $table) {
-            $table->foreignId('company_id')->nullable(false)->change();   // Rollback
+            // $table->foreignId('company_id')->nullable(false)->change();   // Rollback
             $table->dropForeign(['contact_detail_id']);
             $table->dropColumn('contact_detail_id');
         });
