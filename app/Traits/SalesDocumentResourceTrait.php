@@ -35,7 +35,7 @@ trait SalesDocumentResourceTrait
             $companyAccountFields = self::getAccountMasterDetailsTraitField();
         }
         return [
-            Forms\Components\Grid::make(4)
+            Forms\Components\Grid::make(2)
                 ->schema([
                     Forms\Components\TextInput::make('document_number')
                         ->label('Document Number')
@@ -86,84 +86,82 @@ trait SalesDocumentResourceTrait
                     )
                     ->hidden(fn (callable $get) => !$get('has_shipping_address') && !$get('shipping_address_id')),
 
-                Forms\Components\Section::make('Item Table')
+                Forms\Components\Section::make(null)
                     ->schema([
                         TableRepeater::make('items')
+                            ->label(false)
                             ->headers([
-                                Header::make('Item'),
+                                Header::make('Item')->width('300px'),
+                                Header::make('Description'),
                                 Header::make('Quantity')->width('100px'),
-                                Header::make('Price')->width('150px'),
+                                Header::make('Price')->width('100px'),
                                 Header::make('Disc %')->width('100px'),
-                                Header::make('Amount')->width('150px'),
+                                Header::make('Amount')->width('100px'),
                                 Header::make('Actions')->width('60px'),
                             ])
                             ->relationship('items')
                             ->schema([
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Select::make('item_master_id')
-                                            ->label(false)
-                                            ->relationship('itemMaster', 'item_name')
-                                            ->searchable()
-                                            ->preload()
-                                            ->required()
-                                            ->columnSpan(2)
-                                            ->extraAttributes(['style' => 'gap: 0 !important;'])
-                                            ->live() // Optional: for reactivity
-                                            ->getSearchResultsUsing(function (string $search): array {
-                                                // Fetch the search results
-                                                $items = \App\Models\ItemMaster::where('item_name', 'like', "%{$search}%")
-                                                    ->limit(50)
-                                                    ->pluck('item_name', 'id')
-                                                    ->toArray();
+                                Forms\Components\Select::make('item_master_id')
+                                    ->label(false)
+                                    ->relationship('itemMaster', 'item_name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->columnSpan(2)
+                                    ->extraAttributes(['style' => 'gap: 0 !important;'])
+                                    ->live() // Optional: for reactivity
+                                    ->getSearchResultsUsing(function (string $search): array {
+                                        // Fetch the search results
+                                        $items = \App\Models\ItemMaster::where('item_name', 'like', "%{$search}%")
+                                            ->limit(50)
+                                            ->pluck('item_name', 'id')
+                                            ->toArray();
 
-                                                return $items;
-                                            })
-                                            ->createOptionForm([
-                                                ...self::getItemMasterTraitField()
-                                            ])
-                                            ->createOptionAction(function (Action $action) {
-                                                return $action
-                                                    ->modalHeading('Create New Item')
-                                                    ->modalSubmitActionLabel('Create')
-                                                    ->closeModalByClickingAway(false)
-                                                    ->mutateFormDataUsing(function (array $data) {
-                                                        $data['item_code'] = $data['item_code'] ?? \App\Models\NumberSeries::getNextNumber(\App\Models\ItemMaster::class);
-                                                        return $data;
-                                                    });
-                                            }) // No visible() condition, always shown
-                                            ->editOptionForm([
-                                                ...self::getItemMasterTraitField() // Define the edit form fields
-                                            ])
-                                            ->editOptionAction(function (Action $action) {
-                                                return $action
-                                                    ->modalHeading('Edit Item')
-                                                    ->modalSubmitActionLabel('Save')
-                                                    ->closeModalByClickingAway(false)
-                                                    ->visible(fn ($get) => !empty($get('item_master_id'))); // Show only if item_master_id is set
-                                            })
-                                            ->afterStateUpdated(function ($state, callable $set) {
-                                                // When an item is selected, fetch its description and update the Textarea
-                                                if ($state) {
-                                                    $item = \App\Models\ItemMaster::find($state);
-                                                    $set('description', $item?->description ?? ''); // Set description or empty if not found
-                                                } else {
-                                                    $set('description', ''); // Clear description if no item is selected
-                                                }
-                                            }),
-
-                                        Forms\Components\Textarea::make('description')
-                                            ->label(false)
-                                            ->rows(2)
-                                            ->placeholder('Enter item description...')
-                                            ->columnSpan(2)
+                                        return $items;
+                                    })
+                                    ->createOptionForm([
+                                        ...self::getItemMasterTraitField()
                                     ])
-                                    ->extraAttributes(['style' => 'gap: 0 !important;']) // Force inline style with !important
-                                    ->columns(2), // Ensure the grid uses 2 columns
+                                    ->createOptionAction(function (Action $action) {
+                                        return $action
+                                            ->modalHeading('Create New Item')
+                                            ->modalSubmitActionLabel('Create')
+                                            ->closeModalByClickingAway(false)
+                                            ->mutateFormDataUsing(function (array $data) {
+                                                $data['item_code'] = $data['item_code'] ?? \App\Models\NumberSeries::getNextNumber(\App\Models\ItemMaster::class);
+                                                return $data;
+                                            });
+                                    }) // No visible() condition, always shown
+                                    ->editOptionForm([
+                                        ...self::getItemMasterTraitField() // Define the edit form fields
+                                    ])
+                                    ->editOptionAction(function (Action $action) {
+                                        return $action
+                                            ->modalHeading('Edit Item')
+                                            ->modalSubmitActionLabel('Save')
+                                            ->closeModalByClickingAway(false)
+                                            ->visible(fn ($get) => !empty($get('item_master_id'))); // Show only if item_master_id is set
+                                    })
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        // When an item is selected, fetch its description and update the Textarea
+                                        if ($state) {
+                                            $item = \App\Models\ItemMaster::find($state);
+                                            $set('description', $item?->description ?? ''); // Set description or empty if not found
+                                        } else {
+                                            $set('description', ''); // Clear description if no item is selected
+                                        }
+                                    }),
+
+                                Forms\Components\Textarea::make('description')
+                                    ->label(false)
+                                    ->rows(1)
+                                    ->placeholder('Enter item description...')
+                                    ->columnSpan(2), 
+
                                 Forms\Components\TextInput::make('quantity')
                                     ->label(false)
                                     ->numeric()
-                                    ->default(1)
+                                    ->default(0)
                                     ->required()
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
@@ -171,6 +169,7 @@ trait SalesDocumentResourceTrait
                                         self::updateTotals($set, $get);
                                     })
                                     ->extraAttributes(['style' => 'text-align: right;']),
+
                                 Forms\Components\TextInput::make('price')
                                     ->label(false)
                                     ->numeric()
@@ -185,6 +184,7 @@ trait SalesDocumentResourceTrait
                                         self::updateTotals($set, $get);
                                     })
                                     ->extraAttributes(['style' => 'text-align: right;']),
+
                                 Forms\Components\TextInput::make('discount')
                                     ->label(false)
                                     ->numeric()
@@ -194,6 +194,7 @@ trait SalesDocumentResourceTrait
                                         self::updateItemAmount($set, $get);
                                         self::updateTotals($set, $get);
                                     }),
+
                                 Forms\Components\TextInput::make('amount')
                                     ->label(false)
                                     ->numeric()
@@ -236,6 +237,7 @@ trait SalesDocumentResourceTrait
                             ->schema([
                                 Forms\Components\TextInput::make('subtotal')
                                     ->label('Subtotal')
+                                    ->inlineLabel()
                                     ->numeric()
                                     ->live()
                                     ->disabled()
@@ -244,6 +246,7 @@ trait SalesDocumentResourceTrait
                                     ->formatStateUsing(fn ($state) => number_format($state, 2)),
                                 Forms\Components\TextInput::make('tax')
                                     ->label('Tax')
+                                    ->inlineLabel()
                                     ->numeric()
                                     ->live()
                                     ->disabled()
@@ -252,6 +255,7 @@ trait SalesDocumentResourceTrait
                                     ->formatStateUsing(fn ($state) => number_format($state, 2)),
                                 Forms\Components\TextInput::make('total')
                                     ->label('Total')
+                                    ->inlineLabel()
                                     ->numeric()
                                     ->live()
                                     ->disabled()
