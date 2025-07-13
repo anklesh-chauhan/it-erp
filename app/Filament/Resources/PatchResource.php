@@ -25,8 +25,8 @@ class PatchResource extends Resource
 {
     protected static ?string $model = Patch::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    protected static ?string $navigationGroup = 'Marketing';
     // Added a label for better readability in the navigation
     protected static ?string $navigationLabel = 'Patches';
 

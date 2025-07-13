@@ -33,6 +33,8 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Facades\Filament;
 use Filament\GlobalSearch\GlobalSearchResult;
 use Illuminate\Support\Collection;
+use Filament\Navigation\NavigationItem;
+
 use App\Traits\HasCustomerInteractionFields;
 
 
@@ -45,7 +47,7 @@ class LeadResource extends Resource
 
     protected static ?string $model = \App\Models\Lead::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document';
     protected static ?string $navigationGroup = 'Marketing';
     protected static ?int $navigationSort = 10;
 
