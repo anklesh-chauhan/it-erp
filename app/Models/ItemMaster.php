@@ -20,6 +20,7 @@ class ItemMaster extends Model
         'category_type', // For polymorphic relationship
         'item_brand_id',
         'purchase_price',
+        'hsn_code',
         'selling_price',
         'tax_rate',
         'discount',

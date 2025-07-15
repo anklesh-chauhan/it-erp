@@ -48,7 +48,7 @@ trait ItemMasterTrait
                         ->relationship('unitOfMeasurement', 'name')
                         ->label('Unit of Measurement'),
                     TextInput::make('hsn_code')
-                        ->label('HSN Code'),
+                        ->label('HSN/SAC Code'),
                     TextInput::make('tax_rate')
                         ->label('Tax Rate (%)')
                         ->numeric(),
