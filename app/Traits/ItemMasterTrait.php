@@ -49,9 +49,17 @@ trait ItemMasterTrait
                         ->label('Unit of Measurement'),
                     TextInput::make('hsn_code')
                         ->label('HSN/SAC Code'),
-                    TextInput::make('tax_rate')
-                        ->label('Tax Rate (%)')
-                        ->numeric(),
+
+
+                    Select::make('taxes')
+                        ->label('Applicable Taxes')
+                        ->relationship('taxes', 'name')
+                        ->multiple()
+                        ->preload()
+                        ->searchable()
+                        ->required(false)
+                        ->helperText('Choose one or more applicable taxes from the master list'),
+
                     Select::make('item_brand_id')
                         ->relationship('brand', 'name')
                         ->label('Brand'),

@@ -87,6 +87,12 @@ class ItemMaster extends Model
                     ->withTimestamps();
     }
 
+    public function taxes()
+    {
+        return $this->belongsToMany(Tax::class, 'item_master_tax_pivots')
+            ->withTimestamps();
+    }
+
     protected static function boot()
     {
         parent::boot();

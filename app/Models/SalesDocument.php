@@ -75,6 +75,12 @@ abstract class SalesDocument extends Model
         return $this->morphMany(SalesDocumentItem::class, 'document');
     }
 
+    public function taxDetails()
+    {
+        return $this->morphMany(TaxDetail::class, 'taxable');
+    }
+
+
     public function calculateTotals()
     {
         $this->subtotal = $this->items->sum(fn ($item) => $item->quantity * $item->price);

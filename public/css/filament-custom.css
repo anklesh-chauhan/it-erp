@@ -80,3 +80,7 @@
 .fi-fo-component-ctn.filament-tables-table-repeater-grid {
     gap: 0 !important;
 }
+
+.no-gap.grid {
+    gap: 0px !important;
+}
