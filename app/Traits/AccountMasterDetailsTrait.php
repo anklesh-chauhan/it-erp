@@ -5,6 +5,7 @@ namespace App\Traits;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
 
 trait AccountMasterDetailsTrait
 {
@@ -19,12 +20,24 @@ trait AccountMasterDetailsTrait
             Forms\Components\Grid::make(2)
                     ->schema([
                         Forms\Components\Select::make('account_master_id')
-                            ->relationship('accountMaster', 'name', function ($query, callable $get) {
-                                if ($contactId = $get('contact_detail_id')) {
-                                    $contact = \App\Models\ContactDetail::with('accountMaster')->find($contactId);
-                                    return $query->where('id', $contact?->account_master_id);
+                            ->label('Business Details')
+                            ->options(function (callable $get) {
+                                $contactId = $get('contact_detail_id');
+
+                                if ($contactId) {
+                                    // Load contact and its related account masters
+                                    $contact = \App\Models\ContactDetail::with('accountMasters')->find($contactId);
+                                    if (!$contact) {
+                                        return [];
+                                    }
+                                    // Explicitly specify the table for id to avoid ambiguity
+                                    return $contact->accountMasters()
+                                        ->pluck('account_masters.name', 'account_masters.id')
+                                        ->toArray();
                                 }
-                                return $query;
+
+                                // If no contact is selected, show all account masters
+                                return \App\Models\AccountMaster::pluck('name', 'account_masters.id')->toArray();
                             })
                             ->searchable()
                             ->nullable()
@@ -60,6 +73,7 @@ trait AccountMasterDetailsTrait
 
                                         Forms\Components\Select::make('industry_type_id')
                                             ->relationship('industryType', 'name')
+                                            ->model(\App\Models\AccountMaster::class)
                                             ->searchable()
                                             ->nullable()
                                             ->label('Industry Type')
@@ -68,14 +82,26 @@ trait AccountMasterDetailsTrait
                                         Forms\Components\TextInput::make('no_of_employees')
                                             ->maxLength(255)
                                             ->nullable(),
+                                        
+                                        Forms\Components\Select::make('owner_id')
+                                            ->relationship('owner', 'name')
+                                            ->model(\App\Models\AccountMaster::class)
+                                            ->default(fn () => Auth::id())
+                                            ->required()
+                                            ->label('Owner'),
+
+                                        // 👇 Hidden field for type_master_id
+                                        Forms\Components\Hidden::make('type_master_id')
+                                            ->default(fn (callable $get) => 8), // Set static or dynamic default
+
                                     ])
                                 ])
                             ->createOptionUsing(function (array $data, callable $set, callable $get) {
                                 $accountMaster = \App\Models\AccountMaster::create($data);
 
-                                if ($contactId = $get('contact_id')) {
-                                    \App\Models\ContactDetail::where('id', $contactId)
-                                        ->update(['account_master_id' => $accountMaster->id]);
+                                // Attach to contact if contact_detail_id exists
+                                if ($contactId = $get('contact_detail_id')) {
+                                    $accountMaster->contactDetails()->syncWithoutDetaching([$contactId]);
                                 }
 
                                 $set('account_master_id', $accountMaster->id);
@@ -116,6 +142,7 @@ trait AccountMasterDetailsTrait
 
                                                 Forms\Components\Select::make('industry_type_id')
                                                     ->relationship('industryType', 'name')
+                                                    ->model(\App\Models\AccountMaster::class)
                                                     ->searchable()
                                                     ->preload()
                                                     ->default(fn () => \App\Models\AccountMaster::find($get('account_master_id'))?->industry_type_id),
@@ -149,27 +176,107 @@ trait AccountMasterDetailsTrait
                                     ->visible(fn (callable $get) => $get('account_master_id'))
                             )
                             // After state update for account_master_id
-                            ->afterStateUpdated(function (callable $set, $state) {
-                                if ($state) {
-                                    $contact = \App\Models\ContactDetail::where('account_master_id', $state)->first();
-                                    $set('contact_detail_id', $contact?->id);
-                                    $set('show_account_master_info', $state);
+                            ->afterStateUpdated(function (callable $set, $state, callable $get) {
+                        if ($state) {
+                            $accountMaster = \App\Models\AccountMaster::with('addresses')->find($state);
+
+                            if (!$accountMaster) {
+                                $set('contact_detail_id', null);
+                                $set('show_account_master_info', null);
+                                $set('billing_address_id', null); // Clear address if no account master
+                                return;
+                            }
+
+                            // Auto-select address
+                            if ($accountMaster->addresses->isNotEmpty()) {
+                                // Prefer address with 'Billing' type if specified
+                                $defaultAddress = $accountMaster->addresses->where('address_type', 'Billing')->first()
+                                    ?? $accountMaster->addresses->first(); // Fallback to first address
+                                $set('billing_address_id', $defaultAddress->id);
+
+                                // Debug: Log the selected address
+                                \Illuminate\Support\Facades\Log::info('getAccountMasterDetailsTraitField: Auto-selected address', [
+                                    'account_master_id' => $state,
+                                    'address_id' => $defaultAddress->id,
+                                    'address_type' => $defaultAddress->address_type
+                                ]);
+                            } else {
+                                // Debug: Log if no addresses found
+                                \Illuminate\Support\Facades\Log::info('getAccountMasterDetailsTraitField: No addresses found for AccountMaster', [
+                                    'account_master_id' => $state
+                                ]);
+                                $set('billing_address_id', null); // Clear address if no addresses available
+                            }
+
+                            $contactId = $get('contact_detail_id');
+
+                            if (!$contactId) {
+                                $contactId = $accountMaster->contactDetails()->first()?->id;
+                                if ($contactId) {
+                                    $set('contact_detail_id', $contactId); // Set the first contact in the form
+                                }
+                            }
+
+                            if ($contactId) {
+                                    try {
+                                        $accountMaster->contactDetails()->syncWithoutDetaching([$contactId]);
+                                    } catch (\Exception $e) {
+                                        \Filament\Notifications\Notification::make()
+                                            ->title('Error syncing contact')
+                                            ->danger()
+                                            ->send();
+                                    }
+                                }
+                                $set('show_account_master_info', $state);
+                                } else {
+                                    // Clear fields if no account_master_id is selected
+                                    $set('contact_detail_id', null);
+                                    $set('show_account_master_info', null);
+                                    $set('billing_address_id', null); // Clear address
                                 }
                             })
-                            ->afterStateHydrated(function (callable $set, $state) {
+                            ->afterStateHydrated(function (callable $set, $state, callable $get, $component) {
                                 if ($state) {
-                                    $contact = \App\Models\ContactDetail::where('account_master_id', $state)->first();
-                                    $set('contact_detail_id', $contact?->id);
-                                    $set('show_account_master_info', $state);
+                                $set('show_account_master_info', $state);
+                                $contactId = $get('contact_detail_id');
+                                if ($contactId) {
+                                    $accountMaster = \App\Models\AccountMaster::find($state);
+                                    if ($accountMaster && $contactId) {
+                                        $accountMaster->contactDetails()->syncWithoutDetaching([$contactId]);
+                                    }
                                 }
-                            })
+
+                                // Auto-select address during hydration
+                                $accountMaster = \App\Models\AccountMaster::with('addresses')->find($state);
+                                if ($accountMaster && $accountMaster->addresses->isNotEmpty()) {
+                                    $defaultAddress = $accountMaster->addresses->where('address_type', 'Billing')->first()
+                                        ?? $accountMaster->addresses->first();
+                                    $set('billing_address_id', $defaultAddress->id);
+                                }
+                                    } else {
+                                        // Set the account_master_id from the model if available
+                                        $existingAccountMasterId = $component->getModelInstance()->account_master_id;
+                                        if ($existingAccountMasterId) {
+                                            $set('account_master_id', $existingAccountMasterId);
+                                            $set('show_account_master_info', $existingAccountMasterId);
+
+                                            // Auto-select address for existing account master
+                                            $accountMaster = \App\Models\AccountMaster::with('addresses')->find($existingAccountMasterId);
+                                            if ($accountMaster && $accountMaster->addresses->isNotEmpty()) {
+                                                $defaultAddress = $accountMaster->addresses->where('address_type', 'Billing')->first()
+                                                    ?? $accountMaster->addresses->first();
+                                                $set('billing_address_id', $defaultAddress->id);
+                                            }
+                                        }
+                                    }
+                                })
                             ->getOptionLabelUsing(fn ($value) =>
                                 \App\Models\AccountMaster::find($value)?->name ?? 'Unknown Account Master'
                             ),
 
                         Forms\Components\Placeholder::make('Account Details')
                             ->hidden(fn (callable $get) => !$get('account_master_id'))
-                            ->label('Account Details')
+                            ->label('Business Details')
                             ->content(function (callable $get) {
                                 $accountMaster = \App\Models\AccountMaster::find($get('account_master_id'));
 

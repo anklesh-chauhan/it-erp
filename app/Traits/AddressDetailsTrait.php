@@ -36,36 +36,86 @@ trait AddressDetailsTrait
                             Forms\Components\Select::make($fieldName)
                                 ->label($label)
                                 ->relationship($relationshipName, 'street', function ($query, callable $get) {
-                                    if ($contactId = $get('contact_detail_id')) {
+                                    // Get contact_id and account_master_id from the form
+                                    $contactId = $get('contact_detail_id');
+                                    $accountMasterId = $get('account_master_id');
+
+                                    // Base query
+                                    $query = \App\Models\Address::query();
+
+                                    // Filter by contact's addresses if contact_id is present
+                                    if ($contactId) {
                                         $contact = \App\Models\ContactDetail::with('addresses')->find($contactId);
-                                        return $query->whereIn('id', $contact?->addresses->pluck('id'));
+                                        if ($contact) {
+                                            $query->whereIn('id', $contact->addresses->pluck('id'));
+                                        }
                                     }
+
+                                    // Filter by account master's addresses if account_master_id is present
+                                    if ($accountMasterId) {
+                                        $query->where('addressable_id', $accountMasterId)
+                                            ->where('addressable_type', \App\Models\AccountMaster::class);
+                                    }
+
                                     return $query;
                                 })
-                                ->getSearchResultsUsing(function (string $search) {
-                                    return \App\Models\Address::query()
-                                        ->where('street', 'like', "%{$search}%")
+                                ->getSearchResultsUsing(function (string $search, callable $get) {
+                                    // Get account_master_id for filtering
+                                    $accountMasterId = $get('account_master_id');
+                                    $query = \App\Models\Address::query();
+
+                                    // Filter by account master's addresses if account_master_id is present
+                                    if ($accountMasterId) {
+                                        $query->where('addressable_id', $accountMasterId)
+                                            ->where('addressable_type', \App\Models\AccountMaster::class);
+                                    }
+
+                                    // Search across address fields
+                                    $query->where(function ($q) use ($search) {
+                                        $q->where('street', 'like', "%{$search}%")
                                         ->orWhere('city', 'like', "%{$search}%")
                                         ->orWhere('state', 'like', "%{$search}%")
                                         ->orWhere('country', 'like', "%{$search}%")
-                                        ->orWhere('address_type', 'like', "%{$search}%") // Include Address Type in Search
-                                        ->get()
+                                        ->orWhere('address_type', 'like', "%{$search}%");
+                                    });
+
+                                    return $query->get()
                                         ->mapWithKeys(fn ($address) => [
                                             $address->id => "{$address->street}, {$address->city}, {$address->state} — {$address->address_type}"
                                         ]);
                                 })
+                                ->default(function (callable $get) use ($defaultAddressType) {
+                                    // Automatically select an address based on account_master_id
+                                    $accountMasterId = $get('account_master_id');
+                                    if ($accountMasterId) {
+                                        $accountMaster = \App\Models\AccountMaster::with('addresses')->find($accountMasterId);
+                                        if ($accountMaster && $accountMaster->addresses->isNotEmpty()) {
+                                            // Prefer address with the defaultAddressType if specified
+                                            if ($defaultAddressType) {
+                                                $defaultAddress = $accountMaster->addresses->where('address_type', $defaultAddressType)->first();
+                                                if ($defaultAddress) {
+                                                    return $defaultAddress->id;
+                                                }
+                                            }
+                                            // Fallback to the first address if no defaultAddressType is specified or found
+                                            return $accountMaster->addresses->first()->id;
+                                        }
+                                    }
+                                    return null;
+                                })
                                 ->searchable()
                                 ->nullable()
-                                ->live()
+                                ->reactive()
                                 ->createOptionForm([
                                     Forms\Components\Hidden::make('contact_detail_id')
                                         ->default(fn (callable $get) => $get('contact_detail_id')) // ✅ Auto-set `contact_id`
                                         ->dehydrated(),
-
-                                    Forms\Components\Hidden::make('company_id')
-                                        ->default(fn (callable $get) => $get('company_id')) // ✅ Auto-set `company_id`
+                                    Forms\Components\Hidden::make('addressable_id')
+                                        ->default(fn (callable $get) => $get('account_master_id'))
                                         ->dehydrated(),
-
+                                    Forms\Components\Hidden::make('addressable_type')
+                                        ->default(\App\Models\AccountMaster::class)
+                                        ->dehydrated(),
                                     Forms\Components\Select::make('type_master_id')
                                         ->label('Address Type')
                                         ->options(
@@ -106,14 +156,27 @@ trait AddressDetailsTrait
                                         ->searchable(),
                                 ])
                                 ->createOptionUsing(function (array $data, callable $get, callable $set) use ($fieldName)  {
-                                    $data['contact_detail_id'] = $get('contact_id');  // ✅ Assign Contact ID
-                                    $data['company_id'] = $get('company_id');  // ✅ Assign Company ID
+                                    $data['addressable_id'] = $get('account_master_id');
+                                    $data['addressable_type'] = \App\Models\AccountMaster::class;
+                                    $data['contact_detail_id'] = $get('contact_detail_id');
+                                    $data['company_id'] = $get('company_id');
 
+                                    // Create the address
                                     $address = \App\Models\Address::create($data);
 
+                                    // Debug: Log the created address
+                                    \Illuminate\Support\Facades\Log::info('getAddressDetailsTraitField: Address created', [
+                                        'address_id' => $address->id,
+                                        'account_master_id' => $data['addressable_id'],
+                                        'addressable_type' => $data['addressable_type'],
+                                        'contact_detail_id' => $data['contact_detail_id'],
+                                        'company_id' => $data['company_id'],
+                                    ]);
+
+                                    // Update the form state
                                     $set($fieldName, $address->id);
 
-                                    return $address->id;
+                        return $address->id;            
                                 })
                                 ->createOptionAction(fn (Forms\Components\Actions\Action $action) =>
                                     $action->hidden(fn (callable $get) => $get($fieldName) !== null) // ✅ Hide "Create" button when a contact is selected

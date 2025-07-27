@@ -111,9 +111,9 @@ class AccountMaster extends Model
         return $this->belongsToMany(ContactDetail::class, 'account_master_contact_details');
     }
 
-    public function addresses(): BelongsToMany
+    public function addresses()
     {
-        return $this->belongsToMany(Address::class, 'account_master_address_details', 'account_master_id', 'address_id');
+        return $this->morphMany(Address::class, 'addressable');
     }
 
     public function category(): MorphTo
@@ -170,8 +170,8 @@ class AccountMaster extends Model
             $account_master->contactDetails()->forceDelete();
         });
         static::updated(function ($account_master) {
-            $account_master->addresses()->sync($account_master->addresses()->pluck('id')->toArray());
-            $account_master->contactDetails()->sync($account_master->contactDetails()->pluck('id')->toArray());
+            $account_master->addresses()->sync($account_master->addresses()->pluck('addresses.id')->toArray());
+            $account_master->contactDetails()->sync($account_master->contactDetails()->pluck('contact_details.id')->toArray());
         });
         static::restored(function ($account_master) {
             $account_master->addresses()->restore();

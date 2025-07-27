@@ -17,16 +17,16 @@ return new class extends Migration
             $table->foreignId('lead_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('deal_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('contact_detail_id')->constrained()->onDelete('cascade');
-            $table->foreignId('company_id')->constrained()->onDelete('cascade');
+            $table->foreignId('account_master_id')->constrained()->onDelete('cascade');
             $table->foreignId('billing_address_id')->nullable()->constrained('addresses')->onDelete('set null');
             $table->foreignId('shipping_address_id')->nullable()->constrained('addresses')->onDelete('set null');
             $table->date('date');
             $table->date('expiration_date')->nullable(); // e.g., '2025-12-31'
             $table->enum('status', ['draft', 'sent', 'accepted', 'rejected', 'canceled'])->default('draft');
             $table->foreignId('sales_person_id')->nullable()->constrained('users')->onDelete('cascade'); // Assuming you have a users table
-            $table->decimal('subtotal', 10, 2)->default(0);
-            $table->decimal('tax', 10, 2)->default(0);
-            $table->decimal('total', 10, 2)->default(0);
+            $table->decimal('subtotal', 15, 2)->default(0);
+            $table->decimal('tax', 15, 2)->default(0);
+            $table->decimal('total', 15, 2)->default(0);
             $table->string('currency', 3)->default('INR'); // Assuming INR as default currency
             $table->string('payment_terms')->nullable(); // e.g., 'Net 30', 'Due on receipt'
             $table->string('payment_method')->nullable(); // e.g., 'Credit Card', 'Bank Transfer'

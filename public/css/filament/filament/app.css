@@ -3,3 +3,27 @@
 .no-gap.grid {
     gap: 0px !important;
 }
+
+.fi-resource-sales-orders .fi-section-content .gap-6 {
+    gap: 0;
+}
+
+.fi-resource-sales-orders .fi-section-content .grid.gap-y-2 {
+    gap: 0;
+}
+
+.fi-resource-quotes .fi-section-content .gap-6 {
+    gap: 0;
+}
+
+.fi-resource-quotes .fi-section-content .grid.gap-y-2 {
+    gap: 0;
+}
+
+.fi-resource-sales-invoices .fi-section-content .gap-6 {
+    gap: 0;
+}
+
+.fi-resource-sales-invoices .fi-section-content .grid.gap-y-2 {
+    gap: 0;
+}

@@ -169,17 +169,26 @@ class LeadResource extends Resource
                 Tables\Columns\TextColumn::make('owner.name')
                     ->label('Owner')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('contactDetail.full_name')
                     ->label('Contact Name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
 
-                Tables\Columns\TextColumn::make('company.name')
-                    ->label('Company')
+                Tables\Columns\TextColumn::make('accountMaster.name')
+                    ->label('Account Master')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, $record) => $state ?? 'No Account Master')
+                    ->description(fn ($record) => $record->contactDetail && $record->accountMaster 
+                        ? ($record->contactDetail->accountMasters()->where('account_masters.id', $record->account_master_id)->exists() 
+                            ? 'Linked via Contact' 
+                            : 'Directly Assigned')
+                        : ($record->accountMaster ? 'Directly Assigned' : null))
+                    ->toggleable(),
 
                 SelectColumn::make('status_id')
                     ->label('Status')
@@ -234,7 +243,17 @@ class LeadResource extends Resource
 
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status_id')
+                    ->label('Status')
+                    ->options(\App\Models\LeadStatus::pluck('name', 'id')->toArray())
+                    ->multiple(),
+                Tables\Filters\SelectFilter::make('owner_id')
+                    ->label('Owner')
+                    ->options(\App\Models\User::pluck('name', 'id')->toArray())
+                    ->multiple(),
+                Tables\Filters\Filter::make('has_follow_up')
+                    ->label('Has Follow-up')
+                    ->query(fn ($query) => $query->whereHas('followups')),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -250,7 +269,7 @@ class LeadResource extends Resource
                                 ->label('Create Account Master')
                                 ->default(false)
                                 ->visible(function ($get, $record) {
-                                    return $record->company?->account_master_id === null;
+                                    return $record->accountMaster?->type_master_id === 8;
                                 }),
                         ])
                         ->action(function ($record, array $data) {

@@ -10,7 +10,7 @@ class Quote extends SalesDocument
 
     protected $fillable = [
         ...parent::FILLABLE,
-        'company_id',
+        'account_master_id',
         'expiration_date',
         'accepted_at',
     ];

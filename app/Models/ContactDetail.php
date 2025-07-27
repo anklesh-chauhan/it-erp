@@ -44,12 +44,12 @@ class ContactDetail extends Model
 
     public function designation()
     {
-        return $this->belongsTo(Designation::class);
+        return $this->belongsTo(Designation::class, 'designation_id');
     }
 
     public function department()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Department::class, 'department_id');
     }
 
     /**
@@ -60,11 +60,10 @@ class ContactDetail extends Model
         return $this->belongsTo(Company::class, 'company_id');
     }
 
-    public function accountMaster()
+    public function accountMasters()
     {
         return $this->belongsToMany(AccountMaster::class, 'account_master_contact_details');
     }
-
 
     public function companies()
     {

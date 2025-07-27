@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\HasCustomerInteractionFields;
+use App\Models\NumberSeries;
+use App\Models\DealStage;
+use Illuminate\Support\Facades\DB;
 
 class Lead extends Model
 {
@@ -26,6 +29,7 @@ class Lead extends Model
         'custom_fields',
         'status_id',
         'status_type',
+        'account_master_id',
     ];
 
     public function convertToDeal(bool $createCompanyMaster = false, bool $createAccountMaster = false)
@@ -37,7 +41,7 @@ class Lead extends Model
         $defaultDealStage = DealStage::where('name', 'Negotiation/Review')->first();
 
         // Get the company name (if available)
-        $companyName = $this->company?->name ?? 'Unnamed Deal';
+        $companyName = $this->accountMaster?->name ?? 'Unnamed Deal';
 
         // Create a new Deal instance
         $deal = Deal::create([
@@ -46,7 +50,7 @@ class Lead extends Model
             'deal_name' => $companyName,
             'transaction_date' => now(),
             'contact_id' => $this->contact_detail_id,
-            'company_id' => $this->company_id,
+            'account_master_id' => $this->account_master_id,
             'address_id' => $this->address_id,
             'amount' => $this->annual_revenue ?? 0,
             'expected_revenue' => $this->annual_revenue ?? 0,
@@ -56,61 +60,45 @@ class Lead extends Model
             'status_type' => DealStage::class,
         ]);
 
-        // Optionally create an Account Master if selected
-        if ($createAccountMaster && $this->company_id) {
-            $company = $this->company;
+        // update an Account Master if selected
+        if ($createAccountMaster && $this->account_master_id) {
 
-            if (!$company->account_master_id) {
-            // Determine type_master_id (e.g., default to a specific type or make it configurable)
-                $typeMasterId = 2; // 2 is for custommer, You can set this based on a default or form input if needed
+            try {
+                DB::beginTransaction();
+                
+                $typeMasterId = 2;
+
+                // Generate account code for AccountMaster
                 $accountCode = NumberSeries::getNextNumber(AccountMaster::class, $typeMasterId);
 
-                $accountMaster = AccountMaster::create([
-                    'owner_id' => $this->owner_id,
-                    'type_master_id' => $typeMasterId, // Set to null or a default type
-                    'name' => $this->company?->name ?? 'Unnamed Account',
+                // Update the AccountMaster record
+                $this->accountMaster->update([
+                    'type_master_id' => $typeMasterId,
                     'account_code' => $accountCode,
-                    'phone_number' => $this->company?->phone_number,
-                    'email' => $this->company?->email,
-                    'secondary_email' => $this->company?->secondary_email,
-                    'website' => $this->company?->website,
-                    'no_of_employees' => $this->company?->no_of_employees,
-                    'twitter' => $this->company?->twitter,
-                    'linked_in' => $this->company?->linked_in,
-                    'annual_revenue' => $this->annual_revenue,
-                    'description' => $this->description,
-                    'industry_type_id' => $this->company?->industry_type_id,
-                    'ref_dealer_contact' => $this->contact_detail_id,
                 ]);
 
-                $this->company->update([
-                    'account_master_id' => $accountMaster->id,
-                ]);
+                // Increment number series for AccountMaster (not Lead)
+                NumberSeries::incrementNextNumber(AccountMaster::class, $typeMasterId);
 
-                // Attach contact details and addresses if applicable
-                if ($this->contactComapnyDetails->isNotEmpty()) {
-                    $accountMaster->contactDetails()->sync($this->contactComapnyDetails->pluck('id')->toArray());
-                }
-                if ($this->address) {
-                    $accountMaster->addresses()->attach($this->address_id);
-                }
+                DB::commit();
 
-                // Log or notify about the creation of the Account Master
-                \Filament\Notifications\Notification::make()
-                    ->title('Account Master Created')
-                    ->body("Account Master for {$this->company?->name} has been created.")
-                    ->success()
-                    ->send();
-            } else {
-                \Filament\Notifications\Notification::make()
-                    ->title('Account Master Already Exists')
-                    ->body("Account Master for {$this->company?->name} already exists.")
-                    ->warning()
-                    ->send();
+                
+            } catch (\Exception $e) {
+                DB::rollBack();
+                
+                throw new \Exception('Failed to convert lead to customer.', 0, $e);
             }
+
+            
+            \Filament\Notifications\Notification::make()
+                ->title('Account Master Created')
+                ->body("Account Master for {$this->company?->name} has been created.")
+                ->success()
+                ->send();
+           
         }
 
-        // Optionally update the lead's status to "Converted"
+        // update the lead's status to "Converted"
         $convertedStatus = LeadStatus::where('name', 'Converted')->first();
         if ($convertedStatus) {
             $this->update([
@@ -147,10 +135,15 @@ class Lead extends Model
         return $this->hasMany(ContactDetail::class, 'company_id', 'company_id');
     }
 
-    public function company()
+    public function accountMaster()
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(AccountMaster::class, 'account_master_id');
     }
+
+    // public function company()
+    // {
+    //     return $this->belongsTo(Company::class);
+    // }
 
     public function address()
     {

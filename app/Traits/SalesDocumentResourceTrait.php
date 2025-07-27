@@ -9,8 +9,10 @@ use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
 use Illuminate\Support\Facades\Log;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Grid;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
+use Filament\Support\Enums\VerticalAlignment;
 
 trait SalesDocumentResourceTrait
 {
@@ -28,15 +30,15 @@ trait SalesDocumentResourceTrait
     public static function getCommonFormFields(): array
     {
 
-        $companyAccountFields = [];
+        $companyAccountFields = self::getAccountMasterDetailsTraitField();
 
-        if (self::resolveModelClass() === \App\Models\Quote::class) {
-            $companyAccountFields = self::getCompanyDetailsTraitField();
-        } else {
-            $companyAccountFields = self::getAccountMasterDetailsTraitField();
-        }
+        // if (self::resolveModelClass() === \App\Models\Quote::class) {
+        //     $companyAccountFields = self::getCompanyDetailsTraitField();
+        // } else {
+        //     $companyAccountFields = self::getAccountMasterDetailsTraitField();
+        // }
         return [
-            Forms\Components\Grid::make(2)
+            Forms\Components\Grid::make(4)
                 ->schema([
                     Forms\Components\TextInput::make('document_number')
                         ->label('Document Number')
@@ -86,119 +88,125 @@ trait SalesDocumentResourceTrait
                         )
                     )
                     ->hidden(fn (callable $get) => !$get('has_shipping_address') && !$get('shipping_address_id')),
-            Forms\Components\Section::make()
-                ->extraAttributes([
-                    'class' => 'overflow-x-auto w-full',
-                ])
-                ->schema([
+            
+        Forms\Components\Section::make()
+            ->extraAttributes([
+                'class' => 'overflow-x-auto w-full',
+            ])
+            ->schema([
 
                 TableRepeater::make('items')
                     ->label(false)
                     ->columnSpan('full')
-                    ->stackAt('0px')
+                    ->stackAt('100px')
                     ->streamlined()
                     ->headers([
                         Header::make('Item                                                                                          ')->width('350px'),
-                        Header::make('Description                               ')->width('350px'),
-                        Header::make('HAC/SAC                 ')->width('100px'),
+                        // Header::make('HAC/SAC                 ')->width('100px'),
                         Header::make('Quantity           ')->width('100px'),
                         Header::make('Price                      ')->width('100px'),
                         Header::make('Disc %        ')->width('100px'),
                         Header::make('Tax Rate %          ')->width('100px'),
                         Header::make('Taxable Amount                      ')->width('100px'),
-                        Header::make('Actions')->width('60px'),
+                        Header::make(' ')->width('10px'),
                     ])
                     ->relationship('items')
+                    ->extraAttributes(['style' => 'gap:0.5rem !important'])
                     ->schema([
-                        Forms\Components\Select::make('item_master_id')
-                            ->label(false)
-                            ->relationship('itemMaster', 'item_name')
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->columnSpan(2)
-                            ->extraAttributes([
-                                'class' => 'w-24 h-8 text-sm',
-                                'style' => 'font-size: 0.875rem;',
-                            ])
-                            ->live() // Optional: for reactivity
-                            ->getSearchResultsUsing(function (string $search): array {
-                                // Fetch the search results
-                                $items = \App\Models\ItemMaster::where('item_name', 'like', "%{$search}%")
-                                    ->limit(50)
-                                    ->pluck('item_name', 'id')
-                                    ->toArray();
+                        Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('item_master_id')
+                                    ->label(false)
+                                    ->relationship('itemMaster', 'item_name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->columnSpan(2)
+                                    ->extraAttributes([
+                                        'class' => 'w-24 text-sm !rounded-none',
+                                        'style' => 'font-size: 0.875rem; border-radius: 0;',
+                                    ])
+                                    ->live() // Optional: for reactivity
+                                    ->getSearchResultsUsing(function (string $search): array {
+                                        // Fetch the search results
+                                        $items = \App\Models\ItemMaster::where('item_name', 'like', "%{$search}%")
+                                            ->limit(50)
+                                            ->pluck('item_name', 'id')
+                                            ->toArray();
 
-                                return $items;
-                            })
-                            ->createOptionForm([
-                                ...self::getItemMasterTraitField()
-                            ])
-                            ->createOptionAction(function (Action $action) {
-                                return $action
-                                    ->modalHeading('Create New Item')
-                                    ->modalSubmitActionLabel('Create')
-                                    ->closeModalByClickingAway(false)
-                                    ->mutateFormDataUsing(function (array $data) {
-                                        $data['item_code'] = $data['item_code'] ?? \App\Models\NumberSeries::getNextNumber(\App\Models\ItemMaster::class);
-                                        return $data;
-                                    });
-                            }) // No visible() condition, always shown
-                            ->editOptionForm([
-                                ...self::getItemMasterTraitField() // Define the edit form fields
-                            ])
-                            ->editOptionAction(function (Action $action) {
-                                return $action
-                                    ->modalHeading('Edit Item')
-                                    ->modalSubmitActionLabel('Save')
-                                    ->closeModalByClickingAway(false)
-                                    ->visible(fn ($get) => !empty($get('item_master_id'))); // Show only if item_master_id is set
-                            })
-                            ->afterStateUpdated(function ($state, callable $set) {
-                                // When an item is selected, fetch its description and update the Textarea
-                                if ($state) {
-                                    $item = \App\Models\ItemMaster::with('taxes')->find($state);
-                                    if ($item) {
-                                        $set('description', $item?->description ?? '');
-                                        $set('hsn_sac', $item?->hsn_code ?? ''); // Auto-fetch HSN/SAC
-                                        $set('price', $item->selling_price ?? 0); // Auto-fetch Price (assuming 'sale_price' field in ItemMaster)
-                                            // ✅ Automatically calculate total tax rate from related taxes
-                                        $totalTaxRate = $item->taxes->sum('total_rate');
-                                        $set('tax_rate', $totalTaxRate);
-                                    } else {
-                                        $set('description', '');
-                                        $set('hsn_sac', '');
-                                        $set('hsn_sac', '');
-                                        $set('tax_rate', 0);
-                                    }
-                                } else {
-                                    $set('description', '');
-                                    $set('hsn_sac', '');
-                                    $set('price', 0);
-                                    $set('tax_rate', 0);
-                                }
-                            }),
+                                        return $items;
+                                    })
+                                    ->createOptionForm([
+                                        ...self::getItemMasterTraitField()
+                                    ])
+                                    ->createOptionAction(function (Action $action) {
+                                        return $action
+                                            ->modalHeading('Create New Item')
+                                            ->modalSubmitActionLabel('Create')
+                                            ->closeModalByClickingAway(false)
+                                            ->mutateFormDataUsing(function (array $data) {
+                                                $data['item_code'] = $data['item_code'] ?? \App\Models\NumberSeries::getNextNumber(\App\Models\ItemMaster::class);
+                                                return $data;
+                                            });
+                                    }) // No visible() condition, always shown
+                                    ->editOptionForm([
+                                        ...self::getItemMasterTraitField() // Define the edit form fields
+                                    ])
+                                    ->editOptionAction(function (Action $action) {
+                                        return $action
+                                            ->modalHeading('Edit Item')
+                                            ->modalSubmitActionLabel('Save')
+                                            ->closeModalByClickingAway(false)
+                                            ->visible(fn ($get) => !empty($get('item_master_id'))); // Show only if item_master_id is set
+                                    })
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        // When an item is selected, fetch its description and update the Textarea
+                                        if ($state) {
+                                            $item = \App\Models\ItemMaster::with('taxes')->find($state);
+                                            if ($item) {
+                                                $set('description', $item?->description ?? '');
+                                                $set('hsn_sac', $item?->hsn_code ?? ''); // Auto-fetch HSN/SAC
+                                                $set('price', $item->selling_price ?? 0); // Auto-fetch Price (assuming 'sale_price' field in ItemMaster)
+                                                    // ✅ Automatically calculate total tax rate from related taxes
+                                                $totalTaxRate = $item->taxes->sum('total_rate');
+                                                $set('tax_rate', $totalTaxRate);
+                                            } else {
+                                                $set('description', '');
+                                                $set('hsn_sac', '');
+                                                $set('hsn_sac', '');
+                                                $set('tax_rate', 0);
+                                            }
+                                        } else {
+                                            $set('description', '');
+                                            $set('hsn_sac', '');
+                                            $set('price', 0);
+                                            $set('tax_rate', 0);
+                                        }
+                                    }),
 
-
-                        Forms\Components\Textarea::make('description')
-                            ->label(false)
-                            ->rows(1)
-                            ->placeholder('Enter item description...')
-                            ->columnSpan(2)
-                            ->extraAttributes([
-                                'class' => 'w-24 h-8 text-sm',
-                                'style' => 'font-size: 0.875rem;',
-                            ]),
+                                Forms\Components\Textarea::make('description')
+                                    ->label(false)
+                                    ->rows(2)
+                                    ->placeholder('Enter item description...')
+                                    ->columnSpanFull()
+                                    ->extraAttributes([
+                                        'class' => 'w-24 h-16 text-sm',
+                                        'style' => 'font-size: 0.875rem; border-radius: 0;',
+                                    ]),
+                                
+                                
+                            ]), // Span the full width to align properly
                         
-                        Forms\Components\TextInput::make('hsn_sac')
-                            ->label(false)
-                            ->live()
-                            ->placeholder('Enter item HSN or SAC...')
-                            ->extraAttributes([
-                                'class' => 'w-24 h-8 text-sm',
-                                'style' => 'font-size: 0.875rem;',
-                            ]),
-                  
+                        // Forms\Components\TextInput::make('hsn_sac')
+                        //     ->label(false)
+                        //     ->live()
+                        //     ->columnSpan(1)
+                        //     ->placeholder('Enter item HSN or SAC...')
+                        //     ->extraAttributes([
+                        //         'class' => 'w-24 h-8 text-sm',
+                        //         'style' => 'font-size: 0.875rem; border-radius: 0;',
+                        //     ]),
+
                         Forms\Components\TextInput::make('quantity')
                             ->label(false)
                             ->numeric()
@@ -210,8 +218,8 @@ trait SalesDocumentResourceTrait
                                 self::updateTotals($set, $get);
                             })
                             ->extraAttributes([
-                                'class' => 'w-24 h-8 text-sm',
-                                'style' => 'font-size: 0.875rem;',
+                                'class' => 'w-24 h-9 text-sm',
+                                'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
                             ]),
 
                         Forms\Components\TextInput::make('price')
@@ -225,8 +233,8 @@ trait SalesDocumentResourceTrait
                                 self::updateTotals($set, $get);
                             })
                             ->extraAttributes([
-                                'class' => 'w-24 h-8 text-sm',
-                                'style' => 'font-size: 0.875rem;',
+                                'class' => 'w-24 h-9 text-sm',
+                                'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
                             ]),
 
                         Forms\Components\TextInput::make('discount')
@@ -239,8 +247,8 @@ trait SalesDocumentResourceTrait
                                 self::updateTotals($set, $get);
                             })
                             ->extraAttributes([
-                                'class' => 'w-24 h-8 text-sm',
-                                'style' => 'font-size: 0.875rem;',
+                                'class' => 'w-24 h-9 text-sm',
+                                'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
                             ]),
 
                         Forms\Components\Select::make('tax_rate')
@@ -274,10 +282,10 @@ trait SalesDocumentResourceTrait
                             ->searchable()
                             ->preload()
                             ->live()
-                            ->placeholder('Select_tax_rate...')
+                            ->placeholder('Tax Rate')
                             ->extraAttributes([
-                                'class' => 'w-24 h-8 text-sm',
-                                'style' => 'font-size: 0.875rem;',
+                                'class' => 'w-24 h-9 text-sm',
+                                'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
                             ])
                             ->required(),
 
@@ -298,12 +306,13 @@ trait SalesDocumentResourceTrait
                                 return number_format($value, 2, '.', '');
                             })
                             ->extraAttributes([
-                                'class' => 'w-24 h-8 text-sm text-right', // Added text-right for better alignment
-                                'style' => 'font-size: 0.875rem;',
+                                'class' => 'w-24 h-9 text-sm',
+                                'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
                             ]),
                     ])
                     ->extraAttributes([
-                        'class' => 'text-sm', // Smaller font size for all fields
+                        'class' => 'text-sm',
+                        'style' => 'font-size: 0.875rem; border-radius: 0;',
                     ])
                     ->afterStateUpdated(function (callable $set, callable $get, $record) {
                         self::updateTotals($set, $get);

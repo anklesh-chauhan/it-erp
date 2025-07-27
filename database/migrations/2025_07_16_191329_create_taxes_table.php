@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name'); // e.g., GST 18%
             $table->decimal('total_rate', 6, 2); // e.g., 18.00
-            $table->enum('supply_type', ['intra', 'inter'])->default('intra'); // intra = CGST+SGST, inter = IGST
+            $table->enum('supply_type', ['Intra-State', 'Inter-State'])->default('Intra-State'); // intra = CGST+SGST, inter = IGST
             $table->boolean('is_active')->default(true);
             $table->boolean('is_default')->default(false);
             $table->text('description')->nullable();
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('taxes');
+        Schema::dropIfExists('``tax``es');
     }
 };

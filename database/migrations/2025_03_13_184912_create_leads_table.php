@@ -17,7 +17,6 @@ return new class extends Migration
             $table->date('transaction_date')->nullable(); // Add date field
             $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('contact_detail_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('company_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('address_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('lead_source_id')->nullable()->constrained()->onDelete('set null');
             $table->morphs('status');

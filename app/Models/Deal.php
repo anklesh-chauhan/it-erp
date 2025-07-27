@@ -13,7 +13,7 @@ class Deal extends Model
     use HasFactory, HasCustomerInteractionFields;
 
     protected $fillable = [
-        'owner_id', 'reference_code','deal_name', 'transaction_date', 'contact_detail_id', 'company_id', 'address_id',
+        'owner_id', 'reference_code','deal_name', 'transaction_date', 'contact_detail_id', 'company_id', 'account_master_id', 'address_id',
         'type', 'amount', 'expected_revenue', 'expected_close_date', 'lead_source_id', 'description', 'status_id', 'status_type',
     ];
 
@@ -56,6 +56,11 @@ class Deal extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function accountMaster()
+    {
+        return $this->belongsTo(AccountMaster::class, 'account_master_id');
     }
 
     public function address()

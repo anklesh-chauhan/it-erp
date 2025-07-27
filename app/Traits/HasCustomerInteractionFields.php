@@ -17,7 +17,7 @@ use App\Models\ItemMaster;
 trait HasCustomerInteractionFields
 {
     use \App\Traits\ContactDetailsTrait;
-    use \App\Traits\CompanyDetailsTrait;
+    use \App\Traits\AccountMasterDetailsTrait;
 
     protected static function resolveModelClass(): string
     {
@@ -59,8 +59,8 @@ trait HasCustomerInteractionFields
                 // ✅ Contact Details
                 ...self::getContactDetailsTraitField(),
 
-                // ✅ Company Details
-                ...self::getCompanyDetailsTraitField(),
+                // // ✅ Company Details
+                ...self::getAccountMasterDetailsTraitField(),
         ];
     }
 

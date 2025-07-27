@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('deal_name');
             $table->date('transaction_date');
             $table->foreignId('owner_id')->constrained('users');
-            $table->foreignId('contact_detail_id')->nullable()->constrained('contact_details');
-            $table->foreignId('company_id')->nullable()->constrained('companies');
+            $table->foreignId('contact_detail_id')->nullable()->constrained('contact_details')->onDelete('set null');
+            $table->foreignId('account_master_id')->nullable()->constrained('account_masters')->onDelete('set null');
             $table->foreignId('address_id')->nullable()->constrained('addresses')->onDelete('set null');
             $table->nullableMorphs('type');
             $table->decimal('amount', 15, 2);
