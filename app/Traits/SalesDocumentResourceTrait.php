@@ -13,6 +13,13 @@ use Filament\Forms\Components\Grid;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Filament\Support\Enums\VerticalAlignment;
+use App\Models\SalesDocumentPreference;
+use App\Models\Address;
+use App\Models\Organization;
+use App\Models\TaxDetail;
+use Illuminate\Database\Eloquent\Model;
+
+
 
 trait SalesDocumentResourceTrait
 {
@@ -26,6 +33,16 @@ trait SalesDocumentResourceTrait
     {
         return method_exists(static::class, 'getModel') ? static::getModel() : \App\Models\Quote::class;
     }
+
+    // public SalesDocumentPreference $preferences;
+
+    // public function mount($record): void
+    // {
+    //     parent::mount($record);
+
+    //     // Load preferences once at mount time
+    //     $this->preferences = SalesDocumentPreference::first();
+    // }
 
     public static function getCommonFormFields(): array
     {
@@ -91,7 +108,7 @@ trait SalesDocumentResourceTrait
             
         Forms\Components\Section::make()
             ->extraAttributes([
-                'class' => 'overflow-x-auto w-full',
+                'class' => 'overflow-x-auto w-full no-gap-p6'
             ])
             ->schema([
 
@@ -114,6 +131,7 @@ trait SalesDocumentResourceTrait
                     ->extraAttributes(['style' => 'gap:0.5rem !important'])
                     ->schema([
                         Grid::make(2)
+                            ->extraAttributes(['class' => 'no-gap'])
                             ->schema([
                                 Forms\Components\Select::make('item_master_id')
                                     ->label(false)
@@ -195,32 +213,35 @@ trait SalesDocumentResourceTrait
                                     ]),
                                 
                                 
-                            ]), // Span the full width to align properly
-                        
-                        // Forms\Components\TextInput::make('hsn_sac')
-                        //     ->label(false)
-                        //     ->live()
-                        //     ->columnSpan(1)
-                        //     ->placeholder('Enter item HSN or SAC...')
-                        //     ->extraAttributes([
-                        //         'class' => 'w-24 h-8 text-sm',
-                        //         'style' => 'font-size: 0.875rem; border-radius: 0;',
-                        //     ]),
+                            ]), 
 
-                        Forms\Components\TextInput::make('quantity')
-                            ->label(false)
-                            ->numeric()
-                            ->default(0)
-                            ->required()
-                            ->live()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                self::updateItemAmount($set, $get);
-                                self::updateTotals($set, $get);
-                            })
-                            ->extraAttributes([
-                                'class' => 'w-24 h-9 text-sm',
-                                'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
+                        Grid::make(1)
+                            ->extraAttributes(['class' => 'no-gap'])
+                            ->schema([ 
+                                Forms\Components\TextInput::make('quantity')
+                                    ->label(false)
+                                    ->numeric()
+                                    ->default(0)
+                                    // ->required()
+                                    ->live()
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        self::updateItemAmount($set, $get);
+                                        self::updateTotals($set, $get);
+                                    })
+                                    ->extraAttributes([
+                                        'class' => 'w-24 h-9 text-sm',
+                                        'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -5px;',
+                                    ]),
+                                Forms\Components\TextInput::make('hsn_sac')
+                                    ->label('Hsn/Sac')
+                                    ->live()
+                                    ->placeholder('HSN/SAC')
+                                    ->extraAttributes([
+                                        'class' => 'w-24 h-9 text-sm',
+                                        'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: 0px;',
+                                    ]),
                             ]),
+                        
 
                         Forms\Components\TextInput::make('price')
                             ->label(false)
@@ -249,7 +270,10 @@ trait SalesDocumentResourceTrait
                             ->extraAttributes([
                                 'class' => 'w-24 h-9 text-sm',
                                 'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
-                            ]),
+                            ])
+                            ->visible(function () {
+                                return \App\Models\SalesDocumentPreference::first()?->discount_level === 'line_item';
+                            }),
 
                         Forms\Components\Select::make('tax_rate')
                             ->label(false)
@@ -314,6 +338,9 @@ trait SalesDocumentResourceTrait
                         'class' => 'text-sm',
                         'style' => 'font-size: 0.875rem; border-radius: 0;',
                     ])
+                    ->afterStateHydrated(function (callable $set, callable $get) {
+                        self::updateTotals($set, $get);
+                    })
                     ->afterStateUpdated(function (callable $set, callable $get, $record) {
                         self::updateTotals($set, $get);
 
@@ -328,10 +355,7 @@ trait SalesDocumentResourceTrait
                     })
                     ->columnSpan('full')
                     ->addActionLabel('Add Item')
-                    ->deleteAction(fn (Forms\Components\Actions\Action $action) => $action->requiresConfirmation())
                     ->defaultItems(1),
-                
-                
 
                 Forms\Components\Grid::make(4) // Two-column layout
                     ->schema([
@@ -360,24 +384,67 @@ trait SalesDocumentResourceTrait
                                     ->dehydrateStateUsing(fn ($state) =>
                                             $state !== null ? number_format((float) $state, 2, '.', '') : null
                                         ),
-                                    
-                                Forms\Components\TextInput::make('tax')
-                                    ->label('Tax')
+                                
+                                Forms\Components\TextInput::make('transaction_discount')
+                                    ->label('Transaction Discount')
                                     ->inlineLabel()
-                                    ->readOnly()
-                                    ->extraInputAttributes([
-                                        'class' => 'text-right', // Added for right alignment
-                                    ])
-                                    ->formatStateUsing(function ($state) {
-                                        // Ensure state is not null and is a valid number before formatting
-                                        if (is_numeric($state)) {
-                                            return number_format((float) $state, 2, '.', '');
-                                        }
-                                        return $state; // Return original state if not numeric (e.g., null or empty string)
+                                    ->visible(function () {
+                                        return \App\Models\SalesDocumentPreference::first()?->discount_level === 'transaction';
                                     })
-                                    ->dehydrateStateUsing(fn ($state) =>
-                                            $state !== null ? number_format((float) $state, 2, '.', '') : null
-                                        ),
+                                    ->numeric()
+                                    ->default(0)
+                                    ->suffix('%'),
+                                    
+                                Forms\Components\TextInput::make('cgst')
+                                        ->label('CGST')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes([
+                                            'class' => 'text-right',
+                                        ])
+                                        ->formatStateUsing(function ($state) {
+                                            if (is_numeric($state)) {
+                                                return number_format((float) $state, 2, '.', '');
+                                            }
+                                            return $state;
+                                        })
+                                        ->visible(function (callable $get) {
+                                            return self::shouldShowCgstSgst($get);
+                                        }),
+
+                                    Forms\Components\TextInput::make('sgst')
+                                        ->label('SGST')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes([
+                                            'class' => 'text-right',
+                                        ])
+                                        ->formatStateUsing(function ($state) {
+                                            if (is_numeric($state)) {
+                                                return number_format((float) $state, 2, '.', '');
+                                            }
+                                            return $state;
+                                        })
+                                        ->visible(function (callable $get) {
+                                            return self::shouldShowCgstSgst($get);
+                                        }),
+
+                                    Forms\Components\TextInput::make('igst')
+                                        ->label('IGST')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes([
+                                            'class' => 'text-right',
+                                        ])
+                                        ->formatStateUsing(function ($state) {
+                                            if (is_numeric($state)) {
+                                                return number_format((float) $state, 2, '.', '');
+                                            }
+                                            return $state;
+                                        })
+                                        ->visible(function (callable $get) {
+                                            return !self::shouldShowCgstSgst($get);
+                                        }),
 
                                 Forms\Components\TextInput::make('total')
                                     ->label('Total')
@@ -451,6 +518,34 @@ trait SalesDocumentResourceTrait
         ];
     }
 
+    private static function shouldShowCgstSgst(callable $get): bool
+    {
+        $billingAddressId = $get('billing_address_id');
+        if (!$billingAddressId) {
+            return false;
+        }
+
+        $billingAddress = Address::find($billingAddressId);
+        $organization = Organization::first(); // Or however you get current org
+
+        if (!$billingAddress || !$organization) {
+            return false;
+        }
+
+        $organizationAddress = $organization->addresses()->first();
+        $organizationState = $organizationAddress?->state;
+        $billingState = $billingAddress->state;
+
+        return $billingState && $organizationState &&
+            strtolower(trim($billingState)) === strtolower(trim($organizationState));
+    }
+
+
+    protected function getDiscountLevel(): string
+    {
+        return SalesDocumentPreference::first()?->discount_level ?? 'none';
+    }
+
     private static function updateItemAmount(callable $set, callable $get): void
     {
         $quantity = floatval($get('quantity') ?? 1);
@@ -468,6 +563,11 @@ trait SalesDocumentResourceTrait
     {
         $items = $get('items') ?? [];
         $subtotal = 0;
+        $cgstTotal = 0;
+        $sgstTotal = 0;
+        $igstTotal = 0;
+
+        $useCgstSgst = self::shouldShowCgstSgst($get);
 
         foreach ($items as $key => $item) {
             $path = "items.{$key}";
@@ -475,27 +575,151 @@ trait SalesDocumentResourceTrait
             $price = floatval($get("{$path}.price") ?? 0);
             $discount = floatval($get("{$path}.discount") ?? 0);
             $taxRate = floatval($get("{$path}.tax_rate") ?? 0);
+            $itemMasterId = $get("{$path}.item_master_id");
 
             $discountAmount = ($quantity * $price) * ($discount / 100);
             $amount = ($quantity * $price) - $discountAmount;
-            $set("{$path}.amount", round($amount, 2));
+            $set("{$path}.amount", number_format($amount, 2, '.', ''));
+
             $subtotal += $amount;
+
+            if ($itemMasterId && $taxRate) {
+                $item = \App\Models\ItemMaster::with('taxes.components')->find($itemMasterId);
+                $tax = $item->taxes->firstWhere('total_rate', $taxRate);
+                if ($tax) {
+                    $components = $tax->components;
+                    if ($useCgstSgst) {
+                        $cgstComponent = $components->firstWhere('type', 'CGST');
+                        $sgstComponent = $components->firstWhere('type', 'SGST');
+                        if ($cgstComponent) {
+                            $cgstTotal += $amount * ($cgstComponent->rate / 100);
+                        }
+                        if ($sgstComponent) {
+                            $sgstTotal += $amount * ($sgstComponent->rate / 100);
+                        }
+                    } else {
+                        $igstComponent = $components->firstWhere('type', 'IGST');
+                        if ($igstComponent) {
+                            $igstTotal += $amount * ($igstComponent->rate / 100);
+                        }
+                    }
+                }
+            }
         }
 
-        $tax = collect($items)->sum(function ($item) {
-            $quantity = floatval($item['quantity'] ?? 1);
-            $price = floatval($item['price'] ?? 0);
-            $discount = floatval($item['discount'] ?? 0);
-            $taxRate = floatval($item['tax_rate'] ?? 0);
-            $discountAmount = ($quantity * $price) * ($discount / 100);
-            $amount = ($quantity * $price) - $discountAmount;
-            return $amount * ($taxRate / 100);
-        });
-
-        $total = $subtotal + $tax;
+        $transactionDiscount = floatval($get('transaction_discount') ?? 0);
+        $transactionDiscountAmount = $subtotal * ($transactionDiscount / 100);
+        $subtotalAfterDiscount = $subtotal - $transactionDiscountAmount;
+        $total = $subtotalAfterDiscount + $cgstTotal + $sgstTotal + $igstTotal;
 
         $set('subtotal', number_format($subtotal, 2, '.', ''));
-        $set('tax', number_format($tax, 2, '.', ''));
+        $set('cgst', number_format($cgstTotal, 2, '.', ''));
+        $set('sgst', number_format($sgstTotal, 2, '.', ''));
+        $set('igst', number_format($igstTotal, 2, '.', ''));
         $set('total', number_format($total, 2, '.', ''));
     }
+
+    public function afterCreate(): void
+    {
+        Log::info('afterCreate hook is running.');
+        $this->saveTaxDetailsFromModel();
+    }
+
+    public function afterSave(): void
+    {
+        Log::info('afterSave hook is running.');
+        $this->saveTaxDetailsFromModel(); 
+    }
+
+    protected function saveTaxDetailsFromModel(): void
+    {
+        $record = $this->record ?? null;
+
+        if (!$record) {
+            Log::warning('saveTaxDetailsFromModel: Missing record.');
+            return;
+        }
+
+        // Reload the record to ensure the 'items' relationship is up-to-date
+        $record->load('items');
+        $items = $record->items; // Get the items from the relationship, not the form state
+
+        if ($items->isEmpty()) {
+            Log::warning('saveTaxDetailsFromModel: No items found in record relationship.', [
+                'record_id' => $record->id,
+                'items_count' => $items->count(),
+            ]);
+            return;
+        }
+
+        Log::info('Starting saveTaxDetails from model relationship', [
+            'record_id' => $record->id,
+            'items_count' => $items->count(),
+        ]);
+
+        // Delete existing tax details
+        TaxDetail::where('taxable_type', get_class($record))
+            ->where('taxable_id', $record->id)
+            ->delete();
+
+        $useCgstSgst = $this->shouldShowCgstSgst(fn ($field) => data_get($this->form->getState(), $field));
+        Log::info('Tax type determination', ['useCgstSgst' => $useCgstSgst]);
+
+        foreach ($items as $item) {
+            $quantity = floatval($item->quantity ?? 1);
+            $price = floatval($item->price ?? 0);
+            $discount = floatval($item->discount ?? 0);
+            $taxRate = floatval($item->tax_rate ?? 0);
+            $itemMasterId = $item->item_master_id ?? null;
+
+            $discountAmount = ($quantity * $price) * ($discount / 100);
+            $taxableAmount = ($quantity * $price) - $discountAmount;
+
+            if (! $itemMasterId || ! $taxRate) {
+                continue;
+            }
+
+            $itemModel = \App\Models\ItemMaster::with('taxes.components')->find($itemMasterId);
+            if (! $itemModel) continue;
+
+            $tax = $itemModel->taxes->first(function ($tax) use ($taxRate) {
+                return abs($tax->total_rate - $taxRate) < 0.0001;
+            });
+
+            if (! $tax || $tax->components->isEmpty()) continue;
+
+            $components = $tax->components;
+
+            if ($useCgstSgst) {
+                foreach (['CGST', 'SGST'] as $type) {
+                    $component = $components->firstWhere('type', $type);
+                    if ($component) {
+                        TaxDetail::create([
+                            'taxable_type' => get_class($record),
+                            'taxable_id' => $record->id,
+                            'tax_id' => $tax->id,
+                            'tax_component_id' => $component->id,
+                            'type' => $component->type,
+                            'rate' => $component->rate,
+                            'amount' => $taxableAmount * ($component->rate / 100),
+                        ]);
+                    }
+                }
+            } else {
+                $igst = $components->firstWhere('type', 'IGST');
+                if ($igst) {
+                    TaxDetail::create([
+                        'taxable_type' => get_class($record),
+                        'taxable_id' => $record->id,
+                        'tax_id' => $tax->id,
+                        'tax_component_id' => $igst->id,
+                        'type' => $igst->type,
+                        'rate' => $igst->rate,
+                        'amount' => $taxableAmount * ($igst->rate / 100),
+                    ]);
+                }
+            }
+        }
+    }
+
 }

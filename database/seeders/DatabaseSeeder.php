@@ -51,39 +51,39 @@ class DatabaseSeeder extends Seeder
         // Enable foreign key checks again
         // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // try {
-        //     Artisan::call('shield:generate --all');
-        //     $this->command->info('Filament Shield permissions generated successfully.');
-        // } catch (\Exception $e) {
-        //     $this->command->error('Failed to run shield:generate --all: ' . $e->getMessage());
-        // }
+        try {
+            Artisan::call('shield:generate --all');
+            $this->command->info('Filament Shield permissions generated successfully.');
+        } catch (\Exception $e) {
+            $this->command->error('Failed to run shield:generate --all: ' . $e->getMessage());
+        }
 
         $this->call([
-            // UsersTableSeeder::class,
-            // ModelHasRolesSeeder::class,
-            // CountrySeeder::class,
-            // StateSeeder::class,
-            // CitySeeder::class,  
-            // CityPinCodeSeeder::class,
-            // IndustryTypeSeeder::class,
-            // LeadSourceSeeder::class,
-            // LeadStatusSeeder::class,
-            // RatingTypeSeeder::class,
-            // FollowUpMediaSeeder::class,
-            // FollowUpResultSeeder::class,
-            // FollowUpStatusSeeder::class,
-            // FollowUpPrioritySeeder::class,
-            // UnitOfMeasurementSeeder::class,
-            // ItemBrandSeeder::class,
-            // TransportModeSeeder::class,
-            // VisitTypeSeeder::class,
-            // PackingTypeSeeder::class,
-            // DealStageSeeder::class,
-            // TypeMasterSeeder::class,
-            // CategorySeeder::class,
-            // EmpDepartmentSeeder::class,
-            // EmpGradeSeeder::class,
-            // EmpJobTitleSeeder::class,
+            UsersTableSeeder::class,
+            ModelHasRolesSeeder::class,
+            CountrySeeder::class,
+            StateSeeder::class,
+            CitySeeder::class,  
+            CityPinCodeSeeder::class,
+            IndustryTypeSeeder::class,
+            LeadSourceSeeder::class,
+            LeadStatusSeeder::class,
+            RatingTypeSeeder::class,
+            FollowUpMediaSeeder::class,
+            FollowUpResultSeeder::class,
+            FollowUpStatusSeeder::class,
+            FollowUpPrioritySeeder::class,
+            UnitOfMeasurementSeeder::class,
+            ItemBrandSeeder::class,
+            TransportModeSeeder::class,
+            VisitTypeSeeder::class,
+            PackingTypeSeeder::class,
+            DealStageSeeder::class,
+            TypeMasterSeeder::class,
+            CategorySeeder::class,
+            EmpDepartmentSeeder::class,
+            EmpGradeSeeder::class,
+            EmpJobTitleSeeder::class,
             TaxSeeder::class,
 
         ]);
@@ -918,219 +918,5 @@ class EmpJobTitleSeeder extends Seeder
 
         // Insert job titles into the emp_job_titles table
         DB::table('emp_job_titles')->insert($jobTitles);
-    }
-}
-
-class TaxSeeder extends Seeder
-{
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
-    {
-        $taxes = [
-            [
-                'name' => 'GST 0% (Intra-State)',
-                'total_rate' => 0.00,
-                'supply_type' => 'Intra-State',
-                'is_active' => true,
-                'is_default' => false,
-                'description' => 'Zero-rated GST for exempt intra-state supplies',
-                'components' => [
-                    [
-                        'component_type' => 'CGST',
-                        'rate' => 0.00,
-                        'description' => 'Central GST component (0%)',
-                    ],
-                    [
-                        'component_type' => 'SGST',
-                        'rate' => 0.00,
-                        'description' => 'State GST component (0%)',
-                    ],
-                ],
-            ],
-            [
-                'name' => 'GST 5% (Intra-State)',
-                'total_rate' => 5.00,
-                'supply_type' => 'Intra-State',
-                'is_active' => true,
-                'is_default' => false,
-                'description' => '5% GST for intra-state supplies',
-                'components' => [
-                    [
-                        'component_type' => 'CGST',
-                        'rate' => 2.50,
-                        'description' => 'Central GST component (2.5%)',
-                    ],
-                    [
-                        'component_type' => 'SGST',
-                        'rate' => 2.50,
-                        'description' => 'State GST component (2.5%)',
-                    ],
-                ],
-            ],
-            [
-                'name' => 'GST 12% (Intra-State)',
-                'total_rate' => 12.00,
-                'supply_type' => 'Intra-State',
-                'is_active' => true,
-                'is_default' => false,
-                'description' => '12% GST for intra-state supplies',
-                'components' => [
-                    [
-                        'component_type' => 'CGST',
-                        'rate' => 6.00,
-                        'description' => 'Central GST component (6%)',
-                    ],
-                    [
-                        'component_type' => 'SGST',
-                        'rate' => 6.00,
-                        'description' => 'State GST component (6%)',
-                    ],
-                ],
-            ],
-            [
-                'name' => 'GST 18% (Intra-State)',
-                'total_rate' => 18.00,
-                'supply_type' => 'Intra-State',
-                'is_active' => true,
-                'is_default' => true, // Commonly used rate
-                'description' => '18% GST for intra-state supplies',
-                'components' => [
-                    [
-                        'component_type' => 'CGST',
-                        'rate' => 9.00,
-                        'description' => 'Central GST component (9%)',
-                    ],
-                    [
-                        'component_type' => 'SGST',
-                        'rate' => 9.00,
-                        'description' => 'State GST component (9%)',
-                    ],
-                ],
-            ],
-            [
-                'name' => 'GST 28% (Intra-State)',
-                'total_rate' => 28.00,
-                'supply_type' => 'Intra-State',
-                'is_active' => true,
-                'is_default' => false,
-                'description' => '28% GST for intra-state supplies with CESS',
-                'components' => [
-                    [
-                        'component_type' => 'CGST',
-                        'rate' => 14.00,
-                        'description' => 'Central GST component (14%)',
-                    ],
-                    [
-                        'component_type' => 'SGST',
-                        'rate' => 14.00,
-                        'description' => 'State GST component (14%)',
-                    ],
-                    [
-                        'component_type' => 'CESS',
-                        'rate' => 1.00,
-                        'description' => 'Additional CESS for luxury goods (1%)',
-                    ],
-                ],
-            ],
-            [
-                'name' => 'GST 5% (Inter-State)',
-                'total_rate' => 5.00,
-                'supply_type' => 'Inter-State',
-                'is_active' => true,
-                'is_default' => false,
-                'description' => '5% GST for inter-state supplies',
-                'components' => [
-                    [
-                        'component_type' => 'IGST',
-                        'rate' => 5.00,
-                        'description' => 'Integrated GST component (5%)',
-                    ],
-                ],
-            ],
-            [
-                'name' => 'GST 12% (Inter-State)',
-                'total_rate' => 12.00,
-                'supply_type' => 'Inter-State',
-                'is_active' => true,
-                'is_default' => false,
-                'description' => '12% GST for inter-state supplies',
-                'components' => [
-                    [
-                        'component_type' => 'IGST',
-                        'rate' => 12.00,
-                        'description' => 'Integrated GST component (12%)',
-                    ],
-                ],
-            ],
-            [
-                'name' => 'GST 18% (Inter-State)',
-                'total_rate' => 18.00,
-                'supply_type' => 'Inter-State',
-                'is_active' => true,
-                'is_default' => false,
-                'description' => '18% GST for inter-state supplies',
-                'components' => [
-                    [
-                        'component_type' => 'IGST',
-                        'rate' => 18.00,
-                        'description' => 'Integrated GST component (18%)',
-                    ],
-                ],
-            ],
-            [
-                'name' => 'GST 28% (Inter-State)',
-                'total_rate' => 28.00,
-                'supply_type' => 'Inter-State',
-                'is_active' => true,
-                'is_default' => false,
-                'description' => '28% GST for inter-state supplies with CESS',
-                'components' => [
-                    [
-                        'component_type' => 'IGST',
-                        'rate' => 28.00,
-                        'description' => 'Integrated GST component (28%)',
-                    ],
-                    [
-                        'component_type' => 'CESS',
-                        'rate' => 1.00,
-                        'description' => 'Additional CESS for luxury goods (1%)',
-                    ],
-                ],
-            ],
-            [
-                'name' => 'VAT 14.5%',
-                'total_rate' => 14.50,
-                'supply_type' => 'Intra-State',
-                'is_active' => false, // Legacy tax, typically inactive
-                'is_default' => false,
-                'description' => 'Legacy Value Added Tax for specific goods',
-                'components' => [
-                    [
-                        'component_type' => 'VAT',
-                        'rate' => 14.50,
-                        'description' => 'Value Added Tax component (14.5%)',
-                    ],
-                ],
-            ],
-        ];
-
-        // Insert taxes and their components
-        foreach ($taxes as $taxData) {
-            $components = $taxData['components'];
-            unset($taxData['components']);
-
-            // Insert tax record
-            $tax = Tax::create($taxData);
-
-            // Insert associated components
-            foreach ($components as $component) {
-                $component['tax_id'] = $tax->id;
-                TaxComponent::create($component);
-            }
-        }
     }
 }

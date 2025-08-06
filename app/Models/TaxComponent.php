@@ -9,12 +9,7 @@ class TaxComponent extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'tax_id',
-        'component_type',
-        'rate',
-        'description',
-    ];
+    protected $fillable = ['tax_id', 'type', 'rate'];
 
     protected $casts = [
         'rate' => 'decimal:2',

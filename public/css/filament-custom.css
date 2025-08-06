@@ -77,10 +77,20 @@
 }
 
 /* Additional fallback for Filament form components */
-.fi-fo-component-ctn.filament-tables-table-repeater-grid {
+.fi-fo-component-ctn .filament-tables-table-repeater-grid {
+    gap: 0 !important;
+}
+.no-gap .fi-fo-component-ctn {
     gap: 0 !important;
 }
 
+.table-repeater-column .gap-y-2 {
+    gap: 0 !important;
+}
+
+.no-gap-p6 .p-6 {
+    padding: 0 !important;
+}
 .no-gap.grid {
     gap: 0px !important;
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tax_components', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tax_id')->constrained()->onDelete('cascade');
-            $table->enum('component_type', ['CGST', 'SGST', 'IGST', 'CESS', 'VAT', 'EXCISE', 'CUSTOM']);
+            $table->enum('type', ['CGST', 'SGST', 'IGST', 'CESS', 'VAT', 'EXCISE', 'CUSTOM']);
             $table->decimal('rate', 6, 2); // e.g. 9.00, 22.00, 5.00
             $table->string('description')->nullable(); // Optional note about CESS type or usage
             $table->timestamps();

@@ -42,27 +42,13 @@ class TaxResource extends Resource
                     ->step(0.01)
                     ->suffix('%'),
 
-                Radio::make('supply_type')
-                    ->options([
-                        'intra' => 'Intra-State (CGST + SGST)',
-                        'inter' => 'Inter-State (IGST)',
-                    ])
-                    ->inline()
-                    ->default('intra'),
-
                 Toggle::make('is_active')->default(true),
-                Toggle::make('is_default')->default(false),
-
-                Textarea::make('description')
-                    ->rows(2)
-                    ->maxLength(255)
-                    ->columnSpanFull(),
 
                 Repeater::make('components')
                     ->label('Tax Components')
                     ->relationship('components')
                     ->schema([
-                        Select::make('component_type')
+                        Select::make('type')
                             ->options([
                                 'CGST' => 'CGST',
                                 'SGST' => 'SGST',
@@ -79,10 +65,6 @@ class TaxResource extends Resource
                             ->required()
                             ->step(0.01)
                             ->suffix('%'),
-
-                        TextInput::make('description')
-                            ->maxLength(255)
-                            ->placeholder('Optional note'),
                     ])
                     ->defaultItems(1)
                     ->columns(3)

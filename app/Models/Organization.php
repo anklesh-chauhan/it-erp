@@ -71,6 +71,16 @@ class Organization extends Model
         return $this->morphMany(Address::class, 'addressable');
     }
 
+    public function primaryAddress()
+    {
+        return $this->addresses()->first(); // or ->where('is_primary', true)->first() if you track primary
+    }
+
+    public function state()
+    {
+        return optional($this->primaryAddress())->state;
+    }
+
     public function employmentDetails()
     {
         return $this->hasMany(EmploymentDetail::class, 'organization_id');
@@ -78,7 +88,7 @@ class Organization extends Model
 
     public function departments()
     {
-        return $this->hasMany(EmpDeparment::class, 'organization_id');
+        return $this->hasMany(EmpDepartment::class, 'organization_id');
     }
 
     /**

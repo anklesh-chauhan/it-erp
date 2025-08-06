@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Traits\SalesDocumentResourceTrait;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class QuoteResource extends Resource
 {
@@ -30,6 +32,7 @@ class QuoteResource extends Resource
     {
         return method_exists(static::class, 'getModel') ? static::getModel() : \App\Models\Quote::class;
     }
+    
     public static function form(Form $form): Form
     {
         return $form
@@ -184,6 +187,18 @@ class QuoteResource extends Resource
         ];
     }
 
+    protected function handleRecordCreation(array $data): Model
+         {
+             Log::debug('QuoteResource handleRecordCreation called');
+             return $this->handleRecordCreation($data);
+         }
+
+         protected function handleRecordUpdate(Model $record, array $data): Model
+         {
+             Log::debug('QuoteResource handleRecordUpdate called');
+             return $this->handleRecordUpdate($record, $data);
+         }
+
     public static function getPages(): array
     {
         return [
@@ -192,4 +207,5 @@ class QuoteResource extends Resource
             'edit' => Pages\EditQuote::route('/{record}/edit'),
         ];
     }
+    
 }

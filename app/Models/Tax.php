@@ -10,24 +10,8 @@ class Tax extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = [
-        'name',
-        'total_rate',
-        'supply_type',
-        'is_active',
-        'is_default',
-        'description',
-    ];
+    protected $fillable = ['name', 'total_rate', 'is_active'];
 
-    protected $casts = [
-        'total_rate' => 'decimal:2',
-        'is_active' => 'boolean',
-        'is_default' => 'boolean',
-    ];
-
-    /**
-     * Relationship: Components like CGST, SGST, IGST, CESS etc.
-     */
     public function components()
     {
         return $this->hasMany(TaxComponent::class);
