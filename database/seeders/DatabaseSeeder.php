@@ -84,8 +84,6 @@ class DatabaseSeeder extends Seeder
             EmpDepartmentSeeder::class,
             EmpGradeSeeder::class,
             EmpJobTitleSeeder::class,
-            TaxSeeder::class,
-
         ]);
     }
 }
