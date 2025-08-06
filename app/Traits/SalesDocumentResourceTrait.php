@@ -621,13 +621,11 @@ trait SalesDocumentResourceTrait
 
     public function afterCreate(): void
     {
-        Log::info('afterCreate hook is running.');
         $this->saveTaxDetailsFromModel();
     }
 
     public function afterSave(): void
     {
-        Log::info('afterSave hook is running.');
         $this->saveTaxDetailsFromModel(); 
     }
 
@@ -636,7 +634,6 @@ trait SalesDocumentResourceTrait
         $record = $this->record ?? null;
 
         if (!$record) {
-            Log::warning('saveTaxDetailsFromModel: Missing record.');
             return;
         }
 
@@ -645,17 +642,8 @@ trait SalesDocumentResourceTrait
         $items = $record->items; // Get the items from the relationship, not the form state
 
         if ($items->isEmpty()) {
-            Log::warning('saveTaxDetailsFromModel: No items found in record relationship.', [
-                'record_id' => $record->id,
-                'items_count' => $items->count(),
-            ]);
             return;
         }
-
-        Log::info('Starting saveTaxDetails from model relationship', [
-            'record_id' => $record->id,
-            'items_count' => $items->count(),
-        ]);
 
         // Delete existing tax details
         TaxDetail::where('taxable_type', get_class($record))
@@ -663,7 +651,6 @@ trait SalesDocumentResourceTrait
             ->delete();
 
         $useCgstSgst = $this->shouldShowCgstSgst(fn ($field) => data_get($this->form->getState(), $field));
-        Log::info('Tax type determination', ['useCgstSgst' => $useCgstSgst]);
 
         foreach ($items as $item) {
             $quantity = floatval($item->quantity ?? 1);
