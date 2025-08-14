@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\RatingTypeResource\Pages;
+namespace App\Filament\Resources\RatingTypes\Pages;
 
-use App\Filament\Resources\RatingTypeResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\RatingTypes\RatingTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditRatingType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

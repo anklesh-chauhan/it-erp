@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\FollowUpStatusResource\Pages;
+namespace App\Filament\Resources\FollowUpStatuses\Pages;
 
-use App\Filament\Resources\FollowUpStatusResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\FollowUpStatuses\FollowUpStatusResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListFollowUpStatuses extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

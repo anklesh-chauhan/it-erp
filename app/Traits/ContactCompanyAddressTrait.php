@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Filament\Schemas\Components\Grid;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
@@ -16,19 +17,19 @@ use App\Models\ItemMaster;
 
 trait ContactCompanyAddressTrait
 {
-    use \App\Traits\ContactDetailsTrait;
-    use \App\Traits\CompanyDetailsTrait;
-    use \App\Traits\AddressDetailsTrait;
+    use ContactDetailsTrait;
+    use CompanyDetailsTrait;
+    use AddressDetailsTrait;
 
     protected static function resolveModelClass(): string
     {
-        return method_exists(static::class, 'getModel') ? static::getModel() : \App\Models\Lead::class;
+        return method_exists(static::class, 'getModel') ? static::getModel() : Lead::class;
     }
     // Common form schema
     public static function getCommonFormSchema(): array
     {
         return [
-            Forms\Components\Grid::make(3)
+            Grid::make(3)
                 ->schema([
                     ...self::getContactDetailsTraitField(),
                     ...self::getCompanyDetailsTraitField(),

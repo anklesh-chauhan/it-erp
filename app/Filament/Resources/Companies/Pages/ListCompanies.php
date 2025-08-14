@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\CompanyResource\Pages;
+namespace App\Filament\Resources\Companies\Pages;
 
-use App\Filament\Resources\CompanyResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Companies\CompanyResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListCompanies extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

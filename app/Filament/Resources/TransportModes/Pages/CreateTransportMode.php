@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\TransportModeResource\Pages;
+namespace App\Filament\Resources\TransportModes\Pages;
 
-use App\Filament\Resources\TransportModeResource;
+use App\Filament\Resources\TransportModes\TransportModeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

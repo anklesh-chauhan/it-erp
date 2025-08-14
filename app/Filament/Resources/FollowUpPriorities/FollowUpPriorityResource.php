@@ -1,12 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\FollowUpPriorities;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\FollowUpPriorities\Pages\ListFollowUpPriorities;
+use App\Filament\Resources\FollowUpPriorities\Pages\CreateFollowUpPriority;
+use App\Filament\Resources\FollowUpPriorities\Pages\EditFollowUpPriority;
 use App\Filament\Resources\FollowUpPriorityResource\Pages;
 use App\Filament\Resources\FollowUpPriorityResource\RelationManagers;
 use App\Models\FollowUpPriority;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,17 +25,17 @@ class FollowUpPriorityResource extends Resource
 {
     protected static ?string $model = FollowUpPriority::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?string $navigationParentItem = 'Follow Up Config';
     protected static ?string $navigationLabel = 'Priorities';
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -37,13 +45,13 @@ class FollowUpPriorityResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -51,12 +59,12 @@ class FollowUpPriorityResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -71,9 +79,9 @@ class FollowUpPriorityResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFollowUpPriorities::route('/'),
-            'create' => Pages\CreateFollowUpPriority::route('/create'),
-            'edit' => Pages\EditFollowUpPriority::route('/{record}/edit'),
+            'index' => ListFollowUpPriorities::route('/'),
+            'create' => CreateFollowUpPriority::route('/create'),
+            'edit' => EditFollowUpPriority::route('/{record}/edit'),
         ];
     }
 }

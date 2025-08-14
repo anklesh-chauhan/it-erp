@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\SalesDcrResource\Pages;
+namespace App\Filament\Resources\SalesDcrs\Pages;
 
-use App\Filament\Resources\SalesDcrResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\SalesDcrs\SalesDcrResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListSalesDcrs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

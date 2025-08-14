@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\FollowUpResource\Pages;
+namespace App\Filament\Resources\FollowUps\Pages;
 
-use App\Filament\Resources\FollowUpResource;
+use App\Filament\Resources\FollowUps\FollowUpResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

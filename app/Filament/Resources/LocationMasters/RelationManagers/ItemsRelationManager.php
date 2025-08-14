@@ -1,9 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\LocationMasterResource\RelationManagers;
+namespace App\Filament\Resources\LocationMasters\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\AttachAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DetachAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DetachBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -14,14 +21,14 @@ class ItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'items';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('quantity') // Pivot field
+                TextInput::make('quantity') // Pivot field
                     ->required()
                     ->numeric()
                     ->default(0),
@@ -33,23 +40,23 @@ class ItemsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('item_name')
             ->columns([
-                Tables\Columns\TextColumn::make('item_name'),
-                Tables\Columns\TextColumn::make('pivot.quantity') // Display pivot field
+                TextColumn::make('item_name'),
+                TextColumn::make('pivot.quantity') // Display pivot field
                     ->label('Quantity'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make(),
+                AttachAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DetachAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DetachAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DetachBulkAction::make(),
                 ]),
             ]);
     }

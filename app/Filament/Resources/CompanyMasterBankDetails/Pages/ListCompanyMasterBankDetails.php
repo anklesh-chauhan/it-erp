@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\CompanyMasterBankDetailResource\Pages;
+namespace App\Filament\Resources\CompanyMasterBankDetails\Pages;
 
-use App\Filament\Resources\CompanyMasterBankDetailResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\CompanyMasterBankDetails\CompanyMasterBankDetailResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListCompanyMasterBankDetails extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

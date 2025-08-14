@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\CountryResource\Pages;
+namespace App\Filament\Resources\Countries\Pages;
 
-use App\Filament\Resources\CountryResource;
+use App\Filament\Resources\Countries\CountryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

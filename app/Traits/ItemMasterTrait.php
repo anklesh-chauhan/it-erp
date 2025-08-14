@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Components\Actions\Action;
@@ -27,7 +29,7 @@ trait ItemMasterTrait
     public static function getItemMasterTraitField(): array
     {
         return [
-            Forms\Components\Grid::make(3)
+            Grid::make(3)
                 ->schema([
                     TextInput::make('item_code')
                         ->label('Item Code')
@@ -67,9 +69,9 @@ trait ItemMasterTrait
                     Textarea::make('description')
                         ->label('Description'),
 
-                    Forms\Components\Section::make('More Details')
+                    Section::make('More Details')
                         ->schema([
-                            Forms\Components\Grid::make(4)
+                            Grid::make(4)
                                 ->schema([
                                     TextInput::make('purchase_price')
                                         ->label('Purchase Price')

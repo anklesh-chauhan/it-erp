@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Exception;
 use App\Models\Tenant;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -81,7 +82,7 @@ class ManageCloudflareCname implements ShouldQueue
                     Log::error("Failed to delete CNAME: " . $response->body());
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error processing Cloudflare {$this->action} for tenant {$this->tenant->name}: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
         }
     }

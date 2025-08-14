@@ -1,12 +1,23 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Quotes;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Quotes\Pages\ListQuotes;
+use App\Filament\Resources\Quotes\Pages\CreateQuote;
+use App\Filament\Resources\Quotes\Pages\EditQuote;
 use App\Filament\Resources\QuoteResource\Pages;
 use App\Filament\Resources\QuoteResource\RelationManagers;
 use App\Models\Quote;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -24,24 +35,24 @@ class QuoteResource extends Resource
 
     protected static ?string $model = Quote::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Sales';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Sales';
     protected static ?int $navigationSort = 10;
 
     protected static function resolveModelClass(): string
     {
-        return method_exists(static::class, 'getModel') ? static::getModel() : \App\Models\Quote::class;
+        return method_exists(static::class, 'getModel') ? static::getModel() : Quote::class;
     }
     
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 // Common fields for all sales documents
                 ...self::getCommonFormFields(),
 
-                Forms\Components\DatePicker::make('expiration_date'),
-                Forms\Components\Select::make('status')
+                DatePicker::make('expiration_date'),
+                Select::make('status')
                     ->options([
                         'draft' => 'Draft',
                         'sent' => 'Sent',
@@ -52,7 +63,7 @@ class QuoteResource extends Resource
                     ->default('draft') // Set the default value
                     ->required()
                     ->label('Status'),
-                Forms\Components\DatePicker::make('accepted_at'),
+                DatePicker::make('accepted_at'),
 
             ]);
     }
@@ -61,47 +72,47 @@ class QuoteResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('document_number')
+                TextColumn::make('document_number')
                     ->label('Document No.')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('date')
+                TextColumn::make('date')
                     ->label('Date')
                     ->date()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('company.name')
+                TextColumn::make('company.name')
                     ->label('Company')
                     ->searchable()
                     ->sortable(),
 
                 // Contact Detail Column
-                Tables\Columns\TextColumn::make('contactDetail.full_name')
+                TextColumn::make('contactDetail.full_name')
                     ->label('Contact')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('total')
+                TextColumn::make('total')
                     ->label('Total')
                     ->money('INR')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('salesPerson.name')
+                TextColumn::make('salesPerson.name')
                     ->label('Sales Person')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('Status')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\IconColumn::make('sent_at')
+                IconColumn::make('sent_at')
                     ->label('Sent')
                     ->boolean(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->since()
                     ->sortable(),
@@ -110,9 +121,9 @@ class QuoteResource extends Resource
                 // 📅 Date Range Filter
                 Filter::make('date')
                     ->label('Document Date Range')
-                    ->form([
-                        Forms\Components\DatePicker::make('from'),
-                        Forms\Components\DatePicker::make('until'),
+                    ->schema([
+                        DatePicker::make('from'),
+                        DatePicker::make('until'),
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
@@ -160,9 +171,9 @@ class QuoteResource extends Resource
                 // 💰 Total Amount Range Filter
                 Filter::make('total')
                     ->label('Total Amount Range')
-                    ->form([
-                        Forms\Components\TextInput::make('min')->numeric()->placeholder('Min'),
-                        Forms\Components\TextInput::make('max')->numeric()->placeholder('Max'),
+                    ->schema([
+                        TextInput::make('min')->numeric()->placeholder('Min'),
+                        TextInput::make('max')->numeric()->placeholder('Max'),
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
@@ -170,12 +181,12 @@ class QuoteResource extends Resource
                             ->when($data['max'], fn ($q) => $q->where('total', '<=', $data['max']));
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -202,9 +213,9 @@ class QuoteResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListQuotes::route('/'),
-            'create' => Pages\CreateQuote::route('/create'),
-            'edit' => Pages\EditQuote::route('/{record}/edit'),
+            'index' => ListQuotes::route('/'),
+            'create' => CreateQuote::route('/create'),
+            'edit' => EditQuote::route('/{record}/edit'),
         ];
     }
     

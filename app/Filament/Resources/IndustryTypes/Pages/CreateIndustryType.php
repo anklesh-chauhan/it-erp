@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\IndustryTypeResource\Pages;
+namespace App\Filament\Resources\IndustryTypes\Pages;
 
-use App\Filament\Resources\IndustryTypeResource;
+use App\Filament\Resources\IndustryTypes\IndustryTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

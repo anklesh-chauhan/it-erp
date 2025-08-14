@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\EmpGradeResource\Pages;
+namespace App\Filament\Resources\EmpGrades\Pages;
 
-use App\Filament\Resources\EmpGradeResource;
+use App\Filament\Resources\EmpGrades\EmpGradeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

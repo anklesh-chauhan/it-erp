@@ -2,8 +2,19 @@
 
 namespace App\Filament\Resources\AccountMasterBankDetailResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -14,77 +25,77 @@ class BankDetailRelationManager extends RelationManager
 {
     protected static string $relationship = 'bankDetail';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('bank_name')
+        return $schema
+            ->components([
+                TextInput::make('bank_name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('bank_account_number')
+                TextInput::make('bank_account_number')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('bank_account_name')
+                TextInput::make('bank_account_name')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('bank_account_ifsc_code')
+                TextInput::make('bank_account_ifsc_code')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('bank_account_swift_code')
+                TextInput::make('bank_account_swift_code')
                     ->maxLength(255),
 
                 // Show more toggle
-                Forms\Components\Toggle::make('show_more')
+                Toggle::make('show_more')
                     ->label('Show More Details')
                     ->inline(false)
                     ->reactive(),
-                Forms\Components\Section::make('More Bank Details')
+                Section::make('More Bank Details')
                 ->schema([
-                    Forms\Components\TextInput::make('bank_account_branch')
+                    TextInput::make('bank_account_branch')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_iban')
+                    TextInput::make('bank_account_iban')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_bic')
+                    TextInput::make('bank_account_bic')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_phone')
+                    TextInput::make('bank_account_phone')
                         ->tel()
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_email')
+                    TextInput::make('bank_account_email')
                         ->email()
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_address')
+                    TextInput::make('bank_account_address')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_city')
+                    TextInput::make('bank_account_city')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_state')
+                    TextInput::make('bank_account_state')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_country')
+                    TextInput::make('bank_account_country')
                         ->required()
                         ->maxLength(255)
                         ->default('India'),
-                    Forms\Components\TextInput::make('bank_account_zip')
+                    TextInput::make('bank_account_zip')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_tax_id')
+                    TextInput::make('bank_account_tax_id')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_micr_code')
+                    TextInput::make('bank_account_micr_code')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_rtgs_code')
+                    TextInput::make('bank_account_rtgs_code')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_ecs_code')
+                    TextInput::make('bank_account_ecs_code')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_code')
+                    TextInput::make('bank_account_code')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_type')
+                    TextInput::make('bank_account_type')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bank_account_currency')
+                    TextInput::make('bank_account_currency')
                         ->required()
                         ->maxLength(255)
                         ->default('INR'),
                 ])
-                ->visible(fn (Forms\Get $get) => $get('show_more')),
+                ->visible(fn (Get $get) => $get('show_more')),
 
-                Forms\Components\Toggle::make('bank_account_status')
+                Toggle::make('bank_account_status')
                     ->required()
                     ->default('active'),
-                Forms\Components\Textarea::make('remark')
+                Textarea::make('remark')
                     ->columnSpanFull(),
                 // Forms\Components\Select::make('account_master_id')
                 //     ->relationship('accountMaster', 'name')
@@ -97,28 +108,28 @@ class BankDetailRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('bank_name')
+                TextColumn::make('bank_name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('bank_account_number')
+                TextColumn::make('bank_account_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('bank_account_name')
+                TextColumn::make('bank_account_name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('bank_account_ifsc_code')
+                TextColumn::make('bank_account_ifsc_code')
                     ->searchable(),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

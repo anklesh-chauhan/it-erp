@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\NumberSeriesResource\Pages;
+namespace App\Filament\Resources\NumberSeries\Pages;
 
-use App\Filament\Resources\NumberSeriesResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\NumberSeries\NumberSeriesResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditNumberSeries extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

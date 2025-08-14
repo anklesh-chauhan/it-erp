@@ -2,8 +2,17 @@
 
 namespace App\Traits;
 
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use App\Models\ContactDetail;
+use App\Models\AccountMaster;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Hidden;
+use Filament\Actions\Action;
+use Illuminate\Support\Facades\Log;
+use Exception;
 use Filament\Forms;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,16 +26,16 @@ trait AccountMasterDetailsTrait
     public static function getAccountMasterDetailsTraitField(): array
     {
         return [
-            Forms\Components\Grid::make(2)
+            Grid::make(2)
                     ->schema([
-                        Forms\Components\Select::make('account_master_id')
+                        Select::make('account_master_id')
                             ->label('Business Details')
                             ->options(function (callable $get) {
                                 $contactId = $get('contact_detail_id');
 
                                 if ($contactId) {
                                     // Load contact and its related account masters
-                                    $contact = \App\Models\ContactDetail::with('accountMasters')->find($contactId);
+                                    $contact = ContactDetail::with('accountMasters')->find($contactId);
                                     if (!$contact) {
                                         return [];
                                     }
@@ -37,7 +46,7 @@ trait AccountMasterDetailsTrait
                                 }
 
                                 // If no contact is selected, show all account masters
-                                return \App\Models\AccountMaster::pluck('name', 'account_masters.id')->toArray();
+                                return AccountMaster::pluck('name', 'account_masters.id')->toArray();
                             })
                             ->searchable()
                             ->nullable()
@@ -46,58 +55,58 @@ trait AccountMasterDetailsTrait
                             ->extraAttributes(fn (callable $get) => $get('account_master_id') ? ['class' => 'hide-create-button'] : [])
                             ->createOptionForm(fn (callable $get) => $get('account_master_id')
                                 ? [
-                                    Forms\Components\Placeholder::make('info')
+                                    Placeholder::make('info')
                                         ->label('Info')
                                         ->content('The selected contact already belongs to an account master. Creating a new account master is not allowed.')
                                     ]
                                 : [
-                                    Forms\Components\Grid::make(2)
+                                    Grid::make(2)
                                     ->schema([
-                                        Forms\Components\TextInput::make('name')
+                                        TextInput::make('name')
                                             ->required()
                                             ->label('Account Master Name'),
 
-                                        Forms\Components\TextInput::make('email')
+                                        TextInput::make('email')
                                             ->email()
                                             ->nullable()
                                             ->label('Account Master Email'),
 
-                                        Forms\Components\TextInput::make('website')
+                                        TextInput::make('website')
                                             ->url()
                                             ->nullable()
                                             ->label('Website'),
 
-                                        Forms\Components\TextInput::make('phone_number')
+                                        TextInput::make('phone_number')
                                             ->label('Phone Number')
                                             ->nullable(),
 
-                                        Forms\Components\Select::make('industry_type_id')
+                                        Select::make('industry_type_id')
                                             ->relationship('industryType', 'name')
-                                            ->model(\App\Models\AccountMaster::class)
+                                            ->model(AccountMaster::class)
                                             ->searchable()
                                             ->nullable()
                                             ->label('Industry Type')
                                             ->preload(),
 
-                                        Forms\Components\TextInput::make('no_of_employees')
+                                        TextInput::make('no_of_employees')
                                             ->maxLength(255)
                                             ->nullable(),
                                         
-                                        Forms\Components\Select::make('owner_id')
+                                        Select::make('owner_id')
                                             ->relationship('owner', 'name')
-                                            ->model(\App\Models\AccountMaster::class)
+                                            ->model(AccountMaster::class)
                                             ->default(fn () => Auth::id())
                                             ->required()
                                             ->label('Owner'),
 
                                         // 👇 Hidden field for type_master_id
-                                        Forms\Components\Hidden::make('type_master_id')
+                                        Hidden::make('type_master_id')
                                             ->default(fn (callable $get) => 8), // Set static or dynamic default
 
                                     ])
                                 ])
                             ->createOptionUsing(function (array $data, callable $set, callable $get) {
-                                $accountMaster = \App\Models\AccountMaster::create($data);
+                                $accountMaster = AccountMaster::create($data);
 
                                 // Attach to contact if contact_detail_id exists
                                 if ($contactId = $get('contact_detail_id')) {
@@ -107,7 +116,7 @@ trait AccountMasterDetailsTrait
                                 $set('account_master_id', $accountMaster->id);
                                 return $accountMaster->id;
                             })
-                            ->createOptionAction(fn (Forms\Components\Actions\Action $action) =>
+                            ->createOptionAction(fn (Action $action) =>
                                 $action->hidden(fn (callable $get) => $get('account_master_id') !== null) // Hide "Create" button when a contact is selected
                             )
                             ->suffixAction(
@@ -115,46 +124,46 @@ trait AccountMasterDetailsTrait
                                     ->icon('heroicon-o-pencil')
                                     ->modalHeading('Edit Account Master')
                                     ->modalSubmitActionLabel('Update Account Master')
-                                    ->form(fn (callable $get) => [
-                                        Forms\Components\Grid::make(2)
+                                    ->schema(fn (callable $get) => [
+                                        Grid::make(2)
                                             ->schema([
-                                                Forms\Components\TextInput::make('name')
-                                                    ->default(\App\Models\AccountMaster::find($get('account_master_id'))?->name)
+                                                TextInput::make('name')
+                                                    ->default(AccountMaster::find($get('account_master_id'))?->name)
                                                     ->required()
                                                     ->label('Account Master Name'),
 
-                                                Forms\Components\TextInput::make('email')
+                                                TextInput::make('email')
                                                     ->email()
-                                                    ->default(\App\Models\AccountMaster::find($get('account_master_id'))?->email)
+                                                    ->default(AccountMaster::find($get('account_master_id'))?->email)
                                                     ->nullable()
                                                     ->label('Account Master Email'),
 
-                                                Forms\Components\TextInput::make('website')
+                                                TextInput::make('website')
                                                     ->url()
-                                                    ->default(\App\Models\AccountMaster::find($get('account_master_id'))?->website)
+                                                    ->default(AccountMaster::find($get('account_master_id'))?->website)
                                                     ->nullable()
                                                     ->label('Website'),
 
-                                                Forms\Components\TextInput::make('phone_number')
-                                                    ->default(\App\Models\AccountMaster::find($get('account_master_id'))?->phone_number)
+                                                TextInput::make('phone_number')
+                                                    ->default(AccountMaster::find($get('account_master_id'))?->phone_number)
                                                     ->nullable()
                                                     ->label('Phone Number'),
 
-                                                Forms\Components\Select::make('industry_type_id')
+                                                Select::make('industry_type_id')
                                                     ->relationship('industryType', 'name')
-                                                    ->model(\App\Models\AccountMaster::class)
+                                                    ->model(AccountMaster::class)
                                                     ->searchable()
                                                     ->preload()
-                                                    ->default(fn () => \App\Models\AccountMaster::find($get('account_master_id'))?->industry_type_id),
+                                                    ->default(fn () => AccountMaster::find($get('account_master_id'))?->industry_type_id),
 
-                                                Forms\Components\TextInput::make('no_of_employees')
-                                                    ->default(\App\Models\AccountMaster::find($get('account_master_id'))?->no_of_employees)
+                                                TextInput::make('no_of_employees')
+                                                    ->default(AccountMaster::find($get('account_master_id'))?->no_of_employees)
                                                     ->maxLength(255)
                                                     ->label('Number of Employees'),
                                             ]),
                                     ])
                                     ->action(function (array $data, callable $get) {
-                                        $accountMaster = \App\Models\AccountMaster::find($get('account_master_id'));
+                                        $accountMaster = AccountMaster::find($get('account_master_id'));
 
                                         if ($accountMaster) {
                                             $accountMaster->update([
@@ -178,7 +187,7 @@ trait AccountMasterDetailsTrait
                             // After state update for account_master_id
                             ->afterStateUpdated(function (callable $set, $state, callable $get) {
                         if ($state) {
-                            $accountMaster = \App\Models\AccountMaster::with('addresses')->find($state);
+                            $accountMaster = AccountMaster::with('addresses')->find($state);
 
                             if (!$accountMaster) {
                                 $set('contact_detail_id', null);
@@ -195,14 +204,14 @@ trait AccountMasterDetailsTrait
                                 $set('billing_address_id', $defaultAddress->id);
 
                                 // Debug: Log the selected address
-                                \Illuminate\Support\Facades\Log::info('getAccountMasterDetailsTraitField: Auto-selected address', [
+                                Log::info('getAccountMasterDetailsTraitField: Auto-selected address', [
                                     'account_master_id' => $state,
                                     'address_id' => $defaultAddress->id,
                                     'address_type' => $defaultAddress->address_type
                                 ]);
                             } else {
                                 // Debug: Log if no addresses found
-                                \Illuminate\Support\Facades\Log::info('getAccountMasterDetailsTraitField: No addresses found for AccountMaster', [
+                                Log::info('getAccountMasterDetailsTraitField: No addresses found for AccountMaster', [
                                     'account_master_id' => $state
                                 ]);
                                 $set('billing_address_id', null); // Clear address if no addresses available
@@ -220,8 +229,8 @@ trait AccountMasterDetailsTrait
                             if ($contactId) {
                                     try {
                                         $accountMaster->contactDetails()->syncWithoutDetaching([$contactId]);
-                                    } catch (\Exception $e) {
-                                        \Filament\Notifications\Notification::make()
+                                    } catch (Exception $e) {
+                                        Notification::make()
                                             ->title('Error syncing contact')
                                             ->danger()
                                             ->send();
@@ -240,14 +249,14 @@ trait AccountMasterDetailsTrait
                                 $set('show_account_master_info', $state);
                                 $contactId = $get('contact_detail_id');
                                 if ($contactId) {
-                                    $accountMaster = \App\Models\AccountMaster::find($state);
+                                    $accountMaster = AccountMaster::find($state);
                                     if ($accountMaster && $contactId) {
                                         $accountMaster->contactDetails()->syncWithoutDetaching([$contactId]);
                                     }
                                 }
 
                                 // Auto-select address during hydration
-                                $accountMaster = \App\Models\AccountMaster::with('addresses')->find($state);
+                                $accountMaster = AccountMaster::with('addresses')->find($state);
                                 if ($accountMaster && $accountMaster->addresses->isNotEmpty()) {
                                     $defaultAddress = $accountMaster->addresses->where('address_type', 'Billing')->first()
                                         ?? $accountMaster->addresses->first();
@@ -261,7 +270,7 @@ trait AccountMasterDetailsTrait
                                             $set('show_account_master_info', $existingAccountMasterId);
 
                                             // Auto-select address for existing account master
-                                            $accountMaster = \App\Models\AccountMaster::with('addresses')->find($existingAccountMasterId);
+                                            $accountMaster = AccountMaster::with('addresses')->find($existingAccountMasterId);
                                             if ($accountMaster && $accountMaster->addresses->isNotEmpty()) {
                                                 $defaultAddress = $accountMaster->addresses->where('address_type', 'Billing')->first()
                                                     ?? $accountMaster->addresses->first();
@@ -271,14 +280,14 @@ trait AccountMasterDetailsTrait
                                     }
                                 })
                             ->getOptionLabelUsing(fn ($value) =>
-                                \App\Models\AccountMaster::find($value)?->name ?? 'Unknown Account Master'
+                                AccountMaster::find($value)?->name ?? 'Unknown Account Master'
                             ),
 
-                        Forms\Components\Placeholder::make('Account Details')
+                        Placeholder::make('Account Details')
                             ->hidden(fn (callable $get) => !$get('account_master_id'))
                             ->label('Business Details')
                             ->content(function (callable $get) {
-                                $accountMaster = \App\Models\AccountMaster::find($get('account_master_id'));
+                                $accountMaster = AccountMaster::find($get('account_master_id'));
 
                                 $accountDetails = $accountMaster
                                     ? "🏢 {$accountMaster->name}

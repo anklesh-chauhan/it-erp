@@ -1,12 +1,23 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\SalesInvoices;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\SalesInvoices\Pages\ListSalesInvoices;
+use App\Filament\Resources\SalesInvoices\Pages\CreateSalesInvoice;
+use App\Filament\Resources\SalesInvoices\Pages\EditSalesInvoice;
 use App\Filament\Resources\SalesInvoiceResource\Pages;
 use App\Filament\Resources\SalesInvoiceResource\RelationManagers;
 use App\Models\SalesInvoice;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,14 +31,14 @@ class SalesInvoiceResource extends Resource
 
     protected static ?string $model = SalesInvoice::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Sales';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Sales';
     protected static ?int $navigationSort = 30;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 ...self::getCommonFormFields(),
             ]);
     }
@@ -36,78 +47,78 @@ class SalesInvoiceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('document_number')
+                TextColumn::make('document_number')
                     ->label('Document No.')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('date')
+                TextColumn::make('date')
                     ->label('Date')
                     ->date()
                     ->sortable(),
 
                 // Account Master Column
-                Tables\Columns\TextColumn::make('accountMaster.name')
+                TextColumn::make('accountMaster.name')
                     ->label('Account Master')
                     ->searchable()
                     ->sortable(),
 
                 // Contact Detail Column
-                Tables\Columns\TextColumn::make('contactDetail.full_name')
+                TextColumn::make('contactDetail.full_name')
                     ->label('Contact')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('total')
+                TextColumn::make('total')
                     ->label('Total')
                     ->money('INR')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('salesPerson.name')
+                TextColumn::make('salesPerson.name')
                     ->label('Sales Person')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('payment_terms')
+                TextColumn::make('payment_terms')
                     ->label('Payment Terms')
                     ->limit(20),
 
-                Tables\Columns\TextColumn::make('shipping_method')
+                TextColumn::make('shipping_method')
                     ->label('Shipping Method')
                     ->limit(20),
 
-                Tables\Columns\IconColumn::make('rejected_at')
+                IconColumn::make('rejected_at')
                     ->label('Rejected')
                     ->boolean(),
 
-                Tables\Columns\IconColumn::make('canceled_at')
+                IconColumn::make('canceled_at')
                     ->label('Canceled')
                     ->boolean(),
 
-                Tables\Columns\IconColumn::make('sent_at')
+                IconColumn::make('sent_at')
                     ->label('Sent')
                     ->boolean(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->since()
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('sales_person_id')
+                SelectFilter::make('sales_person_id')
                     ->label('Sales Person')
                     ->relationship('salesPerson', 'name')
                     ->searchable(),
 
-                Tables\Filters\SelectFilter::make('account_master_id')
+                SelectFilter::make('account_master_id')
                     ->label('Account Master')
                     ->relationship('accountMaster', 'name')
                     ->searchable(),
 
-                Tables\Filters\Filter::make('date')
-                    ->form([
-                        Forms\Components\DatePicker::make('from'),
-                        Forms\Components\DatePicker::make('until'),
+                Filter::make('date')
+                    ->schema([
+                        DatePicker::make('from'),
+                        DatePicker::make('until'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query
@@ -115,12 +126,12 @@ class SalesInvoiceResource extends Resource
                             ->when($data['until'], fn ($q) => $q->whereDate('date', '<=', $data['until']));
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -135,9 +146,9 @@ class SalesInvoiceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSalesInvoices::route('/'),
-            'create' => Pages\CreateSalesInvoice::route('/create'),
-            'edit' => Pages\EditSalesInvoice::route('/{record}/edit'),
+            'index' => ListSalesInvoices::route('/'),
+            'create' => CreateSalesInvoice::route('/create'),
+            'edit' => EditSalesInvoice::route('/{record}/edit'),
         ];
     }
 }

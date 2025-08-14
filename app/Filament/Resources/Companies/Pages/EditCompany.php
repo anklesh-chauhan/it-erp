@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\CompanyResource\Pages;
+namespace App\Filament\Resources\Companies\Pages;
 
-use App\Filament\Resources\CompanyResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Companies\CompanyResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditCompany extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

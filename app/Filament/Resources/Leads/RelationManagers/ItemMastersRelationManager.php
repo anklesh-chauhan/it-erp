@@ -1,9 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\LeadResource\RelationManagers;
+namespace App\Filament\Resources\Leads\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\AttachAction;
+use Filament\Actions\DetachAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DetachBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,22 +24,22 @@ class ItemMastersRelationManager extends RelationManager
 {
     protected static string $relationship = 'itemMasters';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('recordId') // Change to Select
+        return $schema
+            ->components([
+                Select::make('recordId') // Change to Select
                     ->label('Item Name')
                     ->options(ItemMaster::query()->pluck('item_name', 'id')) // Load Item Names
                     ->searchable()
                     ->required(),
 
-                Forms\Components\TextInput::make('quantity')
+                TextInput::make('quantity')
                     ->numeric()
                     ->required()
                     ->default(1),
 
-                Forms\Components\TextInput::make('price')
+                TextInput::make('price')
                     ->numeric()
                     ->required(),
             ]);
@@ -43,32 +50,32 @@ class ItemMastersRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('item_name')
             ->columns([
-                Tables\Columns\TextColumn::make('item_name')->label('Item Name'),
-                Tables\Columns\TextColumn::make('pivot.quantity')->label('Quantity'),
-                Tables\Columns\TextColumn::make('pivot.price')->label('Price'),
+                TextColumn::make('item_name')->label('Item Name'),
+                TextColumn::make('pivot.quantity')->label('Quantity'),
+                TextColumn::make('pivot.price')->label('Price'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make()
+                AttachAction::make()
                     ->recordSelect(function () {
                         return ItemMaster::query()->pluck('item_name', 'id'); // Load item names
                     })
                     ->preloadRecordSelect()
                     ->form([
 
-                        Forms\Components\Select::make('recordId')
+                        Select::make('recordId')
                         ->label('Item Name')
                         ->options(ItemMaster::query()->pluck('item_name', 'id')) // Load Item Names
                         ->searchable()
                         ->required(),
 
-                        Forms\Components\TextInput::make('quantity')
+                        TextInput::make('quantity')
                             ->numeric()
                             ->minValue(1)
                             ->required(),
-                        Forms\Components\TextInput::make('price')
+                        TextInput::make('price')
                             ->numeric()
                             ->prefix('$')
                             ->minValue(0)
@@ -97,8 +104,8 @@ class ItemMastersRelationManager extends RelationManager
                     }
                 }),
             ])
-            ->actions([
-                Tables\Actions\DetachAction::make()
+            ->recordActions([
+                DetachAction::make()
                 ->action(function ($record, RelationManager $livewire) {
                     $livewire->ownerRecord->itemMasters()->detach($record->id);
                 })
@@ -116,9 +123,9 @@ class ItemMastersRelationManager extends RelationManager
                     }
                 }),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DetachBulkAction::make()
                         ->action(function ($records, RelationManager $livewire) {
                             $lead = $livewire->getOwnerRecord();
                             $itemIds = $records->pluck('id')->toArray();

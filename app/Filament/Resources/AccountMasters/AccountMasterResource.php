@@ -1,11 +1,27 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\AccountMasters;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\AccountMasters\RelationManagers\ContactDetailsRelationManager;
+use App\Filament\Resources\AccountMasters\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\AccountMasters\Pages\ListAccountMasters;
+use App\Filament\Resources\AccountMasters\Pages\CreateAccountMaster;
+use App\Filament\Resources\AccountMasters\Pages\EditAccountMaster;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\AccountMasterResource\Pages;
 use App\Models\AccountMaster;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -21,13 +37,13 @@ class AccountMasterResource extends Resource
 
     protected static ?string $model = AccountMaster::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Masters';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 ...self::getCreateAccountMasterTraitFields()
             ]);
     }
@@ -36,42 +52,42 @@ class AccountMasterResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('account_code')
+                TextColumn::make('account_code')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone_number')
+                TextColumn::make('phone_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('industryType.name')
+                TextColumn::make('industryType.name')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('region.name')
+                TextColumn::make('region.name')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('commission')
+                TextColumn::make('commission')
                     ->money('usd'), // Adjust currency as needed
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+                RestoreAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -79,8 +95,8 @@ class AccountMasterResource extends Resource
     public static function getRelations(): array
     {
         return [
-            AccountMasterResource\RelationManagers\ContactDetailsRelationManager::class,
-            AccountMasterResource\RelationManagers\AddressesRelationManager::class,
+            ContactDetailsRelationManager::class,
+            AddressesRelationManager::class,
             BankDetailRelationManager::class,
             CreditDetailRelationManager::class,
             GSTDetailRelationManager::class,
@@ -91,14 +107,14 @@ class AccountMasterResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAccountMasters::route('/'),
-            'create' => Pages\CreateAccountMaster::route('/create'),
-            'edit' => Pages\EditAccountMaster::route('/{record}/edit'),
+            'index' => ListAccountMasters::route('/'),
+            'create' => CreateAccountMaster::route('/create'),
+            'edit' => EditAccountMaster::route('/{record}/edit'),
         ];
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withoutGlobalScopes([\Illuminate\Database\Eloquent\SoftDeletingScope::class]);
+        return parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class]);
     }
 }

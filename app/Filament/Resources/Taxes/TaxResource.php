@@ -1,14 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Taxes;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Taxes\Pages\ListTaxes;
+use App\Filament\Resources\Taxes\Pages\CreateTax;
+use App\Filament\Resources\Taxes\Pages\EditTax;
 use App\Models\Tax;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\TaxComponent;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Form;
 // use Filament\Resources\Table; // Remove this incorrect import
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
@@ -24,13 +30,13 @@ class TaxResource extends Resource
 {
     protected static ?string $model = Tax::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-receipt-percent';
-    protected static ?string $navigationGroup = 'Tax Management';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-receipt-percent';
+    protected static string | \UnitEnum | null $navigationGroup = 'Tax Management';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('name')
                     ->required()
                     ->maxLength(100),
@@ -73,7 +79,7 @@ class TaxResource extends Resource
                     ->addActionLabel('Add Component'),
             ]);
     }
-    public static function table(\Filament\Tables\Table $table): \Filament\Tables\Table
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -89,12 +95,12 @@ class TaxResource extends Resource
             ])
             ->defaultSort('name')
             ->filters([])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
     
@@ -106,9 +112,9 @@ class TaxResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTaxes::route('/'),
-            'create' => Pages\CreateTax::route('/create'),
-            'edit' => Pages\EditTax::route('/{record}/edit'),
+            'index' => ListTaxes::route('/'),
+            'create' => CreateTax::route('/create'),
+            'edit' => EditTax::route('/{record}/edit'),
         ];
     }
 }

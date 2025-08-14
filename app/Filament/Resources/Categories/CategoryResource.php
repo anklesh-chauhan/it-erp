@@ -1,50 +1,67 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Categories;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\EditAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\Categories\Pages\ListCategories;
+use App\Filament\Resources\Categories\Pages\CreateCategory;
+use App\Filament\Resources\Categories\Pages\EditCategory;
+use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\RestoreAction;
 use App\Helpers\ModelHelper;
 
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-folder';
-    protected static ?string $navigationGroup = 'Masters';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-folder';
+    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
     protected static ?int $navigationSort = 201;
     protected static ?string $navigationLabel = 'Category';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('alias')
+                TextInput::make('alias')
                     ->maxLength(255),
-                Forms\Components\Select::make('parent_id')
+                Select::make('parent_id')
                     ->label('Parent Category')
                     ->options(Category::all()->pluck('name', 'id'))
                     ->searchable()
                     ->nullable(),
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->maxLength(65535),
-                Forms\Components\FileUpload::make('image_path')
+                FileUpload::make('image_path')
                     ->image()
                     ->directory('categories'),
-                Forms\Components\Select::make('modelable_type')
+                Select::make('modelable_type')
                     ->label('Category Type')
                     ->options(ModelHelper::getModelOptions()) // Dynamic Model Names
                     ->nullable(),
-                Forms\Components\TextInput::make('modelable_id')
+                TextInput::make('modelable_id')
                     ->label('Modelable ID')
                     ->numeric()
                     ->nullable(),
@@ -55,32 +72,32 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('alias')
+                TextColumn::make('alias')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('parent.name')
+                TextColumn::make('parent.name')
                     ->label('Parent Category')
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('image_path')
+                ImageColumn::make('image_path')
                     ->label('Image'),
-                Tables\Columns\TextColumn::make('modelable_type')
+                TextColumn::make('modelable_type')
                     ->label('Type')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('modelable_id')
+                TextColumn::make('modelable_id')
                     ->label('Modelable ID')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('modelable_type')
+                TrashedFilter::make(),
+                SelectFilter::make('modelable_type')
                     ->options([
                         'App\Models\ItemMaster' => 'Item',
                         'App\Models\Company' => 'Company',
@@ -88,17 +105,17 @@ class CategoryResource extends Resource
                     ])
                     ->label('Filter by Type'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
                 RestoreAction::make()
                     ->visible(fn ($record) => $record !== null && $record->trashed())
                     ->requiresConfirmation(),
-                Tables\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ])
             ->defaultSort('name');
@@ -114,13 +131,13 @@ class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCategories::route('/'),
-            'create' => Pages\CreateCategory::route('/create'),
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
+            'index' => ListCategories::route('/'),
+            'create' => CreateCategory::route('/create'),
+            'edit' => EditCategory::route('/{record}/edit'),
         ];
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
             ->withTrashed(); // Include soft-deleted records

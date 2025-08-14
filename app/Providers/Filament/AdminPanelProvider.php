@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -18,15 +20,15 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Admin\Pages\Dashboard;
-use App\Filament\Resources\UserResource;
-use App\Filament\Resources\RoleResource;
-use App\Filament\Resources\PermissionResource;
+use App\Filament\Resources\Users\UserResource;
+use App\Filament\Resources\Roles\RoleResource;
+use App\Filament\Resources\Permissions\PermissionResource;
 use App\Providers\Filament\GlobalSearch\ResourceShortcutSearch;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use App\Filament\Resources\GlobalSearchResource;
-use App\Filament\Resources\LeadResource;
+use App\Filament\Resources\Leads\LeadResource;
 use App\Models\Lead;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
@@ -68,8 +70,8 @@ class AdminPanelProvider extends PanelProvider
                 FilamentShieldPlugin::make(),
             ])
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                AccountWidget::class,
+                FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -87,9 +89,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('14rem')
-            ->authGuard('web')
-            ->plugins([
-                FilamentShieldPlugin::make(),
-            ]);
+            ->authGuard('web');
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\SalesDailyExpenseResource\Pages;
+namespace App\Filament\Resources\SalesDailyExpenses\Pages;
 
-use App\Filament\Resources\SalesDailyExpenseResource;
+use App\Filament\Resources\SalesDailyExpenses\SalesDailyExpenseResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

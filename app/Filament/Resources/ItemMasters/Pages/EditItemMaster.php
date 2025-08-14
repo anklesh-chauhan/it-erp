@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\ItemMasterResource\Pages;
+namespace App\Filament\Resources\ItemMasters\Pages;
 
-use App\Filament\Resources\ItemMasterResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\ItemMasters\ItemMasterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditItemMaster extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

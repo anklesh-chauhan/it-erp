@@ -1,9 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\LeadResource\RelationManagers;
+namespace App\Filament\Resources\Leads\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\CreateAction;
+use Exception;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use App\Models\Attachment;
 use App\Models\LeadNote;
@@ -24,10 +31,10 @@ class LeadNotesRelationManager extends RelationManager
 {
     protected static string $relationship = 'leadNotes';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Select::make('lead_id')
                     ->label('Lead ID')
                     ->relationship('lead', 'id')
@@ -97,11 +104,11 @@ class LeadNotesRelationManager extends RelationManager
                 TextColumn::make('created_at')->label('Created At')->sortable()->dateTime(),
             ])
             ->filters([
-                Tables\Filters\Filter::make('created_at')->label('Recent Notes')
+                Filter::make('created_at')->label('Recent Notes')
                     ->query(fn ($query) => $query->orderByDesc('created_at')),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                 ->before(function (array $data) {
                     $data['user_id'] = Auth::id();
                     return $data;
@@ -132,7 +139,7 @@ class LeadNotesRelationManager extends RelationManager
                                     'description' => null, // Optional: Add a description if needed
                                 ]);
                                 Log::info('Attachment created for LeadNote ID: ' . $record->id, ['file_path' => $filePath]);
-                            } catch (\Exception $e) {
+                            } catch (Exception $e) {
                                 Log::error('Failed to create attachment for LeadNote ID: ' . $record->id, [
                                     'error' => $e->getMessage(),
                                     'file_path' => $filePath,
@@ -144,8 +151,8 @@ class LeadNotesRelationManager extends RelationManager
                     }
                 }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make()
+            ->recordActions([
+                EditAction::make()
                     ->after(function (LeadNote $record, array $data, RelationManager $livewire) {
                         $lead = $livewire->getOwnerRecord();
                         if ($lead) {
@@ -157,7 +164,7 @@ class LeadNotesRelationManager extends RelationManager
                             ]);
                         }
                     }),
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->after(function (LeadNote $record, RelationManager $livewire) {
                         $lead = $livewire->getOwnerRecord();
                         if ($lead) {
@@ -170,9 +177,9 @@ class LeadNotesRelationManager extends RelationManager
                         }
                     }),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->after(function (array $records, RelationManager $livewire) {
                             $lead = $livewire->getOwnerRecord();
                             if ($lead) {

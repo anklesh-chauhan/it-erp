@@ -23,4 +23,4 @@ Route::middleware(['web', 'auth:tenant'])->group(function () {
 });
 
 // Login route
-Route::get('/tenant/login', Login::class)->name('filament.tenant.auth.login');
+// Route::get('/tenant/login', Login::class)->name('filament.tenant.auth.login');

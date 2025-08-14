@@ -1,12 +1,21 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Images;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Images\Pages\ListImages;
+use App\Filament\Resources\Images\Pages\CreateImage;
+use App\Filament\Resources\Images\Pages\EditImage;
 use App\Filament\Resources\ImageResource\Pages;
 use App\Filament\Resources\ImageResource\RelationManagers;
 use App\Models\Image;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,28 +26,28 @@ class ImageResource extends Resource
 {
     protected static ?string $model = Image::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?int $navigationSort = 1000;
     protected static ?string $navigationLabel = 'Images';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('imageable_type')
+        return $schema
+            ->components([
+                TextInput::make('imageable_type')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('imageable_id')
+                TextInput::make('imageable_id')
                     ->numeric(),
-                Forms\Components\TextInput::make('file_name')
+                TextInput::make('file_name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('file_path')
+                TextInput::make('file_path')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('file_type')
+                TextInput::make('file_type')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->columnSpanFull(),
             ]);
     }
@@ -47,22 +56,22 @@ class ImageResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('imageable_type')
+                TextColumn::make('imageable_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('imageable_id')
+                TextColumn::make('imageable_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('file_name')
+                TextColumn::make('file_name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('file_path')
+                TextColumn::make('file_path')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('file_type')
+                TextColumn::make('file_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -70,12 +79,12 @@ class ImageResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -90,9 +99,9 @@ class ImageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListImages::route('/'),
-            'create' => Pages\CreateImage::route('/create'),
-            'edit' => Pages\EditImage::route('/{record}/edit'),
+            'index' => ListImages::route('/'),
+            'create' => CreateImage::route('/create'),
+            'edit' => EditImage::route('/{record}/edit'),
         ];
     }
 }

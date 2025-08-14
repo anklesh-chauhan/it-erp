@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\LeadSourceResource\Pages;
+namespace App\Filament\Resources\LeadSources\Pages;
 
-use App\Filament\Resources\LeadSourceResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\LeadSources\LeadSourceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListLeadSources extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

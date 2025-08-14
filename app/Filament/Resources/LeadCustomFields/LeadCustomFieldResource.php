@@ -1,12 +1,21 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\LeadCustomFields;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\LeadCustomFields\Pages\ListLeadCustomFields;
+use App\Filament\Resources\LeadCustomFields\Pages\CreateLeadCustomField;
+use App\Filament\Resources\LeadCustomFields\Pages\EditLeadCustomField;
 use App\Filament\Resources\LeadCustomFieldResource\Pages;
 use App\Filament\Resources\LeadCustomFieldResource\RelationManagers;
 use App\Models\LeadCustomField;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,21 +26,21 @@ class LeadCustomFieldResource extends Resource
 {
     protected static ?string $model = LeadCustomField::class;
 
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?string $navigationLabel = 'Lead Custom Fields';
-    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
     protected static ?int $navigationSort = 4;
     protected static ?string $navigationParentItem = 'Lead Config';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('label')
+        return $schema
+            ->components([
+                TextInput::make('label')
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\Select::make('type')
+                Select::make('type')
                     ->options([
                         'text' => 'Text',
                         'number' => 'Number',
@@ -40,7 +49,7 @@ class LeadCustomFieldResource extends Resource
                     ])
                     ->required(),
 
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -50,17 +59,17 @@ class LeadCustomFieldResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('label')
+                TextColumn::make('label')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -68,12 +77,12 @@ class LeadCustomFieldResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -88,9 +97,9 @@ class LeadCustomFieldResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLeadCustomFields::route('/'),
-            'create' => Pages\CreateLeadCustomField::route('/create'),
-            'edit' => Pages\EditLeadCustomField::route('/{record}/edit'),
+            'index' => ListLeadCustomFields::route('/'),
+            'create' => CreateLeadCustomField::route('/create'),
+            'edit' => EditLeadCustomField::route('/{record}/edit'),
         ];
     }
 }

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\ItemBrandResource\Pages;
+namespace App\Filament\Resources\ItemBrands\Pages;
 
-use App\Filament\Resources\ItemBrandResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\ItemBrands\ItemBrandResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditItemBrand extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\ItemMasterResource\Pages;
+namespace App\Filament\Resources\ItemMasters\Pages;
 
-use App\Filament\Resources\ItemMasterResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\ItemMasters\ItemMasterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListItemMasters extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

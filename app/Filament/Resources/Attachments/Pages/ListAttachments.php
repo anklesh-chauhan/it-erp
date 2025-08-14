@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\AttachmentResource\Pages;
+namespace App\Filament\Resources\Attachments\Pages;
 
-use App\Filament\Resources\AttachmentResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Attachments\AttachmentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListAttachments extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

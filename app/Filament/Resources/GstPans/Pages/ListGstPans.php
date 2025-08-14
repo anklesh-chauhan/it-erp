@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\GstPanResource\Pages;
+namespace App\Filament\Resources\GstPans\Pages;
 
-use App\Filament\Resources\GstPanResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\GstPans\GstPanResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListGstPans extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

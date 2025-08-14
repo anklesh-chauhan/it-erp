@@ -52,12 +52,12 @@ abstract class SalesDocument extends Model
 
     public function billingAddress()
     {
-        return $this->belongsTo(\App\Models\Address::class, 'billing_address_id');
+        return $this->belongsTo(Address::class, 'billing_address_id');
     }
 
     public function shippingAddress()
     {
-        return $this->belongsTo(\App\Models\Address::class, 'shipping_address_id');
+        return $this->belongsTo(Address::class, 'shipping_address_id');
     }
 
     public function address()

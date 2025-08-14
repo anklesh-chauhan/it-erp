@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\FollowUpMediaResource\Pages;
+namespace App\Filament\Resources\FollowUpMedia\Pages;
 
-use App\Filament\Resources\FollowUpMediaResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\FollowUpMedia\FollowUpMediaResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListFollowUpMedia extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

@@ -1,12 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\GstPans;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\GstPans\Pages\ListGstPans;
+use App\Filament\Resources\GstPans\Pages\CreateGstPan;
+use App\Filament\Resources\GstPans\Pages\EditGstPan;
 use App\Filament\Resources\GstPanResource\Pages;
 use App\Filament\Resources\GstPanResource\RelationManagers;
 use App\Models\GstPan;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,28 +25,28 @@ class GstPanResource extends Resource
 {
     protected static ?string $model = GstPan::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Masters';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
     protected static ?string $navigationParentItem = 'Comapany Master';
     protected static ?int $navigationSort = 200;
     protected static ?string $navigationLabel = 'GST & PAN Details';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('company_master_id')
+        return $schema
+            ->components([
+                TextInput::make('company_master_id')
                     ->numeric(),
-                Forms\Components\TextInput::make('company_id')
+                TextInput::make('company_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('address_id')
+                TextInput::make('address_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('pan_number')
+                TextInput::make('pan_number')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('gst_number')
+                TextInput::make('gst_number')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -48,24 +56,24 @@ class GstPanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('company_master_id')
+                TextColumn::make('company_master_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('company_id')
+                TextColumn::make('company_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('address_id')
+                TextColumn::make('address_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('pan_number')
+                TextColumn::make('pan_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('gst_number')
+                TextColumn::make('gst_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -73,12 +81,12 @@ class GstPanResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -93,9 +101,9 @@ class GstPanResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListGstPans::route('/'),
-            'create' => Pages\CreateGstPan::route('/create'),
-            'edit' => Pages\EditGstPan::route('/{record}/edit'),
+            'index' => ListGstPans::route('/'),
+            'create' => CreateGstPan::route('/create'),
+            'edit' => EditGstPan::route('/{record}/edit'),
         ];
     }
 }

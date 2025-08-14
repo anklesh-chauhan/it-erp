@@ -1,9 +1,18 @@
 <?php
 
-namespace App\Filament\Resources\EmployeeResource\RelationManagers;
+namespace App\Filament\Resources\Employees\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -12,41 +21,41 @@ class StatutoryIdsRelationManager extends RelationManager
 {
     protected static string $relationship = 'statutoryIds';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('pan')
+        return $schema
+            ->components([
+                TextInput::make('pan')
                     ->maxLength(50)
                     ->nullable(),
-                Forms\Components\TextInput::make('uan_no')
+                TextInput::make('uan_no')
                     ->maxLength(50)
                     ->nullable(),
-                Forms\Components\DatePicker::make('group_join_date')
+                DatePicker::make('group_join_date')
                     ->native(false)
                     ->nullable(),
-                Forms\Components\TextInput::make('gratuity_code')
+                TextInput::make('gratuity_code')
                     ->maxLength(50)
                     ->nullable(),
-                Forms\Components\TextInput::make('pran')
+                TextInput::make('pran')
                     ->maxLength(50)
                     ->nullable(),
-                Forms\Components\TextInput::make('aadhar_number')
+                TextInput::make('aadhar_number')
                     ->maxLength(50)
                     ->nullable(),
-                Forms\Components\TextInput::make('tax_code')
+                TextInput::make('tax_code')
                     ->maxLength(50)
                     ->nullable(),
-                Forms\Components\TextInput::make('tax_exemption')
+                TextInput::make('tax_exemption')
                     ->maxLength(50)
                     ->nullable(),
-                Forms\Components\Textarea::make('tax_exemption_reason')
+                Textarea::make('tax_exemption_reason')
                     ->maxLength(255)
                     ->nullable(),
-                Forms\Components\TextInput::make('tax_exemption_validity')
+                TextInput::make('tax_exemption_validity')
                     ->maxLength(50)
                     ->nullable(),
-                Forms\Components\Textarea::make('tax_exemption_remarks')
+                Textarea::make('tax_exemption_remarks')
                     ->maxLength(255)
                     ->nullable(),
             ])->columns(2);
@@ -57,26 +66,26 @@ class StatutoryIdsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('pan')
             ->columns([
-                Tables\Columns\TextColumn::make('pan'),
-                Tables\Columns\TextColumn::make('uan_no'),
-                Tables\Columns\TextColumn::make('aadhar_number'),
-                Tables\Columns\TextColumn::make('group_join_date')
+                TextColumn::make('pan'),
+                TextColumn::make('uan_no'),
+                TextColumn::make('aadhar_number'),
+                TextColumn::make('group_join_date')
                     ->date(),
-                Tables\Columns\TextColumn::make('tax_exemption'),
+                TextColumn::make('tax_exemption'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

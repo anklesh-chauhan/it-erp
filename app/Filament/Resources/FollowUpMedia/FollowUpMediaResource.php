@@ -1,12 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\FollowUpMedia;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\FollowUpMedia\Pages\ListFollowUpMedia;
+use App\Filament\Resources\FollowUpMedia\Pages\CreateFollowUpMedia;
+use App\Filament\Resources\FollowUpMedia\Pages\EditFollowUpMedia;
 use App\Filament\Resources\FollowUpMediaResource\Pages;
 use App\Filament\Resources\FollowUpMediaResource\RelationManagers;
 use App\Models\FollowUpMedia;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,17 +25,17 @@ class FollowUpMediaResource extends Resource
 {
     protected static ?string $model = FollowUpMedia::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?string $navigationParentItem = 'Follow Up Config';
     protected static ?string $navigationLabel = 'Media';
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -37,13 +45,13 @@ class FollowUpMediaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -51,12 +59,12 @@ class FollowUpMediaResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -71,9 +79,9 @@ class FollowUpMediaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFollowUpMedia::route('/'),
-            'create' => Pages\CreateFollowUpMedia::route('/create'),
-            'edit' => Pages\EditFollowUpMedia::route('/{record}/edit'),
+            'index' => ListFollowUpMedia::route('/'),
+            'create' => CreateFollowUpMedia::route('/create'),
+            'edit' => EditFollowUpMedia::route('/{record}/edit'),
         ];
     }
 }

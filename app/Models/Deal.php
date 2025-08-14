@@ -123,7 +123,7 @@ class Deal extends Model
 
         static::saving(function ($deal) {
             if ($deal->type_id && !$deal->type_type) {
-                $deal->type_type = \App\Models\TypeMaster::class;
+                $deal->type_type = TypeMaster::class;
             }
         });
 

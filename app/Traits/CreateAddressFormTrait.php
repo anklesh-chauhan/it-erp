@@ -2,6 +2,10 @@
 
 namespace App\Traits;
 
+use Filament\Forms\Components\Select;
+use App\Models\TypeMaster;
+use App\Models\Address;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Components\Actions\Action;
@@ -22,23 +26,23 @@ trait CreateAddressFormTrait
     public static function getCreateAddressFormFields(): array
     {
         return [
-                Forms\Components\Select::make('type_master_id')
+                Select::make('type_master_id')
                     ->label('Address Type')
                     ->options(
-                        \App\Models\TypeMaster::query()
-                            ->where('typeable_type', \App\Models\Address::class) // Filter for Address types
+                        TypeMaster::query()
+                            ->where('typeable_type', Address::class) // Filter for Address types
                             ->pluck('name', 'id')
                     )
                     ->required()
                     ->searchable(),
-                Forms\Components\TextInput::make('street')
+                TextInput::make('street')
                     ->required(),
-                Forms\Components\TextInput::make('area_town')
+                TextInput::make('area_town')
                     ->required(),
-                Forms\Components\TextInput::make('pin_code')
+                TextInput::make('pin_code')
                     ->reactive()
                     ->afterStateUpdated(function (callable $set, $state) {
-                        $pinCodeDetails = \App\Models\CityPinCode::where('pin_code', $state)->first();
+                        $pinCodeDetails = CityPinCode::where('pin_code', $state)->first();
                         if ($pinCodeDetails) {
                             $set('area_town', $pinCodeDetails->area_town);
                             $set('city_id', $pinCodeDetails->city_id);
@@ -46,13 +50,13 @@ trait CreateAddressFormTrait
                             $set('country_id', $pinCodeDetails->country_id);
                         }
                     }),
-                Forms\Components\Select::make('city_id')
+                Select::make('city_id')
                     ->relationship('city', 'name')
                     ->searchable(),
-                Forms\Components\Select::make('state_id')
+                Select::make('state_id')
                     ->relationship('state', 'name')
                     ->searchable(),
-                Forms\Components\Select::make('country_id')
+                Select::make('country_id')
                     ->relationship('country', 'name')
                     ->searchable(),
         ];

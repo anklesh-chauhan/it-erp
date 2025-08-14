@@ -1,12 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\LeadSources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\LeadSources\Pages\ListLeadSources;
+use App\Filament\Resources\LeadSources\Pages\CreateLeadSource;
+use App\Filament\Resources\LeadSources\Pages\EditLeadSource;
 use App\Filament\Resources\LeadSourceResource\Pages;
 use App\Filament\Resources\LeadSourceResource\RelationManagers;
 use App\Models\LeadSource;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,18 +25,18 @@ class LeadSourceResource extends Resource
 {
     protected static ?string $model = LeadSource::class;
 
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?int $navigationSort = 2;
     protected static ?string $navigationLabel = 'Lead Source';
-    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
     protected static ?string $navigationParentItem = 'Lead Config';
 
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -38,13 +46,13 @@ class LeadSourceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -52,12 +60,12 @@ class LeadSourceResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -72,9 +80,9 @@ class LeadSourceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLeadSources::route('/'),
-            'create' => Pages\CreateLeadSource::route('/create'),
-            'edit' => Pages\EditLeadSource::route('/{record}/edit'),
+            'index' => ListLeadSources::route('/'),
+            'create' => CreateLeadSource::route('/create'),
+            'edit' => EditLeadSource::route('/{record}/edit'),
         ];
     }
 }

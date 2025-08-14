@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\ExpenseTypeResource\Pages;
+namespace App\Filament\Resources\ExpenseTypes\Pages;
 
-use App\Filament\Resources\ExpenseTypeResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\ExpenseTypes\ExpenseTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditExpenseType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

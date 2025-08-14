@@ -1,7 +1,15 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Patches;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Patches\Pages\ListPatches;
+use App\Filament\Resources\Patches\Pages\CreatePatch;
+use App\Filament\Resources\Patches\Pages\EditPatch;
 use App\Filament\Resources\PatchResource\Pages;
 use App\Models\Patch;
 use App\Models\Company;
@@ -11,8 +19,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ColorColumn;
@@ -25,18 +31,18 @@ class PatchResource extends Resource
 {
     protected static ?string $model = Patch::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
-    protected static ?string $navigationGroup = 'Marketing';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
     // Added a label for better readability in the navigation
     protected static ?string $navigationLabel = 'Patches';
 
     // Optional: Add a slug for cleaner URLs if needed
     // protected static ?string $slug = 'patches';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('name')
                     ->required()
                     ->unique(ignoreRecord: true)
@@ -113,9 +119,9 @@ class PatchResource extends Resource
                     ->options(function (Get $get) {
                         $selectedTerritoryId = $get('territory_id');
                         $selectedCityPinCodeId = $get('city_pin_code_id');
-                
+
                         $relevantPinCodes = collect();
-                
+
                         // Prioritize specific City Pin Code if selected, otherwise use territory
                         if ($selectedCityPinCodeId) {
                             $relevantPinCodes = CityPinCode::where('id', $selectedCityPinCodeId)->pluck('pin_code');
@@ -124,17 +130,17 @@ class PatchResource extends Resource
                                 $query->where('territories.id', $selectedTerritoryId);
                             })->pluck('pin_code');
                         }
-                
+
                         // If no relevant pin codes, return empty options
                         if ($relevantPinCodes->isEmpty()) {
                             return [];
                         }
-                
+
                         $companies = Company::whereHas('addresses', function ($query) use ($relevantPinCodes) {
                             $query->whereIn('pin_code', $relevantPinCodes);
                         })->get()
                         ->mapWithKeys(fn (Company $company) => ["company_{$company->id}" => "Company: {$company->name}"]);
-                
+
                         $contacts = ContactDetail::where(function ($query) use ($relevantPinCodes) {
                             $query->whereHas('addresses', function ($subQuery) use ($relevantPinCodes) {
                                 $subQuery->whereIn('pin_code', $relevantPinCodes);
@@ -143,7 +149,7 @@ class PatchResource extends Resource
                             });
                         })->get()
                         ->mapWithKeys(fn (ContactDetail $contact) => ["contact_{$contact->id}" => "Contact: {$contact->name} ({$contact->email})"]);
-                
+
                         return array_merge(
                             $companies->toArray(),
                             $contacts->toArray()
@@ -152,7 +158,7 @@ class PatchResource extends Resource
                     ->getOptionLabelFromRecordUsing(function ($value) {
                         // This method is primarily for displaying selected options *after* they've been saved.
                         [$type, $id] = explode('_', $value);
-                        
+
                         if ($type === 'company') {
                             $company = Company::find($id);
                             return $company ? "Company: {$company->name}" : 'Unknown Company';
@@ -165,7 +171,7 @@ class PatchResource extends Resource
                         if ($patch) {
                             $companyIds = [];
                             $contactIds = [];
-                            
+
                             foreach ($state as $value) {
                                 [$type, $id] = explode('_', $value);
                                 if ($type === 'company') {
@@ -179,13 +185,13 @@ class PatchResource extends Resource
                             $patch->contacts()->detach();
 
                             // Attach selected companies
-                            $companies = \App\Models\Company::whereIn('id', $companyIds)->get();
+                            $companies = Company::whereIn('id', $companyIds)->get();
                             foreach ($companies as $company) {
                                 $patch->companies()->attach($company);
                             }
 
                             // Attach selected contacts
-                            $contacts = \App\Models\ContactDetail::whereIn('id', $contactIds)->get();
+                            $contacts = ContactDetail::whereIn('id', $contactIds)->get();
                             foreach ($contacts as $contact) {
                                 $patch->contacts()->attach($contact);
                             }
@@ -194,17 +200,17 @@ class PatchResource extends Resource
                     ->afterStateHydrated(function ($set, $state, $get, $livewire) {
                         $record = $livewire->getRecord();
                         if (! $record) return;
-                    
+
                         $selected = [];
-                    
+
                         foreach ($record->companies as $company) {
                             $selected[] = "company_{$company->id}";
                         }
-                    
+
                         foreach ($record->contacts as $contact) {
                             $selected[] = "contact_{$contact->id}";
                         }
-                    
+
                         $set('patchables', $selected);
                     })
                     ->required()
@@ -304,17 +310,17 @@ class PatchResource extends Resource
                 //     ->relationship('territory', 'name')
                 //     ->label('Filter by Territory'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->before(function (Tables\Actions\DeleteAction $action, $record) {
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, $record) {
                         // Ensure 'deleted_by' is set before deletion
                         $record->update(['deleted_by' => Auth::user()->name ?? 'System']);
                     }),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()
-                    ->before(function (Tables\Actions\DeleteBulkAction $action, $records) {
+            ->toolbarActions([
+                DeleteBulkAction::make()
+                    ->before(function (DeleteBulkAction $action, $records) {
                         // Set 'deleted_by' for all records before bulk deletion
                         $records->each(fn ($record) => $record->update(['deleted_by' => Auth::user()->name ?? 'System']));
                     }),
@@ -332,9 +338,9 @@ class PatchResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPatches::route('/'),
-            'create' => Pages\CreatePatch::route('/create'),
-            'edit' => Pages\EditPatch::route('/{record}/edit'),
+            'index' => ListPatches::route('/'),
+            'create' => CreatePatch::route('/create'),
+            'edit' => EditPatch::route('/{record}/edit'),
         ];
     }
 

@@ -1,9 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\ItemMasterResource\RelationManagers;
+namespace App\Filament\Resources\ItemMasters\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\AttachAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DetachAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DetachBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -14,19 +21,19 @@ class LeadsRelationManager extends RelationManager
 {
     protected static string $relationship = 'leads';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('company.name')
+        return $schema
+            ->components([
+                TextInput::make('company.name')
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\TextInput::make('quantity')
+                TextInput::make('quantity')
                     ->numeric()
                     ->nullable(),
 
-                Forms\Components\TextInput::make('price')
+                TextInput::make('price')
                     ->numeric()
                     ->nullable(),
             ]);
@@ -37,23 +44,23 @@ class LeadsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('company.name')
             ->columns([
-                Tables\Columns\TextColumn::make('company.name'),
-                Tables\Columns\TextColumn::make('quantity')->label('Quantity'),
-                Tables\Columns\TextColumn::make('price')->label('Price'),
+                TextColumn::make('company.name'),
+                TextColumn::make('quantity')->label('Quantity'),
+                TextColumn::make('price')->label('Price'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make(),
+                AttachAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DetachAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DetachAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DetachBulkAction::make(),
                 ]),
             ]);
     }

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\NumberSeriesResource\Pages;
+namespace App\Filament\Resources\NumberSeries\Pages;
 
-use App\Filament\Resources\NumberSeriesResource;
+use App\Filament\Resources\NumberSeries\NumberSeriesResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

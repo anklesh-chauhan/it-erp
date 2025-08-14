@@ -1,12 +1,28 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Territories;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use App\Models\CityPinCode;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Territories\Pages\ListTerritories;
+use App\Filament\Resources\Territories\Pages\CreateTerritory;
+use App\Filament\Resources\Territories\Pages\EditTerritory;
 use App\Enums\TerritoryStatus;
 use App\Filament\Resources\TerritoryResource\Pages;
 use App\Models\Territory;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,58 +32,58 @@ use Illuminate\Database\Eloquent\Model;
 class TerritoryResource extends Resource
 {
     protected static ?string $model = Territory::class;
-    protected static ?string $navigationIcon = 'heroicon-o-map';
-    protected static ?string $navigationGroup = 'Marketing';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Forms\Components\Section::make('Territory Details')
+        return $schema->components([
+            Section::make('Territory Details')
                 ->columns(2)
                 ->schema([
-                    Forms\Components\TextInput::make('name')
+                    TextInput::make('name')
                         ->required()
                         ->maxLength(255)
                         ->unique(ignoreRecord: true),
 
-                    Forms\Components\TextInput::make('code')
+                    TextInput::make('code')
                         ->maxLength(255)
                         ->unique(ignoreRecord: true)
                         ->nullable(),
 
-                    Forms\Components\Select::make('status')
+                    Select::make('status')
                         ->options(TerritoryStatus::class)
                         ->default(TerritoryStatus::Active)
                         ->required(),
 
-                    Forms\Components\Select::make('parent_territory_id')
+                    Select::make('parent_territory_id')
                         ->relationship('parentTerritory', 'name')
                         ->searchable()
                         ->nullable()
                         ->placeholder('Select a Parent Territory')
                         ->label('Parent Territory'),
 
-                    Forms\Components\Select::make('type_master_id')
+                    Select::make('type_master_id')
                         ->relationship('typeMaster', 'name')
                         ->searchable()
                         ->nullable()
                         ->placeholder('Select a Type Master')
                         ->label('Type Master'),
 
-                    Forms\Components\Textarea::make('description')
+                    Textarea::make('description')
                         ->nullable()
                         ->columnSpanFull(),
                 ]),
             
-            Forms\Components\Section::make('Associated Locations')
+            Section::make('Associated Locations')
                 ->schema([
-                    Forms\Components\Select::make('cityPinCodes')
+                    Select::make('cityPinCodes')
                         ->multiple()
                         ->relationship('cityPinCodes', 'id')
                         ->searchable()
                         ->getSearchResultsUsing(fn (string $search) => 
-                            \App\Models\CityPinCode::query()
+                            CityPinCode::query()
                                 ->whereHas('city', fn ($q) => $q->where('name', 'like', "%{$search}%"))
                                 ->orWhere('area_town', 'like', "%{$search}%")
                                 ->orWhere('pin_code', 'like', "%{$search}%")
@@ -79,7 +95,7 @@ class TerritoryResource extends Resource
                                 ])
                         )
                         ->getOptionLabelsUsing(fn ($values) => 
-                            \App\Models\CityPinCode::whereIn('id', $values)
+                            CityPinCode::whereIn('id', $values)
                                 ->with('city')
                                 ->get()
                                 ->mapWithKeys(fn ($item) => [
@@ -90,9 +106,9 @@ class TerritoryResource extends Resource
                         ->required(),
                 ]),
             
-            Forms\Components\Section::make('Associated Positions')
+            Section::make('Associated Positions')
                 ->schema([
-                    Forms\Components\Select::make('positions')
+                    Select::make('positions')
                         ->multiple()
                         ->relationship('positions', 'name')
                         ->searchable()
@@ -101,9 +117,9 @@ class TerritoryResource extends Resource
                         ->placeholder('Select positions linked to this territory'),
                 ]),
 
-            Forms\Components\Section::make('Organizational Linkages')
+            Section::make('Organizational Linkages')
                 ->schema([
-                    Forms\Components\Select::make('organizationalUnits')
+                    Select::make('organizationalUnits')
                         ->multiple()
                         ->relationship('organizationalUnits', 'name')
                         ->searchable()
@@ -118,25 +134,25 @@ class TerritoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('code')->searchable()->sortable(),
+                TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('code')->searchable()->sortable(),
 
-                Tables\Columns\TextColumn::make('parentTerritory.name')
+                TextColumn::make('parentTerritory.name')
                     ->label('Parent Territory')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('typeMaster.name')
+                TextColumn::make('typeMaster.name')
                     ->label('Type Master')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state) => TerritoryStatus::from($state)->getColor())
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('cityPinCodes')
+                TextColumn::make('cityPinCodes')
                     ->label('Cities/Areas')
                     ->formatStateUsing(function (Model $record) {
                         $record->loadMissing('cityPinCodes.city');
@@ -155,50 +171,50 @@ class TerritoryResource extends Resource
                         )
                     ),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->options(TerritoryStatus::class)
                     ->placeholder('Filter by Status'),
 
-                Tables\Filters\SelectFilter::make('type_master_id')
+                SelectFilter::make('type_master_id')
                     ->relationship('typeMaster', 'name')
                     ->label('Type Master')
                     ->placeholder('Filter by Type Master')
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('parent_territory_id')
+                SelectFilter::make('parent_territory_id')
                     ->relationship('parentTerritory', 'name')
                     ->label('Parent Territory')
                     ->placeholder('Filter by Parent Territory')
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('organizationalUnits')
+                SelectFilter::make('organizationalUnits')
                     ->multiple()
                     ->relationship('organizationalUnits', 'name')
                     ->label('Organizational Unit')
                     ->placeholder('Filter by Organizational Unit')
                     ->preload(),
 
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('name');
@@ -214,9 +230,9 @@ class TerritoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListTerritories::route('/'),
-            'create' => Pages\CreateTerritory::route('/create'),
-            'edit'   => Pages\EditTerritory::route('/{record}/edit'),
+            'index'  => ListTerritories::route('/'),
+            'create' => CreateTerritory::route('/create'),
+            'edit'   => EditTerritory::route('/{record}/edit'),
         ];
     }
 

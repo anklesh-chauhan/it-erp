@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\OrganizationalUnitResource\Pages;
+namespace App\Filament\Resources\OrganizationalUnits\Pages;
 
-use App\Filament\Resources\OrganizationalUnitResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\OrganizationalUnits\OrganizationalUnitResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditOrganizationalUnit extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

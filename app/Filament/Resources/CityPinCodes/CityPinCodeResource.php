@@ -1,14 +1,23 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\CityPinCodes;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\CityPinCodes\Pages\ListCityPinCodes;
+use App\Filament\Resources\CityPinCodes\Pages\CreateCityPinCode;
+use App\Filament\Resources\CityPinCodes\Pages\EditCityPinCode;
 use App\Filament\Resources\CityPinCodeResource\Pages;
 use App\Filament\Resources\CityPinCodeResource\RelationManagers;
 use App\Models\CityPinCode;
 use App\Models\City;
 use App\Models\State;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,16 +28,16 @@ class CityPinCodeResource extends Resource
 {
     protected static ?string $model = CityPinCode::class;
 
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?int $navigationSort = 2;
     protected static ?string $navigationLabel = 'Address Config';
-    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('city_id')
+        return $schema
+            ->components([
+                Select::make('city_id')
                     ->relationship('city', 'name')
                     ->reactive()
                     ->afterStateUpdated(fn (callable $set, $state) =>
@@ -37,14 +46,14 @@ class CityPinCodeResource extends Resource
                     ->afterStateUpdated(fn (callable $set, $state) =>
                         $set('country_id', State::find($state)?->country_id)
                     ),
-                Forms\Components\Select::make('state_id')
+                Select::make('state_id')
                     ->relationship('state', 'name')
                     ->disabled(),
-                Forms\Components\Select::make('country_id')
+                Select::make('country_id')
                     ->relationship('country', 'name')
                     ->disabled(),
-                Forms\Components\TextInput::make('pin_code')->required(),
-                Forms\Components\TextInput::make('area_town')->required(),
+                TextInput::make('pin_code')->required(),
+                TextInput::make('area_town')->required(),
             ]);
     }
 
@@ -52,21 +61,21 @@ class CityPinCodeResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('pin_code')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('area_town')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('city.name')->label('City')->searchable(),
-                Tables\Columns\TextColumn::make('state.name')->label('State')->searchable(),
-                Tables\Columns\TextColumn::make('country.name')->label('Country'),
+                TextColumn::make('pin_code')->sortable()->searchable(),
+                TextColumn::make('area_town')->sortable()->searchable(),
+                TextColumn::make('city.name')->label('City')->searchable(),
+                TextColumn::make('state.name')->label('State')->searchable(),
+                TextColumn::make('country.name')->label('Country'),
             ])
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -81,9 +90,9 @@ class CityPinCodeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCityPinCodes::route('/'),
-            'create' => Pages\CreateCityPinCode::route('/create'),
-            'edit' => Pages\EditCityPinCode::route('/{record}/edit'),
+            'index' => ListCityPinCodes::route('/'),
+            'create' => CreateCityPinCode::route('/create'),
+            'edit' => EditCityPinCode::route('/{record}/edit'),
         ];
     }
 }

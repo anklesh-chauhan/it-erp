@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\AccountMasterResource\Pages;
+namespace App\Filament\Resources\AccountMasters\Pages;
 
-use App\Filament\Resources\AccountMasterResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\AccountMasters\AccountMasterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditAccountMaster extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

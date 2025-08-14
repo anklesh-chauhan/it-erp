@@ -1,7 +1,35 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Leads;
 
+use App\Traits\AddressDetailsTrait;
+use App\Traits\HasSafeGlobalSearch;
+use App\Models\LeadStatus;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use App\Models\User;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\DateTimePicker;
+use App\Models\ContactDetail;
+use App\Models\FollowUpMedia;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Leads\RelationManagers\LeadFollowUpRelationManager;
+use App\Filament\Resources\Leads\RelationManagers\ItemMastersRelationManager;
+use App\Filament\Resources\Leads\RelationManagers\LeadNotesRelationManager;
+use App\Filament\Resources\Leads\RelationManagers\LeadActivityRelationManager;
+use App\Filament\Resources\Leads\Pages\ListLeads;
+use App\Filament\Resources\Leads\Pages\CreateLead;
+use App\Filament\Resources\Leads\Pages\EditLead;
+use App\Filament\Resources\Leads\Pages\CustomFields;
 use App\Filament\Resources\LeadResource\Pages;
 use App\Filament\Resources\LeadResource\RelationManagers;
 use App\Models\Lead;
@@ -10,7 +38,6 @@ use App\Models\LeadCustomField;
 use App\Models\NumberSeries;
 use App\Models\ItemMaster;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,11 +50,8 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Notifications\Notification;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Repeater;
-use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Columns\SelectColumn;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Facades\Filament;
@@ -42,20 +66,19 @@ use App\Traits\HasCustomerInteractionFields;
 class LeadResource extends Resource
 {
     use HasCustomerInteractionFields;
-    use \App\Traits\AddressDetailsTrait;
-    use \App\Traits\HasSafeGlobalSearch;
+    use AddressDetailsTrait;
+    use HasSafeGlobalSearch;
 
-    protected static ?string $model = \App\Models\Lead::class;
+    protected static ?string $model = Lead::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document';
-    protected static ?string $navigationGroup = 'Marketing';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
     protected static ?int $navigationSort = 10;
 
     /**
-     * @var \App\Models\LeadStatus
+     * @var LeadStatus
      */
-
-    protected static ?string $statusModel = \App\Models\LeadStatus::class;
+    protected static ?string $statusModel = LeadStatus::class;
 
     protected static ?string $recordTitleAttribute = 'reference_code';
 
@@ -70,59 +93,59 @@ class LeadResource extends Resource
     }
 
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
 
                 ...self::getCommonFormSchema(),
 
                 // ✅ Address Details
-                Forms\Components\Section::make('Other Details')
+                Section::make('Other Details')
                 ->collapsible()
                 ->schema([
 
                     ...self::getAddressDetailsTraitField(),
 
-                    Forms\Components\Grid::make(4)
+                    Grid::make(4)
                         ->schema([
-                            Forms\Components\Select::make('lead_source_id')
+                            Select::make('lead_source_id')
                                 ->relationship('leadSource', 'name')
                                 ->required(),
 
-                            Forms\Components\Select::make('rating_type_id')
+                            Select::make('rating_type_id')
                                 ->relationship('rating', 'name')
                                 ->preload(),
 
-                            Forms\Components\TextInput::make('annual_revenue')
+                            TextInput::make('annual_revenue')
                                 ->numeric()
                                 ->prefix('Rs')
                                 ->label('Annual Revenue'),
 
-                            Forms\Components\Textarea::make('description')
+                            Textarea::make('description')
                                 ->nullable()
                                 ->label('Description Information'),
                         ]),
 
 
                     // Dynamic Custom Fields
-                    Forms\Components\Group::make([
-                        Forms\Components\Section::make('More Details')
-                            ->hidden(fn () => \App\Models\LeadCustomField::count() === 0)
+                    Group::make([
+                        Section::make('More Details')
+                            ->hidden(fn () => LeadCustomField::count() === 0)
                             ->schema(function () {
-                                return \App\Models\LeadCustomField::all()->map(function ($field) {
+                                return LeadCustomField::all()->map(function ($field) {
                                     return match ($field->type) {
-                                        'text' => Forms\Components\TextInput::make("custom_fields.{$field->name}")
+                                        'text' => TextInput::make("custom_fields.{$field->name}")
                                             ->label($field->label)
                                             ->required(),
-                                        'number' => Forms\Components\TextInput::make("custom_fields.{$field->name}")
+                                        'number' => TextInput::make("custom_fields.{$field->name}")
                                             ->numeric()
                                             ->label($field->label)
                                             ->required(),
-                                        'date' => Forms\Components\DatePicker::make("custom_fields.{$field->name}")
+                                        'date' => DatePicker::make("custom_fields.{$field->name}")
                                             ->label($field->label)
                                             ->required(),
-                                        'email' => Forms\Components\TextInput::make("custom_fields.{$field->name}")
+                                        'email' => TextInput::make("custom_fields.{$field->name}")
                                             ->email()
                                             ->label($field->label)
                                             ->required(),
@@ -166,19 +189,19 @@ class LeadResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
-                Tables\Columns\TextColumn::make('owner.name')
+                TextColumn::make('owner.name')
                     ->label('Owner')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('contactDetail.full_name')
+                TextColumn::make('contactDetail.full_name')
                     ->label('Contact Name')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('accountMaster.name')
+                TextColumn::make('accountMaster.name')
                     ->label('Account Master')
                     ->searchable()
                     ->sortable()
@@ -193,13 +216,13 @@ class LeadResource extends Resource
                 SelectColumn::make('status_id')
                     ->label('Status')
                     ->options(
-                        \App\Models\LeadStatus::pluck('name', 'id')
+                        LeadStatus::pluck('name', 'id')
                     )
                     ->getStateUsing(fn ($record) => $record->status_id)
                     ->afterStateUpdated(function ($record, $state) {
                         $record->update([
                             'status_id' => $state,
-                            'status_type' => \App\Models\LeadStatus::class, // ✅ Ensure status_type is set
+                            'status_type' => LeadStatus::class, // ✅ Ensure status_type is set
                         ]);
 
                         Notification::make()
@@ -208,7 +231,7 @@ class LeadResource extends Resource
                             ->send();
                     }),
 
-                Tables\Columns\TextColumn::make('followups.next_follow_up_date')
+                TextColumn::make('followups.next_follow_up_date')
                     ->label('Next Follow-up Date')
                     ->formatStateUsing(function ($record) {
                         $nextFollowUp = $record->followups()->orderByDesc('next_follow_up_date')->first();
@@ -220,13 +243,13 @@ class LeadResource extends Resource
                     })
                     ->html(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->searchable()
                     ->sortable()
@@ -234,7 +257,7 @@ class LeadResource extends Resource
 
                 // Dynamically add custom fields
                 ...LeadCustomField::all()->map(function ($field) {
-                    return Tables\Columns\TextColumn::make("custom_fields.{$field->name}")
+                    return TextColumn::make("custom_fields.{$field->name}")
                         ->label($field->label)
                         ->sortable()
                         ->searchable()
@@ -243,29 +266,29 @@ class LeadResource extends Resource
 
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status_id')
+                SelectFilter::make('status_id')
                     ->label('Status')
-                    ->options(\App\Models\LeadStatus::pluck('name', 'id')->toArray())
+                    ->options(LeadStatus::pluck('name', 'id')->toArray())
                     ->multiple(),
-                Tables\Filters\SelectFilter::make('owner_id')
+                SelectFilter::make('owner_id')
                     ->label('Owner')
-                    ->options(\App\Models\User::pluck('name', 'id')->toArray())
+                    ->options(User::pluck('name', 'id')->toArray())
                     ->multiple(),
-                Tables\Filters\Filter::make('has_follow_up')
+                Filter::make('has_follow_up')
                     ->label('Has Follow-up')
                     ->query(fn ($query) => $query->whereHas('followups')),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                    TableAction::make('convert_to_deal')
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                    \Filament\Actions\Action::make('convert_to_deal')
                         ->label('Convert to Deal')
                         ->icon('heroicon-o-arrow-right-circle')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->form([
-                            Forms\Components\Checkbox::make('create_account_master')
+                        ->schema([
+                            Checkbox::make('create_account_master')
                                 ->label('Create Account Master')
                                 ->default(false)
                                 ->visible(function ($get, $record) {
@@ -284,27 +307,27 @@ class LeadResource extends Resource
                                 ->send();
                         })
                         ->visible(fn ($record) => $record->status?->name !== 'Converted'),
-                    TableAction::make('addFollowUp')
+                    \Filament\Actions\Action::make('addFollowUp')
                         ->label('Add Follow-up')
                         ->icon('heroicon-o-plus')
-                        ->form([
-                            Forms\Components\Hidden::make('user_id')
+                        ->schema([
+                            Hidden::make('user_id')
                                 ->default(Auth::id()) // Automatically sets the current logged-in user
                                 ->required(),
 
-                            Forms\Components\Hidden::make('lead_id')
+                            Hidden::make('lead_id')
                                 ->default(fn ($record) => $record->id),
 
-                            Forms\Components\DateTimePicker::make('follow_up_date')
+                            DateTimePicker::make('follow_up_date')
                                     ->required()
                                     ->label('Follow-up Date'),
 
-                                    Forms\Components\Select::make('to_whom')
+                                    Select::make('to_whom')
                                     ->options(function (callable $get) {
-                                        $lead = \App\Models\Lead::find($get('lead_id'));
+                                        $lead = Lead::find($get('lead_id'));
 
                                         if ($lead) {
-                                            return \App\Models\ContactDetail::where('company_id', $lead->company_id)
+                                            return ContactDetail::where('company_id', $lead->company_id)
                                                 ->get()
                                                 ->mapWithKeys(fn ($contact) => [
                                                     $contact->id => "{$contact->first_name} {$contact->last_name}"
@@ -316,22 +339,22 @@ class LeadResource extends Resource
                                     ->preload()
                                     ->label('To Whom'),
 
-                            Forms\Components\Textarea::make('interaction')
+                            Textarea::make('interaction')
                                 ->label('Interaction')
                                 ->rows(3)
                                 ->nullable(),
 
-                            Forms\Components\Textarea::make('outcome')
+                            Textarea::make('outcome')
                                 ->label('Outcome')
                                 ->rows(2)
                                 ->nullable(),
 
-                            Forms\Components\Select::make('follow_up_media_id')
-                                ->options(\App\Models\FollowUpMedia::pluck('name', 'id')->toArray())
+                            Select::make('follow_up_media_id')
+                                ->options(FollowUpMedia::pluck('name', 'id')->toArray())
                                 ->label('Media')
                                 ->nullable(),
 
-                            Forms\Components\DateTimePicker::make('next_follow_up_date')
+                            DateTimePicker::make('next_follow_up_date')
                                 ->label('Next Follow-up Date')
                                 ->nullable(),
                         ])
@@ -348,9 +371,9 @@ class LeadResource extends Resource
                         ->modalWidth('2xl'),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -359,20 +382,20 @@ class LeadResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\LeadFollowUpRelationManager::class,
-            RelationManagers\ItemMastersRelationManager::class,
-            RelationManagers\LeadNotesRelationManager::class,
-            RelationManagers\LeadActivityRelationManager::class,
+            LeadFollowUpRelationManager::class,
+            ItemMastersRelationManager::class,
+            LeadNotesRelationManager::class,
+            LeadActivityRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLeads::route('/'),
-            'create' => Pages\CreateLead::route('/create'),
-            'edit' => Pages\EditLead::route('/{record}/edit'),
-            'custom-fields' => Pages\CustomFields::route('/custom-fields'),
+            'index' => ListLeads::route('/'),
+            'create' => CreateLead::route('/create'),
+            'edit' => EditLead::route('/{record}/edit'),
+            'custom-fields' => CustomFields::route('/custom-fields'),
         ];
     }
 }

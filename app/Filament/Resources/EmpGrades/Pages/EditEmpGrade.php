@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\EmpGradeResource\Pages;
+namespace App\Filament\Resources\EmpGrades\Pages;
 
-use App\Filament\Resources\EmpGradeResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\EmpGrades\EmpGradeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditEmpGrade extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

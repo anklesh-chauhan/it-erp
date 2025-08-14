@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\CityResource\Pages;
+namespace App\Filament\Resources\Cities\Pages;
 
-use App\Filament\Resources\CityResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Cities\CityResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListCities extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

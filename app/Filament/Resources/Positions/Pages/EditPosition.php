@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\PositionResource\Pages;
+namespace App\Filament\Resources\Positions\Pages;
 
-use App\Filament\Resources\PositionResource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\Action;
+use App\Filament\Resources\Positions\PositionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use App\Models\EmploymentDetail;
@@ -15,8 +17,8 @@ class EditPosition extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
-            Actions\Action::make('Assign Employees')
+            DeleteAction::make(),
+            Action::make('Assign Employees')
                 ->action(function () {
                     $assignedIds = $this->form->getState()['assigned_employee_ids'] ?? [];
                     $this->record->employmentDetails()->sync($assignedIds);

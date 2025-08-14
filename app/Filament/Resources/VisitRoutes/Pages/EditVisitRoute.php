@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\VisitRouteResource\Pages;
+namespace App\Filament\Resources\VisitRoutes\Pages;
 
-use App\Filament\Resources\VisitRouteResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\VisitRoutes\VisitRouteResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditVisitRoute extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

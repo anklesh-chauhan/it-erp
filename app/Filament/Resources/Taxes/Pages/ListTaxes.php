@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\TaxResource\Pages;
+namespace App\Filament\Resources\Taxes\Pages;
 
-use App\Filament\Resources\TaxResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Taxes\TaxResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListTaxes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

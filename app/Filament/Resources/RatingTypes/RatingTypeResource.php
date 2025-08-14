@@ -1,12 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\RatingTypes;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\RatingTypes\Pages\ListRatingTypes;
+use App\Filament\Resources\RatingTypes\Pages\CreateRatingType;
+use App\Filament\Resources\RatingTypes\Pages\EditRatingType;
 use App\Filament\Resources\RatingTypeResource\Pages;
 use App\Filament\Resources\RatingTypeResource\RelationManagers;
 use App\Models\RatingType;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,17 +25,17 @@ class RatingTypeResource extends Resource
 {
     protected static ?string $model = RatingType::class;
 
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?int $navigationSort = 2;
     protected static ?string $navigationLabel = 'Rating Types';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationParentItem = 'Lead Config';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -37,13 +45,13 @@ class RatingTypeResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -51,12 +59,12 @@ class RatingTypeResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -71,9 +79,9 @@ class RatingTypeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRatingTypes::route('/'),
-            'create' => Pages\CreateRatingType::route('/create'),
-            'edit' => Pages\EditRatingType::route('/{record}/edit'),
+            'index' => ListRatingTypes::route('/'),
+            'create' => CreateRatingType::route('/create'),
+            'edit' => EditRatingType::route('/{record}/edit'),
         ];
     }
 }

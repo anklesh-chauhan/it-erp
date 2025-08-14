@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\AddressTypeResource\Pages;
+namespace App\Filament\Resources\AddressTypes\Pages;
 
-use App\Filament\Resources\AddressTypeResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\AddressTypes\AddressTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditAddressType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

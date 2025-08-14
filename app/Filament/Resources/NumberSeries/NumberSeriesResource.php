@@ -1,12 +1,25 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\NumberSeries;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use App\Models\TypeMaster;
+use App\Models\AccountMaster;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\TextInputColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\NumberSeries\Pages\ListNumberSeries;
+use App\Filament\Resources\NumberSeries\Pages\CreateNumberSeries;
+use App\Filament\Resources\NumberSeries\Pages\EditNumberSeries;
 use App\Filament\Resources\NumberSeriesResource\Pages;
 use App\Filament\Resources\NumberSeriesResource\RelationManagers;
 use App\Models\NumberSeries;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,36 +31,36 @@ class NumberSeriesResource extends Resource
 {
     protected static ?string $model = NumberSeries::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?int $navigationSort = 1000;
     protected static ?string $navigationLabel = 'Number Series';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('model_type')
+        return $schema
+            ->components([
+                Select::make('model_type')
                     ->label('Number Series Type')
                     ->options(ModelHelper::getModelOptions()) // Dynamic Model Names
                     ->required(),
-                Forms\Components\Grid::make(3)
+                Grid::make(3)
                     ->schema([
-                        Forms\Components\TextInput::make('Prefix')
+                        TextInput::make('Prefix')
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('next_number')
+                        TextInput::make('next_number')
                             ->required()
                             ->numeric()
                             ->default(0),
-                        Forms\Components\TextInput::make('Suffix')
+                        TextInput::make('Suffix')
                             ->maxLength(255),
                     ]),
-                Forms\Components\Select::make('type_master_id')
+                Select::make('type_master_id')
                     ->label('Module Type')
                     ->helperText('Select the module type for this number series.')
                     ->options(
-                        \App\Models\TypeMaster::query()
-                            ->where('typeable_type', \App\Models\AccountMaster::class) // Filter for Address types
+                        TypeMaster::query()
+                            ->where('typeable_type', AccountMaster::class) // Filter for Address types
                             ->pluck('name', 'id')
                     )
                     ->preload()
@@ -59,25 +72,25 @@ class NumberSeriesResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('model_type')
+                TextColumn::make('model_type')
                     ->label('Module')
                     ->searchable()
                     ->formatStateUsing(fn ($state) => class_basename($state)),
-                Tables\Columns\TextInputColumn::make('Prefix')
+                TextInputColumn::make('Prefix')
                     ->searchable(),
-                Tables\Columns\TextInputColumn::make('next_number')
+                TextInputColumn::make('next_number')
                     ->sortable(),
-                Tables\Columns\TextInputColumn::make('Suffix')
+                TextInputColumn::make('Suffix')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('typeMaster.name') // Updated to match relationship name
+                TextColumn::make('typeMaster.name') // Updated to match relationship name
                     ->label('Module Type')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -85,12 +98,12 @@ class NumberSeriesResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -105,9 +118,9 @@ class NumberSeriesResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNumberSeries::route('/'),
-            'create' => Pages\CreateNumberSeries::route('/create'),
-            'edit' => Pages\EditNumberSeries::route('/{record}/edit'),
+            'index' => ListNumberSeries::route('/'),
+            'create' => CreateNumberSeries::route('/create'),
+            'edit' => EditNumberSeries::route('/{record}/edit'),
         ];
     }
 }

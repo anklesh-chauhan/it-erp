@@ -1,15 +1,29 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Positions;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Positions\Pages\ListPositions;
+use App\Filament\Resources\Positions\Pages\CreatePosition;
+use App\Filament\Resources\Positions\Pages\EditPosition;
 use App\Enums\PositionStatus;
 use App\Filament\Resources\PositionResource\Pages;
 use App\Models\Position;
 use App\Models\Employee;
 use App\Models\OrganizationalUnit;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,52 +33,52 @@ class PositionResource extends Resource
 {
     protected static ?string $model = Position::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-briefcase';
-    protected static ?string $navigationGroup = 'HR & Organization';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-briefcase';
+    protected static string | \UnitEnum | null $navigationGroup = 'HR & Organization';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Forms\Components\Section::make('Position Details')
+        return $schema->components([
+            Section::make('Position Details')
                 ->columns(2)
                 ->schema([
-                    Forms\Components\TextInput::make('name')
+                    TextInput::make('name')
                         ->required()
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('code')
+                    TextInput::make('code')
                         ->unique(ignoreRecord: true)
                         ->required()
                         ->maxLength(255),
-                    Forms\Components\Select::make('status')
+                    Select::make('status')
                         ->options(PositionStatus::class)
                         ->default(PositionStatus::Active)
                         ->required(),
-                    Forms\Components\TextInput::make('level')
+                    TextInput::make('level')
                         ->nullable()
                         ->maxLength(255),
-                    Forms\Components\Textarea::make('description')
+                    Textarea::make('description')
                         ->nullable()
                         ->maxLength(65535)
                         ->columnSpanFull(),
                 ]),
 
-            Forms\Components\Section::make('Reporting & Organizational Structure')
+            Section::make('Reporting & Organizational Structure')
                 ->columns(2)
                 ->schema([
-                    Forms\Components\Select::make('reports_to_position_id')
+                    Select::make('reports_to_position_id')
                         ->label('Reports To Position')
                         ->relationship('reportsTo', 'name')
                         ->searchable()
                         ->nullable()
                         ->placeholder('Select a reporting position'),
                     
-                    Forms\Components\Toggle::make('is_multi_territory')
+                    Toggle::make('is_multi_territory')
                         ->label('Is Multi Territory')
                         ->helperText('Enable to select multiple territories. ⚠️ Once multi-territory is enabled, it cannot be reversed.')
                         ->reactive()
                         ->disabled(fn (?Position $record, Get $get) => $record?->is_multi_territory ?? false),
                     
-                    Forms\Components\Select::make('territories')
+                    Select::make('territories')
                         ->relationship('territories', 'name')
                         ->multiple()
                         ->searchable()
@@ -72,21 +86,21 @@ class PositionResource extends Resource
                         ->label('Territories')
                         ->visible(fn (Get $get) => $get('is_multi_territory')),
                     
-                    Forms\Components\Select::make('territories')
+                    Select::make('territories')
                         ->relationship('territories', 'name')
                         ->searchable()
                         ->preload()
                         ->label('Territory')
                         ->visible(fn (Get $get) => ! $get('is_multi_territory')),
 
-                    Forms\Components\Select::make('location_id')
+                    Select::make('location_id')
                         ->label('Location')
                         ->relationship('location', 'name')
                         ->searchable()
                         ->nullable()
                         ->placeholder('Select a location'),
 
-                    Forms\Components\Select::make('organizationalUnits')
+                    Select::make('organizationalUnits')
                         ->multiple()
                         ->relationship('organizationalUnits', 'name')
                         ->searchable()
@@ -94,31 +108,31 @@ class PositionResource extends Resource
                         ->label('Organizational Units'),
                 ]),
 
-            Forms\Components\Section::make('Job Classification')
+            Section::make('Job Classification')
                 ->columns(2)
                 ->schema([
-                    Forms\Components\Select::make('division_id')
+                    Select::make('division_id')
                         ->label('Division')
                         ->relationship('division', 'name')
                         ->searchable()
                         ->nullable()
                         ->placeholder('Select a division'),
 
-                    Forms\Components\Select::make('department_id')
+                    Select::make('department_id')
                         ->label('Department')
                         ->relationship('department', 'department_name')
                         ->searchable()
                         ->nullable()
                         ->placeholder('Select a department'),
 
-                    Forms\Components\Select::make('job_title_id')
+                    Select::make('job_title_id')
                         ->label('Job Title')
                         ->relationship('jobTitle', 'title')
                         ->searchable()
                         ->nullable()
                         ->placeholder('Select a job title'),
 
-                    Forms\Components\Select::make('job_grade_id')
+                    Select::make('job_grade_id')
                         ->label('Job Grade')
                         ->relationship('jobGrade', 'grade_name')
                         ->searchable()
@@ -126,11 +140,11 @@ class PositionResource extends Resource
                         ->placeholder('Select a job grade'),
                 ]),
 
-            Forms\Components\Section::make('Assigned Employees')
+            Section::make('Assigned Employees')
                 ->columns(1)
                 ->description('Select employees assigned to this position.')
                 ->schema([
-                    Forms\Components\Select::make('employees')
+                    Select::make('employees')
                         ->relationship('employees', 'first_name')
                         ->getOptionLabelFromRecordUsing(fn (Employee $record) =>
                             "{$record->first_name} {$record->last_name} ({$record->employee_code})"
@@ -147,24 +161,24 @@ class PositionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('code')->searchable()->sortable(),
+                TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('code')->searchable()->sortable(),
                 // Tables\Columns\TextColumn::make('status')
                 //     ->badge()
                 //     ->color(fn (string $state): string => PositionStatus::from($state)->getColor())
                 //     ->sortable(),
 
-                Tables\Columns\TextColumn::make('level')
+                TextColumn::make('level')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('reportsTo.name')
+                TextColumn::make('reportsTo.name')
                     ->label('Reports To')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('territories')
+                TextColumn::make('territories')
                     ->label('Territories')
                     ->formatStateUsing(fn ($record) =>
                         $record->territories->pluck('name')->implode(', ')
@@ -172,47 +186,47 @@ class PositionResource extends Resource
                     ->wrap()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('location.name')
+                TextColumn::make('location.name')
                     ->label('Location')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('division.name')
+                TextColumn::make('division.name')
                     ->label('Division')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('department.department_name')
+                TextColumn::make('department.department_name')
                     ->label('Department')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('jobTitle.title')
+                TextColumn::make('jobTitle.title')
                     ->label('Job Title')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('jobGrade.grade_name')
+                TextColumn::make('jobGrade.grade_name')
                     ->label('Job Grade')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('organizationalUnits.name')
+                TextColumn::make('organizationalUnits.name')
                     ->label('Org. Units')
                     ->listWithLineBreaks()
                     ->bulleted()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),
@@ -222,60 +236,60 @@ class PositionResource extends Resource
                 //     ->options(PositionStatus::class)
                 //     ->label('Status'),
 
-                Tables\Filters\SelectFilter::make('territories')
+                SelectFilter::make('territories')
                     ->relationship('territories', 'name')
                     ->multiple()
                     ->label('Filter by Territory'),
 
-                Tables\Filters\SelectFilter::make('location_id')
+                SelectFilter::make('location_id')
                     ->label('Location')
                     ->relationship('location', 'name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('reports_to_position_id')
+                SelectFilter::make('reports_to_position_id')
                     ->label('Reports To')
                     ->relationship('reportsTo', 'name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('division_id')
+                SelectFilter::make('division_id')
                     ->label('Division')
                     ->relationship('division', 'name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('department_id')
+                SelectFilter::make('department_id')
                     ->label('Department')
                     ->relationship('department', 'department_name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('job_title_id')
+                SelectFilter::make('job_title_id')
                     ->label('Job Title')
                     ->relationship('jobTitle', 'title')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('job_grade_id')
+                SelectFilter::make('job_grade_id')
                     ->label('Job Grade')
                     ->relationship('jobGrade', 'grade_name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('organizationalUnits')
+                SelectFilter::make('organizationalUnits')
                     ->relationship('organizationalUnits', 'name')
                     ->multiple()
                     ->preload()
                     ->label('Organizational Units'),
             ])->filtersFormColumns(2)
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ])
             ->defaultSort('name');
     }
@@ -288,9 +302,9 @@ class PositionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPositions::route('/'),
-            'create' => Pages\CreatePosition::route('/create'),
-            'edit' => Pages\EditPosition::route('/{record}/edit'),
+            'index' => ListPositions::route('/'),
+            'create' => CreatePosition::route('/create'),
+            'edit' => EditPosition::route('/{record}/edit'),
         ];
     }
 }

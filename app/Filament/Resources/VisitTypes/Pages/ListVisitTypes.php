@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\VisitTypeResource\Pages;
+namespace App\Filament\Resources\VisitTypes\Pages;
 
-use App\Filament\Resources\VisitTypeResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\VisitTypes\VisitTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListVisitTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

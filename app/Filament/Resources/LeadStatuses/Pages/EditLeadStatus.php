@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\LeadStatusResource\Pages;
+namespace App\Filament\Resources\LeadStatuses\Pages;
 
-use App\Filament\Resources\LeadStatusResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\LeadStatuses\LeadStatusResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditLeadStatus extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

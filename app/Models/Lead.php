@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Exception;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -83,14 +85,14 @@ class Lead extends Model
                 DB::commit();
 
                 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 DB::rollBack();
                 
-                throw new \Exception('Failed to convert lead to customer.', 0, $e);
+                throw new Exception('Failed to convert lead to customer.', 0, $e);
             }
 
             
-            \Filament\Notifications\Notification::make()
+            Notification::make()
                 ->title('Account Master Created')
                 ->body("Account Master for {$this->company?->name} has been created.")
                 ->success()

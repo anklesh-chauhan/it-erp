@@ -1,12 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\ExpenseConfigurations;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\ExpenseConfigurations\Pages\ListExpenseConfigurations;
+use App\Filament\Resources\ExpenseConfigurations\Pages\CreateExpenseConfiguration;
+use App\Filament\Resources\ExpenseConfigurations\Pages\EditExpenseConfiguration;
 use App\Filament\Resources\ExpenseConfigurationResource\Pages;
 use App\Filament\Resources\ExpenseConfigurationResource\RelationManagers;
 use App\Models\ExpenseConfiguration;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,26 +25,26 @@ class ExpenseConfigurationResource extends Resource
 {
     protected static ?string $model = ExpenseConfiguration::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?int $navigationSort = 1004;
     protected static ?string $navigationLabel = 'Expense Config';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('category_id')
+        return $schema
+            ->components([
+                TextInput::make('category_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('expense_type_id')
+                TextInput::make('expense_type_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('transport_mode_id')
+                TextInput::make('transport_mode_id')
                     ->numeric(),
-                Forms\Components\TextInput::make('rate_per_km')
+                TextInput::make('rate_per_km')
                     ->numeric(),
-                Forms\Components\TextInput::make('fixed_expense')
+                TextInput::make('fixed_expense')
                     ->numeric(),
             ]);
     }
@@ -45,26 +53,26 @@ class ExpenseConfigurationResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('category_id')
+                TextColumn::make('category_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('expense_type_id')
+                TextColumn::make('expense_type_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('transport_mode_id')
+                TextColumn::make('transport_mode_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('rate_per_km')
+                TextColumn::make('rate_per_km')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('fixed_expense')
+                TextColumn::make('fixed_expense')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -72,12 +80,12 @@ class ExpenseConfigurationResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -92,9 +100,9 @@ class ExpenseConfigurationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListExpenseConfigurations::route('/'),
-            'create' => Pages\CreateExpenseConfiguration::route('/create'),
-            'edit' => Pages\EditExpenseConfiguration::route('/{record}/edit'),
+            'index' => ListExpenseConfigurations::route('/'),
+            'create' => CreateExpenseConfiguration::route('/create'),
+            'edit' => EditExpenseConfiguration::route('/{record}/edit'),
         ];
     }
 }

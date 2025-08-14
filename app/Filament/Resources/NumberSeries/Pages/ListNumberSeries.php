@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\NumberSeriesResource\Pages;
+namespace App\Filament\Resources\NumberSeries\Pages;
 
-use App\Filament\Resources\NumberSeriesResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\NumberSeries\NumberSeriesResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListNumberSeries extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

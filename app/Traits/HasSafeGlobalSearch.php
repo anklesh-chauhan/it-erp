@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use Filament\Actions\Action;
+use Exception;
 use Filament\GlobalSearch\GlobalSearchResult;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -94,7 +96,7 @@ trait HasSafeGlobalSearch
                 details: static::getGlobalSearchResultDetailsForResource(),
                 url: static::getGlobalSearchResultUrlForResource(),
                 actions: [
-                    \Filament\Actions\Action::make('view_list')
+                    Action::make('view_list')
                         ->label('View All')
                         ->url(static::getUrl('index'))
                         ->icon('heroicon-o-list-bullet'),
@@ -166,7 +168,7 @@ trait HasSafeGlobalSearch
     {
         try {
             return static::getUrl(name: 'edit', parameters: ['record' => $record]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return static::getUrl(name: 'index');
         }
     }

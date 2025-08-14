@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\CompanyMasterTypeResource\Pages;
+namespace App\Filament\Resources\CompanyMasterTypes\Pages;
 
-use App\Filament\Resources\CompanyMasterTypeResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\CompanyMasterTypes\CompanyMasterTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListCompanyMasterTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

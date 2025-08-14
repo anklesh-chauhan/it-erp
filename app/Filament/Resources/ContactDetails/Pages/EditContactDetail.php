@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\ContactDetailResource\Pages;
+namespace App\Filament\Resources\ContactDetails\Pages;
 
-use App\Filament\Resources\ContactDetailResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\ContactDetails\ContactDetailResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditContactDetail extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

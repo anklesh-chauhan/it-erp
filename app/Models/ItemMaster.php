@@ -107,7 +107,7 @@ class ItemMaster extends Model
 
         static::saving(function ($item) {
             if ($item->category_id && !$item->category_type) {
-                $item->category_type = \App\Models\Category::class;
+                $item->category_type = Category::class;
             }
         });
     }

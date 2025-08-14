@@ -1,12 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\VisitRouteTourPlans;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\VisitRouteTourPlans\Pages\ListVisitRouteTourPlans;
+use App\Filament\Resources\VisitRouteTourPlans\Pages\CreateVisitRouteTourPlan;
+use App\Filament\Resources\VisitRouteTourPlans\Pages\EditVisitRouteTourPlan;
 use App\Filament\Resources\VisitRouteTourPlanResource\Pages;
 use App\Filament\Resources\VisitRouteTourPlanResource\RelationManagers;
 use App\Models\VisitRouteTourPlan;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,23 +25,23 @@ class VisitRouteTourPlanResource extends Resource
 {
     protected static ?string $model = VisitRouteTourPlan::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?string $navigationParentItem = 'Sales & Marketing';
     protected static ?int $navigationSort = 1001;
     protected static ?string $navigationLabel = 'Visit Route & Tour Plan Mapping';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('visit_route_id')
+        return $schema
+            ->components([
+                TextInput::make('visit_route_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('tour_plan_id')
+                TextInput::make('tour_plan_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('visit_order')
+                TextInput::make('visit_order')
                     ->required()
                     ->numeric(),
             ]);
@@ -43,20 +51,20 @@ class VisitRouteTourPlanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('visit_route_id')
+                TextColumn::make('visit_route_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tour_plan_id')
+                TextColumn::make('tour_plan_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('visit_order')
+                TextColumn::make('visit_order')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -64,12 +72,12 @@ class VisitRouteTourPlanResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -84,9 +92,9 @@ class VisitRouteTourPlanResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVisitRouteTourPlans::route('/'),
-            'create' => Pages\CreateVisitRouteTourPlan::route('/create'),
-            'edit' => Pages\EditVisitRouteTourPlan::route('/{record}/edit'),
+            'index' => ListVisitRouteTourPlans::route('/'),
+            'create' => CreateVisitRouteTourPlan::route('/create'),
+            'edit' => EditVisitRouteTourPlan::route('/{record}/edit'),
         ];
     }
 }

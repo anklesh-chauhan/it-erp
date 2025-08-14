@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\CompanyMasterTypeResource\Pages;
+namespace App\Filament\Resources\CompanyMasterTypes\Pages;
 
-use App\Filament\Resources\CompanyMasterTypeResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\CompanyMasterTypes\CompanyMasterTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditCompanyMasterType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

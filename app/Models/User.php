@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Spatie\Multitenancy\Models\Tenant;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -14,7 +16,7 @@ use Filament\Models\Contracts\FilamentUser;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles;
 
     /**
@@ -55,14 +57,14 @@ class User extends Authenticatable
 
     public function getConnectionName()
     {
-        return \Spatie\Multitenancy\Models\Tenant::current() ? 'tenant' : 'mysql';
+        return Tenant::current() ? 'tenant' : 'mysql';
     }
 
     protected $guarded = [];
 
     public function getGuardName()
     {
-        return \Spatie\Multitenancy\Models\Tenant::current() ? 'tenant' : 'web';
+        return Tenant::current() ? 'tenant' : 'web';
     }
 
     public function organizationalUnit(): BelongsTo

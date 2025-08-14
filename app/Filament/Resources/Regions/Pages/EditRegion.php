@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\RegionResource\Pages;
+namespace App\Filament\Resources\Regions\Pages;
 
-use App\Filament\Resources\RegionResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Regions\RegionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditRegion extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

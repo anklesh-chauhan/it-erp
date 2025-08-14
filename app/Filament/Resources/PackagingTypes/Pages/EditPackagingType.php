@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\PackagingTypeResource\Pages;
+namespace App\Filament\Resources\PackagingTypes\Pages;
 
-use App\Filament\Resources\PackagingTypeResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\PackagingTypes\PackagingTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditPackagingType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

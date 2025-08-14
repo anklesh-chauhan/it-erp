@@ -1,13 +1,27 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Deals;
 
+use App\Traits\HasSafeGlobalSearch;
+use App\Models\DealStage;
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Deals\Pages\ListDeals;
+use App\Filament\Resources\Deals\Pages\CreateDeal;
+use App\Filament\Resources\Deals\Pages\EditDeal;
 use App\Filament\Resources\DealResource\Pages;
 use App\Filament\Resources\DealResource\RelationManagers;
 use App\Models\Deal;
 use App\Models\TypeMaster;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -29,18 +43,17 @@ use Filament\GlobalSearch\Actions\Action as GlobalSearchAction;
 class DealResource extends Resource
 {
     use HasCustomerInteractionFields;
-    use \App\Traits\HasSafeGlobalSearch;
+    use HasSafeGlobalSearch;
 
-    protected static ?string $model =  \App\Models\Deal::class;
+    protected static ?string $model =  Deal::class;
 
     /**
-     * @var \App\Models\DealStage
+     * @var DealStage
      */
+    protected static ?string $statusModel = DealStage::class;
 
-    protected static ?string $statusModel = \App\Models\DealStage::class;
-
-    protected static ?string $navigationGroup = 'Marketing';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 20;
 
     protected static ?string $recordTitleAttribute = 'reference_code';
@@ -48,39 +61,39 @@ class DealResource extends Resource
     protected static int $globalSearchResultsLimit = 10;
 
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 ...self::getCommonFormSchema(),
 
-                Forms\Components\TextInput::make('deal_name')
+                TextInput::make('deal_name')
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\Select::make('type_id')
+                Select::make('type_id')
                     ->label('Type')
-                    ->options(fn () => \App\Models\TypeMaster::ofType(\App\Models\Deal::class)
+                    ->options(fn () => TypeMaster::ofType(Deal::class)
                         ->pluck('name', 'id')->toArray()
                     )
                     ->searchable()
                     ->preload()
                     ->required(),
 
-                Forms\Components\Hidden::make('type_type')
-                    ->default(\App\Models\Deal::class),
+                Hidden::make('type_type')
+                    ->default(Deal::class),
 
-                Forms\Components\TextInput::make('amount')
+                TextInput::make('amount')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('expected_revenue')
+                TextInput::make('expected_revenue')
                     ->required()
                     ->numeric(),
-                Forms\Components\DatePicker::make('expected_close_date')
+                DatePicker::make('expected_close_date')
                     ->required(),
-                Forms\Components\TextInput::make('lead_source_id')
+                TextInput::make('lead_source_id')
                     ->numeric(),
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->columnSpanFull(),
             ]);
     }
@@ -159,9 +172,9 @@ class DealResource extends Resource
 
                 Filter::make('transaction_date')
                     ->label('Transaction Date Range')
-                    ->form([
-                        Forms\Components\DatePicker::make('from'),
-                        Forms\Components\DatePicker::make('until'),
+                    ->schema([
+                        DatePicker::make('from'),
+                        DatePicker::make('until'),
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
@@ -171,9 +184,9 @@ class DealResource extends Resource
 
                 Filter::make('expected_close_date')
                     ->label('Expected Close Date Range')
-                    ->form([
-                        Forms\Components\DatePicker::make('from'),
-                        Forms\Components\DatePicker::make('until'),
+                    ->schema([
+                        DatePicker::make('from'),
+                        DatePicker::make('until'),
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
@@ -183,9 +196,9 @@ class DealResource extends Resource
 
                 Filter::make('amount_range')
                     ->label('Amount Range')
-                    ->form([
-                        Forms\Components\TextInput::make('min')->numeric(),
-                        Forms\Components\TextInput::make('max')->numeric(),
+                    ->schema([
+                        TextInput::make('min')->numeric(),
+                        TextInput::make('max')->numeric(),
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
@@ -193,14 +206,14 @@ class DealResource extends Resource
                             ->when($data['max'], fn ($q) => $q->where('amount', '<=', $data['max']));
                     }),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
                 ])
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('transaction_date', 'desc')
@@ -217,9 +230,9 @@ class DealResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDeals::route('/'),
-            'create' => Pages\CreateDeal::route('/create'),
-            'edit' => Pages\EditDeal::route('/{record}/edit'),
+            'index' => ListDeals::route('/'),
+            'create' => CreateDeal::route('/create'),
+            'edit' => EditDeal::route('/{record}/edit'),
         ];
     }
 }

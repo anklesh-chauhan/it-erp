@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\OrganizationalUnitResource\Pages;
+namespace App\Filament\Resources\OrganizationalUnits\Pages;
 
-use App\Filament\Resources\OrganizationalUnitResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\OrganizationalUnits\OrganizationalUnitResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListOrganizationalUnits extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

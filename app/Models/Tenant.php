@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Multitenancy\Models\Tenant as BaseTenant;
@@ -137,7 +138,7 @@ class Tenant extends BaseTenant
 
                  // ✅ Run tenant seeder programmatically (not Artisan)
                 app('db')->setDefaultConnection('tenant');
-                $seeder = new \Database\Seeders\DatabaseSeeder();
+                $seeder = new DatabaseSeeder();
                 $seeder->run();
                 Log::info("Seeded tenant database for: {$tenant->name}");
 
@@ -164,7 +165,7 @@ class Tenant extends BaseTenant
                 Log::info("Tenant context cleared for: {$tenant->name}");
 
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error("Error processing tenant {$tenant->name}: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
                 throw $e; // Re-throw to halt seeding if critical
             }

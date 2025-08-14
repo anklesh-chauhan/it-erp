@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\TermsAndConditionResource\Pages;
+namespace App\Filament\Resources\TermsAndConditions\Pages;
 
-use App\Filament\Resources\TermsAndConditionResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\TermsAndConditions\TermsAndConditionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditTermsAndCondition extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

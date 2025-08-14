@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -74,7 +75,7 @@ class NumberSeries extends Model
         static::saving(function ($model) {
             // Add validation logic here
             if (!is_numeric($model->next_number)) {
-                throw new \Exception('The next number must be numeric.');
+                throw new Exception('The next number must be numeric.');
             }
         });
     }

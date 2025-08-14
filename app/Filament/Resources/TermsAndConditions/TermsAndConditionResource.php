@@ -1,12 +1,21 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\TermsAndConditions;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\TermsAndConditions\Pages\ListTermsAndConditions;
+use App\Filament\Resources\TermsAndConditions\Pages\CreateTermsAndCondition;
+use App\Filament\Resources\TermsAndConditions\Pages\EditTermsAndCondition;
 use App\Filament\Resources\TermsAndConditionResource\Pages;
 use App\Filament\Resources\TermsAndConditionResource\RelationManagers;
 use App\Models\TermsAndCondition;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,26 +26,26 @@ class TermsAndConditionResource extends Resource
 {
     protected static ?string $model = TermsAndCondition::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?string $navigationParentItem = 'Company Config';
     protected static ?int $navigationSort = 1001;
     protected static ?string $navigationLabel = 'Terms & Conditions';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('model_type')
+        return $schema
+            ->components([
+                TextInput::make('model_type')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('model_id')
+                TextInput::make('model_id')
                     ->numeric(),
-                Forms\Components\TextInput::make('terms_type_id')
+                TextInput::make('terms_type_id')
                     ->numeric(),
-                Forms\Components\Textarea::make('terms_and_conditions')
+                Textarea::make('terms_and_conditions')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('remarks')
+                Textarea::make('remarks')
                     ->columnSpanFull(),
             ]);
     }
@@ -45,19 +54,19 @@ class TermsAndConditionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('model_type')
+                TextColumn::make('model_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('model_id')
+                TextColumn::make('model_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('terms_type_id')
+                TextColumn::make('terms_type_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -65,12 +74,12 @@ class TermsAndConditionResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -85,9 +94,9 @@ class TermsAndConditionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTermsAndConditions::route('/'),
-            'create' => Pages\CreateTermsAndCondition::route('/create'),
-            'edit' => Pages\EditTermsAndCondition::route('/{record}/edit'),
+            'index' => ListTermsAndConditions::route('/'),
+            'create' => CreateTermsAndCondition::route('/create'),
+            'edit' => EditTermsAndCondition::route('/{record}/edit'),
         ];
     }
 }

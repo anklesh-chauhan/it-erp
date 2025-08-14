@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\VisitRouteResource\Pages;
+namespace App\Filament\Resources\VisitRoutes\Pages;
 
-use App\Filament\Resources\VisitRouteResource;
+use App\Filament\Resources\VisitRoutes\VisitRouteResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

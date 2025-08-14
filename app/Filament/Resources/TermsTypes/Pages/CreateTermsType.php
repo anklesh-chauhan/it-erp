@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\TermsTypeResource\Pages;
+namespace App\Filament\Resources\TermsTypes\Pages;
 
-use App\Filament\Resources\TermsTypeResource;
+use App\Filament\Resources\TermsTypes\TermsTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

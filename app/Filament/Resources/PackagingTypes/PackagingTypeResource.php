@@ -1,12 +1,21 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\PackagingTypes;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\PackagingTypes\Pages\ListPackagingTypes;
+use App\Filament\Resources\PackagingTypes\Pages\CreatePackagingType;
+use App\Filament\Resources\PackagingTypes\Pages\EditPackagingType;
 use App\Filament\Resources\PackagingTypeResource\Pages;
 use App\Filament\Resources\PackagingTypeResource\RelationManagers;
 use App\Models\PackagingType;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,20 +26,20 @@ class PackagingTypeResource extends Resource
 {
     protected static ?string $model = PackagingType::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?string $navigationParentItem = 'Items';
     protected static ?int $navigationSort = 1003;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->columnSpanFull(),
             ]);
     }
@@ -39,13 +48,13 @@ class PackagingTypeResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -53,12 +62,12 @@ class PackagingTypeResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -73,9 +82,9 @@ class PackagingTypeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPackagingTypes::route('/'),
-            'create' => Pages\CreatePackagingType::route('/create'),
-            'edit' => Pages\EditPackagingType::route('/{record}/edit'),
+            'index' => ListPackagingTypes::route('/'),
+            'create' => CreatePackagingType::route('/create'),
+            'edit' => EditPackagingType::route('/{record}/edit'),
         ];
     }
 }

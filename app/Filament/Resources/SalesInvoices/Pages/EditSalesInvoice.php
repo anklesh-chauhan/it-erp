@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\SalesInvoiceResource\Pages;
+namespace App\Filament\Resources\SalesInvoices\Pages;
 
-use App\Filament\Resources\SalesInvoiceResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\SalesInvoices\SalesInvoiceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use App\Traits\SalesDocumentResourceTrait;
@@ -15,7 +16,7 @@ class EditSalesInvoice extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

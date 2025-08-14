@@ -1,9 +1,18 @@
 <?php
 
-namespace App\Filament\Resources\EmployeeResource\RelationManagers;
+namespace App\Filament\Resources\Employees\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -12,47 +21,47 @@ class ReportingEmployeesRelationManager extends RelationManager
 {
     protected static string $relationship = 'reportingEmployees';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('ticket_no')
+        return $schema
+            ->components([
+                TextInput::make('ticket_no')
                     ->maxLength(20)
                     ->nullable(),
-                Forms\Components\Select::make('employee_id')
+                Select::make('employee_id')
                     ->relationship('employee', 'full_name')
                     ->searchable()
                     ->preload()
                     ->required(),
-                Forms\Components\Select::make('department_id')
+                Select::make('department_id')
                     ->relationship('department', 'department_name')
                     ->searchable()
                     ->preload()
                     ->nullable(),
-                Forms\Components\Select::make('job_title_id')
+                Select::make('job_title_id')
                     ->relationship('jobTitle', 'title')
                     ->searchable()
                     ->preload()
                     ->nullable(),
-                Forms\Components\Select::make('grade_id')
+                Select::make('grade_id')
                     ->relationship('grade', 'grade_name')
                     ->searchable()
                     ->preload()
                     ->nullable(),
-                Forms\Components\Select::make('division_id')
+                Select::make('division_id')
                     ->relationship('division', 'name')
                     ->searchable()
                     ->preload()
                     ->nullable(),
-                Forms\Components\Select::make('organization_id')
+                Select::make('organization_id')
                     ->relationship('organization', 'name')
                     ->searchable()
                     ->preload()
                     ->nullable(),
-                Forms\Components\DatePicker::make('hire_date')
+                DatePicker::make('hire_date')
                     ->required()
                     ->native(false),
-                Forms\Components\Select::make('employment_type')
+                Select::make('employment_type')
                     ->options([
                         'Permanent' => 'Permanent',
                         'Contract' => 'Contract',
@@ -61,7 +70,7 @@ class ReportingEmployeesRelationManager extends RelationManager
                         'Consultant' => 'Consultant',
                     ])
                     ->nullable(),
-                Forms\Components\Select::make('employment_status')
+                Select::make('employment_status')
                     ->options([
                         'Active' => 'Active',
                         'Inactive' => 'Inactive',
@@ -78,25 +87,25 @@ class ReportingEmployeesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('employee.full_name')
             ->columns([
-                Tables\Columns\TextColumn::make('employee.full_name'),
-                Tables\Columns\TextColumn::make('ticket_no'),
-                Tables\Columns\TextColumn::make('department.department_name'),
-                Tables\Columns\TextColumn::make('jobTitle.title'),
-                Tables\Columns\TextColumn::make('employment_status'),
+                TextColumn::make('employee.full_name'),
+                TextColumn::make('ticket_no'),
+                TextColumn::make('department.department_name'),
+                TextColumn::make('jobTitle.title'),
+                TextColumn::make('employment_status'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

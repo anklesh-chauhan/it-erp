@@ -2,6 +2,14 @@
 
 namespace App\Traits;
 
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
+use App\Models\Designation;
+use App\Models\Department;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Components\Actions\Action;
@@ -13,8 +21,6 @@ use Filament\Actions\Concerns\HasForm;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 
 trait CreateContactFormTrait
 {
@@ -26,10 +32,10 @@ trait CreateContactFormTrait
     public static function getCreateContactFormTraitFields(): array
     {
         return [
-            Forms\Components\Grid::make(3) // ✅ Three-column layout
+            Grid::make(3) // ✅ Three-column layout
                     ->schema([
                         // ✅ Salutation
-                        Forms\Components\Select::make('salutation')
+                        Select::make('salutation')
                             ->options([
                                 'Mr.'   => 'Mr.',
                                 'Mrs.'  => 'Mrs.',
@@ -43,22 +49,22 @@ trait CreateContactFormTrait
                             ->columnSpan(1),
 
                         // ✅ Contact Information
-                        Forms\Components\TextInput::make('first_name')
+                        TextInput::make('first_name')
                             ->required()
                             ->label('First Name')
                             ->columnSpan(1),
 
-                        Forms\Components\TextInput::make('last_name')
+                        TextInput::make('last_name')
                             ->label('Last Name')
                             ->columnSpan(1),
                         ]),
-                Forms\Components\Grid::make(3) // ✅ Three-column layout
+                Grid::make(3) // ✅ Three-column layout
                     ->schema([
-                        Forms\Components\TextInput::make('email')
+                        TextInput::make('email')
                             ->email()
                             ->required(),
 
-                        Forms\Components\TextInput::make('mobile_number')
+                        TextInput::make('mobile_number')
                             ->tel()
                             ->required()
                             ->label('Primary Phone')
@@ -66,7 +72,7 @@ trait CreateContactFormTrait
                             ->debounce(1000)
                             ->afterStateUpdated(fn (callable $set, $state) => $set('whatsapp_number', $state)),
 
-                        Forms\Components\TextInput::make('alternate_phone')
+                        TextInput::make('alternate_phone')
                             ->tel()
                             ->label('Alternate Phone'),
 
@@ -77,36 +83,36 @@ trait CreateContactFormTrait
                     ->description('Optional')
                     ->collapsed(true)
                     ->schema([
-                        Forms\Components\Grid::make(3) // ✅ Three-column layout
+                        Grid::make(3) // ✅ Three-column layout
                             ->schema([
-                                Forms\Components\Select::make('designation_id')
+                                Select::make('designation_id')
                                     ->relationship('designation', 'name')
                                     ->searchable()
                                     ->nullable()
                                     ->label('Designation')
                                     ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')
+                                        TextInput::make('name')
                                             ->required()
                                             ->label('New Designation')
                                     ])
                                     ->createOptionUsing(function (array $data) {
-                                        return \App\Models\Designation::create($data)->id;  // ✅ Create and return ID
+                                        return Designation::create($data)->id;  // ✅ Create and return ID
                                     })->preload(),
 
-                                Forms\Components\Select::make('department_id')
+                                Select::make('department_id')
                                     ->relationship('department', 'name')
                                     ->searchable()
                                     ->nullable()
                                     ->label('Department')
                                     ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')
+                                        TextInput::make('name')
                                             ->required()
                                             ->label('New Department')
                                     ])
                                     ->createOptionUsing(function (array $data) {
-                                        return \App\Models\Department::create($data)->id;  // ✅ Create and return ID
+                                        return Department::create($data)->id;  // ✅ Create and return ID
                                     })->preload(),
-                                Forms\Components\DatePicker::make('birthday')
+                                DatePicker::make('birthday')
                                     ->nullable()
                                     ->displayFormat('d M Y')
                                     ->native(false)
@@ -114,7 +120,7 @@ trait CreateContactFormTrait
 
                                 ]),
 
-                                Forms\Components\Select::make('company_id')
+                                Select::make('company_id')
                                     ->relationship('company', 'name')
                                     ->searchable()
                                     ->nullable()
@@ -131,7 +137,7 @@ trait CreateContactFormTrait
                                     })
                                     ->afterStateUpdated(function (callable $set, callable $get, $state) {
                                         if ($state) {
-                                            $company = \App\Models\Company::with('addresses')->find($state);
+                                            $company = Company::with('addresses')->find($state);
 
                                             if ($company && $company->addresses->isNotEmpty()) {
                                                 $companyAddress = $company->addresses->first();
@@ -154,39 +160,39 @@ trait CreateContactFormTrait
                                     })
                                     ->label('Company (Optional)')
                                     ->createOptionForm([
-                                        Forms\Components\Grid::make(2)
+                                        Grid::make(2)
                                         ->schema([
-                                            Forms\Components\TextInput::make('name')
+                                            TextInput::make('name')
                                                 ->required()
                                                 ->label('Company Name'),
 
-                                            Forms\Components\TextInput::make('email')
+                                            TextInput::make('email')
                                                 ->email()
                                                 ->nullable()
                                                 ->label('Company Email'),
 
-                                            Forms\Components\TextInput::make('website')
+                                            TextInput::make('website')
                                                 ->url()
                                                 ->nullable()
                                                 ->label('Website'),
 
-                                            Forms\Components\Select::make('industry_type_id')
+                                            Select::make('industry_type_id')
                                                 ->relationship('industryType', 'name')
                                                 ->searchable()
                                                 ->nullable()
                                                 ->label('Industry Type')
                                                 ->preload(),
 
-                                            Forms\Components\TextInput::make('no_of_employees')
+                                            TextInput::make('no_of_employees')
                                                 ->maxLength(255),
 
-                                            Forms\Components\Textarea::make('description')
+                                            Textarea::make('description')
                                                 ->nullable()
                                                 ->label('Company Description'),
                                         ])
                                     ])
                                     ->createOptionUsing(function (array $data, callable $set, callable $get) {
-                                        $company = \App\Models\Company::create($data);
+                                        $company = Company::create($data);
 
                                         // ✅ Force `.afterStateUpdated()` to run and apply logic
                                         $set('company_id', $company->id);
@@ -203,23 +209,23 @@ trait CreateContactFormTrait
                                     ->preload(), // ✅ Preload data for faster search
 
 
-                                Forms\Components\TextInput::make('whatsapp_number')
+                                TextInput::make('whatsapp_number')
                                     ->tel()
                                     ->label('WhatsApp Number')
                                     ->placeholder('Same as phone number unless changed'),
 
-                        Forms\Components\Grid::make(4) // ✅ Three-column layout
+                        Grid::make(4) // ✅ Three-column layout
                             ->schema([
                                 // ✅ Social Media
-                                Forms\Components\TextInput::make('linkedin')->url()->label('LinkedIn'),
-                                Forms\Components\TextInput::make('facebook')->url()->label('Facebook'),
-                                Forms\Components\TextInput::make('twitter')->url()->label('Twitter'),
-                                Forms\Components\TextInput::make('website')->url()->label('Website'),
+                                TextInput::make('linkedin')->url()->label('LinkedIn'),
+                                TextInput::make('facebook')->url()->label('Facebook'),
+                                TextInput::make('twitter')->url()->label('Twitter'),
+                                TextInput::make('website')->url()->label('Website'),
                             ]),
-                        Forms\Components\Grid::make(1) // ✅ Three-column layout
+                        Grid::make(1) // ✅ Three-column layout
                             ->schema([
                         // ✅ Notes
-                        Forms\Components\Textarea::make('notes')
+                        Textarea::make('notes')
                             ->rows(3)
                             ->label('Additional Notes'),
                         ]),

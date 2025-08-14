@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\EmpJobTitleResource\Pages;
+namespace App\Filament\Resources\EmpJobTitles\Pages;
 
-use App\Filament\Resources\EmpJobTitleResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\EmpJobTitles\EmpJobTitleResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListEmpJobTitles extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

@@ -1,14 +1,26 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\SalesOrders;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\SalesOrders\Pages\ListSalesOrders;
+use App\Filament\Resources\SalesOrders\Pages\CreateSalesOrder;
+use App\Filament\Resources\SalesOrders\Pages\EditSalesOrder;
 use App\Filament\Resources\SalesOrderResource\Pages;
 use App\Filament\Resources\SalesOrderResource\RelationManagers;
 use App\Models\SalesOrder;
 use App\Models\SalesInvoice;
 use App\Models\NumberSeries;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,15 +35,15 @@ class SalesOrderResource extends Resource
 
     protected static ?string $model = SalesOrder::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Sales';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Sales';
     protected static ?int $navigationSort = 20;
     protected static ?string $navigationLabel = 'Sales Orders';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 ...self::getCommonFormFields(),
             ]);
     }
@@ -40,87 +52,87 @@ class SalesOrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('document_number')
+                TextColumn::make('document_number')
                     ->label('Document No.')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('date')
+                TextColumn::make('date')
                     ->label('Date')
                     ->date()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('lead.reference_code')
+                TextColumn::make('lead.reference_code')
                     ->label('Lead')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('salesPerson.name')
+                TextColumn::make('salesPerson.name')
                     ->label('Sales Person')
                     ->searchable()
                     ->sortable(),
 
                 // Account Master Column
-                Tables\Columns\TextColumn::make('accountMaster.name')
+                TextColumn::make('accountMaster.name')
                     ->label('Account Master')
                     ->searchable()
                     ->sortable(),
 
                 // Contact Detail Column
-                Tables\Columns\TextColumn::make('contactDetail.full_name')
+                TextColumn::make('contactDetail.full_name')
                     ->label('Contact')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('total')
+                TextColumn::make('total')
                     ->label('Total')
                     ->money('INR')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('currency')
+                TextColumn::make('currency')
                     ->label('Currency')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('payment_terms')
+                TextColumn::make('payment_terms')
                     ->label('Payment Terms')
                     ->limit(20),
 
-                Tables\Columns\TextColumn::make('shipping_method')
+                TextColumn::make('shipping_method')
                     ->label('Shipping Method')
                     ->limit(20),
 
-                Tables\Columns\IconColumn::make('rejected_at')
+                IconColumn::make('rejected_at')
                     ->label('Rejected')
                     ->boolean(),
 
-                Tables\Columns\IconColumn::make('canceled_at')
+                IconColumn::make('canceled_at')
                     ->label('Canceled')
                     ->boolean(),
 
-                Tables\Columns\IconColumn::make('sent_at')
+                IconColumn::make('sent_at')
                     ->label('Sent')
                     ->boolean(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->since()
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('sales_person_id')
+                SelectFilter::make('sales_person_id')
                     ->label('Sales Person')
                     ->relationship('salesPerson', 'name')
                     ->searchable(),
 
-                Tables\Filters\SelectFilter::make('account_master_id')
+                SelectFilter::make('account_master_id')
                     ->label('Account Master')
                     ->relationship('accountMaster', 'name')
                     ->searchable(),
 
-                Tables\Filters\Filter::make('date')
-                    ->form([
-                        Forms\Components\DatePicker::make('from'),
-                        Forms\Components\DatePicker::make('until'),
+                Filter::make('date')
+                    ->schema([
+                        DatePicker::make('from'),
+                        DatePicker::make('until'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query
@@ -128,14 +140,14 @@ class SalesOrderResource extends Resource
                             ->when($data['until'], fn ($q) => $q->whereDate('date', '<=', $data['until']));
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('createInvoice')
+            ->recordActions([
+                EditAction::make(),
+                Action::make('createInvoice')
                     ->label('Create Invoice')
                     ->icon('heroicon-o-document-text')
                     ->requiresConfirmation()
                     ->color('success')
-                    ->action(function (\App\Models\SalesOrder $record, $livewire) {
+                    ->action(function (SalesOrder $record, $livewire) {
                         // Copy relevant data from Sales Order to Sales Invoice
                         $invoice = SalesInvoice::create([
                             'sales_order_id' => $record->id,
@@ -170,9 +182,9 @@ class SalesOrderResource extends Resource
                         return redirect(route('filament.admin.resources.sales-invoices.edit', $invoice));
                     })
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -187,9 +199,9 @@ class SalesOrderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSalesOrders::route('/'),
-            'create' => Pages\CreateSalesOrder::route('/create'),
-            'edit' => Pages\EditSalesOrder::route('/{record}/edit'),
+            'index' => ListSalesOrders::route('/'),
+            'create' => CreateSalesOrder::route('/create'),
+            'edit' => EditSalesOrder::route('/{record}/edit'),
         ];
     }
 }

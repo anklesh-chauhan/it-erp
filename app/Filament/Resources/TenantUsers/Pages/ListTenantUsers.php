@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\TenantUserResource\Pages;
+namespace App\Filament\Resources\TenantUsers\Pages;
 
-use App\Filament\Resources\TenantUserResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\TenantUsers\TenantUserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListTenantUsers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

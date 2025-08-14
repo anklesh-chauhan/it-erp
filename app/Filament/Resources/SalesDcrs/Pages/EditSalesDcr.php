@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\SalesDcrResource\Pages;
+namespace App\Filament\Resources\SalesDcrs\Pages;
 
-use App\Filament\Resources\SalesDcrResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\SalesDcrs\SalesDcrResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditSalesDcr extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

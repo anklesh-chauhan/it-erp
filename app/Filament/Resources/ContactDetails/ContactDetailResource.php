@@ -1,18 +1,33 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\ContactDetails;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use App\Models\Designation;
+use App\Models\Department;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Hidden;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\ContactDetails\Pages\ListContactDetails;
+use App\Filament\Resources\ContactDetails\Pages\CreateContactDetail;
+use App\Filament\Resources\ContactDetails\Pages\EditContactDetail;
 use App\Filament\Resources\ContactDetailResource\Pages;
 use App\Models\ContactDetail;
 use App\Models\CityPinCode;
 use App\Models\Company;
 use Filament\Actions\Concerns\HasForm;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Forms\Components\Grid;
 
 
 class ContactDetailResource extends Resource
@@ -20,19 +35,19 @@ class ContactDetailResource extends Resource
 
     protected static ?string $model = ContactDetail::class;
 
-    protected static ?string $navigationGroup = 'Marketing';
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user';
     protected static ?string $navigationLabel = 'Contacts';
     protected static ?int $navigationSort = 50;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Grid::make(3) // ✅ Three-column layout
+        return $schema
+            ->components([
+                Grid::make(3) // ✅ Three-column layout
                     ->schema([
                         // ✅ Salutation
-                        Forms\Components\Select::make('salutation')
+                        Select::make('salutation')
                             ->options([
                                 'Mr.'   => 'Mr.',
                                 'Mrs.'  => 'Mrs.',
@@ -46,22 +61,22 @@ class ContactDetailResource extends Resource
                             ->columnSpan(1),
 
                         // ✅ Contact Information
-                        Forms\Components\TextInput::make('first_name')
+                        TextInput::make('first_name')
                             ->required()
                             ->label('First Name')
                             ->columnSpan(1),
 
-                        Forms\Components\TextInput::make('last_name')
+                        TextInput::make('last_name')
                             ->label('Last Name')
                             ->columnSpan(1),
                         ]),
-                Forms\Components\Grid::make(3) // ✅ Three-column layout
+                Grid::make(3) // ✅ Three-column layout
                     ->schema([
-                        Forms\Components\TextInput::make('email')
+                        TextInput::make('email')
                             ->email()
                             ->required(),
 
-                        Forms\Components\TextInput::make('mobile_number')
+                        TextInput::make('mobile_number')
                             ->tel()
                             ->required()
                             ->label('Primary Phone')
@@ -69,41 +84,41 @@ class ContactDetailResource extends Resource
                             ->debounce(1000)
                             ->afterStateUpdated(fn (callable $set, $state) => $set('whatsapp_number', $state)),
 
-                        Forms\Components\TextInput::make('alternate_phone')
+                        TextInput::make('alternate_phone')
                             ->tel()
                             ->label('Alternate Phone'),
 
                         ]),
-                Forms\Components\Grid::make(3) // ✅ Three-column layout
+                Grid::make(3) // ✅ Three-column layout
                     ->schema([
-                        Forms\Components\Select::make('designation_id')
+                        Select::make('designation_id')
                             ->relationship('designation', 'name')
                             ->searchable()
                             ->nullable()
                             ->label('Designation')
                             ->createOptionForm([
-                                Forms\Components\TextInput::make('name')
+                                TextInput::make('name')
                                     ->required()
                                     ->label('New Designation')
                             ])
                             ->createOptionUsing(function (array $data) {
-                                return \App\Models\Designation::create($data)->id;  // ✅ Create and return ID
+                                return Designation::create($data)->id;  // ✅ Create and return ID
                             })->preload(),
 
-                        Forms\Components\Select::make('department_id')
+                        Select::make('department_id')
                             ->relationship('department', 'name')
                             ->searchable()
                             ->nullable()
                             ->label('Department')
                             ->createOptionForm([
-                                Forms\Components\TextInput::make('name')
+                                TextInput::make('name')
                                     ->required()
                                     ->label('New Department')
                             ])
                             ->createOptionUsing(function (array $data) {
-                                return \App\Models\Department::create($data)->id;  // ✅ Create and return ID
+                                return Department::create($data)->id;  // ✅ Create and return ID
                             })->preload(),
-                        Forms\Components\DatePicker::make('birthday')
+                        DatePicker::make('birthday')
                             ->nullable()
                             ->displayFormat('d M Y')
                             ->native(false)
@@ -111,7 +126,7 @@ class ContactDetailResource extends Resource
 
                         ]),
 
-                        Forms\Components\Select::make('company_id')
+                        Select::make('company_id')
                             ->relationship('company', 'name')
                             ->searchable()
                             ->nullable()
@@ -128,7 +143,7 @@ class ContactDetailResource extends Resource
                             })
                             ->afterStateUpdated(function (callable $set, callable $get, $state) {
                                 if ($state) {
-                                    $company = \App\Models\Company::with('addresses')->find($state);
+                                    $company = Company::with('addresses')->find($state);
 
                                     if ($company && $company->addresses->isNotEmpty()) {
                                         $companyAddress = $company->addresses->first();
@@ -151,39 +166,39 @@ class ContactDetailResource extends Resource
                             })
                             ->label('Company (Optional)')
                             ->createOptionForm([
-                                Forms\Components\Grid::make(2)
+                                Grid::make(2)
                                 ->schema([
-                                    Forms\Components\TextInput::make('name')
+                                    TextInput::make('name')
                                         ->required()
                                         ->label('Company Name'),
 
-                                    Forms\Components\TextInput::make('email')
+                                    TextInput::make('email')
                                         ->email()
                                         ->nullable()
                                         ->label('Company Email'),
 
-                                    Forms\Components\TextInput::make('website')
+                                    TextInput::make('website')
                                         ->url()
                                         ->nullable()
                                         ->label('Website'),
 
-                                    Forms\Components\Select::make('industry_type_id')
+                                    Select::make('industry_type_id')
                                         ->relationship('industryType', 'name')
                                         ->searchable()
                                         ->nullable()
                                         ->label('Industry Type')
                                         ->preload(),
 
-                                    Forms\Components\TextInput::make('no_of_employees')
+                                    TextInput::make('no_of_employees')
                                         ->maxLength(255),
 
-                                    Forms\Components\Textarea::make('description')
+                                    Textarea::make('description')
                                         ->nullable()
                                         ->label('Company Description'),
                                 ])
                             ])
                             ->createOptionUsing(function (array $data, callable $set, callable $get) {
-                                $company = \App\Models\Company::create($data);
+                                $company = Company::create($data);
 
                                 // ✅ Force `.afterStateUpdated()` to run and apply logic
                                 $set('company_id', $company->id);
@@ -200,42 +215,42 @@ class ContactDetailResource extends Resource
                             ->preload(), // ✅ Preload data for faster search
 
 
-                        Forms\Components\TextInput::make('whatsapp_number')
+                        TextInput::make('whatsapp_number')
                             ->tel()
                             ->label('WhatsApp Number')
                             ->placeholder('Same as phone number unless changed'),
 
-                Forms\Components\Grid::make(4) // ✅ Three-column layout
+                Grid::make(4) // ✅ Three-column layout
                     ->schema([
                         // ✅ Social Media
-                        Forms\Components\TextInput::make('linkedin')->url()->label('LinkedIn'),
-                        Forms\Components\TextInput::make('facebook')->url()->label('Facebook'),
-                        Forms\Components\TextInput::make('twitter')->url()->label('Twitter'),
-                        Forms\Components\TextInput::make('website')->url()->label('Website'),
+                        TextInput::make('linkedin')->url()->label('LinkedIn'),
+                        TextInput::make('facebook')->url()->label('Facebook'),
+                        TextInput::make('twitter')->url()->label('Twitter'),
+                        TextInput::make('website')->url()->label('Website'),
                     ]),
-                Forms\Components\Grid::make(1) // ✅ Three-column layout
+                Grid::make(1) // ✅ Three-column layout
                     ->schema([
                 // ✅ Notes
-                Forms\Components\Textarea::make('notes')
+                Textarea::make('notes')
                     ->rows(3)
                     ->label('Additional Notes'),
                 ]),
 
-                Forms\Components\Grid::make(1) // ✅ Three-column layout
+                Grid::make(1) // ✅ Three-column layout
                     ->schema([
 
                     // 🔄 Add Address Repeater
-                    Forms\Components\Repeater::make('addresses')
+                    Repeater::make('addresses')
                     ->relationship('addresses')
                     ->schema([
-                        Forms\Components\Grid::make(3) // ✅ Three-column layout
+                        Grid::make(3) // ✅ Three-column layout
                         ->schema([
 
-                            Forms\Components\Hidden::make('company_id')
+                            Hidden::make('company_id')
                                 ->default(fn (callable $get) => $get('company_id')) // ✅ Auto-set when creating new records
                                 ->dehydrated(),
 
-                            Forms\Components\Select::make('address_type')
+                            Select::make('address_type')
                                 ->options([
                                     'Company' => 'Company',
                                     'Home' => 'Home',
@@ -245,10 +260,10 @@ class ContactDetailResource extends Resource
                                 ->required()
                                 ->label('Address Type'),
 
-                            Forms\Components\TextInput::make('street')->required(),
-                            Forms\Components\TextInput::make('area_town')->required(),
+                            TextInput::make('street')->required(),
+                            TextInput::make('area_town')->required(),
 
-                            Forms\Components\TextInput::make('pin_code')
+                            TextInput::make('pin_code')
                                 ->reactive()
                                 ->afterStateUpdated(function (callable $set, callable $get, $state) {
                                     if (!$get('city_id')) {
@@ -262,15 +277,15 @@ class ContactDetailResource extends Resource
                                     }
                                 }),
 
-                            Forms\Components\Select::make('city_id')
+                            Select::make('city_id')
                                 ->relationship('city', 'name')
                                 ->searchable(),
 
-                            Forms\Components\Select::make('state_id')
+                            Select::make('state_id')
                                 ->relationship('state', 'name')
                                 ->searchable(),
 
-                            Forms\Components\Select::make('country_id')
+                            Select::make('country_id')
                                 ->relationship('country', 'name')
                                 ->searchable(),
                         ]),
@@ -289,53 +304,53 @@ class ContactDetailResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('salutation')
+                TextColumn::make('salutation')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('first_name')
+                TextColumn::make('first_name')
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('last_name')
+                TextColumn::make('last_name')
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('birthday')
+                TextColumn::make('birthday')
                     ->date('d M Y')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('mobile_number')
+                TextColumn::make('mobile_number')
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('company.name')
+                TextColumn::make('company.name')
                     ->label('Company')
                     ->sortable()
                     ->default('N/A'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('company_id')
+                SelectFilter::make('company_id')
                     ->relationship('company', 'name')
                     ->label('Filter by Company'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListContactDetails::route('/'),
-            'create' => Pages\CreateContactDetail::route('/create'),
-            'edit' => Pages\EditContactDetail::route('/{record}/edit'),
+            'index' => ListContactDetails::route('/'),
+            'create' => CreateContactDetail::route('/create'),
+            'edit' => EditContactDetail::route('/{record}/edit'),
         ];
     }
 }

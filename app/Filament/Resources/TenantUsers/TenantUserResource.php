@@ -1,12 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\TenantUsers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\TenantUsers\Pages\ListTenantUsers;
+use App\Filament\Resources\TenantUsers\Pages\CreateTenantUser;
+use App\Filament\Resources\TenantUsers\Pages\EditTenantUser;
 use App\Filament\Resources\TenantUserResource\Pages;
 use App\Filament\Resources\TenantUserResource\RelationManagers;
 use App\Models\TenantUser;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,26 +25,26 @@ class TenantUserResource extends Resource
 {
     protected static ?string $model = TenantUser::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?string $navigationParentItem = 'User Management';
     protected static ?int $navigationSort = 1000;
     protected static ?string $navigationLabel = 'Tenants Users';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\TextInput::make('email')
+                TextInput::make('email')
                     ->email()
                     ->required()
                     ->unique(ignoreRecord: true),
 
-                Forms\Components\TextInput::make('password')
+                TextInput::make('password')
                     ->password()
                     ->required()
                     ->maxLength(255)
@@ -49,19 +57,19 @@ class TenantUserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('email')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime(),
+                TextColumn::make('name')->sortable()->searchable(),
+                TextColumn::make('email')->sortable()->searchable(),
+                TextColumn::make('created_at')->dateTime(),
             ])
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -76,9 +84,9 @@ class TenantUserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTenantUsers::route('/'),
-            'create' => Pages\CreateTenantUser::route('/create'),
-            'edit' => Pages\EditTenantUser::route('/{record}/edit'),
+            'index' => ListTenantUsers::route('/'),
+            'create' => CreateTenantUser::route('/create'),
+            'edit' => EditTenantUser::route('/{record}/edit'),
         ];
     }
 }

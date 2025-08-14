@@ -2,14 +2,27 @@
 
 namespace App\Traits;
 
+use App\Models\Quote;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use App\Models\NumberSeries;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use App\Models\User;
+use Filament\Forms\Components\Checkbox;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use App\Models\ItemMaster;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Placeholder;
+use Filament\Tables\Columns\TextColumn;
 use App\Models\Tax;
 use Filament\Forms;
 use Filament\Tables;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
 use Illuminate\Support\Facades\Log;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Grid;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Filament\Support\Enums\VerticalAlignment;
@@ -23,15 +36,15 @@ use Illuminate\Database\Eloquent\Model;
 
 trait SalesDocumentResourceTrait
 {
-    use \App\Traits\ContactDetailsTrait;
-    use \App\Traits\CompanyDetailsTrait;
-    use \App\Traits\AddressDetailsTrait;
-    use \App\Traits\ItemMasterTrait;
-    use \App\Traits\AccountMasterDetailsTrait;
+    use ContactDetailsTrait;
+    use CompanyDetailsTrait;
+    use AddressDetailsTrait;
+    use ItemMasterTrait;
+    use AccountMasterDetailsTrait;
 
     protected static function resolveModelClass(): string
     {
-        return method_exists(static::class, 'getModel') ? static::getModel() : \App\Models\Quote::class;
+        return method_exists(static::class, 'getModel') ? static::getModel() : Quote::class;
     }
 
     // public SalesDocumentPreference $preferences;
@@ -55,26 +68,26 @@ trait SalesDocumentResourceTrait
         //     $companyAccountFields = self::getAccountMasterDetailsTraitField();
         // }
         return [
-            Forms\Components\Grid::make(4)
+            Grid::make(4)
                 ->schema([
-                    Forms\Components\TextInput::make('document_number')
+                    TextInput::make('document_number')
                         ->label('Document Number')
-                        ->default(fn () => \App\Models\NumberSeries::getNextNumber(static::resolveModelClass()))
+                        ->default(fn () => NumberSeries::getNextNumber(static::resolveModelClass()))
                         ->disabled()
                         ->dehydrated(true),
-                    Forms\Components\DatePicker::make('date')
+                    DatePicker::make('date')
                         ->label('Date')
                         ->default(now()->toDateString())
                         ->required(),
-                    Forms\Components\Select::make('lead_id')
+                    Select::make('lead_id')
                         ->label('Lead')
                         ->relationship('lead', 'reference_code')
                         ->preload()
                         ->searchable(),
-                    Forms\Components\Select::make('sales_person_id')
+                    Select::make('sales_person_id')
                         ->label('Sales Person')
                         ->options(function () {
-                            return \App\Models\User::all()->pluck('name', 'id')->toArray();
+                            return User::all()->pluck('name', 'id')->toArray();
                         })
                         ->searchable()
                         ->preload()
@@ -92,11 +105,11 @@ trait SalesDocumentResourceTrait
                     label: 'Billing Address',
                     relationshipName: 'billingAddress'
                 ),
-                Forms\Components\Checkbox::make('has_shipping_address')
+                Checkbox::make('has_shipping_address')
                     ->label('Add Shipping Address')
                     ->live()
                     ->default(false),
-                Forms\Components\Group::make()
+                Group::make()
                     ->schema(
                         self::getAddressDetailsTraitField(
                             fieldName: 'shipping_address_id',
@@ -106,7 +119,7 @@ trait SalesDocumentResourceTrait
                     )
                     ->hidden(fn (callable $get) => !$get('has_shipping_address') && !$get('shipping_address_id')),
             
-        Forms\Components\Section::make()
+        Section::make()
             ->extraAttributes([
                 'class' => 'overflow-x-auto w-full no-gap-p6'
             ])
@@ -133,7 +146,7 @@ trait SalesDocumentResourceTrait
                         Grid::make(2)
                             ->extraAttributes(['class' => 'no-gap'])
                             ->schema([
-                                Forms\Components\Select::make('item_master_id')
+                                Select::make('item_master_id')
                                     ->label(false)
                                     ->relationship('itemMaster', 'item_name')
                                     ->searchable()
@@ -147,7 +160,7 @@ trait SalesDocumentResourceTrait
                                     ->live() // Optional: for reactivity
                                     ->getSearchResultsUsing(function (string $search): array {
                                         // Fetch the search results
-                                        $items = \App\Models\ItemMaster::where('item_name', 'like', "%{$search}%")
+                                        $items = ItemMaster::where('item_name', 'like', "%{$search}%")
                                             ->limit(50)
                                             ->pluck('item_name', 'id')
                                             ->toArray();
@@ -162,8 +175,8 @@ trait SalesDocumentResourceTrait
                                             ->modalHeading('Create New Item')
                                             ->modalSubmitActionLabel('Create')
                                             ->closeModalByClickingAway(false)
-                                            ->mutateFormDataUsing(function (array $data) {
-                                                $data['item_code'] = $data['item_code'] ?? \App\Models\NumberSeries::getNextNumber(\App\Models\ItemMaster::class);
+                                            ->mutateDataUsing(function (array $data) {
+                                                $data['item_code'] = $data['item_code'] ?? NumberSeries::getNextNumber(ItemMaster::class);
                                                 return $data;
                                             });
                                     }) // No visible() condition, always shown
@@ -180,7 +193,7 @@ trait SalesDocumentResourceTrait
                                     ->afterStateUpdated(function ($state, callable $set) {
                                         // When an item is selected, fetch its description and update the Textarea
                                         if ($state) {
-                                            $item = \App\Models\ItemMaster::with('taxes')->find($state);
+                                            $item = ItemMaster::with('taxes')->find($state);
                                             if ($item) {
                                                 $set('description', $item?->description ?? '');
                                                 $set('hsn_sac', $item?->hsn_code ?? ''); // Auto-fetch HSN/SAC
@@ -202,7 +215,7 @@ trait SalesDocumentResourceTrait
                                         }
                                     }),
 
-                                Forms\Components\Textarea::make('description')
+                                Textarea::make('description')
                                     ->label(false)
                                     ->rows(2)
                                     ->placeholder('Enter item description...')
@@ -218,7 +231,7 @@ trait SalesDocumentResourceTrait
                         Grid::make(1)
                             ->extraAttributes(['class' => 'no-gap'])
                             ->schema([ 
-                                Forms\Components\TextInput::make('quantity')
+                                TextInput::make('quantity')
                                     ->label(false)
                                     ->numeric()
                                     ->default(0)
@@ -232,7 +245,7 @@ trait SalesDocumentResourceTrait
                                         'class' => 'w-24 h-9 text-sm',
                                         'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -5px;',
                                     ]),
-                                Forms\Components\TextInput::make('hsn_sac')
+                                TextInput::make('hsn_sac')
                                     ->label('Hsn/Sac')
                                     ->live()
                                     ->placeholder('HSN/SAC')
@@ -243,7 +256,7 @@ trait SalesDocumentResourceTrait
                             ]),
                         
 
-                        Forms\Components\TextInput::make('price')
+                        TextInput::make('price')
                             ->label(false)
                             ->numeric()
                             ->default(0)
@@ -258,7 +271,7 @@ trait SalesDocumentResourceTrait
                                 'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
                             ]),
 
-                        Forms\Components\TextInput::make('discount')
+                        TextInput::make('discount')
                             ->label(false)
                             ->numeric()
                             ->default(0)
@@ -272,10 +285,10 @@ trait SalesDocumentResourceTrait
                                 'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
                             ])
                             ->visible(function () {
-                                return \App\Models\SalesDocumentPreference::first()?->discount_level === 'line_item';
+                                return SalesDocumentPreference::first()?->discount_level === 'line_item';
                             }),
 
-                        Forms\Components\Select::make('tax_rate')
+                        Select::make('tax_rate')
                             ->label(false)
                             ->options(function (callable $get) {
                                 $itemId = $get('item_master_id');
@@ -284,7 +297,7 @@ trait SalesDocumentResourceTrait
                                     return [];
                                 }
 
-                                $item = \App\Models\ItemMaster::with('taxes')->find($itemId);
+                                $item = ItemMaster::with('taxes')->find($itemId);
 
                                 if ($item && $item->taxes->isNotEmpty()) {
                                     return $item->taxes->mapWithKeys(function ($tax) {
@@ -295,7 +308,7 @@ trait SalesDocumentResourceTrait
                                 }
 
                                 // Fallback: list all taxes if no item taxes are found
-                                return \App\Models\Tax::active()
+                                return Tax::active()
                                     ->get()
                                     ->mapWithKeys(function ($tax) {
                                         return [
@@ -313,7 +326,7 @@ trait SalesDocumentResourceTrait
                             ])
                             ->required(),
 
-                        Forms\Components\TextInput::make('amount')
+                        TextInput::make('amount')
                             ->label(false)
                             ->readOnly()
                             ->dehydrated(true)
@@ -357,17 +370,17 @@ trait SalesDocumentResourceTrait
                     ->addActionLabel('Add Item')
                     ->defaultItems(1),
 
-                Forms\Components\Grid::make(4) // Two-column layout
+                Grid::make(4) // Two-column layout
                     ->schema([
-                        Forms\Components\Placeholder::make('') // Empty left column to push totals right
+                        Placeholder::make('') // Empty left column to push totals right
                             ->content(''),
-                        Forms\Components\Placeholder::make('') // Empty left column to push totals right
+                        Placeholder::make('') // Empty left column to push totals right
                         ->content(''),
-                        Forms\Components\Placeholder::make('') // Empty left column to push totals right
+                        Placeholder::make('') // Empty left column to push totals right
                         ->content(''),
-                        Forms\Components\Group::make()
+                        Group::make()
                             ->schema([
-                                Forms\Components\TextInput::make('subtotal')
+                                TextInput::make('subtotal')
                                     ->label('Subtotal')
                                     ->inlineLabel()
                                     ->readOnly()
@@ -385,17 +398,17 @@ trait SalesDocumentResourceTrait
                                             $state !== null ? number_format((float) $state, 2, '.', '') : null
                                         ),
                                 
-                                Forms\Components\TextInput::make('transaction_discount')
+                                TextInput::make('transaction_discount')
                                     ->label('Transaction Discount')
                                     ->inlineLabel()
                                     ->visible(function () {
-                                        return \App\Models\SalesDocumentPreference::first()?->discount_level === 'transaction';
+                                        return SalesDocumentPreference::first()?->discount_level === 'transaction';
                                     })
                                     ->numeric()
                                     ->default(0)
                                     ->suffix('%'),
                                     
-                                Forms\Components\TextInput::make('cgst')
+                                TextInput::make('cgst')
                                         ->label('CGST')
                                         ->inlineLabel()
                                         ->readOnly()
@@ -412,7 +425,7 @@ trait SalesDocumentResourceTrait
                                             return self::shouldShowCgstSgst($get);
                                         }),
 
-                                    Forms\Components\TextInput::make('sgst')
+                                    TextInput::make('sgst')
                                         ->label('SGST')
                                         ->inlineLabel()
                                         ->readOnly()
@@ -429,7 +442,7 @@ trait SalesDocumentResourceTrait
                                             return self::shouldShowCgstSgst($get);
                                         }),
 
-                                    Forms\Components\TextInput::make('igst')
+                                    TextInput::make('igst')
                                         ->label('IGST')
                                         ->inlineLabel()
                                         ->readOnly()
@@ -446,7 +459,7 @@ trait SalesDocumentResourceTrait
                                             return !self::shouldShowCgstSgst($get);
                                         }),
 
-                                Forms\Components\TextInput::make('total')
+                                TextInput::make('total')
                                     ->label('Total')
                                     ->inlineLabel()
                                     ->readOnly()
@@ -470,50 +483,50 @@ trait SalesDocumentResourceTrait
 
                 ]),
 
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->label('Description'),
-                Forms\Components\TextInput::make('currency')
+                TextInput::make('currency')
                     ->required()
                     ->maxLength(3)
                     ->default('INR'),
-                Forms\Components\TextInput::make('payment_terms')
+                TextInput::make('payment_terms')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('payment_method')
+                TextInput::make('payment_method')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('shipping_method')
+                TextInput::make('shipping_method')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('shipping_cost')
+                TextInput::make('shipping_cost')
                     ->maxLength(255),
-                Forms\Components\DatePicker::make('rejected_at'),
-                Forms\Components\DatePicker::make('canceled_at'),
-                Forms\Components\DatePicker::make('sent_at'),
+                DatePicker::make('rejected_at'),
+                DatePicker::make('canceled_at'),
+                DatePicker::make('sent_at'),
             ];
     }
 
     public static function getCommonTableColumns(): array
     {
         return [
-            Tables\Columns\TextColumn::make('document_number')
+            TextColumn::make('document_number')
                 ->label('Document Number'),
-            Tables\Columns\TextColumn::make('lead.lead_code')
+            TextColumn::make('lead.lead_code')
                 ->label('Lead Code'),
-            Tables\Columns\TextColumn::make('contactDetail.first_name')
+            TextColumn::make('contactDetail.first_name')
                 ->label('Contact Name'),
-            Tables\Columns\TextColumn::make('company.name')
+            TextColumn::make('company.name')
                 ->label('Company Name'),
-            Tables\Columns\TextColumn::make('date')
+            TextColumn::make('date')
                 ->label('Date')
                 ->date(),
-            Tables\Columns\TextColumn::make('subtotal')
+            TextColumn::make('subtotal')
                 ->label('Subtotal')
                 ->money('USD'),
-            Tables\Columns\TextColumn::make('tax')
+            TextColumn::make('tax')
                 ->label('Tax')
                 ->money('USD'),
-            Tables\Columns\TextColumn::make('total')
+            TextColumn::make('total')
                 ->label('Total')
                 ->money('USD'),
-            Tables\Columns\TextColumn::make('status')
+            TextColumn::make('status')
                 ->label('Status'),
         ];
     }
@@ -584,7 +597,7 @@ trait SalesDocumentResourceTrait
             $subtotal += $amount;
 
             if ($itemMasterId && $taxRate) {
-                $item = \App\Models\ItemMaster::with('taxes.components')->find($itemMasterId);
+                $item = ItemMaster::with('taxes.components')->find($itemMasterId);
                 $tax = $item->taxes->firstWhere('total_rate', $taxRate);
                 if ($tax) {
                     $components = $tax->components;
@@ -666,7 +679,7 @@ trait SalesDocumentResourceTrait
                 continue;
             }
 
-            $itemModel = \App\Models\ItemMaster::with('taxes.components')->find($itemMasterId);
+            $itemModel = ItemMaster::with('taxes.components')->find($itemMasterId);
             if (! $itemModel) continue;
 
             $tax = $itemModel->taxes->first(function ($tax) use ($taxRate) {

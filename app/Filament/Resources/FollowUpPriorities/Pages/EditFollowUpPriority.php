@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\FollowUpPriorityResource\Pages;
+namespace App\Filament\Resources\FollowUpPriorities\Pages;
 
-use App\Filament\Resources\FollowUpPriorityResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\FollowUpPriorities\FollowUpPriorityResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditFollowUpPriority extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

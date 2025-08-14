@@ -1,13 +1,31 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\OrganizationalUnits;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\OrganizationalUnits\Pages\ListOrganizationalUnits;
+use App\Filament\Resources\OrganizationalUnits\Pages\CreateOrganizationalUnit;
+use App\Filament\Resources\OrganizationalUnits\Pages\EditOrganizationalUnit;
 use App\Filament\Resources\OrganizationalUnitResource\Pages;
 use App\Filament\Resources\OrganizationalUnitResource\RelationManagers;
 use App\Filament\Resources\UsersRelationManagerResource\RelationManagers\UsersRelationManager;
 use App\Models\OrganizationalUnit;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,46 +38,46 @@ class OrganizationalUnitResource extends Resource
 {
     protected static ?string $model = OrganizationalUnit::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office-2';
 
     protected static ?string $navigationLabel = 'Org Units';
 
-    protected static ?string $navigationGroup = 'HR & Organization';
+    protected static string | \UnitEnum | null $navigationGroup = 'HR & Organization';
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Basic Information')
+        return $schema
+            ->components([
+                Section::make('Basic Information')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
                             ->autofocus()
                             ->placeholder('Enter unit name'),
-                        Forms\Components\TextInput::make('code')
+                        TextInput::make('code')
                             ->required()
                             ->maxLength(50)
                             ->unique(ignoreRecord: true)
                             ->placeholder('Enter unique code'),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Additional Details')
+                Section::make('Additional Details')
                     ->schema([
-                        Forms\Components\Textarea::make('description')
+                        Textarea::make('description')
                             ->maxLength(65535)
                             ->columnSpanFull()
                             ->placeholder('Describe the organizational unit'),
-                        Forms\Components\Select::make('parent_id')
+                        Select::make('parent_id')
                             ->relationship('parent', 'name')
                             ->searchable()
                             ->preload()
                             ->placeholder('Select parent unit')
                             ->nullable(),
-                        Forms\Components\Toggle::make('is_active')
+                        Toggle::make('is_active')
                             ->required()
                             ->default(true)
                             ->label('Active Status'),
@@ -74,51 +92,51 @@ class OrganizationalUnitResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable()
                     ->sortable()
                     ->description(fn ($record) => Str::limit($record->description, 50)),
-                Tables\Columns\TextColumn::make('code')
+                TextColumn::make('code')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->color('gray'),
-                Tables\Columns\TextColumn::make('parent.name')
+                TextColumn::make('parent.name')
                     ->sortable()
                     ->searchable()
                     ->default('None')
                     ->label('Parent Unit'),
-                Tables\Columns\IconColumn::make('is_active')
+                IconColumn::make('is_active')
                     ->boolean()
                     ->label('Active')
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle'),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Created'),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Updated'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('parent_id')
+                SelectFilter::make('parent_id')
                     ->relationship('parent', 'name')
                     ->label('Parent Unit')
                     ->placeholder('All Units'),
-                Tables\Filters\TernaryFilter::make('is_active')
+                TernaryFilter::make('is_active')
                     ->label('Active Status')
                     ->trueLabel('Active Units')
                     ->falseLabel('Inactive Units')
                     ->placeholder('All Units'),
-                Tables\Filters\Filter::make('created_at')
-                    ->form([
-                        Forms\Components\DatePicker::make('created_from')
+                Filter::make('created_at')
+                    ->schema([
+                        DatePicker::make('created_from')
                             ->label('Created From'),
-                        Forms\Components\DatePicker::make('created_until')
+                        DatePicker::make('created_until')
                             ->label('Created Until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -127,9 +145,9 @@ class OrganizationalUnitResource extends Resource
                             ->when($data['created_until'], fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make()
                     ->requiresConfirmation()
                     ->successNotification(
                         Notification::make()
@@ -138,9 +156,9 @@ class OrganizationalUnitResource extends Resource
                             ->body('The organizational unit has been deleted successfully.')
                     ),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->requiresConfirmation()
                         ->successNotification(
                             Notification::make()
@@ -163,9 +181,9 @@ class OrganizationalUnitResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrganizationalUnits::route('/'),
-            'create' => Pages\CreateOrganizationalUnit::route('/create'),
-            'edit' => Pages\EditOrganizationalUnit::route('/{record}/edit'),
+            'index' => ListOrganizationalUnits::route('/'),
+            'create' => CreateOrganizationalUnit::route('/create'),
+            'edit' => EditOrganizationalUnit::route('/{record}/edit'),
         ];
     }
 

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\PackagingTypeResource\Pages;
+namespace App\Filament\Resources\PackagingTypes\Pages;
 
-use App\Filament\Resources\PackagingTypeResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\PackagingTypes\PackagingTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListPackagingTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

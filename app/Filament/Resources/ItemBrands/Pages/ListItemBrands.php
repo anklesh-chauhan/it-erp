@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\ItemBrandResource\Pages;
+namespace App\Filament\Resources\ItemBrands\Pages;
 
-use App\Filament\Resources\ItemBrandResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\ItemBrands\ItemBrandResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListItemBrands extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

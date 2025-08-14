@@ -6,11 +6,11 @@ use Filament\Pages\Page;
 
 class ItemConfig extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string $view = 'filament.pages.item-config';
+    protected string $view = 'filament.pages.item-config';
     protected static ?string $title = 'Item Configuration';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?int $navigationSort = 1003;
     protected static ?string $navigationLabel = 'Items';
 

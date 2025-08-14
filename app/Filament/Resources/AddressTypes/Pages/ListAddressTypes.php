@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\AddressTypeResource\Pages;
+namespace App\Filament\Resources\AddressTypes\Pages;
 
-use App\Filament\Resources\AddressTypeResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\AddressTypes\AddressTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListAddressTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

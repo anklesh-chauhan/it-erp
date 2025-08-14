@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\ExpenseTypeResource\Pages;
+namespace App\Filament\Resources\ExpenseTypes\Pages;
 
-use App\Filament\Resources\ExpenseTypeResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\ExpenseTypes\ExpenseTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListExpenseTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

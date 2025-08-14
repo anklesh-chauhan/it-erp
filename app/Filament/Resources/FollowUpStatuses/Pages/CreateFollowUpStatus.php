@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\FollowUpStatusResource\Pages;
+namespace App\Filament\Resources\FollowUpStatuses\Pages;
 
-use App\Filament\Resources\FollowUpStatusResource;
+use App\Filament\Resources\FollowUpStatuses\FollowUpStatusResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\FollowUpResultResource\Pages;
+namespace App\Filament\Resources\FollowUpResults\Pages;
 
-use App\Filament\Resources\FollowUpResultResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\FollowUpResults\FollowUpResultResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditFollowUpResult extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

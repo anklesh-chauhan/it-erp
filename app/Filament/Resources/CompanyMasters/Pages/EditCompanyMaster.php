@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\CompanyMasterResource\Pages;
+namespace App\Filament\Resources\CompanyMasters\Pages;
 
-use App\Filament\Resources\CompanyMasterResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\CompanyMasters\CompanyMasterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditCompanyMaster extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

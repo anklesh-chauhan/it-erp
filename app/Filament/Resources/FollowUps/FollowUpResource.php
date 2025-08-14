@@ -1,13 +1,24 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\FollowUps;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\FollowUps\Pages\ListFollowUps;
+use App\Filament\Resources\FollowUps\Pages\CreateFollowUp;
+use App\Filament\Resources\FollowUps\Pages\EditFollowUp;
 use App\Filament\Resources\FollowUpResource\Pages;
 use App\Filament\Resources\FollowUpResource\RelationManagers;
 use App\Models\FollowUp;
 use App\Models\Lead;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,17 +29,17 @@ class FollowUpResource extends Resource
 {
     protected static ?string $model = FollowUp::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Sales & Marketing';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Sales & Marketing';
     protected static ?string $navigationParentItem = 'Leads';
     protected static ?int $navigationSort = 1;
     protected static ?string $navigationLabel = 'Follow ups';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('followupable_type')
+        return $schema
+            ->components([
+                Select::make('followupable_type')
                     ->label('Follow-up Type')
                     ->options([
                         'App\Models\Lead' => 'Lead',
@@ -37,49 +48,49 @@ class FollowUpResource extends Resource
                     ->reactive()
                     ->afterStateUpdated(fn ($set) => $set('followupable_id', null)),
 
-                Forms\Components\Select::make('followupable_id')
+                Select::make('followupable_id')
                     ->label('Related Record')
-                    ->options(fn (Forms\Get $get) => match ($get('followupable_type')) {
+                    ->options(fn (Get $get) => match ($get('followupable_type')) {
                         'App\Models\Lead' => Lead::pluck('id'),
                         default => [],
                     })
                     ->searchable()
                     ->required(),
 
-                Forms\Components\DateTimePicker::make('follow_up_date')
+                DateTimePicker::make('follow_up_date')
                     ->required()
                     ->label('Follow-up Date'),
 
-                Forms\Components\Select::make('media')
+                Select::make('media')
                     ->relationship('media', 'name')
                     ->label('Media')
                     ->nullable(),
 
-                Forms\Components\Textarea::make('interaction')
+                Textarea::make('interaction')
                     ->label('Interaction')
                     ->rows(3)
                     ->nullable(),
 
-                Forms\Components\Textarea::make('outcome')
+                Textarea::make('outcome')
                     ->label('Outcome')
                     ->rows(2)
                     ->nullable(),
 
-                Forms\Components\Select::make('result')
+                Select::make('result')
                     ->label('Result')
                     ->relationship('result', 'name')
                     ->nullable(),
 
-                Forms\Components\DateTimePicker::make('next_follow_up_date')
+                DateTimePicker::make('next_follow_up_date')
                     ->label('Next Follow-up Date')
                     ->nullable(),
 
-                Forms\Components\Select::make('priority')
+                Select::make('priority')
                     ->label('Select Priority')
                     ->relationship('priority', 'name')
                     ->nullable(),
 
-                Forms\Components\Select::make('status')
+                Select::make('status')
                     ->relationship('status', 'name')
                     ->default('Pending')
                     ->required(),
@@ -96,39 +107,39 @@ class FollowUpResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('followupable_type')
+                TextColumn::make('followupable_type')
                     ->formatStateUsing(fn ($state) => class_basename($state))
                     ->label('Follow-up Type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('user.name')
+                TextColumn::make('user.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('follow_up_date')
+                TextColumn::make('follow_up_date')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('media.name')
+                TextColumn::make('media.name')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('contactDetail.full_name')
+                TextColumn::make('contactDetail.full_name')
                     ->label('To Whom')
                     ->tooltip(fn ($record) => "Email: {$record->contactDetail->email}\nPhone: {$record->contactDetail->mobile_number}")
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('result.name')
+                TextColumn::make('result.name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('next_follow_up_date')
+                TextColumn::make('next_follow_up_date')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('priority.name')
+                TextColumn::make('priority.name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('status.name')
+                TextColumn::make('status.name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -136,12 +147,12 @@ class FollowUpResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -156,9 +167,9 @@ class FollowUpResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFollowUps::route('/'),
-            'create' => Pages\CreateFollowUp::route('/create'),
-            'edit' => Pages\EditFollowUp::route('/{record}/edit'),
+            'index' => ListFollowUps::route('/'),
+            'create' => CreateFollowUp::route('/create'),
+            'edit' => EditFollowUp::route('/{record}/edit'),
         ];
     }
 }

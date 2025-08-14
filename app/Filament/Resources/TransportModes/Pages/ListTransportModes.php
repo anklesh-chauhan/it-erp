@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\TransportModeResource\Pages;
+namespace App\Filament\Resources\TransportModes\Pages;
 
-use App\Filament\Resources\TransportModeResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\TransportModes\TransportModeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListTransportModes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

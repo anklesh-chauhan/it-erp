@@ -1,29 +1,32 @@
 <?php
 
-namespace App\Filament\Resources\LeadResource\Pages;
+namespace App\Filament\Resources\Leads\Pages;
 
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
 use App\Models\LeadCustomField;
 use Filament\Resources\Pages\Page;
 use Filament\Forms;
-use App\Filament\Resources\LeadResource;
+use App\Filament\Resources\Leads\LeadResource;
 use Filament\Notifications\Notification;
 
 class CustomFields extends Page
 {
     protected static string $resource = LeadResource::class;
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
-    protected static string $view = 'filament.resources.lead-resource.pages.custom-fields';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-collection';
+    protected string $view = 'filament.resources.lead-resource.pages.custom-fields';
 
     public ?array $customFields = [];
 
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Repeater::make('custom_fields')
+            Repeater::make('custom_fields')
                 ->statePath('customFields') // Ensure data binds properly
                 ->schema([
-                    Forms\Components\TextInput::make('label')->required(),
-                    Forms\Components\Select::make('type')
+                    TextInput::make('label')->required(),
+                    Select::make('type')
                         ->options([
                             'text' => 'Text',
                             'number' => 'Number',
@@ -31,7 +34,7 @@ class CustomFields extends Page
                             'email' => 'Email',
                         ])
                         ->required(),
-                    Forms\Components\TextInput::make('name')->required(),
+                    TextInput::make('name')->required(),
                 ])
                 ->addActionLabel('Add New Field')
                 ->columns(2)

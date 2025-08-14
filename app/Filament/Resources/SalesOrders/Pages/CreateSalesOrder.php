@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\SalesOrderResource\Pages;
+namespace App\Filament\Resources\SalesOrders\Pages;
 
-use App\Filament\Resources\SalesOrderResource;
+use App\Filament\Resources\SalesOrders\SalesOrderResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use App\Traits\SalesDocumentResourceTrait;

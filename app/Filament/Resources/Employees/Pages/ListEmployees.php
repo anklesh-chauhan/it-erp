@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\EmployeeResource\Pages;
+namespace App\Filament\Resources\Employees\Pages;
 
-use App\Filament\Resources\EmployeeResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Employees\EmployeeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListEmployees extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

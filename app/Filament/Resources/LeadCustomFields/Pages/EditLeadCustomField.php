@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\LeadCustomFieldResource\Pages;
+namespace App\Filament\Resources\LeadCustomFields\Pages;
 
-use App\Filament\Resources\LeadCustomFieldResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\LeadCustomFields\LeadCustomFieldResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditLeadCustomField extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

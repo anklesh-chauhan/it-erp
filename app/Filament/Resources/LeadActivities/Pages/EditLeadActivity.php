@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\LeadActivityResource\Pages;
+namespace App\Filament\Resources\LeadActivities\Pages;
 
-use App\Filament\Resources\LeadActivityResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\LeadActivities\LeadActivityResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditLeadActivity extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

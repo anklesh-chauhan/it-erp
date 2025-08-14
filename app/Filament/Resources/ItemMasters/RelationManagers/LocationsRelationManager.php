@@ -1,9 +1,18 @@
 <?php
 
-namespace App\Filament\Resources\ItemMasterResource\RelationManagers;
+namespace App\Filament\Resources\ItemMasters\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\AttachAction;
+use Filament\Forms\Components\Select;
+use Filament\Actions\EditAction;
+use Filament\Actions\DetachAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DetachBulkAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,14 +24,14 @@ class LocationsRelationManager extends RelationManager
 {
     protected static string $relationship = 'locations';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('quantity') // Pivot field
+                TextInput::make('quantity') // Pivot field
                     ->required()
                     ->numeric()
                     ->default(0),
@@ -34,27 +43,27 @@ class LocationsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Location Name'),
-                Tables\Columns\TextColumn::make('pivot.quantity') // Display pivot field
+                TextColumn::make('pivot.quantity') // Display pivot field
                     ->label('Quantity'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make()
+                AttachAction::make()
                 ->recordSelect(function () {
                     return self::getIndentedLocations();
                 })
                 ->preloadRecordSelect()
                 ->form([
-                    Forms\Components\Select::make('recordId')
+                    Select::make('recordId')
                     ->label('Location Name')
                     ->options(fn () => self::getIndentedLocations())
                     ->searchable()
                     ->required(),
-                    Forms\Components\TextInput::make('quantity')
+                    TextInput::make('quantity')
                         ->numeric()
                         ->minValue(1)
                         ->required(),
@@ -67,15 +76,15 @@ class LocationsRelationManager extends RelationManager
                     ]);
                 }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DetachAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DetachAction::make(),
                 // Tables\Actions\DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make(),
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DetachBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

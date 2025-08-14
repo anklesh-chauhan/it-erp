@@ -1,12 +1,19 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\ExpenseTypes;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\ExpenseTypes\Pages\ListExpenseTypes;
+use App\Filament\Resources\ExpenseTypes\Pages\CreateExpenseType;
+use App\Filament\Resources\ExpenseTypes\Pages\EditExpenseType;
 use App\Filament\Resources\ExpenseTypeResource\Pages;
 use App\Filament\Resources\ExpenseTypeResource\RelationManagers;
 use App\Models\ExpenseType;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,16 +24,16 @@ class ExpenseTypeResource extends Resource
 {
     protected static ?string $model = ExpenseType::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?string $navigationParentItem = 'Expense Config';
     protected static ?int $navigationSort = 1003;
     protected static ?string $navigationLabel = 'Expense Types';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 //
             ]);
     }
@@ -35,11 +42,11 @@ class ExpenseTypeResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -47,12 +54,12 @@ class ExpenseTypeResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -67,9 +74,9 @@ class ExpenseTypeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListExpenseTypes::route('/'),
-            'create' => Pages\CreateExpenseType::route('/create'),
-            'edit' => Pages\EditExpenseType::route('/{record}/edit'),
+            'index' => ListExpenseTypes::route('/'),
+            'create' => CreateExpenseType::route('/create'),
+            'edit' => EditExpenseType::route('/{record}/edit'),
         ];
     }
 }

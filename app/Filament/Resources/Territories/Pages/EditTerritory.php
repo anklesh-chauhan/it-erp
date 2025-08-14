@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\TerritoryResource\Pages;
+namespace App\Filament\Resources\Territories\Pages;
 
-use App\Filament\Resources\TerritoryResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Territories\TerritoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditTerritory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

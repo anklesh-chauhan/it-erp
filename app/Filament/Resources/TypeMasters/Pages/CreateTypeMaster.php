@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\TypeMasterResource\Pages;
+namespace App\Filament\Resources\TypeMasters\Pages;
 
-use App\Filament\Resources\TypeMasterResource;
+use App\Filament\Resources\TypeMasters\TypeMasterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

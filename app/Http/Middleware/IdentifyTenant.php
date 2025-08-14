@@ -29,7 +29,7 @@ class IdentifyTenant
 
         Log::info("Tenant identified: {$tenant->id} - {$tenant->domain}");
         $tenant->makeCurrent();
-        Log::info("Current database connection1:" . \Illuminate\Support\Facades\DB::getDefaultConnection());
+        Log::info("Current database connection1:" . DB::getDefaultConnection());
 
         return $next($request);
     }

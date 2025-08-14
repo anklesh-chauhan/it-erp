@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\VisitRouteResource\Pages;
+namespace App\Filament\Resources\VisitRoutes\Pages;
 
-use App\Filament\Resources\VisitRouteResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\VisitRoutes\VisitRouteResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListVisitRoutes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

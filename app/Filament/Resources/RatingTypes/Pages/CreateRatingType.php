@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\RatingTypeResource\Pages;
+namespace App\Filament\Resources\RatingTypes\Pages;
 
-use App\Filament\Resources\RatingTypeResource;
+use App\Filament\Resources\RatingTypes\RatingTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

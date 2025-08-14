@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\TerritoryResource\Pages;
+namespace App\Filament\Resources\Territories\Pages;
 
-use App\Filament\Resources\TerritoryResource;
+use App\Filament\Resources\Territories\TerritoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

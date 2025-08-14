@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\LeadStatusResource\Pages;
+namespace App\Filament\Resources\LeadStatuses\Pages;
 
-use App\Filament\Resources\LeadStatusResource;
+use App\Filament\Resources\LeadStatuses\LeadStatusResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

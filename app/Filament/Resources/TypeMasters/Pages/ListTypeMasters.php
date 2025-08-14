@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\TypeMasterResource\Pages;
+namespace App\Filament\Resources\TypeMasters\Pages;
 
-use App\Filament\Resources\TypeMasterResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\TypeMasters\TypeMasterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListTypeMasters extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

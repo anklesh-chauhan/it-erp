@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\EmpDepartmentResource\Pages;
+namespace App\Filament\Resources\EmpDepartments\Pages;
 
-use App\Filament\Resources\EmpDepartmentResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\EmpDepartments\EmpDepartmentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListEmpDeparments extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\FollowUpPriorityResource\Pages;
+namespace App\Filament\Resources\FollowUpPriorities\Pages;
 
-use App\Filament\Resources\FollowUpPriorityResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\FollowUpPriorities\FollowUpPriorityResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListFollowUpPriorities extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

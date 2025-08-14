@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\FollowUpPriorityResource\Pages;
+namespace App\Filament\Resources\FollowUpPriorities\Pages;
 
-use App\Filament\Resources\FollowUpPriorityResource;
+use App\Filament\Resources\FollowUpPriorities\FollowUpPriorityResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

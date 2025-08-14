@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\TermsAndConditionResource\Pages;
+namespace App\Filament\Resources\TermsAndConditions\Pages;
 
-use App\Filament\Resources\TermsAndConditionResource;
+use App\Filament\Resources\TermsAndConditions\TermsAndConditionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

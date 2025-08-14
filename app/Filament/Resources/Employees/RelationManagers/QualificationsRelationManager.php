@@ -1,9 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\EmployeeResource\RelationManagers;
+namespace App\Filament\Resources\Employees\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -12,31 +20,31 @@ class QualificationsRelationManager extends RelationManager
 {
     protected static string $relationship = 'qualifications';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('degree')
+        return $schema
+            ->components([
+                TextInput::make('degree')
                     ->maxLength(100)
                     ->nullable(),
-                Forms\Components\TextInput::make('institution')
+                TextInput::make('institution')
                     ->maxLength(100)
                     ->nullable(),
-                Forms\Components\TextInput::make('year_of_completion')
+                TextInput::make('year_of_completion')
                     ->numeric()
                     ->minValue(1900)
                     ->maxValue(date('Y'))
                     ->nullable(),
-                Forms\Components\TextInput::make('certification')
+                TextInput::make('certification')
                     ->maxLength(100)
                     ->nullable(),
-                Forms\Components\TextInput::make('grade')
+                TextInput::make('grade')
                     ->maxLength(50)
                     ->nullable(),
-                Forms\Components\TextInput::make('percentage')
+                TextInput::make('percentage')
                     ->maxLength(10)
                     ->nullable(),
-                Forms\Components\Textarea::make('remarks')
+                Textarea::make('remarks')
                     ->maxLength(255)
                     ->nullable(),
             ])->columns(2);
@@ -47,25 +55,25 @@ class QualificationsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('degree')
             ->columns([
-                Tables\Columns\TextColumn::make('degree'),
-                Tables\Columns\TextColumn::make('institution'),
-                Tables\Columns\TextColumn::make('year_of_completion'),
-                Tables\Columns\TextColumn::make('certification'),
-                Tables\Columns\TextColumn::make('grade'),
+                TextColumn::make('degree'),
+                TextColumn::make('institution'),
+                TextColumn::make('year_of_completion'),
+                TextColumn::make('certification'),
+                TextColumn::make('grade'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

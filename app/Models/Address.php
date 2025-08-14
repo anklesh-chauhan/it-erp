@@ -51,7 +51,7 @@ class Address extends Model
 
     public function addressType()
     {
-        return $this->belongsTo(\App\Models\TypeMaster::class, 'type_master_id');
+        return $this->belongsTo(TypeMaster::class, 'type_master_id');
     }
 
     public function accountMasters()

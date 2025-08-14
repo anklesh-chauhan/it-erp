@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\RatingTypeResource\Pages;
+namespace App\Filament\Resources\RatingTypes\Pages;
 
-use App\Filament\Resources\RatingTypeResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\RatingTypes\RatingTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListRatingTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

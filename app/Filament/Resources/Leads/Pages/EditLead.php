@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\LeadResource\Pages;
+namespace App\Filament\Resources\Leads\Pages;
 
-use App\Filament\Resources\LeadResource;
-use App\Filament\Resources\DealResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Leads\LeadResource;
+use App\Filament\Resources\Deals\DealResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Actions\Action;
@@ -22,7 +23,7 @@ class EditLead extends EditRecord
             Action::make('Convert to Deal')
                 ->color('success')
                 ->requiresConfirmation()
-                ->form([
+                ->schema([
                     Checkbox::make('create_account_master')
                         ->label('Create Account Master')
                         ->default(false)
@@ -59,7 +60,7 @@ class EditLead extends EditRecord
                 ->url(fn () => $this->getNextRecordUrl())
                 ->disabled(is_null($this->getNextRecordId())),
 
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\ItemMeasurementUnitResource\Pages;
+namespace App\Filament\Resources\ItemMeasurementUnits\Pages;
 
-use App\Filament\Resources\ItemMeasurementUnitResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\ItemMeasurementUnits\ItemMeasurementUnitResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditItemMeasurementUnit extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

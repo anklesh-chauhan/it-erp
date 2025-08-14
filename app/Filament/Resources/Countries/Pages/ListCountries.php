@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\CountryResource\Pages;
+namespace App\Filament\Resources\Countries\Pages;
 
-use App\Filament\Resources\CountryResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Countries\CountryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListCountries extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

@@ -2,8 +2,16 @@
 
 namespace App\Filament\Resources\AccountMasterStatutoryDetailResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -14,30 +22,30 @@ class StatutoryDetailRelationManager extends RelationManager
 {
     protected static string $relationship = 'statutoryDetail';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('tan_number')
+        return $schema
+            ->components([
+                TextInput::make('tan_number')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('cin')
+                TextInput::make('cin')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('tds_parameters')
+                TextInput::make('tds_parameters')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('tds_section')
+                TextInput::make('tds_section')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('tds_rate')
+                TextInput::make('tds_rate')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('tds_type')
+                TextInput::make('tds_type')
                     ->maxLength(255),
-                Forms\Components\Toggle::make('tds_status')
+                Toggle::make('tds_status')
                     ->required()
                     ->default('active'),
-                Forms\Components\TextInput::make('is_tds_deduct')
+                TextInput::make('is_tds_deduct')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('is_tds_compulsory')
+                TextInput::make('is_tds_compulsory')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('tds_remark')
+                TextInput::make('tds_remark')
                     ->maxLength(255),
             ]);
     }
@@ -47,34 +55,34 @@ class StatutoryDetailRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('tan_number')
+                TextColumn::make('tan_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('cin')
+                TextColumn::make('cin')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tds_parameters')
+                TextColumn::make('tds_parameters')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tds_section')
+                TextColumn::make('tds_section')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tds_rate')
+                TextColumn::make('tds_rate')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tds_type')
+                TextColumn::make('tds_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tds_status')
+                TextColumn::make('tds_status')
                     ->searchable(),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -1,12 +1,22 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\SalesDailyExpenses;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\SalesDailyExpenses\Pages\ListSalesDailyExpenses;
+use App\Filament\Resources\SalesDailyExpenses\Pages\CreateSalesDailyExpense;
+use App\Filament\Resources\SalesDailyExpenses\Pages\EditSalesDailyExpense;
 use App\Filament\Resources\SalesDailyExpenseResource\Pages;
 use App\Filament\Resources\SalesDailyExpenseResource\RelationManagers;
 use App\Models\SalesDailyExpense;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,42 +27,42 @@ class SalesDailyExpenseResource extends Resource
 {
     protected static ?string $model = SalesDailyExpense::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Marketing';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
     protected static ?int $navigationSort = 40;
     protected static ?string $navigationLabel = 'Daily Expense';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('serial_number')
+        return $schema
+            ->components([
+                TextInput::make('serial_number')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DatePicker::make('expense_date')
+                DatePicker::make('expense_date')
                     ->required(),
-                Forms\Components\TextInput::make('user_id')
+                TextInput::make('user_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\DatePicker::make('transaction_date')
+                DatePicker::make('transaction_date')
                     ->required(),
-                Forms\Components\TextInput::make('category_type')
+                TextInput::make('category_type')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('category_id')
+                TextInput::make('category_id')
                     ->numeric(),
-                Forms\Components\TextInput::make('expense_type_id')
+                TextInput::make('expense_type_id')
                     ->numeric(),
-                Forms\Components\TextInput::make('tour_plan_id')
+                TextInput::make('tour_plan_id')
                     ->numeric(),
-                Forms\Components\TextInput::make('rate_amount')
+                TextInput::make('rate_amount')
                     ->numeric(),
-                Forms\Components\TextInput::make('claim_amount')
+                TextInput::make('claim_amount')
                     ->numeric(),
-                Forms\Components\TextInput::make('approved_amount')
+                TextInput::make('approved_amount')
                     ->numeric(),
-                Forms\Components\TextInput::make('approver_id')
+                TextInput::make('approver_id')
                     ->numeric(),
-                Forms\Components\Textarea::make('remarks')
+                Textarea::make('remarks')
                     ->columnSpanFull(),
             ]);
     }
@@ -61,49 +71,49 @@ class SalesDailyExpenseResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('serial_number')
+                TextColumn::make('serial_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('expense_date')
+                TextColumn::make('expense_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('user_id')
+                TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('transaction_date')
+                TextColumn::make('transaction_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('category_type')
+                TextColumn::make('category_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('category_id')
+                TextColumn::make('category_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('expense_type_id')
+                TextColumn::make('expense_type_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tour_plan_id')
+                TextColumn::make('tour_plan_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('rate_amount')
+                TextColumn::make('rate_amount')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('claim_amount')
+                TextColumn::make('claim_amount')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('approved_amount')
+                TextColumn::make('approved_amount')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('approver_id')
+                TextColumn::make('approver_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -111,12 +121,12 @@ class SalesDailyExpenseResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -131,9 +141,9 @@ class SalesDailyExpenseResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSalesDailyExpenses::route('/'),
-            'create' => Pages\CreateSalesDailyExpense::route('/create'),
-            'edit' => Pages\EditSalesDailyExpense::route('/{record}/edit'),
+            'index' => ListSalesDailyExpenses::route('/'),
+            'create' => CreateSalesDailyExpense::route('/create'),
+            'edit' => EditSalesDailyExpense::route('/{record}/edit'),
         ];
     }
 }

@@ -2,8 +2,17 @@
 
 namespace App\Filament\Resources\AccountMasterGSTDetailResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -14,28 +23,28 @@ class GstDetailRelationManager extends RelationManager
 {
     protected static string $relationship = 'gstDetail';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('gst_number')
+        return $schema
+            ->components([
+                TextInput::make('gst_number')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('state_name')
+                TextInput::make('state_name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('state_code')
+                TextInput::make('state_code')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('gst_type')
+                TextInput::make('gst_type')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Toggle::make('gst_status')
+                Toggle::make('gst_status')
                     ->required()
                     ->default('active'),
-                Forms\Components\TextInput::make('pan_number')
+                TextInput::make('pan_number')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('remark')
+                Textarea::make('remark')
                     ->columnSpanFull(),
             ]);
     }
@@ -45,26 +54,26 @@ class GstDetailRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('gst_number')
+                TextColumn::make('gst_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('state_name')
+                TextColumn::make('state_name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('state_code')
+                TextColumn::make('state_code')
                     ->searchable(),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

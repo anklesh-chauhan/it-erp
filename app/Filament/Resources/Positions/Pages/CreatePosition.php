@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\PositionResource\Pages;
+namespace App\Filament\Resources\Positions\Pages;
 
-use App\Filament\Resources\PositionResource;
+use App\Filament\Resources\Positions\PositionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use App\Models\EmploymentDetail;

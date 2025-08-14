@@ -1,14 +1,23 @@
 <?php
 
-namespace App\Filament\Resources\AccountMasterResource\RelationManagers;
+namespace App\Filament\Resources\AccountMasters\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\CreateAction;
+use App\Models\Company;
+use Filament\Actions\EditAction;
+use Filament\Actions\DetachAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DetachBulkAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Actions\AttachAction;
-use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use App\Traits\CreateAddressFormTrait;
@@ -19,11 +28,11 @@ class AddressesRelationManager extends RelationManager
 
     protected static string $relationship = 'addresses';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
         // Define the form schema for creating/editing addresses directly
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 ...self::getCreateAddressFormFields(),
             ]);
     }
@@ -33,63 +42,63 @@ class AddressesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('street')
             ->columns([
-                Tables\Columns\TextColumn::make('typeMaster.name') // Updated to match relationship name
+                TextColumn::make('typeMaster.name') // Updated to match relationship name
                     ->label('Type')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('street')
+                TextColumn::make('street')
                     ->label('Street')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('city.name')
+                TextColumn::make('city.name')
                     ->label('City')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('state.name')
+                TextColumn::make('state.name')
                     ->label('State')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('country.name')
+                TextColumn::make('country.name')
                     ->label('Country')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('pin_code')
+                TextColumn::make('pin_code')
                     ->label('Pin Code')
                     ->sortable()
                     ->searchable(),
 
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('address_type')
+                SelectFilter::make('address_type')
                     ->relationship('typeMaster', 'name') // Updated to match relationship name
                     ->preload(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->after(function (RelationManager $livewire, $record) {
                         $accountMaster = $livewire->getOwnerRecord();
-                        $company = \App\Models\Company::where('account_master_id', $accountMaster->id)->first();
+                        $company = Company::where('account_master_id', $accountMaster->id)->first();
 
                         if ($company) {
                             $record->company_id = $company->id;
                             $record->save();
 
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Address linked to Company')
                                 ->success()
                                 ->send();
                         }
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DetachAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DetachAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make(),
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DetachBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

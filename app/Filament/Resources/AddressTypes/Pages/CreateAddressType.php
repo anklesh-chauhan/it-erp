@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\AddressTypeResource\Pages;
+namespace App\Filament\Resources\AddressTypes\Pages;
 
-use App\Filament\Resources\AddressTypeResource;
+use App\Filament\Resources\AddressTypes\AddressTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

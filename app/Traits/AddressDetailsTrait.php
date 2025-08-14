@@ -2,9 +2,20 @@
 
 namespace App\Traits;
 
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use App\Models\Address;
+use App\Models\ContactDetail;
+use App\Models\AccountMaster;
+use Filament\Forms\Components\Hidden;
+use App\Models\TypeMaster;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Support\Facades\Log;
+use Filament\Actions\Action;
+use App\Models\City;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Notifications\Notification;
 use App\Models\CityPinCode;
 
@@ -31,9 +42,9 @@ trait AddressDetailsTrait
         $relationshipName = $relationshipName ?? 'address';
 
         return [
-            Forms\Components\Grid::make(2)
+            Grid::make(2)
                         ->schema([
-                            Forms\Components\Select::make($fieldName)
+                            Select::make($fieldName)
                                 ->label($label)
                                 ->relationship($relationshipName, 'street', function ($query, callable $get) {
                                     // Get contact_id and account_master_id from the form
@@ -41,11 +52,11 @@ trait AddressDetailsTrait
                                     $accountMasterId = $get('account_master_id');
 
                                     // Base query
-                                    $query = \App\Models\Address::query();
+                                    $query = Address::query();
 
                                     // Filter by contact's addresses if contact_id is present
                                     if ($contactId) {
-                                        $contact = \App\Models\ContactDetail::with('addresses')->find($contactId);
+                                        $contact = ContactDetail::with('addresses')->find($contactId);
                                         if ($contact) {
                                             $query->whereIn('id', $contact->addresses->pluck('id'));
                                         }
@@ -54,7 +65,7 @@ trait AddressDetailsTrait
                                     // Filter by account master's addresses if account_master_id is present
                                     if ($accountMasterId) {
                                         $query->where('addressable_id', $accountMasterId)
-                                            ->where('addressable_type', \App\Models\AccountMaster::class);
+                                            ->where('addressable_type', AccountMaster::class);
                                     }
 
                                     return $query;
@@ -62,12 +73,12 @@ trait AddressDetailsTrait
                                 ->getSearchResultsUsing(function (string $search, callable $get) {
                                     // Get account_master_id for filtering
                                     $accountMasterId = $get('account_master_id');
-                                    $query = \App\Models\Address::query();
+                                    $query = Address::query();
 
                                     // Filter by account master's addresses if account_master_id is present
                                     if ($accountMasterId) {
                                         $query->where('addressable_id', $accountMasterId)
-                                            ->where('addressable_type', \App\Models\AccountMaster::class);
+                                            ->where('addressable_type', AccountMaster::class);
                                     }
 
                                     // Search across address fields
@@ -88,7 +99,7 @@ trait AddressDetailsTrait
                                     // Automatically select an address based on account_master_id
                                     $accountMasterId = $get('account_master_id');
                                     if ($accountMasterId) {
-                                        $accountMaster = \App\Models\AccountMaster::with('addresses')->find($accountMasterId);
+                                        $accountMaster = AccountMaster::with('addresses')->find($accountMasterId);
                                         if ($accountMaster && $accountMaster->addresses->isNotEmpty()) {
                                             // Prefer address with the defaultAddressType if specified
                                             if ($defaultAddressType) {
@@ -107,29 +118,29 @@ trait AddressDetailsTrait
                                 ->nullable()
                                 ->reactive()
                                 ->createOptionForm([
-                                    Forms\Components\Hidden::make('contact_detail_id')
+                                    Hidden::make('contact_detail_id')
                                         ->default(fn (callable $get) => $get('contact_detail_id')) // ✅ Auto-set `contact_id`
                                         ->dehydrated(),
-                                    Forms\Components\Hidden::make('addressable_id')
+                                    Hidden::make('addressable_id')
                                         ->default(fn (callable $get) => $get('account_master_id'))
                                         ->dehydrated(),
-                                    Forms\Components\Hidden::make('addressable_type')
-                                        ->default(\App\Models\AccountMaster::class)
+                                    Hidden::make('addressable_type')
+                                        ->default(AccountMaster::class)
                                         ->dehydrated(),
-                                    Forms\Components\Select::make('type_master_id')
+                                    Select::make('type_master_id')
                                         ->label('Address Type')
                                         ->options(
-                                            \App\Models\TypeMaster::query()
-                                                ->ofType(\App\Models\Address::class) // Filter by the `Address` model
+                                            TypeMaster::query()
+                                                ->ofType(Address::class) // Filter by the `Address` model
                                                 ->pluck('name', 'id') // Get the name and ID for the dropdown
                                         )
                                         ->required()
                                         ->searchable(),
 
-                                    Forms\Components\TextInput::make('street')->required(),
-                                    Forms\Components\TextInput::make('area_town')->required(),
+                                    TextInput::make('street')->required(),
+                                    TextInput::make('area_town')->required(),
 
-                                    Forms\Components\TextInput::make('pin_code')
+                                    TextInput::make('pin_code')
                                         ->reactive()
                                         ->afterStateUpdated(function (callable $set, callable $get, $state) {
                                             if (!$get('city_id')) {
@@ -143,29 +154,29 @@ trait AddressDetailsTrait
                                             }
                                         }),
 
-                                    Forms\Components\Select::make('city_id')
+                                    Select::make('city_id')
                                         ->relationship('city', 'name')
                                         ->searchable(),
 
-                                    Forms\Components\Select::make('state_id')
+                                    Select::make('state_id')
                                         ->relationship('state', 'name')
                                         ->searchable(),
 
-                                    Forms\Components\Select::make('country_id')
+                                    Select::make('country_id')
                                         ->relationship('country', 'name')
                                         ->searchable(),
                                 ])
                                 ->createOptionUsing(function (array $data, callable $get, callable $set) use ($fieldName)  {
                                     $data['addressable_id'] = $get('account_master_id');
-                                    $data['addressable_type'] = \App\Models\AccountMaster::class;
+                                    $data['addressable_type'] = AccountMaster::class;
                                     $data['contact_detail_id'] = $get('contact_detail_id');
                                     $data['company_id'] = $get('company_id');
 
                                     // Create the address
-                                    $address = \App\Models\Address::create($data);
+                                    $address = Address::create($data);
 
                                     // Debug: Log the created address
-                                    \Illuminate\Support\Facades\Log::info('getAddressDetailsTraitField: Address created', [
+                                    Log::info('getAddressDetailsTraitField: Address created', [
                                         'address_id' => $address->id,
                                         'account_master_id' => $data['addressable_id'],
                                         'addressable_type' => $data['addressable_type'],
@@ -178,7 +189,7 @@ trait AddressDetailsTrait
 
                         return $address->id;            
                                 })
-                                ->createOptionAction(fn (Forms\Components\Actions\Action $action) =>
+                                ->createOptionAction(fn (Action $action) =>
                                     $action->hidden(fn (callable $get) => $get($fieldName) !== null) // ✅ Hide "Create" button when a contact is selected
                                 )
                                 ->suffixAction(
@@ -186,12 +197,12 @@ trait AddressDetailsTrait
                                         ->icon('heroicon-o-pencil')
                                         ->modalHeading('Edit Address')
                                         ->modalSubmitActionLabel('Update Address')
-                                        ->form(fn (callable $get) => [
-                                            Forms\Components\Hidden::make('company_id')
+                                        ->schema(fn (callable $get) => [
+                                            Hidden::make('company_id')
                                                 ->default(fn (callable $get) => $get('company_id'))
                                                 ->dehydrated(),
 
-                                            Forms\Components\Select::make('address_type')
+                                            Select::make('address_type')
                                                 ->options([
                                                     'Company' => 'Company',
                                                     'Home' => 'Home',
@@ -200,18 +211,18 @@ trait AddressDetailsTrait
                                                 ])
                                                 ->required()
                                                 ->label('Address Type')
-                                                ->default(\App\Models\Address::find($get($fieldName))?->address_type),
+                                                ->default(Address::find($get($fieldName))?->address_type),
 
-                                            Forms\Components\TextInput::make('street')
-                                                ->default(\App\Models\Address::find($get($fieldName))?->street)
+                                            TextInput::make('street')
+                                                ->default(Address::find($get($fieldName))?->street)
                                                 ->required(),
 
-                                            Forms\Components\TextInput::make('area_town')
-                                                ->default(\App\Models\Address::find($get($fieldName))?->area_town)
+                                            TextInput::make('area_town')
+                                                ->default(Address::find($get($fieldName))?->area_town)
                                                 ->required(),
 
-                                            Forms\Components\TextInput::make('pin_code')
-                                                ->default(\App\Models\Address::find($get($fieldName))?->pin_code)
+                                            TextInput::make('pin_code')
+                                                ->default(Address::find($get($fieldName))?->pin_code)
                                                 ->reactive()
                                                 ->afterStateUpdated(function (callable $set, callable $get, $state) {
                                                     $pinCodeDetails = CityPinCode::where('pin_code', $state)->first();
@@ -223,31 +234,31 @@ trait AddressDetailsTrait
                                                     }
                                                 }),
 
-                                            Forms\Components\Select::make('city_id')
+                                            Select::make('city_id')
                                                 ->relationship('city', 'name')
                                                 ->searchable()
-                                                ->default(\App\Models\Address::find($get($fieldName))?->city_id)
+                                                ->default(Address::find($get($fieldName))?->city_id)
                                                 ->reactive()
                                                 ->afterStateUpdated(function (callable $set, callable $get, $state) {
-                                                    $cityDetails = \App\Models\City::find($state);
+                                                    $cityDetails = City::find($state);
                                                     if ($cityDetails) {
                                                         $set('state_id', $cityDetails->state_id);
                                                         $set('country_id', $cityDetails->country_id);
                                                     }
                                                 }),
 
-                                            Forms\Components\Select::make('state_id')
+                                            Select::make('state_id')
                                                 ->relationship('state', 'name')
                                                 ->searchable()
-                                                ->default(\App\Models\Address::find($get($fieldName))?->state_id),
+                                                ->default(Address::find($get($fieldName))?->state_id),
 
-                                            Forms\Components\Select::make('country_id')
+                                            Select::make('country_id')
                                                 ->relationship('country', 'name')
                                                 ->searchable()
-                                                ->default(\App\Models\Address::find($get($fieldName))?->country_id),
+                                                ->default(Address::find($get($fieldName))?->country_id),
                                         ])
                                         ->action(function (array $data, callable $get, callable $set) use ($fieldName) {
-                                            $address = \App\Models\Address::find($get($fieldName));
+                                            $address = Address::find($get($fieldName));
                                             if ($address) {
                                                 $address->update($data);
 
@@ -270,7 +281,7 @@ trait AddressDetailsTrait
                                     }
                                     // Otherwise, select an address based on contact and optional address type
                                     if ($contactId = $get('contact_detail_id')) {
-                                        $contact = \App\Models\ContactDetail::with('addresses')->find($contactId);
+                                        $contact = ContactDetail::with('addresses')->find($contactId);
                                         if ($defaultAddressType) {
                                             $address = $contact?->addresses->firstWhere('address_type', $defaultAddressType);
                                             return $address?->id;
@@ -286,17 +297,17 @@ trait AddressDetailsTrait
                                     }
                                 })
                                 ->getOptionLabelUsing(function ($value) {
-                                    $address = \App\Models\Address::with('addressType')->find($value);
+                                    $address = Address::with('addressType')->find($value);
                                     return $address ? "{$address->addressType?->name} - {$address->street}" : 'Unknown Address';
                                 })
                                 ->preload(),
 
-                                Forms\Components\Placeholder::make($label)
+                                Placeholder::make($label)
                                     ->hidden(fn (callable $get) => !$get($fieldName)) // Hide if no contact or address is selected
                                     ->content(function (callable $get) use ($fieldName) {
-                                        $contact = \App\Models\ContactDetail::find($get('contact_detail_id'));
+                                        $contact = ContactDetail::find($get('contact_detail_id'));
                                         $address = $get($fieldName)
-                                            ? \App\Models\Address::find($get($fieldName)) // Use the selected address if available
+                                            ? Address::find($get($fieldName)) // Use the selected address if available
                                             : $contact?->addresses->first(); // Otherwise, use the first address from the contact
 
                                         // Extract clean city, state, and country names

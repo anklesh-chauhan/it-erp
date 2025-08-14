@@ -1,12 +1,22 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\CompanyMasterStatutoryDetails;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\CompanyMasterStatutoryDetails\Pages\ListCompanyMasterStatutoryDetails;
+use App\Filament\Resources\CompanyMasterStatutoryDetails\Pages\CreateCompanyMasterStatutoryDetail;
+use App\Filament\Resources\CompanyMasterStatutoryDetails\Pages\EditCompanyMasterStatutoryDetail;
 use App\Filament\Resources\CompanyMasterStatutoryDetailResource\Pages;
 use App\Filament\Resources\CompanyMasterStatutoryDetailResource\RelationManagers;
 use App\Models\CompanyMasterStatutoryDetail;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,29 +27,29 @@ class CompanyMasterStatutoryDetailResource extends Resource
 {
     protected static ?string $model = CompanyMasterStatutoryDetail::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Masters';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
     protected static ?string $navigationParentItem = 'Comapany Master';
     protected static ?int $navigationSort = 200;
     protected static ?string $navigationLabel = 'Comapany Master Statutory Details';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('company_master_id')
+        return $schema
+            ->components([
+                TextInput::make('company_master_id')
                     ->numeric(),
-                Forms\Components\TextInput::make('credit_days')
+                TextInput::make('credit_days')
                     ->numeric(),
-                Forms\Components\TextInput::make('credit_limit')
+                TextInput::make('credit_limit')
                     ->numeric(),
-                Forms\Components\TextInput::make('cin')
+                TextInput::make('cin')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('tds_parameters')
+                TextInput::make('tds_parameters')
                     ->maxLength(255),
-                Forms\Components\Toggle::make('is_tds_deduct')
+                Toggle::make('is_tds_deduct')
                     ->required(),
-                Forms\Components\Toggle::make('is_tds_compulsory')
+                Toggle::make('is_tds_compulsory')
                     ->required(),
             ]);
     }
@@ -48,28 +58,28 @@ class CompanyMasterStatutoryDetailResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('company_master_id')
+                TextColumn::make('company_master_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('credit_days')
+                TextColumn::make('credit_days')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('credit_limit')
+                TextColumn::make('credit_limit')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('cin')
+                TextColumn::make('cin')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tds_parameters')
+                TextColumn::make('tds_parameters')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('is_tds_deduct')
+                IconColumn::make('is_tds_deduct')
                     ->boolean(),
-                Tables\Columns\IconColumn::make('is_tds_compulsory')
+                IconColumn::make('is_tds_compulsory')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -77,12 +87,12 @@ class CompanyMasterStatutoryDetailResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -97,9 +107,9 @@ class CompanyMasterStatutoryDetailResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCompanyMasterStatutoryDetails::route('/'),
-            'create' => Pages\CreateCompanyMasterStatutoryDetail::route('/create'),
-            'edit' => Pages\EditCompanyMasterStatutoryDetail::route('/{record}/edit'),
+            'index' => ListCompanyMasterStatutoryDetails::route('/'),
+            'create' => CreateCompanyMasterStatutoryDetail::route('/create'),
+            'edit' => EditCompanyMasterStatutoryDetail::route('/{record}/edit'),
         ];
     }
 }

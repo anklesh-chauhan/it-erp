@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class CurrentDatabase extends BaseWidget
 {
-    protected static string $view = 'filament.widgets.current-database';
+    protected string $view = 'filament.widgets.current-database';
 
     protected function getViewData(): array
     {

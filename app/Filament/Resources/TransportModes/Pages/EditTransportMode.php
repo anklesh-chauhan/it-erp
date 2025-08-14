@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\TransportModeResource\Pages;
+namespace App\Filament\Resources\TransportModes\Pages;
 
-use App\Filament\Resources\TransportModeResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\TransportModes\TransportModeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditTransportMode extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

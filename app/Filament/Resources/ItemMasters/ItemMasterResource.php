@@ -1,7 +1,18 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\ItemMasters;
 
+use App\Traits\ItemMasterTrait;
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\ItemMasters\RelationManagers\LocationsRelationManager;
+use App\Filament\Resources\ItemMasters\RelationManagers\LeadsRelationManager;
+use App\Filament\Resources\ItemMasters\RelationManagers\SuppliersRelationManager;
+use App\Filament\Resources\ItemMasters\Pages\ListItemMasters;
+use App\Filament\Resources\ItemMasters\Pages\CreateItemMaster;
+use App\Filament\Resources\ItemMasters\Pages\EditItemMaster;
 use App\Filament\Resources\ItemMasterResource\Pages;
 use App\Filament\Resources\ItemMasterResource\RelationManagers;
 use Filament\Forms;
@@ -10,7 +21,6 @@ use App\Models\Category;
 use App\Models\NumberSeries;
 use App\Models\LocationMaster;
 use App\Models\PackagingType;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -28,19 +38,19 @@ use Filament\Tables\Filters\Filter;
 
 class ItemMasterResource extends Resource
 {
-    use \App\Traits\ItemMasterTrait;
+    use ItemMasterTrait;
 
     protected static ?string $model = ItemMaster::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Masters';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
     protected static ?int $navigationSort = 200;
     protected static ?string $navigationLabel = 'Item Master';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 ...self::getItemMasterTraitField(),
             ]);
     }
@@ -51,7 +61,7 @@ class ItemMasterResource extends Resource
             ->columns([
                 TextColumn::make('item_code')->label('Item Code')->sortable()->searchable(),
                 TextColumn::make('item_name')->label('Item Name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('category.name')
+                TextColumn::make('category.name')
                     ->label('Category')
                     ->formatStateUsing(function ($state, $record) {
                         if (!$record->category) {
@@ -78,7 +88,7 @@ class ItemMasterResource extends Resource
                 TextColumn::make('brand.name')->label('Brand')->sortable(),
                 TextColumn::make('storage_location')->label('Storage'),
                 TextColumn::make('expiry_date')->label('Expiry Date')->date()->badge(),
-                Tables\Columns\TextColumn::make('locations.name')
+                TextColumn::make('locations.name')
                     ->label('Locations')
                     ->sortable(),
             ])
@@ -86,12 +96,12 @@ class ItemMasterResource extends Resource
                 Filter::make('expiry_date')->label('Expired Items')
                     ->query(fn ($query) => $query->whereDate('expiry_date', '<', now())),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -99,9 +109,9 @@ class ItemMasterResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\LocationsRelationManager::class,
-            RelationManagers\LeadsRelationManager::class,
-            RelationManagers\SuppliersRelationManager::class
+            LocationsRelationManager::class,
+            LeadsRelationManager::class,
+            SuppliersRelationManager::class
             // RelationManagers\SalesOrdersRelationManager::class,
             // RelationManagers\PurchaseOrdersRelationManager::class,
             // RelationManagers\PurchaseInvoicesRelationManager::class,
@@ -117,9 +127,9 @@ class ItemMasterResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListItemMasters::route('/'),
-            'create' => Pages\CreateItemMaster::route('/create'),
-            'edit' => Pages\EditItemMaster::route('/{record}/edit'),
+            'index' => ListItemMasters::route('/'),
+            'create' => CreateItemMaster::route('/create'),
+            'edit' => EditItemMaster::route('/{record}/edit'),
         ];
     }
 

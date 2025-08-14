@@ -8,7 +8,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Http\Middleware\SetAuthDefaults;
 use App\Http\Middleware\IdentifyTenant;
-use App\Filament\Resources\TenantUserResource;
+use App\Filament\Resources\TenantUsers\TenantUserResource;
 use Filament\Navigation\NavigationGroup;
 use App\Filament\Tenant\Pages\Dashboard;
 use Illuminate\Support\Facades\Route;

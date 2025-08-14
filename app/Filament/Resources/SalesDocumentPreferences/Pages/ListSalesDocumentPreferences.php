@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\SalesDocumentPreferenceResource\Pages;
+namespace App\Filament\Resources\SalesDocumentPreferences\Pages;
 
-use App\Filament\Resources\SalesDocumentPreferenceResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\SalesDocumentPreferences\SalesDocumentPreferenceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListSalesDocumentPreferences extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

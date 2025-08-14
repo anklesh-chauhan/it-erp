@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\CityPinCodeResource\Pages;
+namespace App\Filament\Resources\CityPinCodes\Pages;
 
-use App\Filament\Resources\CityPinCodeResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\CityPinCodes\CityPinCodeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListCityPinCodes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

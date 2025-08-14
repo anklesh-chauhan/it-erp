@@ -1,12 +1,21 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Attachments;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\Attachments\Pages\ListAttachments;
+use App\Filament\Resources\Attachments\Pages\CreateAttachment;
+use App\Filament\Resources\Attachments\Pages\EditAttachment;
 use App\Filament\Resources\AttachmentResource\Pages;
 use App\Filament\Resources\AttachmentResource\RelationManagers;
 use App\Models\Attachment;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,28 +26,28 @@ class AttachmentResource extends Resource
 {
     protected static ?string $model = Attachment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Global Config';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
     protected static ?int $navigationSort = 1005;
     protected static ?string $navigationLabel = 'Attachments';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('attachable_type')
+        return $schema
+            ->components([
+                TextInput::make('attachable_type')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('attachable_id')
+                TextInput::make('attachable_id')
                     ->numeric(),
-                Forms\Components\TextInput::make('file_name')
+                TextInput::make('file_name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('file_path')
+                TextInput::make('file_path')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('file_type')
+                TextInput::make('file_type')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->columnSpanFull(),
             ]);
     }
@@ -47,22 +56,22 @@ class AttachmentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('attachable_type')
+                TextColumn::make('attachable_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('attachable_id')
+                TextColumn::make('attachable_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('file_name')
+                TextColumn::make('file_name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('file_path')
+                TextColumn::make('file_path')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('file_type')
+                TextColumn::make('file_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -70,12 +79,12 @@ class AttachmentResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -90,9 +99,9 @@ class AttachmentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAttachments::route('/'),
-            'create' => Pages\CreateAttachment::route('/create'),
-            'edit' => Pages\EditAttachment::route('/{record}/edit'),
+            'index' => ListAttachments::route('/'),
+            'create' => CreateAttachment::route('/create'),
+            'edit' => EditAttachment::route('/{record}/edit'),
         ];
     }
 }

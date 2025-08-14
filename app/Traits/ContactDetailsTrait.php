@@ -2,9 +2,18 @@
 
 namespace App\Traits;
 
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use App\Models\ContactDetail;
+use Filament\Forms\Components\TextInput;
+use App\Models\Designation;
+use App\Models\Department;
+use Filament\Forms\Components\DatePicker;
+use Filament\Actions\Action;
+use App\Models\AccountMaster;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Notifications\Notification;
 
 trait ContactDetailsTrait
@@ -17,14 +26,14 @@ trait ContactDetailsTrait
     public static function getContactDetailsTraitField(): array
     {
         return [
-            Forms\Components\Grid::make(2)
+            Grid::make(2)
                     ->schema([
-                        Forms\Components\Select::make('contact_detail_id')
+                        Select::make('contact_detail_id')
                             ->label('Contact')
                             ->options(function (callable $get) {
                                 $accountMasterId = $get('account_master_id');
 
-                                $query = \App\Models\ContactDetail::query();
+                                $query = ContactDetail::query();
 
                                 if ($accountMasterId) {
                                     $query->whereHas('accountMasters', fn ($q) =>
@@ -40,7 +49,7 @@ trait ContactDetailsTrait
                             })
                             ->getSearchResultsUsing(function (string $search, callable $get) {
                                 $accountMasterId = $get('account_master_id');
-                                $query = \App\Models\ContactDetail::query();
+                                $query = ContactDetail::query();
 
                                 if ($accountMasterId) {
                                     $query->whereHas('accountMasters', fn ($q) =>
@@ -62,7 +71,7 @@ trait ContactDetailsTrait
                                     ]);
                             })
                             ->getOptionLabelUsing(fn ($value) =>
-                                ($contact = \App\Models\ContactDetail::find($value))
+                                ($contact = ContactDetail::find($value))
                                     ? "{$contact->full_name} — " . ($contact->accountMasters?->first()->name ?? 'No Account')
                                     : 'Unknown Contact'
                             )
@@ -71,62 +80,62 @@ trait ContactDetailsTrait
                             ->nullable()
                             ->live()
                             ->createOptionForm([
-                                Forms\Components\Grid::make(3)->schema([
-                                    Forms\Components\Select::make('salutation')->label('Salutation')->options([
+                                Grid::make(3)->schema([
+                                    Select::make('salutation')->label('Salutation')->options([
                                         'Mr.' => 'Mr.', 'Mrs.' => 'Mrs.', 'Ms.' => 'Ms.', 'Dr.' => 'Dr.', 'Prof.' => 'Prof.',
                                     ])->nullable(),
-                                    Forms\Components\TextInput::make('first_name')->required(),
-                                    Forms\Components\TextInput::make('last_name')->nullable(),
+                                    TextInput::make('first_name')->required(),
+                                    TextInput::make('last_name')->nullable(),
                                 ]),
-                                Forms\Components\Grid::make(3)->schema([
-                                    Forms\Components\TextInput::make('email')->email()->required(),
-                                    Forms\Components\TextInput::make('mobile_number')->required()->label('Primary Phone')
+                                Grid::make(3)->schema([
+                                    TextInput::make('email')->email()->required(),
+                                    TextInput::make('mobile_number')->required()->label('Primary Phone')
                                         ->mask('+919999999999')->live(onBlur: true)->debounce(1000)
                                         ->afterStateUpdated(fn (callable $set, $state) => $set('whatsapp_number', $state)),
-                                    Forms\Components\TextInput::make('alternate_phone')->mask('+919999999999')->nullable()->label('Alternate Phone'),
+                                    TextInput::make('alternate_phone')->mask('+919999999999')->nullable()->label('Alternate Phone'),
                                 ]),
-                                Forms\Components\Grid::make(3)->schema([
-                                    Forms\Components\Select::make('designation_id')
+                                Grid::make(3)->schema([
+                                    Select::make('designation_id')
                                         ->relationship('designation', 'name')
-                                        ->model(\App\Models\ContactDetail::class)
+                                        ->model(ContactDetail::class)
                                         ->searchable()
                                         ->nullable()
                                         ->label('Designation')
                                         ->createOptionForm([
-                                            Forms\Components\TextInput::make('name')
+                                            TextInput::make('name')
                                                 ->required()
                                                 ->label('New Designation'),
                                         ])
-                                        ->createOptionUsing(fn (array $data) => \App\Models\Designation::create($data)->id)
+                                        ->createOptionUsing(fn (array $data) => Designation::create($data)->id)
                                         ->preload()
-                                        ->default(fn (callable $get) => \App\Models\ContactDetail::find($get('contact_detail_id'))?->designation_id),
+                                        ->default(fn (callable $get) => ContactDetail::find($get('contact_detail_id'))?->designation_id),
 
-                                    Forms\Components\Select::make('department_id')
+                                    Select::make('department_id')
                                         ->relationship('department', 'name')
-                                        ->model(\App\Models\ContactDetail::class)
+                                        ->model(ContactDetail::class)
                                         ->searchable()
                                         ->nullable()
                                         ->label('Department')
                                         ->createOptionForm([
-                                            Forms\Components\TextInput::make('name')
+                                            TextInput::make('name')
                                                 ->required()
                                                 ->label('New Department'),
                                         ])
-                                        ->createOptionUsing(fn (array $data) => \App\Models\Department::create($data)->id)
+                                        ->createOptionUsing(fn (array $data) => Department::create($data)->id)
                                         ->preload()
-                                        ->default(fn (callable $get) => \App\Models\ContactDetail::find($get('contact_detail_id'))?->department_id),
+                                        ->default(fn (callable $get) => ContactDetail::find($get('contact_detail_id'))?->department_id),
 
-                                    Forms\Components\DatePicker::make('birthday')->nullable()->displayFormat('d M Y')->native(false)->label('Birthday'),
+                                    DatePicker::make('birthday')->nullable()->displayFormat('d M Y')->native(false)->label('Birthday'),
                                 ]),
-                                Forms\Components\Grid::make(4)->schema([
-                                    Forms\Components\TextInput::make('linkedin')->url()->label('LinkedIn'),
-                                    Forms\Components\TextInput::make('facebook')->url()->label('Facebook'),
-                                    Forms\Components\TextInput::make('twitter')->url()->label('Twitter'),
-                                    Forms\Components\TextInput::make('website')->url()->label('Website'),
+                                Grid::make(4)->schema([
+                                    TextInput::make('linkedin')->url()->label('LinkedIn'),
+                                    TextInput::make('facebook')->url()->label('Facebook'),
+                                    TextInput::make('twitter')->url()->label('Twitter'),
+                                    TextInput::make('website')->url()->label('Website'),
                                 ]),
                             ])
                             ->createOptionUsing(function (array $data, callable $set, callable $get) {
-                                $contact = \App\Models\ContactDetail::create($data);
+                                $contact = ContactDetail::create($data);
 
                                 // Attach to account master if account_master_id exists
                                 if ($accountMasterId = $get('account_master_id')) {
@@ -136,7 +145,7 @@ trait ContactDetailsTrait
                                 $set('contact_id', $contact->id);
                                 return $contact->id;
                             })
-                            ->createOptionAction(fn (Forms\Components\Actions\Action $action) =>
+                            ->createOptionAction(fn (Action $action) =>
                                 $action->hidden(fn (callable $get) => $get('contact_detail_id') !== null)
                             )
                             ->suffixAction(
@@ -144,67 +153,67 @@ trait ContactDetailsTrait
                                     ->icon('heroicon-o-pencil')
                                     ->modalHeading('Edit Contact')
                                     ->modalSubmitActionLabel('Update Contact')
-                                    ->form(fn (callable $get) => [
-                                        Forms\Components\Grid::make(2)->schema([
-                                            Forms\Components\TextInput::make('first_name')
-                                                ->default(\App\Models\ContactDetail::find($get('contact_detail_id'))?->first_name)
+                                    ->schema(fn (callable $get) => [
+                                        Grid::make(2)->schema([
+                                            TextInput::make('first_name')
+                                                ->default(ContactDetail::find($get('contact_detail_id'))?->first_name)
                                                 ->required(),
-                                            Forms\Components\TextInput::make('last_name')
-                                                ->default(\App\Models\ContactDetail::find($get('contact_detail_id'))?->last_name)
+                                            TextInput::make('last_name')
+                                                ->default(ContactDetail::find($get('contact_detail_id'))?->last_name)
                                                 ->nullable(),
                                         ]),
-                                        Forms\Components\Grid::make(2)->schema([
-                                            Forms\Components\TextInput::make('email')->email()
-                                                ->default(\App\Models\ContactDetail::find($get('contact_detail_id'))?->email)->required(),
-                                            Forms\Components\TextInput::make('mobile_number')->tel()
-                                                ->default(\App\Models\ContactDetail::find($get('contact_detail_id'))?->mobile_number)
+                                        Grid::make(2)->schema([
+                                            TextInput::make('email')->email()
+                                                ->default(ContactDetail::find($get('contact_detail_id'))?->email)->required(),
+                                            TextInput::make('mobile_number')->tel()
+                                                ->default(ContactDetail::find($get('contact_detail_id'))?->mobile_number)
                                                 ->required()->label('Primary Phone')->reactive()->debounce(1000)
                                                 ->afterStateUpdated(fn (callable $set, $state) => $set('whatsapp_number', $state)),
                                         ]),
-                                        Forms\Components\Grid::make(2)->schema([
-                                            Forms\Components\Select::make('designation_id')
+                                        Grid::make(2)->schema([
+                                            Select::make('designation_id')
                                                 ->relationship('designation', 'name')
-                                                ->model(\App\Models\ContactDetail::class)
+                                                ->model(ContactDetail::class)
                                                 ->searchable()
                                                 ->nullable()
                                                 ->label('Designation')
                                                 ->createOptionForm([
-                                                    Forms\Components\TextInput::make('name')
+                                                    TextInput::make('name')
                                                         ->required()
                                                         ->label('New Designation'),
                                                 ])
-                                                ->createOptionUsing(fn (array $data) => \App\Models\Designation::create($data)->id)
+                                                ->createOptionUsing(fn (array $data) => Designation::create($data)->id)
                                                 ->preload()
-                                                ->default(fn (callable $get) => \App\Models\ContactDetail::find($get('contact_detail_id'))?->designation_id),
+                                                ->default(fn (callable $get) => ContactDetail::find($get('contact_detail_id'))?->designation_id),
 
-                                            Forms\Components\Select::make('department_id')
+                                            Select::make('department_id')
                                                 ->relationship('department', 'name')
-                                                ->model(\App\Models\ContactDetail::class)
+                                                ->model(ContactDetail::class)
                                                 ->searchable()
                                                 ->nullable()
                                                 ->label('Department')
                                                 ->createOptionForm([
-                                                    Forms\Components\TextInput::make('name')
+                                                    TextInput::make('name')
                                                         ->required()
                                                         ->label('New Department'),
                                                 ])
-                                                ->createOptionUsing(fn (array $data) => \App\Models\Department::create($data)->id)
+                                                ->createOptionUsing(fn (array $data) => Department::create($data)->id)
                                                 ->preload()
-                                                ->default(fn (callable $get) => \App\Models\ContactDetail::find($get('contact_detail_id'))?->department_id),
+                                                ->default(fn (callable $get) => ContactDetail::find($get('contact_detail_id'))?->department_id),
                                         ]),
-                                        Forms\Components\Grid::make(2)->schema([
-                                            Forms\Components\TextInput::make('linkedin')
-                                                ->default(\App\Models\ContactDetail::find($get('contact_detail_id'))?->linkedin)->url()->label('LinkedIn'),
-                                            Forms\Components\TextInput::make('facebook')
-                                                ->default(\App\Models\ContactDetail::find($get('contact_detail_id'))?->facebook)->url()->label('Facebook'),
-                                            Forms\Components\TextInput::make('twitter')
-                                                ->default(\App\Models\ContactDetail::find($get('contact_detail_id'))?->twitter)->url()->label('Twitter'),
-                                            Forms\Components\TextInput::make('website')
-                                                ->default(\App\Models\ContactDetail::find($get('contact_detail_id'))?->website)->url()->label('Website'),
+                                        Grid::make(2)->schema([
+                                            TextInput::make('linkedin')
+                                                ->default(ContactDetail::find($get('contact_detail_id'))?->linkedin)->url()->label('LinkedIn'),
+                                            TextInput::make('facebook')
+                                                ->default(ContactDetail::find($get('contact_detail_id'))?->facebook)->url()->label('Facebook'),
+                                            TextInput::make('twitter')
+                                                ->default(ContactDetail::find($get('contact_detail_id'))?->twitter)->url()->label('Twitter'),
+                                            TextInput::make('website')
+                                                ->default(ContactDetail::find($get('contact_detail_id'))?->website)->url()->label('Website'),
                                         ]),
                                     ])
                                     ->action(function (array $data, callable $get) {
-                                        $contact = \App\Models\ContactDetail::find($get('contact_detail_id'));
+                                        $contact = ContactDetail::find($get('contact_detail_id'));
                                         if ($contact) {
                                             $contact->update($data);
                                             Notification::make()->title('Contact Updated')->success()->send();
@@ -214,7 +223,7 @@ trait ContactDetailsTrait
                                     ->visible(fn (callable $get) => $get('contact_detail_id'))
                             )
                             ->afterStateUpdated(function (callable $set, callable $get, $state) {
-                                if ($state && $contact = \App\Models\ContactDetail::with('accountMasters')->find($state)) {
+                                if ($state && $contact = ContactDetail::with('accountMasters')->find($state)) {
                                     $set('show_contact_info', $state);
                                     $set('contact_id', $state);
 
@@ -244,7 +253,7 @@ trait ContactDetailsTrait
                                 $set('contact_id', $state);
 
                                 // Load the contact and its account masters
-                                if ($state && $contact = \App\Models\ContactDetail::with('accountMasters')->find($state)) {
+                                if ($state && $contact = ContactDetail::with('accountMasters')->find($state)) {
                                     // Get the existing account_master_id from the form or model
                                     $existingAccountMasterId = $get('account_master_id') ?? $component->getModelInstance()->account_master_id;
 
@@ -260,7 +269,7 @@ trait ContactDetailsTrait
                                     $set('address_id', $contact->addresses->first()?->id);
                                 } elseif ($accountMasterId = $get('account_master_id')) {
                                     // If no contact but an account master exists, try to set a contact
-                                    $firstContact = \App\Models\AccountMaster::find($accountMasterId)?->contactDetails()->first();
+                                    $firstContact = AccountMaster::find($accountMasterId)?->contactDetails()->first();
                                     if ($firstContact) {
                                         $set('contact_detail_id', $firstContact->id);
                                         $set('show_contact_info', $firstContact->id);
@@ -271,10 +280,10 @@ trait ContactDetailsTrait
                                 }
                             }),
 
-                        Forms\Components\Placeholder::make('Contact Information')
+                        Placeholder::make('Contact Information')
                             ->hidden(fn (callable $get) => !$get('show_contact_info'))
                             ->content(function (callable $get) {
-                                $contact = \App\Models\ContactDetail::find($get('contact_detail_id'));
+                                $contact = ContactDetail::find($get('contact_detail_id'));
                                 $account = $contact?->accountMasters->first();
                                 $address = $contact?->addresses->first();
                                 return $contact

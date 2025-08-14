@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\GstPanResource\Pages;
+namespace App\Filament\Resources\GstPans\Pages;
 
-use App\Filament\Resources\GstPanResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\GstPans\GstPanResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditGstPan extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

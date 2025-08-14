@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\ImageResource\Pages;
+namespace App\Filament\Resources\Images\Pages;
 
-use App\Filament\Resources\ImageResource;
+use App\Filament\Resources\Images\ImageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

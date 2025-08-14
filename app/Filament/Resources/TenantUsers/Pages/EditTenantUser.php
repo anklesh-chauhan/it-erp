@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\TenantUserResource\Pages;
+namespace App\Filament\Resources\TenantUsers\Pages;
 
-use App\Filament\Resources\TenantUserResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\TenantUsers\TenantUserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditTenantUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

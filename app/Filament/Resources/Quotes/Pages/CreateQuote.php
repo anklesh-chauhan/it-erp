@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\QuoteResource\Pages;
+namespace App\Filament\Resources\Quotes\Pages;
 
-use App\Filament\Resources\QuoteResource;
+use App\Filament\Resources\Quotes\QuoteResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\SalesDailyExpenseResource\Pages;
+namespace App\Filament\Resources\SalesDailyExpenses\Pages;
 
-use App\Filament\Resources\SalesDailyExpenseResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\SalesDailyExpenses\SalesDailyExpenseResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditSalesDailyExpense extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

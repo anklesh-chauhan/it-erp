@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\PackagingTypeResource\Pages;
+namespace App\Filament\Resources\PackagingTypes\Pages;
 
-use App\Filament\Resources\PackagingTypeResource;
+use App\Filament\Resources\PackagingTypes\PackagingTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

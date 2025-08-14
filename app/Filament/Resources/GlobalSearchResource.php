@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\CompanyMasters\CompanyMasterResource;
+use App\Filament\Resources\ContactDetails\ContactDetailResource;
+use App\Filament\Resources\ItemMasters\ItemMasterResource;
+use App\Filament\Resources\Leads\LeadResource;
 use Filament\GlobalSearch\GlobalSearchResult;
 use Illuminate\Support\Collection;
 
@@ -39,10 +43,10 @@ class GlobalSearchResource
     protected static function getSearchableResources(): array
     {
         return [
-            \App\Filament\Resources\LeadResource::class,
-            \App\Filament\Resources\CompanyMasterResource::class,
-            \App\Filament\Resources\ContactDetailResource::class,
-            \App\Filament\Resources\ItemMasterResource::class,
+            LeadResource::class,
+            CompanyMasterResource::class,
+            ContactDetailResource::class,
+            ItemMasterResource::class,
         ];
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\LeadResource\Pages;
+namespace App\Filament\Resources\Leads\Pages;
 
-use App\Filament\Resources\LeadResource;
+use App\Filament\Resources\Leads\LeadResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

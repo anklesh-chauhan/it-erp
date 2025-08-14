@@ -1,14 +1,24 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\LocationMasters;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\LocationMasters\RelationManagers\ItemsRelationManager;
+use App\Filament\Resources\LocationMasters\Pages\ListLocationMasters;
+use App\Filament\Resources\LocationMasters\Pages\CreateLocationMaster;
+use App\Filament\Resources\LocationMasters\Pages\EditLocationMaster;
+use App\Filament\Resources\LocationMasters\Pages\ViewLocationMaster;
 use App\Filament\Resources\LocationMasterResource\Pages;
 use App\Filament\Resources\LocationMasterResource\RelationManagers;
 use App\Models\LocationMaster;
 use App\Models\NumberSeries;
 use App\Models\TypeMaster;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -27,15 +37,15 @@ class LocationMasterResource extends Resource
 {
     protected static ?string $model = LocationMaster::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Masters';
+    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
     protected static ?int $navigationSort = 200;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('name')->label('Location Name')->required(),
                 TextInput::make('location_code')
                     ->label('Location Code')
@@ -106,16 +116,16 @@ class LocationMasterResource extends Resource
                 TextColumn::make('is_active')->label('Active')->badge(),
             ])
             ->filters([
-                Tables\Filters\Filter::make('is_active')->label('Active Locations')
+                Filter::make('is_active')->label('Active Locations')
                     ->query(fn ($query) => $query->where('is_active', true)),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -123,17 +133,17 @@ class LocationMasterResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\ItemsRelationManager::class,
+            ItemsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLocationMasters::route('/'),
-            'create' => Pages\CreateLocationMaster::route('/create'),
-            'edit' => Pages\EditLocationMaster::route('/{record}/edit'),
-            'view' => Pages\ViewLocationMaster::route('/{record}'),
+            'index' => ListLocationMasters::route('/'),
+            'create' => CreateLocationMaster::route('/create'),
+            'edit' => EditLocationMaster::route('/{record}/edit'),
+            'view' => ViewLocationMaster::route('/{record}'),
         ];
     }
 }

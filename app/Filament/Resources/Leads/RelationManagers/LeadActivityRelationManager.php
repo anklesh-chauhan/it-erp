@@ -1,9 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\LeadResource\RelationManagers;
+namespace App\Filament\Resources\Leads\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,18 +24,18 @@ class LeadActivityRelationManager extends RelationManager
 
     protected static string $relationship = 'leadActivities';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Hidden::make('user_id')
                     ->default(Auth::id()),
 
-                Forms\Components\TextInput::make('activity_type')
+                TextInput::make('activity_type')
                     ->label('Activity Type')
                     ->required(),
 
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->label('Description')
                     ->rows(3)
                     ->required(),
@@ -40,7 +47,7 @@ class LeadActivityRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('activity_type')
+                TextColumn::make('activity_type')
                     ->label('Activity Type')
                     ->badge()
                     ->color(fn ($record) => match ($record->activity_type) {
@@ -50,13 +57,13 @@ class LeadActivityRelationManager extends RelationManager
                     })
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('description')
+                TextColumn::make('description')
                     ->label('Description')
                     ->wrap()
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->description), // Shows full text on hover
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created At')
                     ->dateTime('d M Y, h:i A') // Improved date format
                     ->sortable(),
@@ -66,14 +73,14 @@ class LeadActivityRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

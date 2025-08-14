@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\VisitRouteTourPlanResource\Pages;
+namespace App\Filament\Resources\VisitRouteTourPlans\Pages;
 
-use App\Filament\Resources\VisitRouteTourPlanResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\VisitRouteTourPlans\VisitRouteTourPlanResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditVisitRouteTourPlan extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

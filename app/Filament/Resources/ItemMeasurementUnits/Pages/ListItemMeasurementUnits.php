@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\ItemMeasurementUnitResource\Pages;
+namespace App\Filament\Resources\ItemMeasurementUnits\Pages;
 
-use App\Filament\Resources\ItemMeasurementUnitResource;
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\ItemMeasurementUnits\ItemMeasurementUnitResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,7 @@ class ListItemMeasurementUnits extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

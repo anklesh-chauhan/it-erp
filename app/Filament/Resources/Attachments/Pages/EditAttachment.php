@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\AttachmentResource\Pages;
+namespace App\Filament\Resources\Attachments\Pages;
 
-use App\Filament\Resources\AttachmentResource;
+use Filament\Actions\DeleteAction;
+use App\Filament\Resources\Attachments\AttachmentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditAttachment extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\LeadResource\Pages;
+namespace App\Filament\Resources\Leads\Pages;
 
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Group;
+use Filament\Forms\Components\Repeater;
 use Filament\Resources\Pages\ViewRecord;
-use App\Filament\Resources\LeadResource;
+use App\Filament\Resources\Leads\LeadResource;
 use Filament\Forms;
 
 class ViewLead extends ViewRecord
@@ -13,20 +16,20 @@ class ViewLead extends ViewRecord
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\TextInput::make('first_name')
+            TextInput::make('first_name')
                 ->label('First Name'),
 
-            Forms\Components\TextInput::make('last_name')
+            TextInput::make('last_name')
                 ->label('Last Name'),
 
-            Forms\Components\Group::make([
-                Forms\Components\Repeater::make('custom_fields')
+            Group::make([
+                Repeater::make('custom_fields')
                     ->schema([
-                        Forms\Components\TextInput::make('label')
+                        TextInput::make('label')
                             ->label('Field Label'),
-                        Forms\Components\TextInput::make('type')
+                        TextInput::make('type')
                             ->label('Field Type'),
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Field Name'),
                     ]),
             ]),

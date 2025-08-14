@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\TourPlanResource\Pages;
+namespace App\Filament\Resources\TourPlans\Pages;
 
-use App\Filament\Resources\TourPlanResource;
+use App\Filament\Resources\TourPlans\TourPlanResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
