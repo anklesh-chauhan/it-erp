@@ -125,7 +125,7 @@ class LeadResource extends Resource
                             Textarea::make('description')
                                 ->nullable()
                                 ->label('Description Information'),
-                        ]),
+                        ])->columnSpanFull(),
 
 
                     // Dynamic Custom Fields
@@ -153,10 +153,11 @@ class LeadResource extends Resource
                                     };
                                 })->toArray();
                             })
+                            ->columnSpanFull()
                             ->columns(2)
                         ]),
 
-                ]),
+                ])->columnSpanFull(),
 
     ]);
 
@@ -206,9 +207,9 @@ class LeadResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->formatStateUsing(fn ($state, $record) => $state ?? 'No Account Master')
-                    ->description(fn ($record) => $record->contactDetail && $record->accountMaster 
-                        ? ($record->contactDetail->accountMasters()->where('account_masters.id', $record->account_master_id)->exists() 
-                            ? 'Linked via Contact' 
+                    ->description(fn ($record) => $record->contactDetail && $record->accountMaster
+                        ? ($record->contactDetail->accountMasters()->where('account_masters.id', $record->account_master_id)->exists()
+                            ? 'Linked via Contact'
                             : 'Directly Assigned')
                         : ($record->accountMaster ? 'Directly Assigned' : null))
                     ->toggleable(),

@@ -187,7 +187,7 @@ trait AddressDetailsTrait
                                     // Update the form state
                                     $set($fieldName, $address->id);
 
-                        return $address->id;            
+                        return $address->id;
                                 })
                                 ->createOptionAction(fn (Action $action) =>
                                     $action->hidden(fn (callable $get) => $get($fieldName) !== null) // ✅ Hide "Create" button when a contact is selected
@@ -321,7 +321,7 @@ trait AddressDetailsTrait
 
                                         return "{$addressDetails}";
                                     }),
-                            ]),
+                            ])->columnSpanFull(),
         ];
     }
 }

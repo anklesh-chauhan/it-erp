@@ -81,6 +81,7 @@ class ChartOfAccountResource extends Resource
                         ->maxLength(500)
                         ->placeholder('Optional description...'),
                 ])
+                ->columnSpanFull()
                 ->columns(2),
 
             Section::make('Account Status')
@@ -98,6 +99,7 @@ class ChartOfAccountResource extends Resource
                         ->helperText('System-owned accounts cannot be modified or deleted by users.')
                         ->default(false),
                 ])
+                ->columnSpanFull()
                 ->columns(3),
 
             Section::make('Balance Information')
@@ -120,6 +122,7 @@ class ChartOfAccountResource extends Resource
                         ->dehydrated(false)
                         ->helperText('This balance is automatically calculated from ledger entries.'),
                 ])
+                ->columnSpanFull()
                 ->columns(3),
 
             Section::make('Currency Settings')
@@ -135,6 +138,7 @@ class ChartOfAccountResource extends Resource
                         ->required()
                         ->searchable(),
                 ])
+                ->columnSpanFull()
                 ->columns(1),
         ]);
     }

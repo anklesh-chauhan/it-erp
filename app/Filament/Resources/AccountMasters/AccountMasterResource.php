@@ -43,7 +43,7 @@ class AccountMasterResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 ...self::getCreateAccountMasterTraitFields()
             ]);
     }

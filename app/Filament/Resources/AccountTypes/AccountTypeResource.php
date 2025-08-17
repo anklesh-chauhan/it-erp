@@ -70,6 +70,7 @@ class AccountTypeResource extends Resource
                         ->label('System Type')
                         ->default(false),
                 ])
+                ->columnSpanFull()
                 ->columns(2),
         ]);
     }

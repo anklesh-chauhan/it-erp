@@ -65,7 +65,7 @@ trait HasCustomerInteractionFields
 
                     Hidden::make('status_type')
                         ->default(static::$statusModel),
-                ]),
+                ])->columnSpanFull(),
 
                 // ✅ Contact Details
                 ...self::getContactDetailsTraitField(),

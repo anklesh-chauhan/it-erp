@@ -37,41 +37,40 @@ trait CreateAccountMasterTrait
             Grid::make(3)
                     ->schema([
                         Select::make('owner_id')
-                    ->relationship('owner', 'name')
-                    ->default(fn () => Auth::id())
-                    ->required()
-                    ->label('Owner'),
-                Select::make('type_master_id')
-                    ->label('Account Type')
-                    ->options(
-                        TypeMaster::query()
-                            ->where('typeable_type', AccountMaster::class)
-                            ->pluck('name', 'id')
-                    )
-                    ->required()
-                    ->searchable()
-                    ->nullable() // Allow null if no type is selected
-                    ->helperText('Leave blank for default sequence.')
-                    ->preload()
-                    ->live()
-                    ->afterStateUpdated(function (callable $set, $state, $component) {
-                        // Get the current state of type_master_id
-                        $typeMasterId = $state;
-                        // Fetch the next number based on the selected type_master_id
-                        $nextNumber = NumberSeries::getNextNumber(AccountMaster::class, $typeMasterId);
-                        // Set the account_code field with the new number
-                        $set('account_code', $nextNumber);
-                    }),
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                    TextInput::make('account_code')
-                    ->disabled() // Prevent manual edits
-                    ->maxLength(255)
-                    ->live() // Make it reactive to reflect updates
-                    ->dehydrated(false) // Prevent sending initial default to server
-                    ->default(''), // Initial empty value (will be overridden by type_master_id update)
-
+                            ->relationship('owner', 'name')
+                            ->default(fn () => Auth::id())
+                            ->required()
+                            ->label('Owner'),
+                        Select::make('type_master_id')
+                            ->label('Account Type')
+                            ->options(
+                                TypeMaster::query()
+                                    ->where('typeable_type', AccountMaster::class)
+                                    ->pluck('name', 'id')
+                            )
+                            ->required()
+                            ->searchable()
+                            ->nullable() // Allow null if no type is selected
+                            ->helperText('Leave blank for default sequence.')
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function (callable $set, $state, $component) {
+                                // Get the current state of type_master_id
+                                $typeMasterId = $state;
+                                // Fetch the next number based on the selected type_master_id
+                                $nextNumber = NumberSeries::getNextNumber(AccountMaster::class, $typeMasterId);
+                                // Set the account_code field with the new number
+                                $set('account_code', $nextNumber);
+                            }),
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                            TextInput::make('account_code')
+                            ->disabled() // Prevent manual edits
+                            ->maxLength(255)
+                            ->live() // Make it reactive to reflect updates
+                            ->dehydrated(false) // Prevent sending initial default to server
+                            ->default(''), // Initial empty value (will be overridden by type_master_id update)
 
                         TextInput::make('phone_number')
                             ->tel()
@@ -129,7 +128,7 @@ trait CreateAccountMasterTrait
                             ->relationship('accountOwnership', 'name')
                             ->searchable()
                             ->preload(),
-                    ]),
+                    ])->columnSpanFull(),
         ];
 
     }

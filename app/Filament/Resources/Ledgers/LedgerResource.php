@@ -65,7 +65,9 @@ class LedgerResource extends Resource
                             ->rows(2)
                             ->columnSpan('full')
                             ->placeholder('Enter a detailed description of the transaction...'),
-                    ])->columns(2),
+                    ])
+                    ->columnSpanFull()
+                    ->columns(2),
 
                 Section::make('Amounts')
                     ->schema([
@@ -85,8 +87,9 @@ class LedgerResource extends Resource
                                     ->requiredIf('debit', fn ($state) => empty($state))
                                     ->rules(['nullable', 'min:0', 'regex:/^\d{1,6}(\.\d{0,2})?$/']),
                             ])
+                            ->columnSpanFull()
                             ->columns(2),
-                    ]),
+                    ])->columnSpanFull(),
 
                 Section::make('Advanced Options')
                     ->collapsed()
@@ -119,8 +122,12 @@ class LedgerResource extends Resource
                                     ->label('System Entry?')
                                     ->default(false)
                                     ->helperText('Used for internal, system-generated entries.'),
-                            ])->columns(3),
-                    ])->columns(2),
+                            ])
+                            ->columnSpanFull()
+                            ->columns(3),
+                    ])
+                    ->columnSpanFull()
+                    ->columns(2),
             ]);
     }
 

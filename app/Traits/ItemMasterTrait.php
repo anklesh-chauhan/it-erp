@@ -109,8 +109,9 @@ trait ItemMasterTrait
                                         ->numeric(),
                                 ]),
                         ])
+                        ->columnSpanFull()
                         ->collapsed()
-                ]),
+                ])->columnSpanFull(),
 
         ];
     }

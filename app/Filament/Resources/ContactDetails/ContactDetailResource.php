@@ -69,7 +69,7 @@ class ContactDetailResource extends Resource
                         TextInput::make('last_name')
                             ->label('Last Name')
                             ->columnSpan(1),
-                        ]),
+                        ])->columnSpanFull(),
                 Grid::make(3) // ✅ Three-column layout
                     ->schema([
                         TextInput::make('email')
@@ -88,7 +88,7 @@ class ContactDetailResource extends Resource
                             ->tel()
                             ->label('Alternate Phone'),
 
-                        ]),
+                        ])->columnSpanFull(),
                 Grid::make(3) // ✅ Three-column layout
                     ->schema([
                         Select::make('designation_id')
@@ -124,7 +124,7 @@ class ContactDetailResource extends Resource
                             ->native(false)
                             ->label('Birthday'),
 
-                        ]),
+                        ])->columnSpanFull(),
 
                         Select::make('company_id')
                             ->relationship('company', 'name')
@@ -195,7 +195,7 @@ class ContactDetailResource extends Resource
                                     Textarea::make('description')
                                         ->nullable()
                                         ->label('Company Description'),
-                                ])
+                                ])->columnSpanFull()
                             ])
                             ->createOptionUsing(function (array $data, callable $set, callable $get) {
                                 $company = Company::create($data);
@@ -227,17 +227,17 @@ class ContactDetailResource extends Resource
                         TextInput::make('facebook')->url()->label('Facebook'),
                         TextInput::make('twitter')->url()->label('Twitter'),
                         TextInput::make('website')->url()->label('Website'),
-                    ]),
+                    ])->columnSpanFull(),
                 Grid::make(1) // ✅ Three-column layout
                     ->schema([
-                // ✅ Notes
-                Textarea::make('notes')
-                    ->rows(3)
-                    ->label('Additional Notes'),
-                ]),
+                        // ✅ Notes
+                        Textarea::make('notes')
+                            ->rows(3)
+                            ->label('Additional Notes'),
+                        ])->columnSpanFull(),
 
                 Grid::make(1) // ✅ Three-column layout
-                    ->schema([
+                ->schema([
 
                     // 🔄 Add Address Repeater
                     Repeater::make('addresses')
@@ -288,15 +288,15 @@ class ContactDetailResource extends Resource
                             Select::make('country_id')
                                 ->relationship('country', 'name')
                                 ->searchable(),
-                        ]),
-                    ])
+                        ])->columnSpanFull(),
+                    ])->columnSpanFull()
                     ->collapsible() // Optional for better UI
                     ->orderColumn() // Enables drag & drop sorting
                     ->addActionLabel('Add Address') // ✅ Custom add button text
                     ->default(function (callable $get) {
                         return [['company_id' => $get('company_id')]]; // ✅ Ensures `company_id` is included by default
-                    }),
-                ]),
+                    })->columnSpanFull(),
+                ])->columnSpanFull(),
             ]);
     }
 

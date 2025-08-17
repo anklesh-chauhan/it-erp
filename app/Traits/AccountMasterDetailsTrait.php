@@ -91,7 +91,7 @@ trait AccountMasterDetailsTrait
                                         TextInput::make('no_of_employees')
                                             ->maxLength(255)
                                             ->nullable(),
-                                        
+
                                         Select::make('owner_id')
                                             ->relationship('owner', 'name')
                                             ->model(AccountMaster::class)
@@ -298,7 +298,7 @@ trait AccountMasterDetailsTrait
                                 return "{$accountDetails}";
                             }),
 
-                    ]),
+                    ])->columnSpanFull(),
         ];
     }
 }

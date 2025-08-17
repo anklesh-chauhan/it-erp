@@ -244,7 +244,7 @@ trait ContactDetailsTrait
                                     $set('show_contact_info', null);
                                     $set('contact_id', null);
                                     $set('address_id', null);
-                                
+
                                 }
                             })
                             ->afterStateHydrated(function (callable $set, callable $get, $state, $component) {
@@ -294,7 +294,7 @@ trait ContactDetailsTrait
                                     : 'No contact selected.';
                             }),
 
-                    ]),
+                    ])->columnSpanFull(),
 
         ];
     }
