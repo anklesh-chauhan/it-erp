@@ -20,8 +20,8 @@ use Filament\Tables\Columns\TextColumn;
 use App\Models\Tax;
 use Filament\Forms;
 use Filament\Tables;
-use Awcodes\TableRepeater\Components\TableRepeater;
-use Awcodes\TableRepeater\Header;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Repeater\TableColumn;
 use Illuminate\Support\Facades\Log;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
@@ -47,26 +47,11 @@ trait SalesDocumentResourceTrait
         return method_exists(static::class, 'getModel') ? static::getModel() : Quote::class;
     }
 
-    // public SalesDocumentPreference $preferences;
-
-    // public function mount($record): void
-    // {
-    //     parent::mount($record);
-
-    //     // Load preferences once at mount time
-    //     $this->preferences = SalesDocumentPreference::first();
-    // }
-
     public static function getCommonFormFields(): array
     {
 
         $companyAccountFields = self::getAccountMasterDetailsTraitField();
 
-        // if (self::resolveModelClass() === \App\Models\Quote::class) {
-        //     $companyAccountFields = self::getCompanyDetailsTraitField();
-        // } else {
-        //     $companyAccountFields = self::getAccountMasterDetailsTraitField();
-        // }
         return [
             Grid::make(4)
                 ->schema([
@@ -95,7 +80,7 @@ trait SalesDocumentResourceTrait
                         ->required()
                         ->default(Auth::id()),
 
-                ]),
+                ])->columnSpanFull(),
 
                 ...$companyAccountFields,
 
@@ -118,239 +103,200 @@ trait SalesDocumentResourceTrait
                         )
                     )
                     ->hidden(fn (callable $get) => !$get('has_shipping_address') && !$get('shipping_address_id')),
-            
-        Section::make()
-            ->extraAttributes([
-                'class' => 'overflow-x-auto w-full no-gap-p6'
-            ])
-            ->schema([
 
-                TableRepeater::make('items')
+            Section::make() // Two-column layout
+            ->schema([
+                Repeater::make('items')
+                    ->relationship('items')
+                    ->columnSpanFull()
                     ->label(false)
-                    ->columnSpan('full')
-                    ->stackAt('100px')
-                    ->streamlined()
-                    ->headers([
-                        Header::make('Item                                                                                          ')->width('350px'),
-                        // Header::make('HAC/SAC                 ')->width('100px'),
-                        Header::make('Quantity           ')->width('100px'),
-                        Header::make('Price                      ')->width('100px'),
-                        Header::make('Disc %        ')->width('100px'),
-                        Header::make('Tax Rate %          ')->width('100px'),
-                        Header::make('Taxable Amount                      ')->width('100px'),
-                        Header::make(' ')->width('10px'),
+                    ->extraAttributes([
+                        'class' => 'invoice-items-repeater',
+                    ])
+                    ->table([
+                        TableColumn::make('Item                                                              ')
+                            ->width('350px'),
+                        TableColumn::make('Description                                                            ')->width('450px'),
+                        TableColumn::make('Quantity           ')->width('100px'),
+                        TableColumn::make('HSN/SAC'),
+                        TableColumn::make('Price                      ')->width('100px'),
+                        TableColumn::make('Disc %        ')->width('100px'),
+                        TableColumn::make('Tax Rate %          ')->width('100px'),
+                        TableColumn::make('Taxable Amount                      ')->width('100px'),
+                        TableColumn::make(' ')->width('10px'),
                     ])
                     ->relationship('items')
-                    ->extraAttributes(['style' => 'gap:0.5rem !important'])
                     ->schema([
-                        Grid::make(2)
-                            ->extraAttributes(['class' => 'no-gap'])
-                            ->schema([
-                                Select::make('item_master_id')
-                                    ->label(false)
-                                    ->relationship('itemMaster', 'item_name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required()
-                                    ->columnSpan(2)
-                                    ->extraAttributes([
-                                        'class' => 'w-24 text-sm !rounded-none',
-                                        'style' => 'font-size: 0.875rem; border-radius: 0;',
-                                    ])
-                                    ->live() // Optional: for reactivity
-                                    ->getSearchResultsUsing(function (string $search): array {
-                                        // Fetch the search results
-                                        $items = ItemMaster::where('item_name', 'like', "%{$search}%")
-                                            ->limit(50)
-                                            ->pluck('item_name', 'id')
-                                            ->toArray();
-
-                                        return $items;
-                                    })
-                                    ->createOptionForm([
-                                        ...self::getItemMasterTraitField()
-                                    ])
-                                    ->createOptionAction(function (Action $action) {
-                                        return $action
-                                            ->modalHeading('Create New Item')
-                                            ->modalSubmitActionLabel('Create')
-                                            ->closeModalByClickingAway(false)
-                                            ->mutateDataUsing(function (array $data) {
-                                                $data['item_code'] = $data['item_code'] ?? NumberSeries::getNextNumber(ItemMaster::class);
-                                                return $data;
-                                            });
-                                    }) // No visible() condition, always shown
-                                    ->editOptionForm([
-                                        ...self::getItemMasterTraitField() // Define the edit form fields
-                                    ])
-                                    ->editOptionAction(function (Action $action) {
-                                        return $action
-                                            ->modalHeading('Edit Item')
-                                            ->modalSubmitActionLabel('Save')
-                                            ->closeModalByClickingAway(false)
-                                            ->visible(fn ($get) => !empty($get('item_master_id'))); // Show only if item_master_id is set
-                                    })
-                                    ->afterStateUpdated(function ($state, callable $set) {
-                                        // When an item is selected, fetch its description and update the Textarea
-                                        if ($state) {
-                                            $item = ItemMaster::with('taxes')->find($state);
-                                            if ($item) {
-                                                $set('description', $item?->description ?? '');
-                                                $set('hsn_sac', $item?->hsn_code ?? ''); // Auto-fetch HSN/SAC
-                                                $set('price', $item->selling_price ?? 0); // Auto-fetch Price (assuming 'sale_price' field in ItemMaster)
-                                                    // ✅ Automatically calculate total tax rate from related taxes
-                                                $totalTaxRate = $item->taxes->sum('total_rate');
-                                                $set('tax_rate', $totalTaxRate);
-                                            } else {
-                                                $set('description', '');
-                                                $set('hsn_sac', '');
-                                                $set('hsn_sac', '');
-                                                $set('tax_rate', 0);
-                                            }
-                                        } else {
-                                            $set('description', '');
-                                            $set('hsn_sac', '');
-                                            $set('price', 0);
-                                            $set('tax_rate', 0);
-                                        }
-                                    }),
-
-                                Textarea::make('description')
-                                    ->label(false)
-                                    ->rows(2)
-                                    ->placeholder('Enter item description...')
-                                    ->columnSpanFull()
-                                    ->extraAttributes([
-                                        'class' => 'w-24 h-16 text-sm',
-                                        'style' => 'font-size: 0.875rem; border-radius: 0;',
-                                    ]),
-                                
-                                
-                            ]), 
-
-                        Grid::make(1)
-                            ->extraAttributes(['class' => 'no-gap'])
-                            ->schema([ 
-                                TextInput::make('quantity')
-                                    ->label(false)
-                                    ->numeric()
-                                    ->default(0)
-                                    // ->required()
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        self::updateItemAmount($set, $get);
-                                        self::updateTotals($set, $get);
-                                    })
-                                    ->extraAttributes([
-                                        'class' => 'w-24 h-9 text-sm',
-                                        'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -5px;',
-                                    ]),
-                                TextInput::make('hsn_sac')
-                                    ->label('Hsn/Sac')
-                                    ->live()
-                                    ->placeholder('HSN/SAC')
-                                    ->extraAttributes([
-                                        'class' => 'w-24 h-9 text-sm',
-                                        'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: 0px;',
-                                    ]),
-                            ]),
-                        
-
-                        TextInput::make('price')
+                        Select::make('item_master_id')
                             ->label(false)
-                            ->numeric()
-                            ->default(0)
+                            ->relationship('itemMaster', 'item_name')
+                            ->searchable()
+                            ->native(false) // Ensure Filament uses Popper.js instead of native select
+                            ->preload()
                             ->required()
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                self::updateItemAmount($set, $get);
-                                self::updateTotals($set, $get);
-                            })
-                            ->extraAttributes([
-                                'class' => 'w-24 h-9 text-sm',
-                                'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
-                            ]),
+                            ->live() // Optional: for reactivity
+                            ->getSearchResultsUsing(function (string $search): array {
+                                // Fetch the search results
+                                $items = ItemMaster::where('item_name', 'like', "%{$search}%")
+                                    ->limit(50)
+                                    ->pluck('item_name', 'id')
+                                    ->toArray();
 
-                        TextInput::make('discount')
-                            ->label(false)
-                            ->numeric()
-                            ->default(0)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                self::updateItemAmount($set, $get);
-                                self::updateTotals($set, $get);
+                                return $items;
                             })
-                            ->extraAttributes([
-                                'class' => 'w-24 h-9 text-sm',
-                                'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
+                            ->createOptionForm([
+                                ...self::getItemMasterTraitField()
                             ])
-                            ->visible(function () {
-                                return SalesDocumentPreference::first()?->discount_level === 'line_item';
+                            ->createOptionAction(function (Action $action) {
+                                return $action
+                                    ->modalHeading('Create New Item')
+                                    ->modalSubmitActionLabel('Create')
+                                    ->closeModalByClickingAway(false)
+                                    ->mutateDataUsing(function (array $data) {
+                                        $data['item_code'] = $data['item_code'] ?? NumberSeries::getNextNumber(ItemMaster::class);
+                                        return $data;
+                                    });
+                            }) // No visible() condition, always shown
+                            ->editOptionForm([
+                                ...self::getItemMasterTraitField() // Define the edit form fields
+                            ])
+                            ->editOptionAction(function (Action $action) {
+                                return $action
+                                    ->modalHeading('Edit Item')
+                                    ->modalSubmitActionLabel('Save')
+                                    ->closeModalByClickingAway(false)
+                                    ->visible(fn ($get) => !empty($get('item_master_id'))); // Show only if item_master_id is set
+                            })
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                // When an item is selected, fetch its description and update the Textarea
+                                if ($state) {
+                                    $item = ItemMaster::with('taxes')->find($state);
+                                    if ($item) {
+                                        $set('description', $item?->description ?? '');
+                                        $set('hsn_sac', $item?->hsn_code ?? ''); // Auto-fetch HSN/SAC
+                                        $set('price', $item->selling_price ?? 0); // Auto-fetch Price (assuming 'sale_price' field in ItemMaster)
+                                            // ✅ Automatically calculate total tax rate from related taxes
+                                        $totalTaxRate = $item->taxes->sum('total_rate');
+                                        $set('tax_rate', $totalTaxRate);
+                                    } else {
+                                        $set('description', '');
+                                        $set('hsn_sac', '');
+                                        $set('hsn_sac', '');
+                                        $set('tax_rate', 0);
+                                    }
+                                } else {
+                                    $set('description', '');
+                                    $set('hsn_sac', '');
+                                    $set('price', 0);
+                                    $set('tax_rate', 0);
+                                }
                             }),
 
-                        Select::make('tax_rate')
-                            ->label(false)
-                            ->options(function (callable $get) {
-                                $itemId = $get('item_master_id');
+                            Textarea::make('description')
+                                ->label(false)
+                                ->maxWidth(450)
+                                ->rows(1)
+                                ->placeholder('Enter item description...')
+                                ->extraFieldWrapperAttributes(['class' => 'min-w-[550px]'])
+                                ->columnSpanFull(),
 
-                                if (!$itemId) {
-                                    return [];
-                                }
+                            TextInput::make('quantity')
+                                ->label(false)
+                                ->numeric()
+                                ->default(0)
+                                // ->required()
+                                ->live()
+                                ->extraFieldWrapperAttributes(['class' => 'min-w-[100px]'])
+                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    self::updateItemAmount($set, $get);
+                                    self::updateTotals($set, $get);
+                                }),
 
-                                $item = ItemMaster::with('taxes')->find($itemId);
+                            TextInput::make('hsn_sac')
+                                ->label('Hsn/Sac')
+                                ->live()
+                                ->extraFieldWrapperAttributes(['class' => 'min-w-[100px]'])
+                                ->placeholder('HSN/SAC'),
 
-                                if ($item && $item->taxes->isNotEmpty()) {
-                                    return $item->taxes->mapWithKeys(function ($tax) {
-                                        return [
-                                            number_format($tax->total_rate, 2, '.', '') => number_format($tax->total_rate, 2) . '%',
-                                        ];
-                                    })->toArray();
-                                }
+                            TextInput::make('price')
+                                ->label(false)
+                                ->numeric()
+                                ->default(0)
+                                ->required()
+                                ->live(onBlur: true)
+                                ->extraFieldWrapperAttributes(['class' => 'min-w-[100px]'])
+                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    self::updateItemAmount($set, $get);
+                                    self::updateTotals($set, $get);
+                                }),
 
-                                // Fallback: list all taxes if no item taxes are found
-                                return Tax::active()
-                                    ->get()
-                                    ->mapWithKeys(function ($tax) {
-                                        return [
-                                            number_format($tax->total_rate, 2, '.', '') => number_format($tax->total_rate, 2) . '%',
-                                        ];
-                                    })->toArray();
-                            })
-                            ->searchable()
-                            ->preload()
-                            ->live()
-                            ->placeholder('Tax Rate')
-                            ->extraAttributes([
-                                'class' => 'w-24 h-9 text-sm',
-                                'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
-                            ])
-                            ->required(),
+                            TextInput::make('discount')
+                                ->label(false)
+                                ->numeric()
+                                ->default(0)
+                                ->live(onBlur: true)
+                                ->extraFieldWrapperAttributes(['class' => 'min-w-[100px]'])
+                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    self::updateItemAmount($set, $get);
+                                    self::updateTotals($set, $get);
+                                })
+                                ->visible(function () {
+                                    return SalesDocumentPreference::first()?->discount_level === 'line_item';
+                                }),
 
-                        TextInput::make('amount')
-                            ->label(false)
-                            ->readOnly()
-                            ->dehydrated(true)
-                            ->inputMode('decimal') // Enforce decimal input behavior
-                            ->step('0.01')
-                            ->extraInputAttributes([
-                                'min' => 0,
-                                'step' => '0.01', // Reinforce 2 decimal places in the HTML input
-                            ])
-                            ->formatStateUsing(function ($state): string {
-                                // Convert state to float to handle null, empty, or integer values
-                                $value = (float) ($state ?? 0);
-                                // Always format to 2 decimal places
-                                return number_format($value, 2, '.', '');
-                            })
-                            ->extraAttributes([
-                                'class' => 'w-24 h-9 text-sm',
-                                'style' => 'font-size: 0.875rem; border-radius: 0; margin-top: -50px;',
-                            ]),
-                    ])
-                    ->extraAttributes([
-                        'class' => 'text-sm',
-                        'style' => 'font-size: 0.875rem; border-radius: 0;',
-                    ])
+                            Select::make('tax_rate')
+                                ->label(false)
+                                ->options(function (callable $get) {
+                                    $itemId = $get('item_master_id');
+
+                                    if (!$itemId) {
+                                        return [];
+                                    }
+
+                                    $item = ItemMaster::with('taxes')->find($itemId);
+
+                                    if ($item && $item->taxes->isNotEmpty()) {
+                                        return $item->taxes->mapWithKeys(function ($tax) {
+                                            return [
+                                                number_format($tax->total_rate, 2, '.', '') => number_format($tax->total_rate, 2) . '%',
+                                            ];
+                                        })->toArray();
+                                    }
+
+                                    // Fallback: list all taxes if no item taxes are found
+                                    return Tax::active()
+                                        ->get()
+                                        ->mapWithKeys(function ($tax) {
+                                            return [
+                                                number_format($tax->total_rate, 2, '.', '') => number_format($tax->total_rate, 2) . '%',
+                                            ];
+                                        })->toArray();
+                                })
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->extraFieldWrapperAttributes(['class' => 'min-w-[100px]'])
+                                ->placeholder('Tax Rate')
+                                ->required(),
+
+                            TextInput::make('amount')
+                                ->label(false)
+                                ->readOnly()
+                                ->extraFieldWrapperAttributes(['class' => 'min-w-[100px]'])
+                                ->dehydrated(true)
+                                ->inputMode('decimal') // Enforce decimal input behavior
+                                ->step('0.01')
+                                ->extraInputAttributes([
+                                    'min' => 0,
+                                    'step' => '0.01', // Reinforce 2 decimal places in the HTML input
+                                ])
+                                ->formatStateUsing(function ($state): string {
+                                    // Convert state to float to handle null, empty, or integer values
+                                    $value = (float) ($state ?? 0);
+                                    // Always format to 2 decimal places
+                                    return number_format($value, 2, '.', '');
+                                }),
+                        ])
                     ->afterStateHydrated(function (callable $set, callable $get) {
                         self::updateTotals($set, $get);
                     })
@@ -366,122 +312,64 @@ trait SalesDocumentResourceTrait
                             );
                         }
                     })
-                    ->columnSpan('full')
-                    ->addActionLabel('Add Item')
-                    ->defaultItems(1),
+                    ->columnSpanFull()
+                    ->addActionLabel('Add Item'),
 
-                Grid::make(4) // Two-column layout
+                Grid::make(4)
                     ->schema([
-                        Placeholder::make('') // Empty left column to push totals right
-                            ->content(''),
-                        Placeholder::make('') // Empty left column to push totals right
-                        ->content(''),
-                        Placeholder::make('') // Empty left column to push totals right
-                        ->content(''),
                         Group::make()
                             ->schema([
                                 TextInput::make('subtotal')
                                     ->label('Subtotal')
                                     ->inlineLabel()
                                     ->readOnly()
-                                    ->extraInputAttributes([
-                                        'class' => 'text-right', // Added for right alignment
-                                    ])
-                                    ->formatStateUsing(function (?string $state): ?string {
-                                        // Ensure state is not null and is a valid number before formatting
-                                        if (is_numeric($state)) {
-                                            return number_format((float) $state, 2, '.', '');
-                                        }
-                                        return $state; // Return original state if not numeric (e.g., null or empty string)
-                                    })
-                                    ->dehydrateStateUsing(fn ($state) =>
-                                            $state !== null ? number_format((float) $state, 2, '.', '') : null
-                                        ),
-                                
+                                    ->extraInputAttributes(['class' => 'text-right'])
+                                    ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+
                                 TextInput::make('transaction_discount')
                                     ->label('Transaction Discount')
                                     ->inlineLabel()
-                                    ->visible(function () {
-                                        return SalesDocumentPreference::first()?->discount_level === 'transaction';
-                                    })
+                                    ->visible(fn () => SalesDocumentPreference::first()?->discount_level === 'transaction')
                                     ->numeric()
                                     ->default(0)
                                     ->suffix('%'),
-                                    
+
                                 TextInput::make('cgst')
-                                        ->label('CGST')
-                                        ->inlineLabel()
-                                        ->readOnly()
-                                        ->extraInputAttributes([
-                                            'class' => 'text-right',
-                                        ])
-                                        ->formatStateUsing(function ($state) {
-                                            if (is_numeric($state)) {
-                                                return number_format((float) $state, 2, '.', '');
-                                            }
-                                            return $state;
-                                        })
-                                        ->visible(function (callable $get) {
-                                            return self::shouldShowCgstSgst($get);
-                                        }),
+                                    ->label('CGST')
+                                    ->inlineLabel()
+                                    ->readOnly()
+                                    ->extraInputAttributes(['class' => 'text-right'])
+                                    ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                                    ->visible(fn (callable $get) => self::shouldShowCgstSgst($get)),
 
-                                    TextInput::make('sgst')
-                                        ->label('SGST')
-                                        ->inlineLabel()
-                                        ->readOnly()
-                                        ->extraInputAttributes([
-                                            'class' => 'text-right',
-                                        ])
-                                        ->formatStateUsing(function ($state) {
-                                            if (is_numeric($state)) {
-                                                return number_format((float) $state, 2, '.', '');
-                                            }
-                                            return $state;
-                                        })
-                                        ->visible(function (callable $get) {
-                                            return self::shouldShowCgstSgst($get);
-                                        }),
+                                TextInput::make('sgst')
+                                    ->label('SGST')
+                                    ->inlineLabel()
+                                    ->readOnly()
+                                    ->extraInputAttributes(['class' => 'text-right'])
+                                    ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                                    ->visible(fn (callable $get) => self::shouldShowCgstSgst($get)),
 
-                                    TextInput::make('igst')
-                                        ->label('IGST')
-                                        ->inlineLabel()
-                                        ->readOnly()
-                                        ->extraInputAttributes([
-                                            'class' => 'text-right',
-                                        ])
-                                        ->formatStateUsing(function ($state) {
-                                            if (is_numeric($state)) {
-                                                return number_format((float) $state, 2, '.', '');
-                                            }
-                                            return $state;
-                                        })
-                                        ->visible(function (callable $get) {
-                                            return !self::shouldShowCgstSgst($get);
-                                        }),
+                                TextInput::make('igst')
+                                    ->label('IGST')
+                                    ->inlineLabel()
+                                    ->readOnly()
+                                    ->extraInputAttributes(['class' => 'text-right'])
+                                    ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                                    ->visible(fn (callable $get) => !self::shouldShowCgstSgst($get)),
 
                                 TextInput::make('total')
                                     ->label('Total')
                                     ->inlineLabel()
                                     ->readOnly()
-                                    ->extraInputAttributes([
-                                        'class' => 'text-right', // Added for right alignment
-                                    ])
-                                    ->formatStateUsing(function ($state) {
-                                        // Ensure state is not null and is a valid number before formatting
-                                        if (is_numeric($state)) {
-                                            return number_format((float) $state, 2, '.', '');
-                                        }
-                                        return $state; // Return original state if not numeric (e.g., null or empty string)
-                                    })
-                                    ->dehydrateStateUsing(fn ($state) =>
-                                            $state !== null ? number_format((float) $state, 2, '.', '') : null
-                                        ),
+                                    ->extraInputAttributes(['class' => 'text-right'])
+                                    ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
                             ])
-                            ->columnSpan(1), // Right column
+                            ->columnStart(4) // Push the entire group into the 4th column
+                            ->columnSpan(1),
                     ])
-                    ->columnSpan('full'), // Span the full width to align properly
-
-                ]),
+                    ->columnSpanFull()
+            ])->columnSpanFull(),
 
                 Textarea::make('description')
                     ->label('Description'),
@@ -569,7 +457,7 @@ trait SalesDocumentResourceTrait
         $amount = ($quantity * $price) - $discountAmount;
 
         $set('amount', number_format($amount, 2, '.', ''));
-    
+
     }
 
     private static function updateTotals(callable $set, callable $get): void
@@ -639,7 +527,7 @@ trait SalesDocumentResourceTrait
 
     public function afterSave(): void
     {
-        $this->saveTaxDetailsFromModel(); 
+        $this->saveTaxDetailsFromModel();
     }
 
     protected function saveTaxDetailsFromModel(): void

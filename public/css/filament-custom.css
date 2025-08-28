@@ -94,3 +94,50 @@
 .no-gap.grid {
     gap: 0px !important;
 }
+
+/* Let horizontal scroll work, but keep vertical overflow open for dropdowns */
+.invoice-items-repeater {
+    overflow-x: auto;                    /* Keep your horizontal scroll */
+    overflow-y: visible !important;      /* Allow dropdown to escape vertically */
+    max-height: 300px;
+    clip-path: none !important;          /* Prevent clipping */
+}
+/* Force dropdown panels above sticky headers and scroll wrappers */
+.invoice-items-repeater .fi-dropdown-panel,
+.invoice-items-repeater .fi-dropdown-list {
+    position: inherit !important;         /* Take it out of the stacking context entirely */
+    z-index: 2147483647 !important;      /* Max practical z-index */
+    left: auto !important;               /* Let Popper reposition */
+    top: auto !important;
+}
+
+/* Optional: prevent accidental clipping from transforms/clip-path in ancestors */
+.invoice-items-repeater table,
+.invoice-items-repeater thead th,
+.invoice-items-repeater tbody td {
+    transform: none !important;
+    clip-path: none !important;
+    overflow: visible !important;
+    vertical-align: top; /* Align text to the top of cells */
+}
+
+/* Sticky first column */
+.invoice-items-repeater thead th:nth-child(1) {
+    background-color: var(--gray-50);
+    position: sticky;
+    left: 0;
+    z-index: 1; /* Lower than dropdown */
+}
+
+.invoice-items-repeater tbody td:nth-child(1) {
+    position: sticky;
+    left: 0;
+    z-index: 1; /* Lower than dropdown */
+    background: var(--fi-color-surface);
+    border-inline-end-style: var(--tw-border-style);
+    border-inline-end-width: var(--tw-border-width);
+    border-inline-end-color: var(--gray-200);
+    border-inline-start-style: var(--tw-border-style);
+    border-inline-start-width: var(--tw-border-width);
+    border-inline-start-color: var(--gray-200);
+}
