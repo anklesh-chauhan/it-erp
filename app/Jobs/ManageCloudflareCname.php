@@ -55,7 +55,7 @@ class ManageCloudflareCname implements ShouldQueue
                 if ($response->successful()) {
                     $recordId = $response->json()['result']['id'];
                     $this->tenant->update(['cloudflare_record_id' => $recordId]);
-                    Log::info("Created CNAME record for {$subdomain}.{$baseDomain}, record ID: {$recordId}");
+                    Log::info("Created CNAME record forr {$subdomain}.{$baseDomain}, record ID: {$recordId}");
                 } else {
                     Log::error("Failed to create CNAME: " . $response->body());
                 }
@@ -99,8 +99,8 @@ class ManageCloudflareCname implements ShouldQueue
 
             // If nothing remains, no subdomain exists
             return $subdomainPart === $baseDomain ? null : $subdomainPart;
+            Log::info("Extracted subdomain: {$subdomainPart} from full domain: {$fullDomain}");
         }
-
         // No match found, return as-is (fallback)
         return null;
     }
