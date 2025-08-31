@@ -35,6 +35,8 @@ class ManageCloudflareCname implements ShouldQueue
         $subdomain = $this->getSubdomain($this->tenant->domain);
         $baseDomain = 'iterp.in'; // Add APP_DOMAIN to .env for your base domain
 
+        dd($this->tenant->domain, $subdomain, $this->action, $this->oldDomain);
+
         try {
             $headers = [
                 'Authorization' => 'Bearer ' . $apiToken,
