@@ -47,7 +47,7 @@ class ManageCloudflareCname implements ShouldQueue
             if ($this->action === 'create') {
                 $response = Http::withHeaders($headers)->post("https://api.cloudflare.com/client/v4/zones/{$zoneId}/dns_records", [
                     'type'    => 'CNAME',
-                    'name'    => $fullDomain,
+                    'name'    => $this->tenant->domain,
                     'content' => $target,
                     'ttl'     => 3600,
                     'proxied' => true,
@@ -56,9 +56,9 @@ class ManageCloudflareCname implements ShouldQueue
                 if ($response->successful()) {
                     $recordId = $response->json()['result']['id'];
                     $this->tenant->update(['cloudflare_record_id' => $recordId]);
-                    Log::info("Created CNAME record for {$fullDomain}, record ID: {$recordId}");
+                    Log::info("Created CNAME record for {$this->tenant->domain}, record ID: {$recordId}");
                 } else {
-                    Log::error("Failed to create CNAME for {$fullDomain}: " . $response->body());
+                    Log::error("Failed to create CNAME for {$this->tenant->domain}: " . $response->body());
                 }
             }
 
@@ -66,14 +66,14 @@ class ManageCloudflareCname implements ShouldQueue
             elseif ($this->action === 'update' && $this->tenant->cloudflare_record_id) {
                 $response = Http::withHeaders($headers)->patch("https://api.cloudflare.com/client/v4/zones/{$zoneId}/dns_records/{$this->tenant->cloudflare_record_id}", [
                     'type'    => 'CNAME',
-                    'name'    => $fullDomain,
+                    'name'    => $this->tenant->domain,
                     'content' => $target,
                     'ttl'     => 3600,
                     'proxied' => true,
                 ]);
 
                 if ($response->successful()) {
-                    Log::info("Updated CNAME record for {$fullDomain}, record ID: {$this->tenant->cloudflare_record_id}");
+                    Log::info("Updated CNAME record for {$this->tenant->domain}, record ID: {$this->tenant->cloudflare_record_id}");
                 } else {
                     Log::error("Failed to update CNAME for {$fullDomain}: " . $response->body());
                 }
