@@ -32,6 +32,7 @@ class ManageCloudflareCname implements ShouldQueue
         $zoneId = env('CLOUDFLARE_ZONE_ID');
         $apiToken = env('CLOUDFLARE_API_TOKEN');
         $target = env('CLOUDFLARE_TARGET', 'iterp.in');
+        $subdomain = $this->getSubdomain($this->tenant->domain);
         $baseDomain = 'iterp.in'; // Add APP_DOMAIN to .env for your base domain
 
         try {
@@ -44,7 +45,7 @@ class ManageCloudflareCname implements ShouldQueue
                 // Create CNAME record
                 $response = Http::withHeaders($headers)->post("https://api.cloudflare.com/client/v4/zones/{$zoneId}/dns_records", [
                     'type' => 'CNAME',
-                    'name' => "{$this->tenant->domain}.{$baseDomain}",
+                    'name' => "{$subdomain}.{$baseDomain}",
                     'content' => $target,
                     'ttl' => 3600,
                     'proxied' => true, // Set to false for DNS-only
@@ -53,7 +54,7 @@ class ManageCloudflareCname implements ShouldQueue
                 if ($response->successful()) {
                     $recordId = $response->json()['result']['id'];
                     $this->tenant->update(['cloudflare_record_id' => $recordId]);
-                    Log::info("Created CNAME record for {$this->tenant->domain}.{$baseDomain}, record ID: {$recordId}");
+                    Log::info("Created CNAME record for {$subdomain}.{$baseDomain}, record ID: {$recordId}");
                 } else {
                     Log::error("Failed to create CNAME: " . $response->body());
                 }
@@ -61,14 +62,14 @@ class ManageCloudflareCname implements ShouldQueue
                 // Update CNAME record
                 $response = Http::withHeaders($headers)->patch("https://api.cloudflare.com/client/v4/zones/{$zoneId}/dns_records/{$this->tenant->cloudflare_record_id}", [
                     'type' => 'CNAME',
-                    'name' => "{$this->tenant->domain}.{$baseDomain}",
+                    'name' => "{$subdomain}.{$baseDomain}",
                     'content' => $target,
                     'ttl' => 3600,
                     'proxied' => true,
                 ]);
 
                 if ($response->successful()) {
-                    Log::info("Updated CNAME record for {$this->tenant->domain}.{$baseDomain}, record ID: {$this->tenant->cloudflare_record_id}");
+                    Log::info("Updated CNAME record for {$subdomain}.{$baseDomain}, record ID: {$this->tenant->cloudflare_record_id}");
                 } else {
                     Log::error("Failed to update CNAME: " . $response->body());
                 }
@@ -77,7 +78,7 @@ class ManageCloudflareCname implements ShouldQueue
                 $response = Http::withHeaders($headers)->delete("https://api.cloudflare.com/client/v4/zones/{$zoneId}/dns_records/{$this->tenant->cloudflare_record_id}");
 
                 if ($response->successful()) {
-                    Log::info("Deleted CNAME record for {$this->tenant->domain}.{$baseDomain}, record ID: {$this->tenant->cloudflare_record_id}");
+                    Log::info("Deleted CNAME record for {$subdomain}.{$baseDomain}, record ID: {$this->tenant->cloudflare_record_id}");
                 } else {
                     Log::error("Failed to delete CNAME: " . $response->body());
                 }
@@ -85,5 +86,19 @@ class ManageCloudflareCname implements ShouldQueue
         } catch (Exception $e) {
             Log::error("Error processing Cloudflare {$this->action} for tenant {$this->tenant->name}: {$e->getMessage()}", ['exception' => $e->getTraceAsString()]);
         }
+    }
+
+    protected function getSubdomain(string $fullDomain): ?string
+    {
+        $parts = explode('.', $fullDomain);
+        $count = count($parts);
+
+        if ($count < 3) {
+            // No subdomain present (just domain.tld)
+            return null;
+        }
+
+        // Everything except the last two parts = subdomain
+        return implode('.', array_slice($parts, 0, $count - 2));
     }
 }
