@@ -28,6 +28,9 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Filament\Actions\Action;
+use Filament\Tables\Enums\RecordActionsPosition;
+use Filament\Actions\ActionGroup;
 
 class QuoteResource extends Resource
 {
@@ -117,6 +120,30 @@ class QuoteResource extends Resource
                     ->since()
                     ->sortable(),
             ])
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
+                    Action::make('previewPdf')
+                        ->icon('heroicon-o-eye')
+                        ->label('Preview PDF')
+                        ->modalHeading('PDF Preview')
+                        ->modalSubmitActionLabel('Close')
+                        ->modalWidth('full')
+                        ->modalContent(fn ($record) => view('components.pdf-preview', [
+                            'url' => route('sales-documents.preview', [
+                                strtolower(class_basename($record)), 
+                                $record->id
+                            ]),
+                        ])),
+
+                    Action::make('downloadPdf')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->label('Download PDF')
+                        ->url(fn($record) => route('sales-documents.download', [
+                            strtolower(class_basename($record)), $record->id
+                        ])),
+                    ])
+                    ])
             ->filters([
                 // 📅 Date Range Filter
                 Filter::make('date')
@@ -180,9 +207,6 @@ class QuoteResource extends Resource
                             ->when($data['min'], fn ($q) => $q->where('total', '>=', $data['min']))
                             ->when($data['max'], fn ($q) => $q->where('total', '<=', $data['max']));
                     }),
-            ])
-            ->recordActions([
-                EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

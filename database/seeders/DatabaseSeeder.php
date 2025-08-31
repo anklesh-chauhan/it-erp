@@ -51,39 +51,39 @@ class DatabaseSeeder extends Seeder
         // Enable foreign key checks again
         // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // try {
-        //     Artisan::call('shield:generate --all');
-        //     $this->command->info('Filament Shield permissions generated successfully.');
-        // } catch (\Exception $e) {
-        //     $this->command->error('Failed to run shield:generate --all: ' . $e->getMessage());
-        // }
+        try {
+            Artisan::call('shield:generate --all');
+            $this->command->info('Filament Shield permissions generated successfully.');
+        } catch (\Exception $e) {
+            $this->command->error('Failed to run shield:generate --all: ' . $e->getMessage());
+        }
 
         $this->call([
-            // UsersTableSeeder::class,
-            // ModelHasRolesSeeder::class,
-            // CountrySeeder::class,
-            // StateSeeder::class,
-            // CitySeeder::class,  
-            // CityPinCodeSeeder::class,
-            // IndustryTypeSeeder::class,
-            // LeadSourceSeeder::class,
-            // LeadStatusSeeder::class,
-            // RatingTypeSeeder::class,
-            // FollowUpMediaSeeder::class,
-            // FollowUpResultSeeder::class,
-            // FollowUpStatusSeeder::class,
-            // FollowUpPrioritySeeder::class,
-            // UnitOfMeasurementSeeder::class,
-            // ItemBrandSeeder::class,
-            // TransportModeSeeder::class,
-            // VisitTypeSeeder::class,
-            // PackingTypeSeeder::class,
-            // DealStageSeeder::class,
-            // TypeMasterSeeder::class,
-            // CategorySeeder::class,
-            // EmpDepartmentSeeder::class,
-            // EmpGradeSeeder::class,
-            // EmpJobTitleSeeder::class,
+            UsersTableSeeder::class,
+            ModelHasRolesSeeder::class,
+            CountrySeeder::class,
+            StateSeeder::class,
+            CitySeeder::class,  
+            CityPinCodeSeeder::class,
+            IndustryTypeSeeder::class,
+            LeadSourceSeeder::class,
+            LeadStatusSeeder::class,
+            RatingTypeSeeder::class,
+            FollowUpMediaSeeder::class,
+            FollowUpResultSeeder::class,
+            FollowUpStatusSeeder::class,
+            FollowUpPrioritySeeder::class,
+            UnitOfMeasurementSeeder::class,
+            ItemBrandSeeder::class,
+            TransportModeSeeder::class,
+            VisitTypeSeeder::class,
+            PackingTypeSeeder::class,
+            DealStageSeeder::class,
+            TypeMasterSeeder::class,
+            CategorySeeder::class,
+            EmpDepartmentSeeder::class,
+            EmpGradeSeeder::class,
+            EmpJobTitleSeeder::class,
             AccountTypeSeeder::class,
             ChartOfAccountSeeder::class,
         ]);
