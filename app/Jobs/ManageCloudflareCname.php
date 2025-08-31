@@ -45,7 +45,7 @@ class ManageCloudflareCname implements ShouldQueue
                 // Create CNAME record
                 $response = Http::withHeaders($headers)->post("https://api.cloudflare.com/client/v4/zones/{$zoneId}/dns_records", [
                     'type' => 'CNAME',
-                    'name' => "{$subdomain}.{$baseDomain}",
+                    'name' => "{$subdomain}",
                     'content' => $target,
                     'ttl' => 3600,
                     'proxied' => true, // Set to false for DNS-only
@@ -62,7 +62,7 @@ class ManageCloudflareCname implements ShouldQueue
                 // Update CNAME record
                 $response = Http::withHeaders($headers)->patch("https://api.cloudflare.com/client/v4/zones/{$zoneId}/dns_records/{$this->tenant->cloudflare_record_id}", [
                     'type' => 'CNAME',
-                    'name' => "{$subdomain}.{$baseDomain}",
+                    'name' => "{$subdomain}",
                     'content' => $target,
                     'ttl' => 3600,
                     'proxied' => true,
