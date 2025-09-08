@@ -111,6 +111,12 @@
     top: auto !important;
 }
 
+.fi-ta-actions .fi-dropdown-panel,
+.fi-ta-actions .fi-dropdown-list {
+    left: auto !important;
+    right: auto !important;
+}
+
 /* Optional: prevent accidental clipping from transforms/clip-path in ancestors */
 .invoice-items-repeater table,
 .invoice-items-repeater thead th,

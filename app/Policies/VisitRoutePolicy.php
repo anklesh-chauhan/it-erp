@@ -15,7 +15,7 @@ class VisitRoutePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_visit::route');
+        return $user->can('view_any_visit::routes::visit::route');
     }
 
     /**
@@ -23,7 +23,7 @@ class VisitRoutePolicy
      */
     public function view(User $user, VisitRoute $visitRoute): bool
     {
-        return $user->can('view_visit::route');
+        return $user->can('view_visit::routes::visit::route');
     }
 
     /**
@@ -31,7 +31,7 @@ class VisitRoutePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_visit::route');
+        return $user->can('create_visit::routes::visit::route');
     }
 
     /**
@@ -39,7 +39,7 @@ class VisitRoutePolicy
      */
     public function update(User $user, VisitRoute $visitRoute): bool
     {
-        return $user->can('update_visit::route');
+        return $user->can('update_visit::routes::visit::route');
     }
 
     /**
@@ -47,7 +47,7 @@ class VisitRoutePolicy
      */
     public function delete(User $user, VisitRoute $visitRoute): bool
     {
-        return $user->can('delete_visit::route');
+        return $user->can('delete_visit::routes::visit::route');
     }
 
     /**
@@ -55,7 +55,7 @@ class VisitRoutePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_visit::route');
+        return $user->can('delete_any_visit::routes::visit::route');
     }
 
     /**
@@ -63,7 +63,7 @@ class VisitRoutePolicy
      */
     public function forceDelete(User $user, VisitRoute $visitRoute): bool
     {
-        return $user->can('force_delete_visit::route');
+        return $user->can('force_delete_visit::routes::visit::route');
     }
 
     /**
@@ -71,7 +71,7 @@ class VisitRoutePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_visit::route');
+        return $user->can('force_delete_any_visit::routes::visit::route');
     }
 
     /**
@@ -79,7 +79,7 @@ class VisitRoutePolicy
      */
     public function restore(User $user, VisitRoute $visitRoute): bool
     {
-        return $user->can('restore_visit::route');
+        return $user->can('restore_visit::routes::visit::route');
     }
 
     /**
@@ -87,7 +87,7 @@ class VisitRoutePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_visit::route');
+        return $user->can('restore_any_visit::routes::visit::route');
     }
 
     /**
@@ -95,7 +95,7 @@ class VisitRoutePolicy
      */
     public function replicate(User $user, VisitRoute $visitRoute): bool
     {
-        return $user->can('replicate_visit::route');
+        return $user->can('replicate_visit::routes::visit::route');
     }
 
     /**
@@ -103,6 +103,6 @@ class VisitRoutePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_visit::route');
+        return $user->can('reorder_visit::routes::visit::route');
     }
 }

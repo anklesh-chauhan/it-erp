@@ -15,7 +15,7 @@ class VisitPurposePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_visit::purpose');
+        return $user->can('view_any_visit::purposes::visit::purpose');
     }
 
     /**
@@ -23,7 +23,7 @@ class VisitPurposePolicy
      */
     public function view(User $user, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('view_visit::purpose');
+        return $user->can('view_visit::purposes::visit::purpose');
     }
 
     /**
@@ -31,7 +31,7 @@ class VisitPurposePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_visit::purpose');
+        return $user->can('create_visit::purposes::visit::purpose');
     }
 
     /**
@@ -39,7 +39,7 @@ class VisitPurposePolicy
      */
     public function update(User $user, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('update_visit::purpose');
+        return $user->can('update_visit::purposes::visit::purpose');
     }
 
     /**
@@ -47,7 +47,7 @@ class VisitPurposePolicy
      */
     public function delete(User $user, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('delete_visit::purpose');
+        return $user->can('delete_visit::purposes::visit::purpose');
     }
 
     /**
@@ -55,7 +55,7 @@ class VisitPurposePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_visit::purpose');
+        return $user->can('delete_any_visit::purposes::visit::purpose');
     }
 
     /**
@@ -63,7 +63,7 @@ class VisitPurposePolicy
      */
     public function forceDelete(User $user, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('force_delete_visit::purpose');
+        return $user->can('force_delete_visit::purposes::visit::purpose');
     }
 
     /**
@@ -71,7 +71,7 @@ class VisitPurposePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_visit::purpose');
+        return $user->can('force_delete_any_visit::purposes::visit::purpose');
     }
 
     /**
@@ -79,7 +79,7 @@ class VisitPurposePolicy
      */
     public function restore(User $user, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('restore_visit::purpose');
+        return $user->can('restore_visit::purposes::visit::purpose');
     }
 
     /**
@@ -87,7 +87,7 @@ class VisitPurposePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_visit::purpose');
+        return $user->can('restore_any_visit::purposes::visit::purpose');
     }
 
     /**
@@ -95,7 +95,7 @@ class VisitPurposePolicy
      */
     public function replicate(User $user, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('replicate_visit::purpose');
+        return $user->can('replicate_visit::purposes::visit::purpose');
     }
 
     /**
@@ -103,6 +103,6 @@ class VisitPurposePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_visit::purpose');
+        return $user->can('reorder_visit::purposes::visit::purpose');
     }
 }

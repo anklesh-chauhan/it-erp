@@ -15,7 +15,7 @@ class OrganizationalUnitPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_organizational::unit');
+        return $user->can('view_any_organizational::units::organizational::unit');
     }
 
     /**
@@ -23,7 +23,7 @@ class OrganizationalUnitPolicy
      */
     public function view(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('view_organizational::unit');
+        return $user->can('view_organizational::units::organizational::unit');
     }
 
     /**
@@ -31,7 +31,7 @@ class OrganizationalUnitPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_organizational::unit');
+        return $user->can('create_organizational::units::organizational::unit');
     }
 
     /**
@@ -39,7 +39,7 @@ class OrganizationalUnitPolicy
      */
     public function update(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('update_organizational::unit');
+        return $user->can('update_organizational::units::organizational::unit');
     }
 
     /**
@@ -47,7 +47,7 @@ class OrganizationalUnitPolicy
      */
     public function delete(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('delete_organizational::unit');
+        return $user->can('delete_organizational::units::organizational::unit');
     }
 
     /**
@@ -55,7 +55,7 @@ class OrganizationalUnitPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_organizational::unit');
+        return $user->can('delete_any_organizational::units::organizational::unit');
     }
 
     /**
@@ -63,7 +63,7 @@ class OrganizationalUnitPolicy
      */
     public function forceDelete(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('force_delete_organizational::unit');
+        return $user->can('force_delete_organizational::units::organizational::unit');
     }
 
     /**
@@ -71,7 +71,7 @@ class OrganizationalUnitPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_organizational::unit');
+        return $user->can('force_delete_any_organizational::units::organizational::unit');
     }
 
     /**
@@ -79,7 +79,7 @@ class OrganizationalUnitPolicy
      */
     public function restore(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('restore_organizational::unit');
+        return $user->can('restore_organizational::units::organizational::unit');
     }
 
     /**
@@ -87,7 +87,7 @@ class OrganizationalUnitPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_organizational::unit');
+        return $user->can('restore_any_organizational::units::organizational::unit');
     }
 
     /**
@@ -95,7 +95,7 @@ class OrganizationalUnitPolicy
      */
     public function replicate(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('replicate_organizational::unit');
+        return $user->can('replicate_organizational::units::organizational::unit');
     }
 
     /**
@@ -103,6 +103,6 @@ class OrganizationalUnitPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_organizational::unit');
+        return $user->can('reorder_organizational::units::organizational::unit');
     }
 }

@@ -20,10 +20,9 @@ class Quote extends SalesDocument
         'accepted_at' => 'datetime',
     ];
 
-    public function company()
+    public function accountMaster()
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(AccountMaster::class);
     }
-
 
 }

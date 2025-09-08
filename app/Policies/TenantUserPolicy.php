@@ -15,7 +15,7 @@ class TenantUserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_tenant::user');
+        return $user->can('view_any_tenant::users::tenant::user');
     }
 
     /**
@@ -23,7 +23,7 @@ class TenantUserPolicy
      */
     public function view(User $user, TenantUser $tenantUser): bool
     {
-        return $user->can('view_tenant::user');
+        return $user->can('view_tenant::users::tenant::user');
     }
 
     /**
@@ -31,7 +31,7 @@ class TenantUserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_tenant::user');
+        return $user->can('create_tenant::users::tenant::user');
     }
 
     /**
@@ -39,7 +39,7 @@ class TenantUserPolicy
      */
     public function update(User $user, TenantUser $tenantUser): bool
     {
-        return $user->can('update_tenant::user');
+        return $user->can('update_tenant::users::tenant::user');
     }
 
     /**
@@ -47,7 +47,7 @@ class TenantUserPolicy
      */
     public function delete(User $user, TenantUser $tenantUser): bool
     {
-        return $user->can('delete_tenant::user');
+        return $user->can('delete_tenant::users::tenant::user');
     }
 
     /**
@@ -55,7 +55,7 @@ class TenantUserPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_tenant::user');
+        return $user->can('delete_any_tenant::users::tenant::user');
     }
 
     /**
@@ -63,7 +63,7 @@ class TenantUserPolicy
      */
     public function forceDelete(User $user, TenantUser $tenantUser): bool
     {
-        return $user->can('force_delete_tenant::user');
+        return $user->can('force_delete_tenant::users::tenant::user');
     }
 
     /**
@@ -71,7 +71,7 @@ class TenantUserPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_tenant::user');
+        return $user->can('force_delete_any_tenant::users::tenant::user');
     }
 
     /**
@@ -79,7 +79,7 @@ class TenantUserPolicy
      */
     public function restore(User $user, TenantUser $tenantUser): bool
     {
-        return $user->can('restore_tenant::user');
+        return $user->can('restore_tenant::users::tenant::user');
     }
 
     /**
@@ -87,7 +87,7 @@ class TenantUserPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_tenant::user');
+        return $user->can('restore_any_tenant::users::tenant::user');
     }
 
     /**
@@ -95,7 +95,7 @@ class TenantUserPolicy
      */
     public function replicate(User $user, TenantUser $tenantUser): bool
     {
-        return $user->can('replicate_tenant::user');
+        return $user->can('replicate_tenant::users::tenant::user');
     }
 
     /**
@@ -103,6 +103,6 @@ class TenantUserPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_tenant::user');
+        return $user->can('reorder_tenant::users::tenant::user');
     }
 }

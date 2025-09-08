@@ -15,7 +15,7 @@ class RegionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_region');
+        return $user->can('view_any_regions::region');
     }
 
     /**
@@ -23,7 +23,7 @@ class RegionPolicy
      */
     public function view(User $user, Region $region): bool
     {
-        return $user->can('view_region');
+        return $user->can('view_regions::region');
     }
 
     /**
@@ -31,7 +31,7 @@ class RegionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_region');
+        return $user->can('create_regions::region');
     }
 
     /**
@@ -39,7 +39,7 @@ class RegionPolicy
      */
     public function update(User $user, Region $region): bool
     {
-        return $user->can('update_region');
+        return $user->can('update_regions::region');
     }
 
     /**
@@ -47,7 +47,7 @@ class RegionPolicy
      */
     public function delete(User $user, Region $region): bool
     {
-        return $user->can('delete_region');
+        return $user->can('delete_regions::region');
     }
 
     /**
@@ -55,7 +55,7 @@ class RegionPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_region');
+        return $user->can('delete_any_regions::region');
     }
 
     /**
@@ -63,7 +63,7 @@ class RegionPolicy
      */
     public function forceDelete(User $user, Region $region): bool
     {
-        return $user->can('force_delete_region');
+        return $user->can('force_delete_regions::region');
     }
 
     /**
@@ -71,7 +71,7 @@ class RegionPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_region');
+        return $user->can('force_delete_any_regions::region');
     }
 
     /**
@@ -79,7 +79,7 @@ class RegionPolicy
      */
     public function restore(User $user, Region $region): bool
     {
-        return $user->can('restore_region');
+        return $user->can('restore_regions::region');
     }
 
     /**
@@ -87,7 +87,7 @@ class RegionPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_region');
+        return $user->can('restore_any_regions::region');
     }
 
     /**
@@ -95,7 +95,7 @@ class RegionPolicy
      */
     public function replicate(User $user, Region $region): bool
     {
-        return $user->can('replicate_region');
+        return $user->can('replicate_regions::region');
     }
 
     /**
@@ -103,6 +103,6 @@ class RegionPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_region');
+        return $user->can('reorder_regions::region');
     }
 }

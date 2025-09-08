@@ -15,7 +15,7 @@ class AddressTypePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_address::type');
+        return $user->can('view_any_address::types::address::type');
     }
 
     /**
@@ -23,7 +23,7 @@ class AddressTypePolicy
      */
     public function view(User $user, AddressType $addressType): bool
     {
-        return $user->can('view_address::type');
+        return $user->can('view_address::types::address::type');
     }
 
     /**
@@ -31,7 +31,7 @@ class AddressTypePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_address::type');
+        return $user->can('create_address::types::address::type');
     }
 
     /**
@@ -39,7 +39,7 @@ class AddressTypePolicy
      */
     public function update(User $user, AddressType $addressType): bool
     {
-        return $user->can('update_address::type');
+        return $user->can('update_address::types::address::type');
     }
 
     /**
@@ -47,7 +47,7 @@ class AddressTypePolicy
      */
     public function delete(User $user, AddressType $addressType): bool
     {
-        return $user->can('delete_address::type');
+        return $user->can('delete_address::types::address::type');
     }
 
     /**
@@ -55,7 +55,7 @@ class AddressTypePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_address::type');
+        return $user->can('delete_any_address::types::address::type');
     }
 
     /**
@@ -63,7 +63,7 @@ class AddressTypePolicy
      */
     public function forceDelete(User $user, AddressType $addressType): bool
     {
-        return $user->can('force_delete_address::type');
+        return $user->can('force_delete_address::types::address::type');
     }
 
     /**
@@ -71,7 +71,7 @@ class AddressTypePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_address::type');
+        return $user->can('force_delete_any_address::types::address::type');
     }
 
     /**
@@ -79,7 +79,7 @@ class AddressTypePolicy
      */
     public function restore(User $user, AddressType $addressType): bool
     {
-        return $user->can('restore_address::type');
+        return $user->can('restore_address::types::address::type');
     }
 
     /**
@@ -87,7 +87,7 @@ class AddressTypePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_address::type');
+        return $user->can('restore_any_address::types::address::type');
     }
 
     /**
@@ -95,7 +95,7 @@ class AddressTypePolicy
      */
     public function replicate(User $user, AddressType $addressType): bool
     {
-        return $user->can('replicate_address::type');
+        return $user->can('replicate_address::types::address::type');
     }
 
     /**
@@ -103,6 +103,6 @@ class AddressTypePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_address::type');
+        return $user->can('reorder_address::types::address::type');
     }
 }

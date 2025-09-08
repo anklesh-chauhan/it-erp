@@ -15,7 +15,7 @@ class QuotePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_quote');
+        return $user->can('view_any_quotes::quote');
     }
 
     /**
@@ -23,7 +23,7 @@ class QuotePolicy
      */
     public function view(User $user, Quote $quote): bool
     {
-        return $user->can('view_quote');
+        return $user->can('view_quotes::quote');
     }
 
     /**
@@ -31,7 +31,7 @@ class QuotePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_quote');
+        return $user->can('create_quotes::quote');
     }
 
     /**
@@ -39,7 +39,7 @@ class QuotePolicy
      */
     public function update(User $user, Quote $quote): bool
     {
-        return $user->can('update_quote');
+        return $user->can('update_quotes::quote');
     }
 
     /**
@@ -47,7 +47,7 @@ class QuotePolicy
      */
     public function delete(User $user, Quote $quote): bool
     {
-        return $user->can('delete_quote');
+        return $user->can('delete_quotes::quote');
     }
 
     /**
@@ -55,7 +55,7 @@ class QuotePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_quote');
+        return $user->can('delete_any_quotes::quote');
     }
 
     /**
@@ -63,7 +63,7 @@ class QuotePolicy
      */
     public function forceDelete(User $user, Quote $quote): bool
     {
-        return $user->can('force_delete_quote');
+        return $user->can('force_delete_quotes::quote');
     }
 
     /**
@@ -71,7 +71,7 @@ class QuotePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_quote');
+        return $user->can('force_delete_any_quotes::quote');
     }
 
     /**
@@ -79,7 +79,7 @@ class QuotePolicy
      */
     public function restore(User $user, Quote $quote): bool
     {
-        return $user->can('restore_quote');
+        return $user->can('restore_quotes::quote');
     }
 
     /**
@@ -87,7 +87,7 @@ class QuotePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_quote');
+        return $user->can('restore_any_quotes::quote');
     }
 
     /**
@@ -95,7 +95,7 @@ class QuotePolicy
      */
     public function replicate(User $user, Quote $quote): bool
     {
-        return $user->can('replicate_quote');
+        return $user->can('replicate_quotes::quote');
     }
 
     /**
@@ -103,6 +103,6 @@ class QuotePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_quote');
+        return $user->can('reorder_quotes::quote');
     }
 }

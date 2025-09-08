@@ -15,7 +15,7 @@ class FollowUpPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_follow::up');
+        return $user->can('view_any_follow::ups::follow::up');
     }
 
     /**
@@ -23,7 +23,7 @@ class FollowUpPolicy
      */
     public function view(User $user, FollowUp $followUp): bool
     {
-        return $user->can('view_follow::up');
+        return $user->can('view_follow::ups::follow::up');
     }
 
     /**
@@ -31,7 +31,7 @@ class FollowUpPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_follow::up');
+        return $user->can('create_follow::ups::follow::up');
     }
 
     /**
@@ -39,7 +39,7 @@ class FollowUpPolicy
      */
     public function update(User $user, FollowUp $followUp): bool
     {
-        return $user->can('update_follow::up');
+        return $user->can('update_follow::ups::follow::up');
     }
 
     /**
@@ -47,7 +47,7 @@ class FollowUpPolicy
      */
     public function delete(User $user, FollowUp $followUp): bool
     {
-        return $user->can('delete_follow::up');
+        return $user->can('delete_follow::ups::follow::up');
     }
 
     /**
@@ -55,7 +55,7 @@ class FollowUpPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_follow::up');
+        return $user->can('delete_any_follow::ups::follow::up');
     }
 
     /**
@@ -63,7 +63,7 @@ class FollowUpPolicy
      */
     public function forceDelete(User $user, FollowUp $followUp): bool
     {
-        return $user->can('force_delete_follow::up');
+        return $user->can('force_delete_follow::ups::follow::up');
     }
 
     /**
@@ -71,7 +71,7 @@ class FollowUpPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_follow::up');
+        return $user->can('force_delete_any_follow::ups::follow::up');
     }
 
     /**
@@ -79,7 +79,7 @@ class FollowUpPolicy
      */
     public function restore(User $user, FollowUp $followUp): bool
     {
-        return $user->can('restore_follow::up');
+        return $user->can('restore_follow::ups::follow::up');
     }
 
     /**
@@ -87,7 +87,7 @@ class FollowUpPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_follow::up');
+        return $user->can('restore_any_follow::ups::follow::up');
     }
 
     /**
@@ -95,7 +95,7 @@ class FollowUpPolicy
      */
     public function replicate(User $user, FollowUp $followUp): bool
     {
-        return $user->can('replicate_follow::up');
+        return $user->can('replicate_follow::ups::follow::up');
     }
 
     /**
@@ -103,6 +103,6 @@ class FollowUpPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_follow::up');
+        return $user->can('reorder_follow::ups::follow::up');
     }
 }

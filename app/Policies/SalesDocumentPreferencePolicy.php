@@ -15,7 +15,7 @@ class SalesDocumentPreferencePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_sales::document::preference');
+        return $user->can('view_any_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -23,7 +23,7 @@ class SalesDocumentPreferencePolicy
      */
     public function view(User $user, SalesDocumentPreference $salesDocumentPreference): bool
     {
-        return $user->can('view_sales::document::preference');
+        return $user->can('view_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -31,7 +31,7 @@ class SalesDocumentPreferencePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_sales::document::preference');
+        return $user->can('create_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -39,7 +39,7 @@ class SalesDocumentPreferencePolicy
      */
     public function update(User $user, SalesDocumentPreference $salesDocumentPreference): bool
     {
-        return $user->can('update_sales::document::preference');
+        return $user->can('update_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -47,7 +47,7 @@ class SalesDocumentPreferencePolicy
      */
     public function delete(User $user, SalesDocumentPreference $salesDocumentPreference): bool
     {
-        return $user->can('delete_sales::document::preference');
+        return $user->can('delete_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -55,7 +55,7 @@ class SalesDocumentPreferencePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_sales::document::preference');
+        return $user->can('delete_any_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -63,7 +63,7 @@ class SalesDocumentPreferencePolicy
      */
     public function forceDelete(User $user, SalesDocumentPreference $salesDocumentPreference): bool
     {
-        return $user->can('force_delete_sales::document::preference');
+        return $user->can('force_delete_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -71,7 +71,7 @@ class SalesDocumentPreferencePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_sales::document::preference');
+        return $user->can('force_delete_any_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -79,7 +79,7 @@ class SalesDocumentPreferencePolicy
      */
     public function restore(User $user, SalesDocumentPreference $salesDocumentPreference): bool
     {
-        return $user->can('restore_sales::document::preference');
+        return $user->can('restore_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -87,7 +87,7 @@ class SalesDocumentPreferencePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_sales::document::preference');
+        return $user->can('restore_any_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -95,7 +95,7 @@ class SalesDocumentPreferencePolicy
      */
     public function replicate(User $user, SalesDocumentPreference $salesDocumentPreference): bool
     {
-        return $user->can('replicate_sales::document::preference');
+        return $user->can('replicate_sales::document::preferences::sales::document::preference');
     }
 
     /**
@@ -103,6 +103,6 @@ class SalesDocumentPreferencePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_sales::document::preference');
+        return $user->can('reorder_sales::document::preferences::sales::document::preference');
     }
 }

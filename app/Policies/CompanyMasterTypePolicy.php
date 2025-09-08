@@ -15,7 +15,7 @@ class CompanyMasterTypePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_company::master::type');
+        return $user->can('view_any_company::master::types::company::master::type');
     }
 
     /**
@@ -23,7 +23,7 @@ class CompanyMasterTypePolicy
      */
     public function view(User $user, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('view_company::master::type');
+        return $user->can('view_company::master::types::company::master::type');
     }
 
     /**
@@ -31,7 +31,7 @@ class CompanyMasterTypePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_company::master::type');
+        return $user->can('create_company::master::types::company::master::type');
     }
 
     /**
@@ -39,7 +39,7 @@ class CompanyMasterTypePolicy
      */
     public function update(User $user, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('update_company::master::type');
+        return $user->can('update_company::master::types::company::master::type');
     }
 
     /**
@@ -47,7 +47,7 @@ class CompanyMasterTypePolicy
      */
     public function delete(User $user, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('delete_company::master::type');
+        return $user->can('delete_company::master::types::company::master::type');
     }
 
     /**
@@ -55,7 +55,7 @@ class CompanyMasterTypePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_company::master::type');
+        return $user->can('delete_any_company::master::types::company::master::type');
     }
 
     /**
@@ -63,7 +63,7 @@ class CompanyMasterTypePolicy
      */
     public function forceDelete(User $user, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('force_delete_company::master::type');
+        return $user->can('force_delete_company::master::types::company::master::type');
     }
 
     /**
@@ -71,7 +71,7 @@ class CompanyMasterTypePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_company::master::type');
+        return $user->can('force_delete_any_company::master::types::company::master::type');
     }
 
     /**
@@ -79,7 +79,7 @@ class CompanyMasterTypePolicy
      */
     public function restore(User $user, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('restore_company::master::type');
+        return $user->can('restore_company::master::types::company::master::type');
     }
 
     /**
@@ -87,7 +87,7 @@ class CompanyMasterTypePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_company::master::type');
+        return $user->can('restore_any_company::master::types::company::master::type');
     }
 
     /**
@@ -95,7 +95,7 @@ class CompanyMasterTypePolicy
      */
     public function replicate(User $user, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('replicate_company::master::type');
+        return $user->can('replicate_company::master::types::company::master::type');
     }
 
     /**
@@ -103,6 +103,6 @@ class CompanyMasterTypePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_company::master::type');
+        return $user->can('reorder_company::master::types::company::master::type');
     }
 }

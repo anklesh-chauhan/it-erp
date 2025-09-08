@@ -15,7 +15,7 @@ class LocationMasterPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_location::master');
+        return $user->can('view_any_location::masters::location::master');
     }
 
     /**
@@ -23,7 +23,7 @@ class LocationMasterPolicy
      */
     public function view(User $user, LocationMaster $locationMaster): bool
     {
-        return $user->can('view_location::master');
+        return $user->can('view_location::masters::location::master');
     }
 
     /**
@@ -31,7 +31,7 @@ class LocationMasterPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_location::master');
+        return $user->can('create_location::masters::location::master');
     }
 
     /**
@@ -39,7 +39,7 @@ class LocationMasterPolicy
      */
     public function update(User $user, LocationMaster $locationMaster): bool
     {
-        return $user->can('update_location::master');
+        return $user->can('update_location::masters::location::master');
     }
 
     /**
@@ -47,7 +47,7 @@ class LocationMasterPolicy
      */
     public function delete(User $user, LocationMaster $locationMaster): bool
     {
-        return $user->can('delete_location::master');
+        return $user->can('delete_location::masters::location::master');
     }
 
     /**
@@ -55,7 +55,7 @@ class LocationMasterPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_location::master');
+        return $user->can('delete_any_location::masters::location::master');
     }
 
     /**
@@ -63,7 +63,7 @@ class LocationMasterPolicy
      */
     public function forceDelete(User $user, LocationMaster $locationMaster): bool
     {
-        return $user->can('force_delete_location::master');
+        return $user->can('force_delete_location::masters::location::master');
     }
 
     /**
@@ -71,7 +71,7 @@ class LocationMasterPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_location::master');
+        return $user->can('force_delete_any_location::masters::location::master');
     }
 
     /**
@@ -79,7 +79,7 @@ class LocationMasterPolicy
      */
     public function restore(User $user, LocationMaster $locationMaster): bool
     {
-        return $user->can('restore_location::master');
+        return $user->can('restore_location::masters::location::master');
     }
 
     /**
@@ -87,7 +87,7 @@ class LocationMasterPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_location::master');
+        return $user->can('restore_any_location::masters::location::master');
     }
 
     /**
@@ -95,7 +95,7 @@ class LocationMasterPolicy
      */
     public function replicate(User $user, LocationMaster $locationMaster): bool
     {
-        return $user->can('replicate_location::master');
+        return $user->can('replicate_location::masters::location::master');
     }
 
     /**
@@ -103,6 +103,6 @@ class LocationMasterPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_location::master');
+        return $user->can('reorder_location::masters::location::master');
     }
 }

@@ -15,7 +15,7 @@ class DealPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_deal');
+        return $user->can('view_any_deals::deal');
     }
 
     /**
@@ -23,7 +23,7 @@ class DealPolicy
      */
     public function view(User $user, Deal $deal): bool
     {
-        return $user->can('view_deal');
+        return $user->can('view_deals::deal');
     }
 
     /**
@@ -31,7 +31,7 @@ class DealPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_deal');
+        return $user->can('create_deals::deal');
     }
 
     /**
@@ -39,7 +39,7 @@ class DealPolicy
      */
     public function update(User $user, Deal $deal): bool
     {
-        return $user->can('update_deal');
+        return $user->can('update_deals::deal');
     }
 
     /**
@@ -47,7 +47,7 @@ class DealPolicy
      */
     public function delete(User $user, Deal $deal): bool
     {
-        return $user->can('delete_deal');
+        return $user->can('delete_deals::deal');
     }
 
     /**
@@ -55,7 +55,7 @@ class DealPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_deal');
+        return $user->can('delete_any_deals::deal');
     }
 
     /**
@@ -63,7 +63,7 @@ class DealPolicy
      */
     public function forceDelete(User $user, Deal $deal): bool
     {
-        return $user->can('force_delete_deal');
+        return $user->can('force_delete_deals::deal');
     }
 
     /**
@@ -71,7 +71,7 @@ class DealPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_deal');
+        return $user->can('force_delete_any_deals::deal');
     }
 
     /**
@@ -79,7 +79,7 @@ class DealPolicy
      */
     public function restore(User $user, Deal $deal): bool
     {
-        return $user->can('restore_deal');
+        return $user->can('restore_deals::deal');
     }
 
     /**
@@ -87,7 +87,7 @@ class DealPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_deal');
+        return $user->can('restore_any_deals::deal');
     }
 
     /**
@@ -95,7 +95,7 @@ class DealPolicy
      */
     public function replicate(User $user, Deal $deal): bool
     {
-        return $user->can('replicate_deal');
+        return $user->can('replicate_deals::deal');
     }
 
     /**
@@ -103,6 +103,6 @@ class DealPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_deal');
+        return $user->can('reorder_deals::deal');
     }
 }

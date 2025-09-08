@@ -15,7 +15,7 @@ class LeadCustomFieldPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_lead::custom::field');
+        return $user->can('view_any_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -23,7 +23,7 @@ class LeadCustomFieldPolicy
      */
     public function view(User $user, LeadCustomField $leadCustomField): bool
     {
-        return $user->can('view_lead::custom::field');
+        return $user->can('view_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -31,7 +31,7 @@ class LeadCustomFieldPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_lead::custom::field');
+        return $user->can('create_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -39,7 +39,7 @@ class LeadCustomFieldPolicy
      */
     public function update(User $user, LeadCustomField $leadCustomField): bool
     {
-        return $user->can('update_lead::custom::field');
+        return $user->can('update_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -47,7 +47,7 @@ class LeadCustomFieldPolicy
      */
     public function delete(User $user, LeadCustomField $leadCustomField): bool
     {
-        return $user->can('delete_lead::custom::field');
+        return $user->can('delete_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -55,7 +55,7 @@ class LeadCustomFieldPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_lead::custom::field');
+        return $user->can('delete_any_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -63,7 +63,7 @@ class LeadCustomFieldPolicy
      */
     public function forceDelete(User $user, LeadCustomField $leadCustomField): bool
     {
-        return $user->can('force_delete_lead::custom::field');
+        return $user->can('force_delete_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -71,7 +71,7 @@ class LeadCustomFieldPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_lead::custom::field');
+        return $user->can('force_delete_any_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -79,7 +79,7 @@ class LeadCustomFieldPolicy
      */
     public function restore(User $user, LeadCustomField $leadCustomField): bool
     {
-        return $user->can('restore_lead::custom::field');
+        return $user->can('restore_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -87,7 +87,7 @@ class LeadCustomFieldPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_lead::custom::field');
+        return $user->can('restore_any_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -95,7 +95,7 @@ class LeadCustomFieldPolicy
      */
     public function replicate(User $user, LeadCustomField $leadCustomField): bool
     {
-        return $user->can('replicate_lead::custom::field');
+        return $user->can('replicate_lead::custom::fields::lead::custom::field');
     }
 
     /**
@@ -103,6 +103,6 @@ class LeadCustomFieldPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_lead::custom::field');
+        return $user->can('reorder_lead::custom::fields::lead::custom::field');
     }
 }

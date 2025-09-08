@@ -15,7 +15,7 @@ class TransportModePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_transport::mode');
+        return $user->can('view_any_transport::modes::transport::mode');
     }
 
     /**
@@ -23,7 +23,7 @@ class TransportModePolicy
      */
     public function view(User $user, TransportMode $transportMode): bool
     {
-        return $user->can('view_transport::mode');
+        return $user->can('view_transport::modes::transport::mode');
     }
 
     /**
@@ -31,7 +31,7 @@ class TransportModePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_transport::mode');
+        return $user->can('create_transport::modes::transport::mode');
     }
 
     /**
@@ -39,7 +39,7 @@ class TransportModePolicy
      */
     public function update(User $user, TransportMode $transportMode): bool
     {
-        return $user->can('update_transport::mode');
+        return $user->can('update_transport::modes::transport::mode');
     }
 
     /**
@@ -47,7 +47,7 @@ class TransportModePolicy
      */
     public function delete(User $user, TransportMode $transportMode): bool
     {
-        return $user->can('delete_transport::mode');
+        return $user->can('delete_transport::modes::transport::mode');
     }
 
     /**
@@ -55,7 +55,7 @@ class TransportModePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_transport::mode');
+        return $user->can('delete_any_transport::modes::transport::mode');
     }
 
     /**
@@ -63,7 +63,7 @@ class TransportModePolicy
      */
     public function forceDelete(User $user, TransportMode $transportMode): bool
     {
-        return $user->can('force_delete_transport::mode');
+        return $user->can('force_delete_transport::modes::transport::mode');
     }
 
     /**
@@ -71,7 +71,7 @@ class TransportModePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_transport::mode');
+        return $user->can('force_delete_any_transport::modes::transport::mode');
     }
 
     /**
@@ -79,7 +79,7 @@ class TransportModePolicy
      */
     public function restore(User $user, TransportMode $transportMode): bool
     {
-        return $user->can('restore_transport::mode');
+        return $user->can('restore_transport::modes::transport::mode');
     }
 
     /**
@@ -87,7 +87,7 @@ class TransportModePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_transport::mode');
+        return $user->can('restore_any_transport::modes::transport::mode');
     }
 
     /**
@@ -95,7 +95,7 @@ class TransportModePolicy
      */
     public function replicate(User $user, TransportMode $transportMode): bool
     {
-        return $user->can('replicate_transport::mode');
+        return $user->can('replicate_transport::modes::transport::mode');
     }
 
     /**
@@ -103,6 +103,6 @@ class TransportModePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_transport::mode');
+        return $user->can('reorder_transport::modes::transport::mode');
     }
 }

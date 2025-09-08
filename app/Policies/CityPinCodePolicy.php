@@ -15,7 +15,7 @@ class CityPinCodePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_city::pin::code');
+        return $user->can('view_any_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -23,7 +23,7 @@ class CityPinCodePolicy
      */
     public function view(User $user, CityPinCode $cityPinCode): bool
     {
-        return $user->can('view_city::pin::code');
+        return $user->can('view_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -31,7 +31,7 @@ class CityPinCodePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_city::pin::code');
+        return $user->can('create_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -39,7 +39,7 @@ class CityPinCodePolicy
      */
     public function update(User $user, CityPinCode $cityPinCode): bool
     {
-        return $user->can('update_city::pin::code');
+        return $user->can('update_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -47,7 +47,7 @@ class CityPinCodePolicy
      */
     public function delete(User $user, CityPinCode $cityPinCode): bool
     {
-        return $user->can('delete_city::pin::code');
+        return $user->can('delete_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -55,7 +55,7 @@ class CityPinCodePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_city::pin::code');
+        return $user->can('delete_any_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -63,7 +63,7 @@ class CityPinCodePolicy
      */
     public function forceDelete(User $user, CityPinCode $cityPinCode): bool
     {
-        return $user->can('force_delete_city::pin::code');
+        return $user->can('force_delete_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -71,7 +71,7 @@ class CityPinCodePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_city::pin::code');
+        return $user->can('force_delete_any_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -79,7 +79,7 @@ class CityPinCodePolicy
      */
     public function restore(User $user, CityPinCode $cityPinCode): bool
     {
-        return $user->can('restore_city::pin::code');
+        return $user->can('restore_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -87,7 +87,7 @@ class CityPinCodePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_city::pin::code');
+        return $user->can('restore_any_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -95,7 +95,7 @@ class CityPinCodePolicy
      */
     public function replicate(User $user, CityPinCode $cityPinCode): bool
     {
-        return $user->can('replicate_city::pin::code');
+        return $user->can('replicate_city::pin::codes::city::pin::code');
     }
 
     /**
@@ -103,6 +103,6 @@ class CityPinCodePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_city::pin::code');
+        return $user->can('reorder_city::pin::codes::city::pin::code');
     }
 }

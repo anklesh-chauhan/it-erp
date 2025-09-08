@@ -15,7 +15,7 @@ class SalesInvoicePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_sales::invoice');
+        return $user->can('view_any_sales::invoices::sales::invoice');
     }
 
     /**
@@ -23,7 +23,7 @@ class SalesInvoicePolicy
      */
     public function view(User $user, SalesInvoice $salesInvoice): bool
     {
-        return $user->can('view_sales::invoice');
+        return $user->can('view_sales::invoices::sales::invoice');
     }
 
     /**
@@ -31,7 +31,7 @@ class SalesInvoicePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_sales::invoice');
+        return $user->can('create_sales::invoices::sales::invoice');
     }
 
     /**
@@ -39,7 +39,7 @@ class SalesInvoicePolicy
      */
     public function update(User $user, SalesInvoice $salesInvoice): bool
     {
-        return $user->can('update_sales::invoice');
+        return $user->can('update_sales::invoices::sales::invoice');
     }
 
     /**
@@ -47,7 +47,7 @@ class SalesInvoicePolicy
      */
     public function delete(User $user, SalesInvoice $salesInvoice): bool
     {
-        return $user->can('delete_sales::invoice');
+        return $user->can('delete_sales::invoices::sales::invoice');
     }
 
     /**
@@ -55,7 +55,7 @@ class SalesInvoicePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_sales::invoice');
+        return $user->can('delete_any_sales::invoices::sales::invoice');
     }
 
     /**
@@ -63,7 +63,7 @@ class SalesInvoicePolicy
      */
     public function forceDelete(User $user, SalesInvoice $salesInvoice): bool
     {
-        return $user->can('force_delete_sales::invoice');
+        return $user->can('force_delete_sales::invoices::sales::invoice');
     }
 
     /**
@@ -71,7 +71,7 @@ class SalesInvoicePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_sales::invoice');
+        return $user->can('force_delete_any_sales::invoices::sales::invoice');
     }
 
     /**
@@ -79,7 +79,7 @@ class SalesInvoicePolicy
      */
     public function restore(User $user, SalesInvoice $salesInvoice): bool
     {
-        return $user->can('restore_sales::invoice');
+        return $user->can('restore_sales::invoices::sales::invoice');
     }
 
     /**
@@ -87,7 +87,7 @@ class SalesInvoicePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_sales::invoice');
+        return $user->can('restore_any_sales::invoices::sales::invoice');
     }
 
     /**
@@ -95,7 +95,7 @@ class SalesInvoicePolicy
      */
     public function replicate(User $user, SalesInvoice $salesInvoice): bool
     {
-        return $user->can('replicate_sales::invoice');
+        return $user->can('replicate_sales::invoices::sales::invoice');
     }
 
     /**
@@ -103,6 +103,6 @@ class SalesInvoicePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_sales::invoice');
+        return $user->can('reorder_sales::invoices::sales::invoice');
     }
 }

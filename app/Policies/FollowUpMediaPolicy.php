@@ -15,7 +15,7 @@ class FollowUpMediaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_follow::up::media');
+        return $user->can('view_any_follow::up::media::follow::up::media');
     }
 
     /**
@@ -23,7 +23,7 @@ class FollowUpMediaPolicy
      */
     public function view(User $user, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('view_follow::up::media');
+        return $user->can('view_follow::up::media::follow::up::media');
     }
 
     /**
@@ -31,7 +31,7 @@ class FollowUpMediaPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_follow::up::media');
+        return $user->can('create_follow::up::media::follow::up::media');
     }
 
     /**
@@ -39,7 +39,7 @@ class FollowUpMediaPolicy
      */
     public function update(User $user, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('update_follow::up::media');
+        return $user->can('update_follow::up::media::follow::up::media');
     }
 
     /**
@@ -47,7 +47,7 @@ class FollowUpMediaPolicy
      */
     public function delete(User $user, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('delete_follow::up::media');
+        return $user->can('delete_follow::up::media::follow::up::media');
     }
 
     /**
@@ -55,7 +55,7 @@ class FollowUpMediaPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_follow::up::media');
+        return $user->can('delete_any_follow::up::media::follow::up::media');
     }
 
     /**
@@ -63,7 +63,7 @@ class FollowUpMediaPolicy
      */
     public function forceDelete(User $user, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('force_delete_follow::up::media');
+        return $user->can('force_delete_follow::up::media::follow::up::media');
     }
 
     /**
@@ -71,7 +71,7 @@ class FollowUpMediaPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_follow::up::media');
+        return $user->can('force_delete_any_follow::up::media::follow::up::media');
     }
 
     /**
@@ -79,7 +79,7 @@ class FollowUpMediaPolicy
      */
     public function restore(User $user, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('restore_follow::up::media');
+        return $user->can('restore_follow::up::media::follow::up::media');
     }
 
     /**
@@ -87,7 +87,7 @@ class FollowUpMediaPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_follow::up::media');
+        return $user->can('restore_any_follow::up::media::follow::up::media');
     }
 
     /**
@@ -95,7 +95,7 @@ class FollowUpMediaPolicy
      */
     public function replicate(User $user, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('replicate_follow::up::media');
+        return $user->can('replicate_follow::up::media::follow::up::media');
     }
 
     /**
@@ -103,6 +103,6 @@ class FollowUpMediaPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_follow::up::media');
+        return $user->can('reorder_follow::up::media::follow::up::media');
     }
 }

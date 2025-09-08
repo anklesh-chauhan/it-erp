@@ -15,7 +15,7 @@ class DesignationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_designation');
+        return $user->can('view_any_designations::designation');
     }
 
     /**
@@ -23,7 +23,7 @@ class DesignationPolicy
      */
     public function view(User $user, Designation $designation): bool
     {
-        return $user->can('view_designation');
+        return $user->can('view_designations::designation');
     }
 
     /**
@@ -31,7 +31,7 @@ class DesignationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_designation');
+        return $user->can('create_designations::designation');
     }
 
     /**
@@ -39,7 +39,7 @@ class DesignationPolicy
      */
     public function update(User $user, Designation $designation): bool
     {
-        return $user->can('update_designation');
+        return $user->can('update_designations::designation');
     }
 
     /**
@@ -47,7 +47,7 @@ class DesignationPolicy
      */
     public function delete(User $user, Designation $designation): bool
     {
-        return $user->can('delete_designation');
+        return $user->can('delete_designations::designation');
     }
 
     /**
@@ -55,7 +55,7 @@ class DesignationPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_designation');
+        return $user->can('delete_any_designations::designation');
     }
 
     /**
@@ -63,7 +63,7 @@ class DesignationPolicy
      */
     public function forceDelete(User $user, Designation $designation): bool
     {
-        return $user->can('force_delete_designation');
+        return $user->can('force_delete_designations::designation');
     }
 
     /**
@@ -71,7 +71,7 @@ class DesignationPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_designation');
+        return $user->can('force_delete_any_designations::designation');
     }
 
     /**
@@ -79,7 +79,7 @@ class DesignationPolicy
      */
     public function restore(User $user, Designation $designation): bool
     {
-        return $user->can('restore_designation');
+        return $user->can('restore_designations::designation');
     }
 
     /**
@@ -87,7 +87,7 @@ class DesignationPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_designation');
+        return $user->can('restore_any_designations::designation');
     }
 
     /**
@@ -95,7 +95,7 @@ class DesignationPolicy
      */
     public function replicate(User $user, Designation $designation): bool
     {
-        return $user->can('replicate_designation');
+        return $user->can('replicate_designations::designation');
     }
 
     /**
@@ -103,6 +103,6 @@ class DesignationPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_designation');
+        return $user->can('reorder_designations::designation');
     }
 }

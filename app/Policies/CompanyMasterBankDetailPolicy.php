@@ -15,7 +15,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_company::master::bank::detail');
+        return $user->can('view_any_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -23,7 +23,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function view(User $user, CompanyMasterBankDetail $companyMasterBankDetail): bool
     {
-        return $user->can('view_company::master::bank::detail');
+        return $user->can('view_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -31,7 +31,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_company::master::bank::detail');
+        return $user->can('create_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -39,7 +39,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function update(User $user, CompanyMasterBankDetail $companyMasterBankDetail): bool
     {
-        return $user->can('update_company::master::bank::detail');
+        return $user->can('update_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -47,7 +47,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function delete(User $user, CompanyMasterBankDetail $companyMasterBankDetail): bool
     {
-        return $user->can('delete_company::master::bank::detail');
+        return $user->can('delete_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -55,7 +55,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_company::master::bank::detail');
+        return $user->can('delete_any_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -63,7 +63,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function forceDelete(User $user, CompanyMasterBankDetail $companyMasterBankDetail): bool
     {
-        return $user->can('force_delete_company::master::bank::detail');
+        return $user->can('force_delete_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -71,7 +71,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_company::master::bank::detail');
+        return $user->can('force_delete_any_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -79,7 +79,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function restore(User $user, CompanyMasterBankDetail $companyMasterBankDetail): bool
     {
-        return $user->can('restore_company::master::bank::detail');
+        return $user->can('restore_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -87,7 +87,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_company::master::bank::detail');
+        return $user->can('restore_any_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -95,7 +95,7 @@ class CompanyMasterBankDetailPolicy
      */
     public function replicate(User $user, CompanyMasterBankDetail $companyMasterBankDetail): bool
     {
-        return $user->can('replicate_company::master::bank::detail');
+        return $user->can('replicate_company::master::bank::details::company::master::bank::detail');
     }
 
     /**
@@ -103,6 +103,6 @@ class CompanyMasterBankDetailPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_company::master::bank::detail');
+        return $user->can('reorder_company::master::bank::details::company::master::bank::detail');
     }
 }

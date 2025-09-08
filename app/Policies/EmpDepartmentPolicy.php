@@ -15,7 +15,7 @@ class EmpDepartmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_emp::department');
+        return $user->can('view_any_emp::departments::emp::department');
     }
 
     /**
@@ -23,7 +23,7 @@ class EmpDepartmentPolicy
      */
     public function view(User $user, EmpDepartment $empDepartment): bool
     {
-        return $user->can('view_emp::department');
+        return $user->can('view_emp::departments::emp::department');
     }
 
     /**
@@ -31,7 +31,7 @@ class EmpDepartmentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_emp::department');
+        return $user->can('create_emp::departments::emp::department');
     }
 
     /**
@@ -39,7 +39,7 @@ class EmpDepartmentPolicy
      */
     public function update(User $user, EmpDepartment $empDepartment): bool
     {
-        return $user->can('update_emp::department');
+        return $user->can('update_emp::departments::emp::department');
     }
 
     /**
@@ -47,7 +47,7 @@ class EmpDepartmentPolicy
      */
     public function delete(User $user, EmpDepartment $empDepartment): bool
     {
-        return $user->can('delete_emp::department');
+        return $user->can('delete_emp::departments::emp::department');
     }
 
     /**
@@ -55,7 +55,7 @@ class EmpDepartmentPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_emp::department');
+        return $user->can('delete_any_emp::departments::emp::department');
     }
 
     /**
@@ -63,7 +63,7 @@ class EmpDepartmentPolicy
      */
     public function forceDelete(User $user, EmpDepartment $empDepartment): bool
     {
-        return $user->can('force_delete_emp::department');
+        return $user->can('force_delete_emp::departments::emp::department');
     }
 
     /**
@@ -71,7 +71,7 @@ class EmpDepartmentPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_emp::department');
+        return $user->can('force_delete_any_emp::departments::emp::department');
     }
 
     /**
@@ -79,7 +79,7 @@ class EmpDepartmentPolicy
      */
     public function restore(User $user, EmpDepartment $empDepartment): bool
     {
-        return $user->can('restore_emp::department');
+        return $user->can('restore_emp::departments::emp::department');
     }
 
     /**
@@ -87,7 +87,7 @@ class EmpDepartmentPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_emp::department');
+        return $user->can('restore_any_emp::departments::emp::department');
     }
 
     /**
@@ -95,7 +95,7 @@ class EmpDepartmentPolicy
      */
     public function replicate(User $user, EmpDepartment $empDepartment): bool
     {
-        return $user->can('replicate_emp::department');
+        return $user->can('replicate_emp::departments::emp::department');
     }
 
     /**
@@ -103,6 +103,6 @@ class EmpDepartmentPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_emp::department');
+        return $user->can('reorder_emp::departments::emp::department');
     }
 }

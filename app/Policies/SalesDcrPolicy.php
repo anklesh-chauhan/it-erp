@@ -15,7 +15,7 @@ class SalesDcrPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_sales::dcr');
+        return $user->can('view_any_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -23,7 +23,7 @@ class SalesDcrPolicy
      */
     public function view(User $user, SalesDcr $salesDcr): bool
     {
-        return $user->can('view_sales::dcr');
+        return $user->can('view_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -31,7 +31,7 @@ class SalesDcrPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_sales::dcr');
+        return $user->can('create_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -39,7 +39,7 @@ class SalesDcrPolicy
      */
     public function update(User $user, SalesDcr $salesDcr): bool
     {
-        return $user->can('update_sales::dcr');
+        return $user->can('update_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -47,7 +47,7 @@ class SalesDcrPolicy
      */
     public function delete(User $user, SalesDcr $salesDcr): bool
     {
-        return $user->can('delete_sales::dcr');
+        return $user->can('delete_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -55,7 +55,7 @@ class SalesDcrPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_sales::dcr');
+        return $user->can('delete_any_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -63,7 +63,7 @@ class SalesDcrPolicy
      */
     public function forceDelete(User $user, SalesDcr $salesDcr): bool
     {
-        return $user->can('force_delete_sales::dcr');
+        return $user->can('force_delete_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -71,7 +71,7 @@ class SalesDcrPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_sales::dcr');
+        return $user->can('force_delete_any_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -79,7 +79,7 @@ class SalesDcrPolicy
      */
     public function restore(User $user, SalesDcr $salesDcr): bool
     {
-        return $user->can('restore_sales::dcr');
+        return $user->can('restore_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -87,7 +87,7 @@ class SalesDcrPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_sales::dcr');
+        return $user->can('restore_any_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -95,7 +95,7 @@ class SalesDcrPolicy
      */
     public function replicate(User $user, SalesDcr $salesDcr): bool
     {
-        return $user->can('replicate_sales::dcr');
+        return $user->can('replicate_sales::dcrs::sales::dcr');
     }
 
     /**
@@ -103,6 +103,6 @@ class SalesDcrPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_sales::dcr');
+        return $user->can('reorder_sales::dcrs::sales::dcr');
     }
 }

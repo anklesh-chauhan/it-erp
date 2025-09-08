@@ -15,7 +15,7 @@ class CompanyMasterPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_company::master');
+        return $user->can('view_any_company::masters::company::master');
     }
 
     /**
@@ -23,7 +23,7 @@ class CompanyMasterPolicy
      */
     public function view(User $user, CompanyMaster $companyMaster): bool
     {
-        return $user->can('view_company::master');
+        return $user->can('view_company::masters::company::master');
     }
 
     /**
@@ -31,7 +31,7 @@ class CompanyMasterPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_company::master');
+        return $user->can('create_company::masters::company::master');
     }
 
     /**
@@ -39,7 +39,7 @@ class CompanyMasterPolicy
      */
     public function update(User $user, CompanyMaster $companyMaster): bool
     {
-        return $user->can('update_company::master');
+        return $user->can('update_company::masters::company::master');
     }
 
     /**
@@ -47,7 +47,7 @@ class CompanyMasterPolicy
      */
     public function delete(User $user, CompanyMaster $companyMaster): bool
     {
-        return $user->can('delete_company::master');
+        return $user->can('delete_company::masters::company::master');
     }
 
     /**
@@ -55,7 +55,7 @@ class CompanyMasterPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_company::master');
+        return $user->can('delete_any_company::masters::company::master');
     }
 
     /**
@@ -63,7 +63,7 @@ class CompanyMasterPolicy
      */
     public function forceDelete(User $user, CompanyMaster $companyMaster): bool
     {
-        return $user->can('force_delete_company::master');
+        return $user->can('force_delete_company::masters::company::master');
     }
 
     /**
@@ -71,7 +71,7 @@ class CompanyMasterPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_company::master');
+        return $user->can('force_delete_any_company::masters::company::master');
     }
 
     /**
@@ -79,7 +79,7 @@ class CompanyMasterPolicy
      */
     public function restore(User $user, CompanyMaster $companyMaster): bool
     {
-        return $user->can('restore_company::master');
+        return $user->can('restore_company::masters::company::master');
     }
 
     /**
@@ -87,7 +87,7 @@ class CompanyMasterPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_company::master');
+        return $user->can('restore_any_company::masters::company::master');
     }
 
     /**
@@ -95,7 +95,7 @@ class CompanyMasterPolicy
      */
     public function replicate(User $user, CompanyMaster $companyMaster): bool
     {
-        return $user->can('replicate_company::master');
+        return $user->can('replicate_company::masters::company::master');
     }
 
     /**
@@ -103,6 +103,6 @@ class CompanyMasterPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_company::master');
+        return $user->can('reorder_company::masters::company::master');
     }
 }

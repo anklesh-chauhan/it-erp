@@ -15,7 +15,7 @@ class LeadActivityPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_lead::activity');
+        return $user->can('view_any_lead::activities::lead::activity');
     }
 
     /**
@@ -23,7 +23,7 @@ class LeadActivityPolicy
      */
     public function view(User $user, LeadActivity $leadActivity): bool
     {
-        return $user->can('view_lead::activity');
+        return $user->can('view_lead::activities::lead::activity');
     }
 
     /**
@@ -31,7 +31,7 @@ class LeadActivityPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_lead::activity');
+        return $user->can('create_lead::activities::lead::activity');
     }
 
     /**
@@ -39,7 +39,7 @@ class LeadActivityPolicy
      */
     public function update(User $user, LeadActivity $leadActivity): bool
     {
-        return $user->can('update_lead::activity');
+        return $user->can('update_lead::activities::lead::activity');
     }
 
     /**
@@ -47,7 +47,7 @@ class LeadActivityPolicy
      */
     public function delete(User $user, LeadActivity $leadActivity): bool
     {
-        return $user->can('delete_lead::activity');
+        return $user->can('delete_lead::activities::lead::activity');
     }
 
     /**
@@ -55,7 +55,7 @@ class LeadActivityPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_lead::activity');
+        return $user->can('delete_any_lead::activities::lead::activity');
     }
 
     /**
@@ -63,7 +63,7 @@ class LeadActivityPolicy
      */
     public function forceDelete(User $user, LeadActivity $leadActivity): bool
     {
-        return $user->can('force_delete_lead::activity');
+        return $user->can('force_delete_lead::activities::lead::activity');
     }
 
     /**
@@ -71,7 +71,7 @@ class LeadActivityPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_lead::activity');
+        return $user->can('force_delete_any_lead::activities::lead::activity');
     }
 
     /**
@@ -79,7 +79,7 @@ class LeadActivityPolicy
      */
     public function restore(User $user, LeadActivity $leadActivity): bool
     {
-        return $user->can('restore_lead::activity');
+        return $user->can('restore_lead::activities::lead::activity');
     }
 
     /**
@@ -87,7 +87,7 @@ class LeadActivityPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_lead::activity');
+        return $user->can('restore_any_lead::activities::lead::activity');
     }
 
     /**
@@ -95,7 +95,7 @@ class LeadActivityPolicy
      */
     public function replicate(User $user, LeadActivity $leadActivity): bool
     {
-        return $user->can('replicate_lead::activity');
+        return $user->can('replicate_lead::activities::lead::activity');
     }
 
     /**
@@ -103,6 +103,6 @@ class LeadActivityPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_lead::activity');
+        return $user->can('reorder_lead::activities::lead::activity');
     }
 }

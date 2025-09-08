@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AccountMasterGSTDetail extends Model
 {
+    use HasFactory;
     protected $table = 'account_master_g_s_t_details';
 
     protected $fillable = [

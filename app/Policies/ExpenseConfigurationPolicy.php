@@ -15,7 +15,7 @@ class ExpenseConfigurationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_expense::configuration');
+        return $user->can('view_any_expense::configurations::expense::configuration');
     }
 
     /**
@@ -23,7 +23,7 @@ class ExpenseConfigurationPolicy
      */
     public function view(User $user, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('view_expense::configuration');
+        return $user->can('view_expense::configurations::expense::configuration');
     }
 
     /**
@@ -31,7 +31,7 @@ class ExpenseConfigurationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_expense::configuration');
+        return $user->can('create_expense::configurations::expense::configuration');
     }
 
     /**
@@ -39,7 +39,7 @@ class ExpenseConfigurationPolicy
      */
     public function update(User $user, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('update_expense::configuration');
+        return $user->can('update_expense::configurations::expense::configuration');
     }
 
     /**
@@ -47,7 +47,7 @@ class ExpenseConfigurationPolicy
      */
     public function delete(User $user, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('delete_expense::configuration');
+        return $user->can('delete_expense::configurations::expense::configuration');
     }
 
     /**
@@ -55,7 +55,7 @@ class ExpenseConfigurationPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_expense::configuration');
+        return $user->can('delete_any_expense::configurations::expense::configuration');
     }
 
     /**
@@ -63,7 +63,7 @@ class ExpenseConfigurationPolicy
      */
     public function forceDelete(User $user, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('force_delete_expense::configuration');
+        return $user->can('force_delete_expense::configurations::expense::configuration');
     }
 
     /**
@@ -71,7 +71,7 @@ class ExpenseConfigurationPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_expense::configuration');
+        return $user->can('force_delete_any_expense::configurations::expense::configuration');
     }
 
     /**
@@ -79,7 +79,7 @@ class ExpenseConfigurationPolicy
      */
     public function restore(User $user, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('restore_expense::configuration');
+        return $user->can('restore_expense::configurations::expense::configuration');
     }
 
     /**
@@ -87,7 +87,7 @@ class ExpenseConfigurationPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_expense::configuration');
+        return $user->can('restore_any_expense::configurations::expense::configuration');
     }
 
     /**
@@ -95,7 +95,7 @@ class ExpenseConfigurationPolicy
      */
     public function replicate(User $user, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('replicate_expense::configuration');
+        return $user->can('replicate_expense::configurations::expense::configuration');
     }
 
     /**
@@ -103,6 +103,6 @@ class ExpenseConfigurationPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_expense::configuration');
+        return $user->can('reorder_expense::configurations::expense::configuration');
     }
 }

@@ -47,7 +47,7 @@ abstract class SalesDocument extends Model
 
     public function company()
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(AccountMaster::class);
     }
 
     public function billingAddress()

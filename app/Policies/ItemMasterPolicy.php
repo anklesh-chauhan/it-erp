@@ -15,7 +15,7 @@ class ItemMasterPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_item::master');
+        return $user->can('view_any_item::masters::item::master');
     }
 
     /**
@@ -23,7 +23,7 @@ class ItemMasterPolicy
      */
     public function view(User $user, ItemMaster $itemMaster): bool
     {
-        return $user->can('view_item::master');
+        return $user->can('view_item::masters::item::master');
     }
 
     /**
@@ -31,7 +31,7 @@ class ItemMasterPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_item::master');
+        return $user->can('create_item::masters::item::master');
     }
 
     /**
@@ -39,7 +39,7 @@ class ItemMasterPolicy
      */
     public function update(User $user, ItemMaster $itemMaster): bool
     {
-        return $user->can('update_item::master');
+        return $user->can('update_item::masters::item::master');
     }
 
     /**
@@ -47,7 +47,7 @@ class ItemMasterPolicy
      */
     public function delete(User $user, ItemMaster $itemMaster): bool
     {
-        return $user->can('delete_item::master');
+        return $user->can('delete_item::masters::item::master');
     }
 
     /**
@@ -55,7 +55,7 @@ class ItemMasterPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_item::master');
+        return $user->can('delete_any_item::masters::item::master');
     }
 
     /**
@@ -63,7 +63,7 @@ class ItemMasterPolicy
      */
     public function forceDelete(User $user, ItemMaster $itemMaster): bool
     {
-        return $user->can('force_delete_item::master');
+        return $user->can('force_delete_item::masters::item::master');
     }
 
     /**
@@ -71,7 +71,7 @@ class ItemMasterPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_item::master');
+        return $user->can('force_delete_any_item::masters::item::master');
     }
 
     /**
@@ -79,7 +79,7 @@ class ItemMasterPolicy
      */
     public function restore(User $user, ItemMaster $itemMaster): bool
     {
-        return $user->can('restore_item::master');
+        return $user->can('restore_item::masters::item::master');
     }
 
     /**
@@ -87,7 +87,7 @@ class ItemMasterPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_item::master');
+        return $user->can('restore_any_item::masters::item::master');
     }
 
     /**
@@ -95,7 +95,7 @@ class ItemMasterPolicy
      */
     public function replicate(User $user, ItemMaster $itemMaster): bool
     {
-        return $user->can('replicate_item::master');
+        return $user->can('replicate_item::masters::item::master');
     }
 
     /**
@@ -103,6 +103,6 @@ class ItemMasterPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_item::master');
+        return $user->can('reorder_item::masters::item::master');
     }
 }

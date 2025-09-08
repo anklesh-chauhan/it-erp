@@ -85,7 +85,7 @@ class QuoteResource extends Resource
                     ->date()
                     ->sortable(),
 
-                TextColumn::make('company.name')
+                TextColumn::make('accountMaster.name')
                     ->label('Company')
                     ->searchable()
                     ->sortable(),
@@ -143,7 +143,7 @@ class QuoteResource extends Resource
                             strtolower(class_basename($record)), $record->id
                         ])),
                     ])
-                    ])
+                    ], position: RecordActionsPosition::BeforeColumns)
             ->filters([
                 // 📅 Date Range Filter
                 Filter::make('date')

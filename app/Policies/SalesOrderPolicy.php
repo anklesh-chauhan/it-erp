@@ -15,7 +15,7 @@ class SalesOrderPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_sales::order');
+        return $user->can('view_any_sales::orders::sales::order');
     }
 
     /**
@@ -23,7 +23,7 @@ class SalesOrderPolicy
      */
     public function view(User $user, SalesOrder $salesOrder): bool
     {
-        return $user->can('view_sales::order');
+        return $user->can('view_sales::orders::sales::order');
     }
 
     /**
@@ -31,7 +31,7 @@ class SalesOrderPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_sales::order');
+        return $user->can('create_sales::orders::sales::order');
     }
 
     /**
@@ -39,7 +39,7 @@ class SalesOrderPolicy
      */
     public function update(User $user, SalesOrder $salesOrder): bool
     {
-        return $user->can('update_sales::order');
+        return $user->can('update_sales::orders::sales::order');
     }
 
     /**
@@ -47,7 +47,7 @@ class SalesOrderPolicy
      */
     public function delete(User $user, SalesOrder $salesOrder): bool
     {
-        return $user->can('delete_sales::order');
+        return $user->can('delete_sales::orders::sales::order');
     }
 
     /**
@@ -55,7 +55,7 @@ class SalesOrderPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_sales::order');
+        return $user->can('delete_any_sales::orders::sales::order');
     }
 
     /**
@@ -63,7 +63,7 @@ class SalesOrderPolicy
      */
     public function forceDelete(User $user, SalesOrder $salesOrder): bool
     {
-        return $user->can('force_delete_sales::order');
+        return $user->can('force_delete_sales::orders::sales::order');
     }
 
     /**
@@ -71,7 +71,7 @@ class SalesOrderPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_sales::order');
+        return $user->can('force_delete_any_sales::orders::sales::order');
     }
 
     /**
@@ -79,7 +79,7 @@ class SalesOrderPolicy
      */
     public function restore(User $user, SalesOrder $salesOrder): bool
     {
-        return $user->can('restore_sales::order');
+        return $user->can('restore_sales::orders::sales::order');
     }
 
     /**
@@ -87,7 +87,7 @@ class SalesOrderPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_sales::order');
+        return $user->can('restore_any_sales::orders::sales::order');
     }
 
     /**
@@ -95,7 +95,7 @@ class SalesOrderPolicy
      */
     public function replicate(User $user, SalesOrder $salesOrder): bool
     {
-        return $user->can('replicate_sales::order');
+        return $user->can('replicate_sales::orders::sales::order');
     }
 
     /**
@@ -103,6 +103,6 @@ class SalesOrderPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_sales::order');
+        return $user->can('reorder_sales::orders::sales::order');
     }
 }

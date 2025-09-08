@@ -15,7 +15,7 @@ class SalesDailyExpensePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_sales::daily::expense');
+        return $user->can('view_any_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -23,7 +23,7 @@ class SalesDailyExpensePolicy
      */
     public function view(User $user, SalesDailyExpense $salesDailyExpense): bool
     {
-        return $user->can('view_sales::daily::expense');
+        return $user->can('view_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -31,7 +31,7 @@ class SalesDailyExpensePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_sales::daily::expense');
+        return $user->can('create_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -39,7 +39,7 @@ class SalesDailyExpensePolicy
      */
     public function update(User $user, SalesDailyExpense $salesDailyExpense): bool
     {
-        return $user->can('update_sales::daily::expense');
+        return $user->can('update_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -47,7 +47,7 @@ class SalesDailyExpensePolicy
      */
     public function delete(User $user, SalesDailyExpense $salesDailyExpense): bool
     {
-        return $user->can('delete_sales::daily::expense');
+        return $user->can('delete_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -55,7 +55,7 @@ class SalesDailyExpensePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_sales::daily::expense');
+        return $user->can('delete_any_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -63,7 +63,7 @@ class SalesDailyExpensePolicy
      */
     public function forceDelete(User $user, SalesDailyExpense $salesDailyExpense): bool
     {
-        return $user->can('force_delete_sales::daily::expense');
+        return $user->can('force_delete_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -71,7 +71,7 @@ class SalesDailyExpensePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_sales::daily::expense');
+        return $user->can('force_delete_any_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -79,7 +79,7 @@ class SalesDailyExpensePolicy
      */
     public function restore(User $user, SalesDailyExpense $salesDailyExpense): bool
     {
-        return $user->can('restore_sales::daily::expense');
+        return $user->can('restore_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -87,7 +87,7 @@ class SalesDailyExpensePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_sales::daily::expense');
+        return $user->can('restore_any_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -95,7 +95,7 @@ class SalesDailyExpensePolicy
      */
     public function replicate(User $user, SalesDailyExpense $salesDailyExpense): bool
     {
-        return $user->can('replicate_sales::daily::expense');
+        return $user->can('replicate_sales::daily::expenses::sales::daily::expense');
     }
 
     /**
@@ -103,6 +103,6 @@ class SalesDailyExpensePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_sales::daily::expense');
+        return $user->can('reorder_sales::daily::expenses::sales::daily::expense');
     }
 }

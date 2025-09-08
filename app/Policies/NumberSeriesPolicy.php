@@ -15,7 +15,7 @@ class NumberSeriesPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_number::series');
+        return $user->can('view_any_number::series::number::series');
     }
 
     /**
@@ -23,7 +23,7 @@ class NumberSeriesPolicy
      */
     public function view(User $user, NumberSeries $numberSeries): bool
     {
-        return $user->can('view_number::series');
+        return $user->can('view_number::series::number::series');
     }
 
     /**
@@ -31,7 +31,7 @@ class NumberSeriesPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_number::series');
+        return $user->can('create_number::series::number::series');
     }
 
     /**
@@ -39,7 +39,7 @@ class NumberSeriesPolicy
      */
     public function update(User $user, NumberSeries $numberSeries): bool
     {
-        return $user->can('update_number::series');
+        return $user->can('update_number::series::number::series');
     }
 
     /**
@@ -47,7 +47,7 @@ class NumberSeriesPolicy
      */
     public function delete(User $user, NumberSeries $numberSeries): bool
     {
-        return $user->can('delete_number::series');
+        return $user->can('delete_number::series::number::series');
     }
 
     /**
@@ -55,7 +55,7 @@ class NumberSeriesPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_number::series');
+        return $user->can('delete_any_number::series::number::series');
     }
 
     /**
@@ -63,7 +63,7 @@ class NumberSeriesPolicy
      */
     public function forceDelete(User $user, NumberSeries $numberSeries): bool
     {
-        return $user->can('force_delete_number::series');
+        return $user->can('force_delete_number::series::number::series');
     }
 
     /**
@@ -71,7 +71,7 @@ class NumberSeriesPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_number::series');
+        return $user->can('force_delete_any_number::series::number::series');
     }
 
     /**
@@ -79,7 +79,7 @@ class NumberSeriesPolicy
      */
     public function restore(User $user, NumberSeries $numberSeries): bool
     {
-        return $user->can('restore_number::series');
+        return $user->can('restore_number::series::number::series');
     }
 
     /**
@@ -87,7 +87,7 @@ class NumberSeriesPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_number::series');
+        return $user->can('restore_any_number::series::number::series');
     }
 
     /**
@@ -95,7 +95,7 @@ class NumberSeriesPolicy
      */
     public function replicate(User $user, NumberSeries $numberSeries): bool
     {
-        return $user->can('replicate_number::series');
+        return $user->can('replicate_number::series::number::series');
     }
 
     /**
@@ -103,6 +103,6 @@ class NumberSeriesPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_number::series');
+        return $user->can('reorder_number::series::number::series');
     }
 }

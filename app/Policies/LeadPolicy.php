@@ -15,7 +15,7 @@ class LeadPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_lead');
+        return $user->can('view_any_leads::lead');
     }
 
     /**
@@ -23,7 +23,7 @@ class LeadPolicy
      */
     public function view(User $user, Lead $lead): bool
     {
-        return $user->can('view_lead');
+        return $user->can('view_leads::lead');
     }
 
     /**
@@ -31,7 +31,7 @@ class LeadPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_lead');
+        return $user->can('create_leads::lead');
     }
 
     /**
@@ -39,7 +39,7 @@ class LeadPolicy
      */
     public function update(User $user, Lead $lead): bool
     {
-        return $user->can('update_lead');
+        return $user->can('update_leads::lead');
     }
 
     /**
@@ -47,7 +47,7 @@ class LeadPolicy
      */
     public function delete(User $user, Lead $lead): bool
     {
-        return $user->can('delete_lead');
+        return $user->can('delete_leads::lead');
     }
 
     /**
@@ -55,7 +55,7 @@ class LeadPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_lead');
+        return $user->can('delete_any_leads::lead');
     }
 
     /**
@@ -63,7 +63,7 @@ class LeadPolicy
      */
     public function forceDelete(User $user, Lead $lead): bool
     {
-        return $user->can('force_delete_lead');
+        return $user->can('force_delete_leads::lead');
     }
 
     /**
@@ -71,7 +71,7 @@ class LeadPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_lead');
+        return $user->can('force_delete_any_leads::lead');
     }
 
     /**
@@ -79,7 +79,7 @@ class LeadPolicy
      */
     public function restore(User $user, Lead $lead): bool
     {
-        return $user->can('restore_lead');
+        return $user->can('restore_leads::lead');
     }
 
     /**
@@ -87,7 +87,7 @@ class LeadPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_lead');
+        return $user->can('restore_any_leads::lead');
     }
 
     /**
@@ -95,7 +95,7 @@ class LeadPolicy
      */
     public function replicate(User $user, Lead $lead): bool
     {
-        return $user->can('replicate_lead');
+        return $user->can('replicate_leads::lead');
     }
 
     /**
@@ -103,6 +103,6 @@ class LeadPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_lead');
+        return $user->can('reorder_leads::lead');
     }
 }

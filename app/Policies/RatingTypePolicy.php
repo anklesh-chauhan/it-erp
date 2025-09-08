@@ -15,7 +15,7 @@ class RatingTypePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_rating::type');
+        return $user->can('view_any_rating::types::rating::type');
     }
 
     /**
@@ -23,7 +23,7 @@ class RatingTypePolicy
      */
     public function view(User $user, RatingType $ratingType): bool
     {
-        return $user->can('view_rating::type');
+        return $user->can('view_rating::types::rating::type');
     }
 
     /**
@@ -31,7 +31,7 @@ class RatingTypePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_rating::type');
+        return $user->can('create_rating::types::rating::type');
     }
 
     /**
@@ -39,7 +39,7 @@ class RatingTypePolicy
      */
     public function update(User $user, RatingType $ratingType): bool
     {
-        return $user->can('update_rating::type');
+        return $user->can('update_rating::types::rating::type');
     }
 
     /**
@@ -47,7 +47,7 @@ class RatingTypePolicy
      */
     public function delete(User $user, RatingType $ratingType): bool
     {
-        return $user->can('delete_rating::type');
+        return $user->can('delete_rating::types::rating::type');
     }
 
     /**
@@ -55,7 +55,7 @@ class RatingTypePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_rating::type');
+        return $user->can('delete_any_rating::types::rating::type');
     }
 
     /**
@@ -63,7 +63,7 @@ class RatingTypePolicy
      */
     public function forceDelete(User $user, RatingType $ratingType): bool
     {
-        return $user->can('force_delete_rating::type');
+        return $user->can('force_delete_rating::types::rating::type');
     }
 
     /**
@@ -71,7 +71,7 @@ class RatingTypePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_rating::type');
+        return $user->can('force_delete_any_rating::types::rating::type');
     }
 
     /**
@@ -79,7 +79,7 @@ class RatingTypePolicy
      */
     public function restore(User $user, RatingType $ratingType): bool
     {
-        return $user->can('restore_rating::type');
+        return $user->can('restore_rating::types::rating::type');
     }
 
     /**
@@ -87,7 +87,7 @@ class RatingTypePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_rating::type');
+        return $user->can('restore_any_rating::types::rating::type');
     }
 
     /**
@@ -95,7 +95,7 @@ class RatingTypePolicy
      */
     public function replicate(User $user, RatingType $ratingType): bool
     {
-        return $user->can('replicate_rating::type');
+        return $user->can('replicate_rating::types::rating::type');
     }
 
     /**
@@ -103,6 +103,6 @@ class RatingTypePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_rating::type');
+        return $user->can('reorder_rating::types::rating::type');
     }
 }

@@ -15,7 +15,7 @@ class AccountMasterPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_account::master');
+        return $user->can('view_any_account::masters::account::master');
     }
 
     /**
@@ -23,7 +23,7 @@ class AccountMasterPolicy
      */
     public function view(User $user, AccountMaster $accountMaster): bool
     {
-        return $user->can('view_account::master');
+        return $user->can('view_account::masters::account::master');
     }
 
     /**
@@ -31,7 +31,7 @@ class AccountMasterPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_account::master');
+        return $user->can('create_account::masters::account::master');
     }
 
     /**
@@ -39,7 +39,7 @@ class AccountMasterPolicy
      */
     public function update(User $user, AccountMaster $accountMaster): bool
     {
-        return $user->can('update_account::master');
+        return $user->can('update_account::masters::account::master');
     }
 
     /**
@@ -47,7 +47,7 @@ class AccountMasterPolicy
      */
     public function delete(User $user, AccountMaster $accountMaster): bool
     {
-        return $user->can('delete_account::master');
+        return $user->can('delete_account::masters::account::master');
     }
 
     /**
@@ -55,7 +55,7 @@ class AccountMasterPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_account::master');
+        return $user->can('delete_any_account::masters::account::master');
     }
 
     /**
@@ -63,7 +63,7 @@ class AccountMasterPolicy
      */
     public function forceDelete(User $user, AccountMaster $accountMaster): bool
     {
-        return $user->can('force_delete_account::master');
+        return $user->can('force_delete_account::masters::account::master');
     }
 
     /**
@@ -71,7 +71,7 @@ class AccountMasterPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_account::master');
+        return $user->can('force_delete_any_account::masters::account::master');
     }
 
     /**
@@ -79,7 +79,7 @@ class AccountMasterPolicy
      */
     public function restore(User $user, AccountMaster $accountMaster): bool
     {
-        return $user->can('restore_account::master');
+        return $user->can('restore_account::masters::account::master');
     }
 
     /**
@@ -87,7 +87,7 @@ class AccountMasterPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_account::master');
+        return $user->can('restore_any_account::masters::account::master');
     }
 
     /**
@@ -95,7 +95,7 @@ class AccountMasterPolicy
      */
     public function replicate(User $user, AccountMaster $accountMaster): bool
     {
-        return $user->can('replicate_account::master');
+        return $user->can('replicate_account::masters::account::master');
     }
 
     /**
@@ -103,6 +103,6 @@ class AccountMasterPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_account::master');
+        return $user->can('reorder_account::masters::account::master');
     }
 }

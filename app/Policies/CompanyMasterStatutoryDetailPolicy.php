@@ -15,7 +15,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_company::master::statutory::detail');
+        return $user->can('view_any_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -23,7 +23,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function view(User $user, CompanyMasterStatutoryDetail $companyMasterStatutoryDetail): bool
     {
-        return $user->can('view_company::master::statutory::detail');
+        return $user->can('view_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -31,7 +31,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_company::master::statutory::detail');
+        return $user->can('create_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -39,7 +39,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function update(User $user, CompanyMasterStatutoryDetail $companyMasterStatutoryDetail): bool
     {
-        return $user->can('update_company::master::statutory::detail');
+        return $user->can('update_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -47,7 +47,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function delete(User $user, CompanyMasterStatutoryDetail $companyMasterStatutoryDetail): bool
     {
-        return $user->can('delete_company::master::statutory::detail');
+        return $user->can('delete_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -55,7 +55,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_company::master::statutory::detail');
+        return $user->can('delete_any_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -63,7 +63,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function forceDelete(User $user, CompanyMasterStatutoryDetail $companyMasterStatutoryDetail): bool
     {
-        return $user->can('force_delete_company::master::statutory::detail');
+        return $user->can('force_delete_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -71,7 +71,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_company::master::statutory::detail');
+        return $user->can('force_delete_any_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -79,7 +79,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function restore(User $user, CompanyMasterStatutoryDetail $companyMasterStatutoryDetail): bool
     {
-        return $user->can('restore_company::master::statutory::detail');
+        return $user->can('restore_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -87,7 +87,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_company::master::statutory::detail');
+        return $user->can('restore_any_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -95,7 +95,7 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function replicate(User $user, CompanyMasterStatutoryDetail $companyMasterStatutoryDetail): bool
     {
-        return $user->can('replicate_company::master::statutory::detail');
+        return $user->can('replicate_company::master::statutory::details::company::master::statutory::detail');
     }
 
     /**
@@ -103,6 +103,6 @@ class CompanyMasterStatutoryDetailPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_company::master::statutory::detail');
+        return $user->can('reorder_company::master::statutory::details::company::master::statutory::detail');
     }
 }

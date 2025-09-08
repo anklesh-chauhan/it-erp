@@ -15,7 +15,7 @@ class TypeMasterPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_type::master');
+        return $user->can('view_any_type::masters::type::master');
     }
 
     /**
@@ -23,7 +23,7 @@ class TypeMasterPolicy
      */
     public function view(User $user, TypeMaster $typeMaster): bool
     {
-        return $user->can('view_type::master');
+        return $user->can('view_type::masters::type::master');
     }
 
     /**
@@ -31,7 +31,7 @@ class TypeMasterPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_type::master');
+        return $user->can('create_type::masters::type::master');
     }
 
     /**
@@ -39,7 +39,7 @@ class TypeMasterPolicy
      */
     public function update(User $user, TypeMaster $typeMaster): bool
     {
-        return $user->can('update_type::master');
+        return $user->can('update_type::masters::type::master');
     }
 
     /**
@@ -47,7 +47,7 @@ class TypeMasterPolicy
      */
     public function delete(User $user, TypeMaster $typeMaster): bool
     {
-        return $user->can('delete_type::master');
+        return $user->can('delete_type::masters::type::master');
     }
 
     /**
@@ -55,7 +55,7 @@ class TypeMasterPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_type::master');
+        return $user->can('delete_any_type::masters::type::master');
     }
 
     /**
@@ -63,7 +63,7 @@ class TypeMasterPolicy
      */
     public function forceDelete(User $user, TypeMaster $typeMaster): bool
     {
-        return $user->can('force_delete_type::master');
+        return $user->can('force_delete_type::masters::type::master');
     }
 
     /**
@@ -71,7 +71,7 @@ class TypeMasterPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_type::master');
+        return $user->can('force_delete_any_type::masters::type::master');
     }
 
     /**
@@ -79,7 +79,7 @@ class TypeMasterPolicy
      */
     public function restore(User $user, TypeMaster $typeMaster): bool
     {
-        return $user->can('restore_type::master');
+        return $user->can('restore_type::masters::type::master');
     }
 
     /**
@@ -87,7 +87,7 @@ class TypeMasterPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_type::master');
+        return $user->can('restore_any_type::masters::type::master');
     }
 
     /**
@@ -95,7 +95,7 @@ class TypeMasterPolicy
      */
     public function replicate(User $user, TypeMaster $typeMaster): bool
     {
-        return $user->can('replicate_type::master');
+        return $user->can('replicate_type::masters::type::master');
     }
 
     /**
@@ -103,6 +103,6 @@ class TypeMasterPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_type::master');
+        return $user->can('reorder_type::masters::type::master');
     }
 }

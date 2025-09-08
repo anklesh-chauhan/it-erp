@@ -51,12 +51,12 @@ class DatabaseSeeder extends Seeder
         // Enable foreign key checks again
         // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // try {
-        //     Artisan::call('shield:generate --all');
-        //     $this->command->info('Filament Shield permissions generated successfully.');
-        // } catch (\Exception $e) {
-        //     $this->command->error('Failed to run shield:generate --all: ' . $e->getMessage());
-        // }
+        try {
+            Artisan::call('shield:generate --all');
+            $this->command->info('Filament Shield permissions generated successfully.');
+        } catch (\Exception $e) {
+            $this->command->error('Failed to run shield:generate --all: ' . $e->getMessage());
+        }
 
         $this->call([
             UsersTableSeeder::class,

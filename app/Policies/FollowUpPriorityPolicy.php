@@ -15,7 +15,7 @@ class FollowUpPriorityPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_follow::up::priority');
+        return $user->can('view_any_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -23,7 +23,7 @@ class FollowUpPriorityPolicy
      */
     public function view(User $user, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('view_follow::up::priority');
+        return $user->can('view_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -31,7 +31,7 @@ class FollowUpPriorityPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_follow::up::priority');
+        return $user->can('create_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -39,7 +39,7 @@ class FollowUpPriorityPolicy
      */
     public function update(User $user, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('update_follow::up::priority');
+        return $user->can('update_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -47,7 +47,7 @@ class FollowUpPriorityPolicy
      */
     public function delete(User $user, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('delete_follow::up::priority');
+        return $user->can('delete_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -55,7 +55,7 @@ class FollowUpPriorityPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_follow::up::priority');
+        return $user->can('delete_any_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -63,7 +63,7 @@ class FollowUpPriorityPolicy
      */
     public function forceDelete(User $user, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('force_delete_follow::up::priority');
+        return $user->can('force_delete_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -71,7 +71,7 @@ class FollowUpPriorityPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_follow::up::priority');
+        return $user->can('force_delete_any_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -79,7 +79,7 @@ class FollowUpPriorityPolicy
      */
     public function restore(User $user, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('restore_follow::up::priority');
+        return $user->can('restore_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -87,7 +87,7 @@ class FollowUpPriorityPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_follow::up::priority');
+        return $user->can('restore_any_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -95,7 +95,7 @@ class FollowUpPriorityPolicy
      */
     public function replicate(User $user, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('replicate_follow::up::priority');
+        return $user->can('replicate_follow::up::priorities::follow::up::priority');
     }
 
     /**
@@ -103,6 +103,6 @@ class FollowUpPriorityPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_follow::up::priority');
+        return $user->can('reorder_follow::up::priorities::follow::up::priority');
     }
 }

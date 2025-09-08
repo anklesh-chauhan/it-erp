@@ -15,7 +15,7 @@ class VisitTypePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_visit::type');
+        return $user->can('view_any_visit::types::visit::type');
     }
 
     /**
@@ -23,7 +23,7 @@ class VisitTypePolicy
      */
     public function view(User $user, VisitType $visitType): bool
     {
-        return $user->can('view_visit::type');
+        return $user->can('view_visit::types::visit::type');
     }
 
     /**
@@ -31,7 +31,7 @@ class VisitTypePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_visit::type');
+        return $user->can('create_visit::types::visit::type');
     }
 
     /**
@@ -39,7 +39,7 @@ class VisitTypePolicy
      */
     public function update(User $user, VisitType $visitType): bool
     {
-        return $user->can('update_visit::type');
+        return $user->can('update_visit::types::visit::type');
     }
 
     /**
@@ -47,7 +47,7 @@ class VisitTypePolicy
      */
     public function delete(User $user, VisitType $visitType): bool
     {
-        return $user->can('delete_visit::type');
+        return $user->can('delete_visit::types::visit::type');
     }
 
     /**
@@ -55,7 +55,7 @@ class VisitTypePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_visit::type');
+        return $user->can('delete_any_visit::types::visit::type');
     }
 
     /**
@@ -63,7 +63,7 @@ class VisitTypePolicy
      */
     public function forceDelete(User $user, VisitType $visitType): bool
     {
-        return $user->can('force_delete_visit::type');
+        return $user->can('force_delete_visit::types::visit::type');
     }
 
     /**
@@ -71,7 +71,7 @@ class VisitTypePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_visit::type');
+        return $user->can('force_delete_any_visit::types::visit::type');
     }
 
     /**
@@ -79,7 +79,7 @@ class VisitTypePolicy
      */
     public function restore(User $user, VisitType $visitType): bool
     {
-        return $user->can('restore_visit::type');
+        return $user->can('restore_visit::types::visit::type');
     }
 
     /**
@@ -87,7 +87,7 @@ class VisitTypePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_visit::type');
+        return $user->can('restore_any_visit::types::visit::type');
     }
 
     /**
@@ -95,7 +95,7 @@ class VisitTypePolicy
      */
     public function replicate(User $user, VisitType $visitType): bool
     {
-        return $user->can('replicate_visit::type');
+        return $user->can('replicate_visit::types::visit::type');
     }
 
     /**
@@ -103,6 +103,6 @@ class VisitTypePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_visit::type');
+        return $user->can('reorder_visit::types::visit::type');
     }
 }

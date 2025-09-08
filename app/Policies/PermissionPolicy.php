@@ -15,7 +15,7 @@ class PermissionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_permission');
+        return $user->can('view_any_permissions::permission');
     }
 
     /**
@@ -23,7 +23,7 @@ class PermissionPolicy
      */
     public function view(User $user, Permission $permission): bool
     {
-        return $user->can('view_permission');
+        return $user->can('view_permissions::permission');
     }
 
     /**
@@ -31,7 +31,7 @@ class PermissionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_permission');
+        return $user->can('create_permissions::permission');
     }
 
     /**
@@ -39,7 +39,7 @@ class PermissionPolicy
      */
     public function update(User $user, Permission $permission): bool
     {
-        return $user->can('update_permission');
+        return $user->can('update_permissions::permission');
     }
 
     /**
@@ -47,7 +47,7 @@ class PermissionPolicy
      */
     public function delete(User $user, Permission $permission): bool
     {
-        return $user->can('delete_permission');
+        return $user->can('delete_permissions::permission');
     }
 
     /**
@@ -55,7 +55,7 @@ class PermissionPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_permission');
+        return $user->can('delete_any_permissions::permission');
     }
 
     /**
@@ -63,7 +63,7 @@ class PermissionPolicy
      */
     public function forceDelete(User $user, Permission $permission): bool
     {
-        return $user->can('force_delete_permission');
+        return $user->can('force_delete_permissions::permission');
     }
 
     /**
@@ -71,7 +71,7 @@ class PermissionPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_permission');
+        return $user->can('force_delete_any_permissions::permission');
     }
 
     /**
@@ -79,7 +79,7 @@ class PermissionPolicy
      */
     public function restore(User $user, Permission $permission): bool
     {
-        return $user->can('restore_permission');
+        return $user->can('restore_permissions::permission');
     }
 
     /**
@@ -87,7 +87,7 @@ class PermissionPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_permission');
+        return $user->can('restore_any_permissions::permission');
     }
 
     /**
@@ -95,7 +95,7 @@ class PermissionPolicy
      */
     public function replicate(User $user, Permission $permission): bool
     {
-        return $user->can('replicate_permission');
+        return $user->can('replicate_permissions::permission');
     }
 
     /**
@@ -103,6 +103,6 @@ class PermissionPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_permission');
+        return $user->can('reorder_permissions::permission');
     }
 }

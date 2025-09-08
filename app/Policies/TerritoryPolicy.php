@@ -15,7 +15,7 @@ class TerritoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_territory');
+        return $user->can('view_any_territories::territory');
     }
 
     /**
@@ -23,7 +23,7 @@ class TerritoryPolicy
      */
     public function view(User $user, Territory $territory): bool
     {
-        return $user->can('view_territory');
+        return $user->can('view_territories::territory');
     }
 
     /**
@@ -31,7 +31,7 @@ class TerritoryPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_territory');
+        return $user->can('create_territories::territory');
     }
 
     /**
@@ -39,7 +39,7 @@ class TerritoryPolicy
      */
     public function update(User $user, Territory $territory): bool
     {
-        return $user->can('update_territory');
+        return $user->can('update_territories::territory');
     }
 
     /**
@@ -47,7 +47,7 @@ class TerritoryPolicy
      */
     public function delete(User $user, Territory $territory): bool
     {
-        return $user->can('delete_territory');
+        return $user->can('delete_territories::territory');
     }
 
     /**
@@ -55,7 +55,7 @@ class TerritoryPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_territory');
+        return $user->can('delete_any_territories::territory');
     }
 
     /**
@@ -63,7 +63,7 @@ class TerritoryPolicy
      */
     public function forceDelete(User $user, Territory $territory): bool
     {
-        return $user->can('force_delete_territory');
+        return $user->can('force_delete_territories::territory');
     }
 
     /**
@@ -71,7 +71,7 @@ class TerritoryPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_territory');
+        return $user->can('force_delete_any_territories::territory');
     }
 
     /**
@@ -79,7 +79,7 @@ class TerritoryPolicy
      */
     public function restore(User $user, Territory $territory): bool
     {
-        return $user->can('restore_territory');
+        return $user->can('restore_territories::territory');
     }
 
     /**
@@ -87,7 +87,7 @@ class TerritoryPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_territory');
+        return $user->can('restore_any_territories::territory');
     }
 
     /**
@@ -95,7 +95,7 @@ class TerritoryPolicy
      */
     public function replicate(User $user, Territory $territory): bool
     {
-        return $user->can('replicate_territory');
+        return $user->can('replicate_territories::territory');
     }
 
     /**
@@ -103,6 +103,6 @@ class TerritoryPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_territory');
+        return $user->can('reorder_territories::territory');
     }
 }

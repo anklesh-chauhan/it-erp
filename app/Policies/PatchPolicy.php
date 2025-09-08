@@ -15,7 +15,7 @@ class PatchPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_patch');
+        return $user->can('view_any_patches::patch');
     }
 
     /**
@@ -23,7 +23,7 @@ class PatchPolicy
      */
     public function view(User $user, Patch $patch): bool
     {
-        return $user->can('view_patch');
+        return $user->can('view_patches::patch');
     }
 
     /**
@@ -31,7 +31,7 @@ class PatchPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_patch');
+        return $user->can('create_patches::patch');
     }
 
     /**
@@ -39,7 +39,7 @@ class PatchPolicy
      */
     public function update(User $user, Patch $patch): bool
     {
-        return $user->can('update_patch');
+        return $user->can('update_patches::patch');
     }
 
     /**
@@ -47,7 +47,7 @@ class PatchPolicy
      */
     public function delete(User $user, Patch $patch): bool
     {
-        return $user->can('delete_patch');
+        return $user->can('delete_patches::patch');
     }
 
     /**
@@ -55,7 +55,7 @@ class PatchPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_patch');
+        return $user->can('delete_any_patches::patch');
     }
 
     /**
@@ -63,7 +63,7 @@ class PatchPolicy
      */
     public function forceDelete(User $user, Patch $patch): bool
     {
-        return $user->can('force_delete_patch');
+        return $user->can('force_delete_patches::patch');
     }
 
     /**
@@ -71,7 +71,7 @@ class PatchPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_patch');
+        return $user->can('force_delete_any_patches::patch');
     }
 
     /**
@@ -79,7 +79,7 @@ class PatchPolicy
      */
     public function restore(User $user, Patch $patch): bool
     {
-        return $user->can('restore_patch');
+        return $user->can('restore_patches::patch');
     }
 
     /**
@@ -87,7 +87,7 @@ class PatchPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_patch');
+        return $user->can('restore_any_patches::patch');
     }
 
     /**
@@ -95,7 +95,7 @@ class PatchPolicy
      */
     public function replicate(User $user, Patch $patch): bool
     {
-        return $user->can('replicate_patch');
+        return $user->can('replicate_patches::patch');
     }
 
     /**
@@ -103,6 +103,6 @@ class PatchPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_patch');
+        return $user->can('reorder_patches::patch');
     }
 }

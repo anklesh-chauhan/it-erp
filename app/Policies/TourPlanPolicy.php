@@ -15,7 +15,7 @@ class TourPlanPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_tour::plan');
+        return $user->can('view_any_tour::plans::tour::plan');
     }
 
     /**
@@ -23,7 +23,7 @@ class TourPlanPolicy
      */
     public function view(User $user, TourPlan $tourPlan): bool
     {
-        return $user->can('view_tour::plan');
+        return $user->can('view_tour::plans::tour::plan');
     }
 
     /**
@@ -31,7 +31,7 @@ class TourPlanPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_tour::plan');
+        return $user->can('create_tour::plans::tour::plan');
     }
 
     /**
@@ -39,7 +39,7 @@ class TourPlanPolicy
      */
     public function update(User $user, TourPlan $tourPlan): bool
     {
-        return $user->can('update_tour::plan');
+        return $user->can('update_tour::plans::tour::plan');
     }
 
     /**
@@ -47,7 +47,7 @@ class TourPlanPolicy
      */
     public function delete(User $user, TourPlan $tourPlan): bool
     {
-        return $user->can('delete_tour::plan');
+        return $user->can('delete_tour::plans::tour::plan');
     }
 
     /**
@@ -55,7 +55,7 @@ class TourPlanPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_tour::plan');
+        return $user->can('delete_any_tour::plans::tour::plan');
     }
 
     /**
@@ -63,7 +63,7 @@ class TourPlanPolicy
      */
     public function forceDelete(User $user, TourPlan $tourPlan): bool
     {
-        return $user->can('force_delete_tour::plan');
+        return $user->can('force_delete_tour::plans::tour::plan');
     }
 
     /**
@@ -71,7 +71,7 @@ class TourPlanPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_tour::plan');
+        return $user->can('force_delete_any_tour::plans::tour::plan');
     }
 
     /**
@@ -79,7 +79,7 @@ class TourPlanPolicy
      */
     public function restore(User $user, TourPlan $tourPlan): bool
     {
-        return $user->can('restore_tour::plan');
+        return $user->can('restore_tour::plans::tour::plan');
     }
 
     /**
@@ -87,7 +87,7 @@ class TourPlanPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_tour::plan');
+        return $user->can('restore_any_tour::plans::tour::plan');
     }
 
     /**
@@ -95,7 +95,7 @@ class TourPlanPolicy
      */
     public function replicate(User $user, TourPlan $tourPlan): bool
     {
-        return $user->can('replicate_tour::plan');
+        return $user->can('replicate_tour::plans::tour::plan');
     }
 
     /**
@@ -103,6 +103,6 @@ class TourPlanPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_tour::plan');
+        return $user->can('reorder_tour::plans::tour::plan');
     }
 }

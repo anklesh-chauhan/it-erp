@@ -15,7 +15,7 @@ class PositionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_position');
+        return $user->can('view_any_positions::position');
     }
 
     /**
@@ -23,7 +23,7 @@ class PositionPolicy
      */
     public function view(User $user, Position $position): bool
     {
-        return $user->can('view_position');
+        return $user->can('view_positions::position');
     }
 
     /**
@@ -31,7 +31,7 @@ class PositionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_position');
+        return $user->can('create_positions::position');
     }
 
     /**
@@ -39,7 +39,7 @@ class PositionPolicy
      */
     public function update(User $user, Position $position): bool
     {
-        return $user->can('update_position');
+        return $user->can('update_positions::position');
     }
 
     /**
@@ -47,7 +47,7 @@ class PositionPolicy
      */
     public function delete(User $user, Position $position): bool
     {
-        return $user->can('delete_position');
+        return $user->can('delete_positions::position');
     }
 
     /**
@@ -55,7 +55,7 @@ class PositionPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_position');
+        return $user->can('delete_any_positions::position');
     }
 
     /**
@@ -63,7 +63,7 @@ class PositionPolicy
      */
     public function forceDelete(User $user, Position $position): bool
     {
-        return $user->can('force_delete_position');
+        return $user->can('force_delete_positions::position');
     }
 
     /**
@@ -71,7 +71,7 @@ class PositionPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_position');
+        return $user->can('force_delete_any_positions::position');
     }
 
     /**
@@ -79,7 +79,7 @@ class PositionPolicy
      */
     public function restore(User $user, Position $position): bool
     {
-        return $user->can('restore_position');
+        return $user->can('restore_positions::position');
     }
 
     /**
@@ -87,7 +87,7 @@ class PositionPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_position');
+        return $user->can('restore_any_positions::position');
     }
 
     /**
@@ -95,7 +95,7 @@ class PositionPolicy
      */
     public function replicate(User $user, Position $position): bool
     {
-        return $user->can('replicate_position');
+        return $user->can('replicate_positions::position');
     }
 
     /**
@@ -103,6 +103,6 @@ class PositionPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_position');
+        return $user->can('reorder_positions::position');
     }
 }

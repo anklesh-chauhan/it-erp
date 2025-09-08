@@ -15,7 +15,7 @@ class EmpDivisionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_emp::division');
+        return $user->can('view_any_emp::divisions::emp::division');
     }
 
     /**
@@ -23,7 +23,7 @@ class EmpDivisionPolicy
      */
     public function view(User $user, EmpDivision $empDivision): bool
     {
-        return $user->can('view_emp::division');
+        return $user->can('view_emp::divisions::emp::division');
     }
 
     /**
@@ -31,7 +31,7 @@ class EmpDivisionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_emp::division');
+        return $user->can('create_emp::divisions::emp::division');
     }
 
     /**
@@ -39,7 +39,7 @@ class EmpDivisionPolicy
      */
     public function update(User $user, EmpDivision $empDivision): bool
     {
-        return $user->can('update_emp::division');
+        return $user->can('update_emp::divisions::emp::division');
     }
 
     /**
@@ -47,7 +47,7 @@ class EmpDivisionPolicy
      */
     public function delete(User $user, EmpDivision $empDivision): bool
     {
-        return $user->can('delete_emp::division');
+        return $user->can('delete_emp::divisions::emp::division');
     }
 
     /**
@@ -55,7 +55,7 @@ class EmpDivisionPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_emp::division');
+        return $user->can('delete_any_emp::divisions::emp::division');
     }
 
     /**
@@ -63,7 +63,7 @@ class EmpDivisionPolicy
      */
     public function forceDelete(User $user, EmpDivision $empDivision): bool
     {
-        return $user->can('force_delete_emp::division');
+        return $user->can('force_delete_emp::divisions::emp::division');
     }
 
     /**
@@ -71,7 +71,7 @@ class EmpDivisionPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_emp::division');
+        return $user->can('force_delete_any_emp::divisions::emp::division');
     }
 
     /**
@@ -79,7 +79,7 @@ class EmpDivisionPolicy
      */
     public function restore(User $user, EmpDivision $empDivision): bool
     {
-        return $user->can('restore_emp::division');
+        return $user->can('restore_emp::divisions::emp::division');
     }
 
     /**
@@ -87,7 +87,7 @@ class EmpDivisionPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_emp::division');
+        return $user->can('restore_any_emp::divisions::emp::division');
     }
 
     /**
@@ -95,7 +95,7 @@ class EmpDivisionPolicy
      */
     public function replicate(User $user, EmpDivision $empDivision): bool
     {
-        return $user->can('replicate_emp::division');
+        return $user->can('replicate_emp::divisions::emp::division');
     }
 
     /**
@@ -103,6 +103,6 @@ class EmpDivisionPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_emp::division');
+        return $user->can('reorder_emp::divisions::emp::division');
     }
 }

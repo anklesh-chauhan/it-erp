@@ -15,7 +15,7 @@ class ExpenseTypePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_expense::type');
+        return $user->can('view_any_expense::types::expense::type');
     }
 
     /**
@@ -23,7 +23,7 @@ class ExpenseTypePolicy
      */
     public function view(User $user, ExpenseType $expenseType): bool
     {
-        return $user->can('view_expense::type');
+        return $user->can('view_expense::types::expense::type');
     }
 
     /**
@@ -31,7 +31,7 @@ class ExpenseTypePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_expense::type');
+        return $user->can('create_expense::types::expense::type');
     }
 
     /**
@@ -39,7 +39,7 @@ class ExpenseTypePolicy
      */
     public function update(User $user, ExpenseType $expenseType): bool
     {
-        return $user->can('update_expense::type');
+        return $user->can('update_expense::types::expense::type');
     }
 
     /**
@@ -47,7 +47,7 @@ class ExpenseTypePolicy
      */
     public function delete(User $user, ExpenseType $expenseType): bool
     {
-        return $user->can('delete_expense::type');
+        return $user->can('delete_expense::types::expense::type');
     }
 
     /**
@@ -55,7 +55,7 @@ class ExpenseTypePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_expense::type');
+        return $user->can('delete_any_expense::types::expense::type');
     }
 
     /**
@@ -63,7 +63,7 @@ class ExpenseTypePolicy
      */
     public function forceDelete(User $user, ExpenseType $expenseType): bool
     {
-        return $user->can('force_delete_expense::type');
+        return $user->can('force_delete_expense::types::expense::type');
     }
 
     /**
@@ -71,7 +71,7 @@ class ExpenseTypePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_expense::type');
+        return $user->can('force_delete_any_expense::types::expense::type');
     }
 
     /**
@@ -79,7 +79,7 @@ class ExpenseTypePolicy
      */
     public function restore(User $user, ExpenseType $expenseType): bool
     {
-        return $user->can('restore_expense::type');
+        return $user->can('restore_expense::types::expense::type');
     }
 
     /**
@@ -87,7 +87,7 @@ class ExpenseTypePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_expense::type');
+        return $user->can('restore_any_expense::types::expense::type');
     }
 
     /**
@@ -95,7 +95,7 @@ class ExpenseTypePolicy
      */
     public function replicate(User $user, ExpenseType $expenseType): bool
     {
-        return $user->can('replicate_expense::type');
+        return $user->can('replicate_expense::types::expense::type');
     }
 
     /**
@@ -103,6 +103,6 @@ class ExpenseTypePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_expense::type');
+        return $user->can('reorder_expense::types::expense::type');
     }
 }

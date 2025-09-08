@@ -15,7 +15,7 @@ class TermsTypePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_terms::type');
+        return $user->can('view_any_terms::types::terms::type');
     }
 
     /**
@@ -23,7 +23,7 @@ class TermsTypePolicy
      */
     public function view(User $user, TermsType $termsType): bool
     {
-        return $user->can('view_terms::type');
+        return $user->can('view_terms::types::terms::type');
     }
 
     /**
@@ -31,7 +31,7 @@ class TermsTypePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_terms::type');
+        return $user->can('create_terms::types::terms::type');
     }
 
     /**
@@ -39,7 +39,7 @@ class TermsTypePolicy
      */
     public function update(User $user, TermsType $termsType): bool
     {
-        return $user->can('update_terms::type');
+        return $user->can('update_terms::types::terms::type');
     }
 
     /**
@@ -47,7 +47,7 @@ class TermsTypePolicy
      */
     public function delete(User $user, TermsType $termsType): bool
     {
-        return $user->can('delete_terms::type');
+        return $user->can('delete_terms::types::terms::type');
     }
 
     /**
@@ -55,7 +55,7 @@ class TermsTypePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_terms::type');
+        return $user->can('delete_any_terms::types::terms::type');
     }
 
     /**
@@ -63,7 +63,7 @@ class TermsTypePolicy
      */
     public function forceDelete(User $user, TermsType $termsType): bool
     {
-        return $user->can('force_delete_terms::type');
+        return $user->can('force_delete_terms::types::terms::type');
     }
 
     /**
@@ -71,7 +71,7 @@ class TermsTypePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_terms::type');
+        return $user->can('force_delete_any_terms::types::terms::type');
     }
 
     /**
@@ -79,7 +79,7 @@ class TermsTypePolicy
      */
     public function restore(User $user, TermsType $termsType): bool
     {
-        return $user->can('restore_terms::type');
+        return $user->can('restore_terms::types::terms::type');
     }
 
     /**
@@ -87,7 +87,7 @@ class TermsTypePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_terms::type');
+        return $user->can('restore_any_terms::types::terms::type');
     }
 
     /**
@@ -95,7 +95,7 @@ class TermsTypePolicy
      */
     public function replicate(User $user, TermsType $termsType): bool
     {
-        return $user->can('replicate_terms::type');
+        return $user->can('replicate_terms::types::terms::type');
     }
 
     /**
@@ -103,6 +103,6 @@ class TermsTypePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_terms::type');
+        return $user->can('reorder_terms::types::terms::type');
     }
 }

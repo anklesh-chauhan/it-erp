@@ -15,7 +15,7 @@ class PackagingTypePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_packaging::type');
+        return $user->can('view_any_packaging::types::packaging::type');
     }
 
     /**
@@ -23,7 +23,7 @@ class PackagingTypePolicy
      */
     public function view(User $user, PackagingType $packagingType): bool
     {
-        return $user->can('view_packaging::type');
+        return $user->can('view_packaging::types::packaging::type');
     }
 
     /**
@@ -31,7 +31,7 @@ class PackagingTypePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_packaging::type');
+        return $user->can('create_packaging::types::packaging::type');
     }
 
     /**
@@ -39,7 +39,7 @@ class PackagingTypePolicy
      */
     public function update(User $user, PackagingType $packagingType): bool
     {
-        return $user->can('update_packaging::type');
+        return $user->can('update_packaging::types::packaging::type');
     }
 
     /**
@@ -47,7 +47,7 @@ class PackagingTypePolicy
      */
     public function delete(User $user, PackagingType $packagingType): bool
     {
-        return $user->can('delete_packaging::type');
+        return $user->can('delete_packaging::types::packaging::type');
     }
 
     /**
@@ -55,7 +55,7 @@ class PackagingTypePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_packaging::type');
+        return $user->can('delete_any_packaging::types::packaging::type');
     }
 
     /**
@@ -63,7 +63,7 @@ class PackagingTypePolicy
      */
     public function forceDelete(User $user, PackagingType $packagingType): bool
     {
-        return $user->can('force_delete_packaging::type');
+        return $user->can('force_delete_packaging::types::packaging::type');
     }
 
     /**
@@ -71,7 +71,7 @@ class PackagingTypePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_packaging::type');
+        return $user->can('force_delete_any_packaging::types::packaging::type');
     }
 
     /**
@@ -79,7 +79,7 @@ class PackagingTypePolicy
      */
     public function restore(User $user, PackagingType $packagingType): bool
     {
-        return $user->can('restore_packaging::type');
+        return $user->can('restore_packaging::types::packaging::type');
     }
 
     /**
@@ -87,7 +87,7 @@ class PackagingTypePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_packaging::type');
+        return $user->can('restore_any_packaging::types::packaging::type');
     }
 
     /**
@@ -95,7 +95,7 @@ class PackagingTypePolicy
      */
     public function replicate(User $user, PackagingType $packagingType): bool
     {
-        return $user->can('replicate_packaging::type');
+        return $user->can('replicate_packaging::types::packaging::type');
     }
 
     /**
@@ -103,6 +103,6 @@ class PackagingTypePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_packaging::type');
+        return $user->can('reorder_packaging::types::packaging::type');
     }
 }

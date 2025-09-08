@@ -15,7 +15,7 @@ class ContactDetailPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_contact::detail');
+        return $user->can('view_any_contact::details::contact::detail');
     }
 
     /**
@@ -23,7 +23,7 @@ class ContactDetailPolicy
      */
     public function view(User $user, ContactDetail $contactDetail): bool
     {
-        return $user->can('view_contact::detail');
+        return $user->can('view_contact::details::contact::detail');
     }
 
     /**
@@ -31,7 +31,7 @@ class ContactDetailPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_contact::detail');
+        return $user->can('create_contact::details::contact::detail');
     }
 
     /**
@@ -39,7 +39,7 @@ class ContactDetailPolicy
      */
     public function update(User $user, ContactDetail $contactDetail): bool
     {
-        return $user->can('update_contact::detail');
+        return $user->can('update_contact::details::contact::detail');
     }
 
     /**
@@ -47,7 +47,7 @@ class ContactDetailPolicy
      */
     public function delete(User $user, ContactDetail $contactDetail): bool
     {
-        return $user->can('delete_contact::detail');
+        return $user->can('delete_contact::details::contact::detail');
     }
 
     /**
@@ -55,7 +55,7 @@ class ContactDetailPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_contact::detail');
+        return $user->can('delete_any_contact::details::contact::detail');
     }
 
     /**
@@ -63,7 +63,7 @@ class ContactDetailPolicy
      */
     public function forceDelete(User $user, ContactDetail $contactDetail): bool
     {
-        return $user->can('force_delete_contact::detail');
+        return $user->can('force_delete_contact::details::contact::detail');
     }
 
     /**
@@ -71,7 +71,7 @@ class ContactDetailPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_contact::detail');
+        return $user->can('force_delete_any_contact::details::contact::detail');
     }
 
     /**
@@ -79,7 +79,7 @@ class ContactDetailPolicy
      */
     public function restore(User $user, ContactDetail $contactDetail): bool
     {
-        return $user->can('restore_contact::detail');
+        return $user->can('restore_contact::details::contact::detail');
     }
 
     /**
@@ -87,7 +87,7 @@ class ContactDetailPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_contact::detail');
+        return $user->can('restore_any_contact::details::contact::detail');
     }
 
     /**
@@ -95,7 +95,7 @@ class ContactDetailPolicy
      */
     public function replicate(User $user, ContactDetail $contactDetail): bool
     {
-        return $user->can('replicate_contact::detail');
+        return $user->can('replicate_contact::details::contact::detail');
     }
 
     /**
@@ -103,6 +103,6 @@ class ContactDetailPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_contact::detail');
+        return $user->can('reorder_contact::details::contact::detail');
     }
 }

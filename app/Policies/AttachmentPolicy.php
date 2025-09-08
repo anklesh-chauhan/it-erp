@@ -15,7 +15,7 @@ class AttachmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_attachment');
+        return $user->can('view_any_attachments::attachment');
     }
 
     /**
@@ -23,7 +23,7 @@ class AttachmentPolicy
      */
     public function view(User $user, Attachment $attachment): bool
     {
-        return $user->can('view_attachment');
+        return $user->can('view_attachments::attachment');
     }
 
     /**
@@ -31,7 +31,7 @@ class AttachmentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_attachment');
+        return $user->can('create_attachments::attachment');
     }
 
     /**
@@ -39,7 +39,7 @@ class AttachmentPolicy
      */
     public function update(User $user, Attachment $attachment): bool
     {
-        return $user->can('update_attachment');
+        return $user->can('update_attachments::attachment');
     }
 
     /**
@@ -47,7 +47,7 @@ class AttachmentPolicy
      */
     public function delete(User $user, Attachment $attachment): bool
     {
-        return $user->can('delete_attachment');
+        return $user->can('delete_attachments::attachment');
     }
 
     /**
@@ -55,7 +55,7 @@ class AttachmentPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_attachment');
+        return $user->can('delete_any_attachments::attachment');
     }
 
     /**
@@ -63,7 +63,7 @@ class AttachmentPolicy
      */
     public function forceDelete(User $user, Attachment $attachment): bool
     {
-        return $user->can('force_delete_attachment');
+        return $user->can('force_delete_attachments::attachment');
     }
 
     /**
@@ -71,7 +71,7 @@ class AttachmentPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_attachment');
+        return $user->can('force_delete_any_attachments::attachment');
     }
 
     /**
@@ -79,7 +79,7 @@ class AttachmentPolicy
      */
     public function restore(User $user, Attachment $attachment): bool
     {
-        return $user->can('restore_attachment');
+        return $user->can('restore_attachments::attachment');
     }
 
     /**
@@ -87,7 +87,7 @@ class AttachmentPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_attachment');
+        return $user->can('restore_any_attachments::attachment');
     }
 
     /**
@@ -95,7 +95,7 @@ class AttachmentPolicy
      */
     public function replicate(User $user, Attachment $attachment): bool
     {
-        return $user->can('replicate_attachment');
+        return $user->can('replicate_attachments::attachment');
     }
 
     /**
@@ -103,6 +103,6 @@ class AttachmentPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_attachment');
+        return $user->can('reorder_attachments::attachment');
     }
 }

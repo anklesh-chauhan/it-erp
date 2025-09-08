@@ -15,7 +15,7 @@ class GstPanPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_gst::pan');
+        return $user->can('view_any_gst::pans::gst::pan');
     }
 
     /**
@@ -23,7 +23,7 @@ class GstPanPolicy
      */
     public function view(User $user, GstPan $gstPan): bool
     {
-        return $user->can('view_gst::pan');
+        return $user->can('view_gst::pans::gst::pan');
     }
 
     /**
@@ -31,7 +31,7 @@ class GstPanPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_gst::pan');
+        return $user->can('create_gst::pans::gst::pan');
     }
 
     /**
@@ -39,7 +39,7 @@ class GstPanPolicy
      */
     public function update(User $user, GstPan $gstPan): bool
     {
-        return $user->can('update_gst::pan');
+        return $user->can('update_gst::pans::gst::pan');
     }
 
     /**
@@ -47,7 +47,7 @@ class GstPanPolicy
      */
     public function delete(User $user, GstPan $gstPan): bool
     {
-        return $user->can('delete_gst::pan');
+        return $user->can('delete_gst::pans::gst::pan');
     }
 
     /**
@@ -55,7 +55,7 @@ class GstPanPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_gst::pan');
+        return $user->can('delete_any_gst::pans::gst::pan');
     }
 
     /**
@@ -63,7 +63,7 @@ class GstPanPolicy
      */
     public function forceDelete(User $user, GstPan $gstPan): bool
     {
-        return $user->can('force_delete_gst::pan');
+        return $user->can('force_delete_gst::pans::gst::pan');
     }
 
     /**
@@ -71,7 +71,7 @@ class GstPanPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_gst::pan');
+        return $user->can('force_delete_any_gst::pans::gst::pan');
     }
 
     /**
@@ -79,7 +79,7 @@ class GstPanPolicy
      */
     public function restore(User $user, GstPan $gstPan): bool
     {
-        return $user->can('restore_gst::pan');
+        return $user->can('restore_gst::pans::gst::pan');
     }
 
     /**
@@ -87,7 +87,7 @@ class GstPanPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_gst::pan');
+        return $user->can('restore_any_gst::pans::gst::pan');
     }
 
     /**
@@ -95,7 +95,7 @@ class GstPanPolicy
      */
     public function replicate(User $user, GstPan $gstPan): bool
     {
-        return $user->can('replicate_gst::pan');
+        return $user->can('replicate_gst::pans::gst::pan');
     }
 
     /**
@@ -103,6 +103,6 @@ class GstPanPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_gst::pan');
+        return $user->can('reorder_gst::pans::gst::pan');
     }
 }

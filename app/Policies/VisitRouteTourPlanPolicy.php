@@ -15,7 +15,7 @@ class VisitRouteTourPlanPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_visit::route::tour::plan');
+        return $user->can('view_any_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -23,7 +23,7 @@ class VisitRouteTourPlanPolicy
      */
     public function view(User $user, VisitRouteTourPlan $visitRouteTourPlan): bool
     {
-        return $user->can('view_visit::route::tour::plan');
+        return $user->can('view_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -31,7 +31,7 @@ class VisitRouteTourPlanPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_visit::route::tour::plan');
+        return $user->can('create_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -39,7 +39,7 @@ class VisitRouteTourPlanPolicy
      */
     public function update(User $user, VisitRouteTourPlan $visitRouteTourPlan): bool
     {
-        return $user->can('update_visit::route::tour::plan');
+        return $user->can('update_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -47,7 +47,7 @@ class VisitRouteTourPlanPolicy
      */
     public function delete(User $user, VisitRouteTourPlan $visitRouteTourPlan): bool
     {
-        return $user->can('delete_visit::route::tour::plan');
+        return $user->can('delete_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -55,7 +55,7 @@ class VisitRouteTourPlanPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_visit::route::tour::plan');
+        return $user->can('delete_any_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -63,7 +63,7 @@ class VisitRouteTourPlanPolicy
      */
     public function forceDelete(User $user, VisitRouteTourPlan $visitRouteTourPlan): bool
     {
-        return $user->can('force_delete_visit::route::tour::plan');
+        return $user->can('force_delete_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -71,7 +71,7 @@ class VisitRouteTourPlanPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_visit::route::tour::plan');
+        return $user->can('force_delete_any_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -79,7 +79,7 @@ class VisitRouteTourPlanPolicy
      */
     public function restore(User $user, VisitRouteTourPlan $visitRouteTourPlan): bool
     {
-        return $user->can('restore_visit::route::tour::plan');
+        return $user->can('restore_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -87,7 +87,7 @@ class VisitRouteTourPlanPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_visit::route::tour::plan');
+        return $user->can('restore_any_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -95,7 +95,7 @@ class VisitRouteTourPlanPolicy
      */
     public function replicate(User $user, VisitRouteTourPlan $visitRouteTourPlan): bool
     {
-        return $user->can('replicate_visit::route::tour::plan');
+        return $user->can('replicate_visit::route::tour::plans::visit::route::tour::plan');
     }
 
     /**
@@ -103,6 +103,6 @@ class VisitRouteTourPlanPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_visit::route::tour::plan');
+        return $user->can('reorder_visit::route::tour::plans::visit::route::tour::plan');
     }
 }

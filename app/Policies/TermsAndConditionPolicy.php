@@ -15,7 +15,7 @@ class TermsAndConditionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_terms::and::condition');
+        return $user->can('view_any_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -23,7 +23,7 @@ class TermsAndConditionPolicy
      */
     public function view(User $user, TermsAndCondition $termsAndCondition): bool
     {
-        return $user->can('view_terms::and::condition');
+        return $user->can('view_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -31,7 +31,7 @@ class TermsAndConditionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_terms::and::condition');
+        return $user->can('create_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -39,7 +39,7 @@ class TermsAndConditionPolicy
      */
     public function update(User $user, TermsAndCondition $termsAndCondition): bool
     {
-        return $user->can('update_terms::and::condition');
+        return $user->can('update_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -47,7 +47,7 @@ class TermsAndConditionPolicy
      */
     public function delete(User $user, TermsAndCondition $termsAndCondition): bool
     {
-        return $user->can('delete_terms::and::condition');
+        return $user->can('delete_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -55,7 +55,7 @@ class TermsAndConditionPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_terms::and::condition');
+        return $user->can('delete_any_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -63,7 +63,7 @@ class TermsAndConditionPolicy
      */
     public function forceDelete(User $user, TermsAndCondition $termsAndCondition): bool
     {
-        return $user->can('force_delete_terms::and::condition');
+        return $user->can('force_delete_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -71,7 +71,7 @@ class TermsAndConditionPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_terms::and::condition');
+        return $user->can('force_delete_any_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -79,7 +79,7 @@ class TermsAndConditionPolicy
      */
     public function restore(User $user, TermsAndCondition $termsAndCondition): bool
     {
-        return $user->can('restore_terms::and::condition');
+        return $user->can('restore_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -87,7 +87,7 @@ class TermsAndConditionPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_terms::and::condition');
+        return $user->can('restore_any_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -95,7 +95,7 @@ class TermsAndConditionPolicy
      */
     public function replicate(User $user, TermsAndCondition $termsAndCondition): bool
     {
-        return $user->can('replicate_terms::and::condition');
+        return $user->can('replicate_terms::and::conditions::terms::and::condition');
     }
 
     /**
@@ -103,6 +103,6 @@ class TermsAndConditionPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_terms::and::condition');
+        return $user->can('reorder_terms::and::conditions::terms::and::condition');
     }
 }

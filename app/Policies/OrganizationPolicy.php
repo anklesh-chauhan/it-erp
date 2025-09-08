@@ -15,7 +15,7 @@ class OrganizationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_organization');
+        return $user->can('view_any_organizations::organization');
     }
 
     /**
@@ -23,7 +23,7 @@ class OrganizationPolicy
      */
     public function view(User $user, Organization $organization): bool
     {
-        return $user->can('view_organization');
+        return $user->can('view_organizations::organization');
     }
 
     /**
@@ -31,7 +31,7 @@ class OrganizationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_organization');
+        return $user->can('create_organizations::organization');
     }
 
     /**
@@ -39,7 +39,7 @@ class OrganizationPolicy
      */
     public function update(User $user, Organization $organization): bool
     {
-        return $user->can('update_organization');
+        return $user->can('update_organizations::organization');
     }
 
     /**
@@ -47,7 +47,7 @@ class OrganizationPolicy
      */
     public function delete(User $user, Organization $organization): bool
     {
-        return $user->can('delete_organization');
+        return $user->can('delete_organizations::organization');
     }
 
     /**
@@ -55,7 +55,7 @@ class OrganizationPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_organization');
+        return $user->can('delete_any_organizations::organization');
     }
 
     /**
@@ -63,7 +63,7 @@ class OrganizationPolicy
      */
     public function forceDelete(User $user, Organization $organization): bool
     {
-        return $user->can('force_delete_organization');
+        return $user->can('force_delete_organizations::organization');
     }
 
     /**
@@ -71,7 +71,7 @@ class OrganizationPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_organization');
+        return $user->can('force_delete_any_organizations::organization');
     }
 
     /**
@@ -79,7 +79,7 @@ class OrganizationPolicy
      */
     public function restore(User $user, Organization $organization): bool
     {
-        return $user->can('restore_organization');
+        return $user->can('restore_organizations::organization');
     }
 
     /**
@@ -87,7 +87,7 @@ class OrganizationPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_organization');
+        return $user->can('restore_any_organizations::organization');
     }
 
     /**
@@ -95,7 +95,7 @@ class OrganizationPolicy
      */
     public function replicate(User $user, Organization $organization): bool
     {
-        return $user->can('replicate_organization');
+        return $user->can('replicate_organizations::organization');
     }
 
     /**
@@ -103,6 +103,6 @@ class OrganizationPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_organization');
+        return $user->can('reorder_organizations::organization');
     }
 }

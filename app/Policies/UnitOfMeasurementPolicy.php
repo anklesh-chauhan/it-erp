@@ -15,7 +15,7 @@ class UnitOfMeasurementPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_unit::of::measurement');
+        return $user->can('view_any_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -23,7 +23,7 @@ class UnitOfMeasurementPolicy
      */
     public function view(User $user, UnitOfMeasurement $unitOfMeasurement): bool
     {
-        return $user->can('view_unit::of::measurement');
+        return $user->can('view_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -31,7 +31,7 @@ class UnitOfMeasurementPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_unit::of::measurement');
+        return $user->can('create_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -39,7 +39,7 @@ class UnitOfMeasurementPolicy
      */
     public function update(User $user, UnitOfMeasurement $unitOfMeasurement): bool
     {
-        return $user->can('update_unit::of::measurement');
+        return $user->can('update_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -47,7 +47,7 @@ class UnitOfMeasurementPolicy
      */
     public function delete(User $user, UnitOfMeasurement $unitOfMeasurement): bool
     {
-        return $user->can('delete_unit::of::measurement');
+        return $user->can('delete_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -55,7 +55,7 @@ class UnitOfMeasurementPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_unit::of::measurement');
+        return $user->can('delete_any_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -63,7 +63,7 @@ class UnitOfMeasurementPolicy
      */
     public function forceDelete(User $user, UnitOfMeasurement $unitOfMeasurement): bool
     {
-        return $user->can('force_delete_unit::of::measurement');
+        return $user->can('force_delete_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -71,7 +71,7 @@ class UnitOfMeasurementPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_unit::of::measurement');
+        return $user->can('force_delete_any_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -79,7 +79,7 @@ class UnitOfMeasurementPolicy
      */
     public function restore(User $user, UnitOfMeasurement $unitOfMeasurement): bool
     {
-        return $user->can('restore_unit::of::measurement');
+        return $user->can('restore_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -87,7 +87,7 @@ class UnitOfMeasurementPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_unit::of::measurement');
+        return $user->can('restore_any_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -95,7 +95,7 @@ class UnitOfMeasurementPolicy
      */
     public function replicate(User $user, UnitOfMeasurement $unitOfMeasurement): bool
     {
-        return $user->can('replicate_unit::of::measurement');
+        return $user->can('replicate_unit::of::measurements::unit::of::measurement');
     }
 
     /**
@@ -103,6 +103,6 @@ class UnitOfMeasurementPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_unit::of::measurement');
+        return $user->can('reorder_unit::of::measurements::unit::of::measurement');
     }
 }

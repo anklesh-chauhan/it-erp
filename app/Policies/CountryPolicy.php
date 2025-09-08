@@ -15,7 +15,7 @@ class CountryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_country');
+        return $user->can('view_any_countries::country');
     }
 
     /**
@@ -23,7 +23,7 @@ class CountryPolicy
      */
     public function view(User $user, Country $country): bool
     {
-        return $user->can('view_country');
+        return $user->can('view_countries::country');
     }
 
     /**
@@ -31,7 +31,7 @@ class CountryPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_country');
+        return $user->can('create_countries::country');
     }
 
     /**
@@ -39,7 +39,7 @@ class CountryPolicy
      */
     public function update(User $user, Country $country): bool
     {
-        return $user->can('update_country');
+        return $user->can('update_countries::country');
     }
 
     /**
@@ -47,7 +47,7 @@ class CountryPolicy
      */
     public function delete(User $user, Country $country): bool
     {
-        return $user->can('delete_country');
+        return $user->can('delete_countries::country');
     }
 
     /**
@@ -55,7 +55,7 @@ class CountryPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_country');
+        return $user->can('delete_any_countries::country');
     }
 
     /**
@@ -63,7 +63,7 @@ class CountryPolicy
      */
     public function forceDelete(User $user, Country $country): bool
     {
-        return $user->can('force_delete_country');
+        return $user->can('force_delete_countries::country');
     }
 
     /**
@@ -71,7 +71,7 @@ class CountryPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_country');
+        return $user->can('force_delete_any_countries::country');
     }
 
     /**
@@ -79,7 +79,7 @@ class CountryPolicy
      */
     public function restore(User $user, Country $country): bool
     {
-        return $user->can('restore_country');
+        return $user->can('restore_countries::country');
     }
 
     /**
@@ -87,7 +87,7 @@ class CountryPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_country');
+        return $user->can('restore_any_countries::country');
     }
 
     /**
@@ -95,7 +95,7 @@ class CountryPolicy
      */
     public function replicate(User $user, Country $country): bool
     {
-        return $user->can('replicate_country');
+        return $user->can('replicate_countries::country');
     }
 
     /**
@@ -103,6 +103,6 @@ class CountryPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_country');
+        return $user->can('reorder_countries::country');
     }
 }

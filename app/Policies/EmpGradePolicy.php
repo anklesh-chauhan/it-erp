@@ -15,7 +15,7 @@ class EmpGradePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_emp::grade');
+        return $user->can('view_any_emp::grades::emp::grade');
     }
 
     /**
@@ -23,7 +23,7 @@ class EmpGradePolicy
      */
     public function view(User $user, EmpGrade $empGrade): bool
     {
-        return $user->can('view_emp::grade');
+        return $user->can('view_emp::grades::emp::grade');
     }
 
     /**
@@ -31,7 +31,7 @@ class EmpGradePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_emp::grade');
+        return $user->can('create_emp::grades::emp::grade');
     }
 
     /**
@@ -39,7 +39,7 @@ class EmpGradePolicy
      */
     public function update(User $user, EmpGrade $empGrade): bool
     {
-        return $user->can('update_emp::grade');
+        return $user->can('update_emp::grades::emp::grade');
     }
 
     /**
@@ -47,7 +47,7 @@ class EmpGradePolicy
      */
     public function delete(User $user, EmpGrade $empGrade): bool
     {
-        return $user->can('delete_emp::grade');
+        return $user->can('delete_emp::grades::emp::grade');
     }
 
     /**
@@ -55,7 +55,7 @@ class EmpGradePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_emp::grade');
+        return $user->can('delete_any_emp::grades::emp::grade');
     }
 
     /**
@@ -63,7 +63,7 @@ class EmpGradePolicy
      */
     public function forceDelete(User $user, EmpGrade $empGrade): bool
     {
-        return $user->can('force_delete_emp::grade');
+        return $user->can('force_delete_emp::grades::emp::grade');
     }
 
     /**
@@ -71,7 +71,7 @@ class EmpGradePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_emp::grade');
+        return $user->can('force_delete_any_emp::grades::emp::grade');
     }
 
     /**
@@ -79,7 +79,7 @@ class EmpGradePolicy
      */
     public function restore(User $user, EmpGrade $empGrade): bool
     {
-        return $user->can('restore_emp::grade');
+        return $user->can('restore_emp::grades::emp::grade');
     }
 
     /**
@@ -87,7 +87,7 @@ class EmpGradePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_emp::grade');
+        return $user->can('restore_any_emp::grades::emp::grade');
     }
 
     /**
@@ -95,7 +95,7 @@ class EmpGradePolicy
      */
     public function replicate(User $user, EmpGrade $empGrade): bool
     {
-        return $user->can('replicate_emp::grade');
+        return $user->can('replicate_emp::grades::emp::grade');
     }
 
     /**
@@ -103,6 +103,6 @@ class EmpGradePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_emp::grade');
+        return $user->can('reorder_emp::grades::emp::grade');
     }
 }
