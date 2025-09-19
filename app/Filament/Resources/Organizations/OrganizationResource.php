@@ -171,7 +171,7 @@ class OrganizationResource extends Resource
                                 TextInput::make('registration_number')
                                     ->maxLength(255)
                                     ->placeholder('e.g., ABC-12345'),
-                                TextInput::make('GST Number') // Consider renaming to 'GST_number' for consistency or use label()
+                                TextInput::make('gst_number') // Consider renaming to 'GST_number' for consistency or use label()
                                     ->maxLength(255)
                                     ->placeholder('e.g., 22AAAAA0000A1Z2'),
                                 DatePicker::make('registration_date'),

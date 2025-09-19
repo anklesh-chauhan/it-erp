@@ -25,7 +25,11 @@ return new class extends Migration
             $table->enum('status', ['draft', 'sent', 'accepted', 'rejected', 'canceled'])->default('draft');
             $table->foreignId('sales_person_id')->nullable()->constrained('users')->onDelete('cascade'); // Assuming you have a users table
             $table->decimal('subtotal', 15, 2)->default(0);
+            $table->enum('discount_type', ['percentage', 'amoount'])->nullable(); // e.g., 'percentage' or 'fixed'
+            $table->decimal('discount_value', 15, 2)->nullable(); // e.g., '10.00' for 10% or '50.00' for fixed amount
+            $table->decimal('transaction_discount', 15, 2)->default(0); // Computed discount amount
             $table->decimal('tax', 15, 2)->default(0);
+            $table->decimal('round_off', 15, 2)->default(0); //round off to 2 decimal places
             $table->decimal('total', 15, 2)->default(0);
             $table->string('currency', 3)->default('INR'); // Assuming INR as default currency
             $table->string('payment_terms')->nullable(); // e.g., 'Net 30', 'Due on receipt'

@@ -11,4 +11,11 @@ class CreateSalesInvoice extends CreateRecord
 {
     use SalesDocumentResourceTrait;
     protected static string $resource = SalesInvoiceResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            static::getSalesDocumentPreferenceAction(), // ⚙ at top
+        ];
+    }
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->boolean('encrypt_pdf')->default(false);
 
             // Discounts
-            $table->enum('discount_level', ['none', 'line_item', 'transaction'])->default('none');
+            $table->enum('discount_level', ['none', 'line_item', 'transaction'])->default('line_item');
 
             // Additional charges
             $table->boolean('include_adjustments')->default(false);

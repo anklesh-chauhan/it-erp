@@ -11,4 +11,11 @@ class CreateSalesOrder extends CreateRecord
 {
     use SalesDocumentResourceTrait;
     protected static string $resource = SalesOrderResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            static::getSalesDocumentPreferenceAction(), // ⚙ at top
+        ];
+    }
 }

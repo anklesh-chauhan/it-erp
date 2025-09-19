@@ -31,8 +31,8 @@ use App\Models\Address;
 use App\Models\Organization;
 use App\Models\TaxDetail;
 use Illuminate\Database\Eloquent\Model;
-
-
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Form;
 
 trait SalesDocumentResourceTrait
 {
@@ -41,6 +41,7 @@ trait SalesDocumentResourceTrait
     use AddressDetailsTrait;
     use ItemMasterTrait;
     use AccountMasterDetailsTrait;
+    use SalesDocumentPreferenceTrait;
 
     protected static function resolveModelClass(): string
     {
@@ -51,6 +52,31 @@ trait SalesDocumentResourceTrait
     {
 
         $companyAccountFields = self::getAccountMasterDetailsTraitField();
+
+        // Get the record from the route
+        $record = request()->route('record');
+        $modelClass = static::resolveModelClass();
+
+        // If record is a string (e.g., ID), fetch the actual model instance
+        if (is_string($record)) {
+            $record = $modelClass::find($record);
+        }
+        // Determine discount mode: prioritize record's discount_mode, fallback to preference
+
+        $recordDiscountMode = optional($record)->discount_mode;
+
+        // ⚠️ CHANGE: Get discount mode from form state if available, otherwise from record or preference
+        // Define the callable to get the discount mode value
+        $discountModeCallable = fn(callable $get) => $get('discount_mode') 
+            ?? optional($record)->discount_mode 
+            ?? (SalesDocumentPreference::first()?->discount_level ?? 'none');
+
+        // Now, define the visibility booleans using the callable's result
+        $showLineItemDiscount = fn(callable $get) => $discountModeCallable($get) === 'line_item';
+        $showTransactionDiscount = fn(callable $get) => $discountModeCallable($get) === 'transaction';
+
+
+        // $showLineItemDiscount = SalesDocumentPreference::first()?->discount_level === 'line_item';
 
         return [
             Grid::make(4)
@@ -79,6 +105,12 @@ trait SalesDocumentResourceTrait
                         ->placeholder('Select a sales person...')
                         ->required()
                         ->default(Auth::id()),
+                    Hidden::make('discount_mode')
+                        ->default(fn () => 
+                            optional($record)->discount_mode 
+                            ?? SalesDocumentPreference::first()?->discount_level 
+                            ?? 'none'
+                        ),
 
                 ])->columnSpanFull(),
 
@@ -113,20 +145,28 @@ trait SalesDocumentResourceTrait
                     ->extraAttributes([
                         'class' => 'invoice-items-repeater',
                     ])
-                    ->table([
-                        TableColumn::make('Item                                                              ')
-                            ->width('350px'),
-                        TableColumn::make('Description                                                            ')->width('450px'),
-                        TableColumn::make('Quantity           ')->width('100px'),
-                        TableColumn::make('HSN/SAC'),
-                        TableColumn::make('Price                      ')->width('100px'),
-                        TableColumn::make('Disc %        ')->width('100px'),
-                        TableColumn::make('Tax Rate %          ')->width('100px'),
-                        TableColumn::make('Taxable Amount                      ')->width('100px'),
-                        TableColumn::make(' ')->width('10px'),
-                    ])
+                    ->table(
+                        fn (callable $get) => collect([
+                            TableColumn::make('Item                                                                    ')
+                                ->width('350px'),
+                            TableColumn::make('Description                                                            ')->width('450px'),
+                            TableColumn::make('Quantity           ')->width('100px'),
+                            TableColumn::make('HSN/SAC'),
+                            TableColumn::make('Price                      ')->width('100px'),
+                            
+                            // 🚀 Correctly execute the callable here with the $get from the closure
+                            $showLineItemDiscount($get)
+                                ? TableColumn::make('Disc %        ')->width('100px') 
+                                : null,
+
+                            TableColumn::make('Tax Rate %              ')->width('100px'),
+                            TableColumn::make('Taxable Amount                      ')->width('100px'),
+                            TableColumn::make(' ')->width('10px'),
+                        ])->filter()->all()
+                    )
                     ->relationship('items')
-                    ->schema([
+                    ->schema(
+                        fn (callable $get) => collect([
                         Select::make('item_master_id')
                             ->label(false)
                             ->relationship('itemMaster', 'item_name')
@@ -177,7 +217,7 @@ trait SalesDocumentResourceTrait
                                         $set('price', $item->selling_price ?? 0); // Auto-fetch Price (assuming 'sale_price' field in ItemMaster)
                                             // ✅ Automatically calculate total tax rate from related taxes
                                         $totalTaxRate = $item->taxes->sum('total_rate');
-                                        $set('tax_rate', $totalTaxRate);
+                                        $set('tax_rate', number_format($totalTaxRate, 2, '.', ''));
                                     } else {
                                         $set('description', '');
                                         $set('hsn_sac', '');
@@ -230,19 +270,17 @@ trait SalesDocumentResourceTrait
                                     self::updateTotals($set, $get);
                                 }),
 
-                            TextInput::make('discount')
-                                ->label(false)
-                                ->numeric()
-                                ->default(0)
-                                ->live(onBlur: true)
-                                ->extraFieldWrapperAttributes(['class' => 'min-w-[100px]'])
-                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                    self::updateItemAmount($set, $get);
-                                    self::updateTotals($set, $get);
-                                })
-                                ->visible(function () {
-                                    return SalesDocumentPreference::first()?->discount_level === 'line_item';
-                                }),
+                            $showLineItemDiscount($get)
+                                ? TextInput::make('discount')
+                                    ->label(false)
+                                    ->numeric()
+                                    ->default(0)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        self::updateItemAmount($set, $get);
+                                        self::updateTotals($set, $get);
+                                    })
+                                : null,
 
                             Select::make('tax_rate')
                                 ->label(false)
@@ -296,7 +334,8 @@ trait SalesDocumentResourceTrait
                                     // Always format to 2 decimal places
                                     return number_format($value, 2, '.', '');
                                 }),
-                        ])
+                        ])->filter()->all() // removes null entries safely
+                    )
                     ->afterStateHydrated(function (callable $set, callable $get) {
                         self::updateTotals($set, $get);
                     })
@@ -314,61 +353,83 @@ trait SalesDocumentResourceTrait
                     })
                     ->columnSpanFull()
                     ->addActionLabel('Add Item'),
-
-                Grid::make(4)
+                Section::make()
+                ->schema([
+                    Grid::make(7)
                     ->schema([
-                        Group::make()
-                            ->schema([
-                                TextInput::make('subtotal')
-                                    ->label('Subtotal')
-                                    ->inlineLabel()
-                                    ->readOnly()
-                                    ->extraInputAttributes(['class' => 'text-right'])
-                                    ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
-
-                                TextInput::make('transaction_discount')
-                                    ->label('Transaction Discount')
-                                    ->inlineLabel()
-                                    ->visible(fn () => SalesDocumentPreference::first()?->discount_level === 'transaction')
-                                    ->numeric()
-                                    ->default(0)
-                                    ->suffix('%'),
-
-                                TextInput::make('cgst')
-                                    ->label('CGST')
-                                    ->inlineLabel()
-                                    ->readOnly()
-                                    ->extraInputAttributes(['class' => 'text-right'])
-                                    ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
-                                    ->visible(fn (callable $get) => self::shouldShowCgstSgst($get)),
-
-                                TextInput::make('sgst')
-                                    ->label('SGST')
-                                    ->inlineLabel()
-                                    ->readOnly()
-                                    ->extraInputAttributes(['class' => 'text-right'])
-                                    ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
-                                    ->visible(fn (callable $get) => self::shouldShowCgstSgst($get)),
-
-                                TextInput::make('igst')
-                                    ->label('IGST')
-                                    ->inlineLabel()
-                                    ->readOnly()
-                                    ->extraInputAttributes(['class' => 'text-right'])
-                                    ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
-                                    ->visible(fn (callable $get) => !self::shouldShowCgstSgst($get)),
-
-                                TextInput::make('total')
-                                    ->label('Total')
-                                    ->inlineLabel()
-                                    ->readOnly()
-                                    ->extraInputAttributes(['class' => 'text-right'])
-                                    ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+                        Select::make('discount_type')
+                            ->label('Disc Type')
+                            ->options([
+                                'percentage' => '%',
+                                'amount'     => '₹',
                             ])
-                            ->columnStart(4) // Push the entire group into the 4th column
-                            ->columnSpan(1),
+                            ->native(false)
+                            ->default(fn () => $record && $record->discount_type ? $record->discount_type : 'percentage')
+                            ->live() // make the select reactive
+                            ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                self::updateTotals($set, $get)
+                            )
+                            ->hidden(fn (callable $get) => !$showTransactionDiscount($get)),
+
+                        TextInput::make('discount_value')
+                            ->label('Disc Value')
+                            ->numeric()
+                            ->default(fn () => $record && is_numeric($record->discount_value) ? $record->discount_value : 0)
+                                ->minValue(0)
+                                ->maxValue(fn (callable $get) => $get('discount_type') === 'percentage' ? 100 : 99999999)
+                            ->suffix(fn (callable $get) => $get('discount_type') === 'percentage' ? '%' : '₹')
+                            ->live() // make the select reactive
+                            ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                self::updateTotals($set, $get)
+                            )
+                            ->hidden(fn (callable $get) => !$showTransactionDiscount($get)),
+
+                            // Show computed discount amount (read-only)
+                        TextInput::make('transaction_discount')
+                            ->label('Disc Amount')
+                            ->readOnly()
+                            ->default(fn () => $record && is_numeric($record->transaction_discount) ? number_format((float) $record->transaction_discount, 2, '.', '') : '0.00')
+                            ->extraInputAttributes(['class' => 'text-right'])
+                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+                
+                        TextInput::make('subtotal')
+                            ->label('Subtotal')
+                            ->readOnly()
+                            ->extraInputAttributes(['class' => 'text-right'])
+                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+
+                        TextInput::make('cgst')
+                            ->label('CGST')
+                            ->readOnly()
+                            ->extraInputAttributes(['class' => 'text-right'])
+                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                            ->visible(fn (callable $get) => self::shouldShowCgstSgst($get)),
+
+                        TextInput::make('sgst')
+                            ->label('SGST')
+                            ->readOnly()
+                            ->extraInputAttributes(['class' => 'text-right'])
+                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                            ->visible(fn (callable $get) => self::shouldShowCgstSgst($get)),
+
+                        TextInput::make('igst')
+                            ->label('IGST')
+                            ->readOnly()
+                            ->extraInputAttributes(['class' => 'text-right'])
+                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                            ->visible(fn (callable $get) => !self::shouldShowCgstSgst($get)),
+
+                        TextInput::make('total')
+                            ->label('Total')
+                            ->readOnly()
+                            ->extraInputAttributes(['class' => 'text-right'])
+                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+                        
+                        Hidden::make('discount_mode'),
+                        Hidden::make('gross_total'),
+                        Hidden::make('tax'),
                     ])
-                    ->columnSpanFull()
+                ]), // Empty section for spacing
             ])->columnSpanFull(),
 
                 Textarea::make('description')
@@ -463,60 +524,145 @@ trait SalesDocumentResourceTrait
     private static function updateTotals(callable $set, callable $get): void
     {
         $items = $get('items') ?? [];
-        $subtotal = 0;
+
+        // Get the record from the route
+        $record = request()->route('record');
+        $modelClass = static::resolveModelClass();
+        if (is_string($record)) {
+            $record = $modelClass::find($record);
+        }
+
+        // Determine discount mode: prioritize record's discount_mode, fallback to preference
+        $recordDiscountMode = optional($record)->discount_mode;
+        $discountLevel = $get('discount_mode')
+            ?? optional($record)->discount_mode
+            ?? (SalesDocumentPreference::first()?->discount_level ?? 'none');
+
+        $originalSubtotal = 0;       // Subtotal before ANY discount
+        $discountedSubtotal = 0;     // After applying discount
         $cgstTotal = 0;
         $sgstTotal = 0;
         $igstTotal = 0;
+        $transactionDiscountAmount = 0;
 
         $useCgstSgst = self::shouldShowCgstSgst($get);
+        $lineData = [];
 
+        // --- First loop: calculate gross + line-level discounts ---
         foreach ($items as $key => $item) {
             $path = "items.{$key}";
             $quantity = floatval($get("{$path}.quantity") ?? 1);
             $price = floatval($get("{$path}.price") ?? 0);
             $discount = floatval($get("{$path}.discount") ?? 0);
-            $taxRate = floatval($get("{$path}.tax_rate") ?? 0);
-            $itemMasterId = $get("{$path}.item_master_id");
 
-            $discountAmount = ($quantity * $price) * ($discount / 100);
-            $amount = ($quantity * $price) - $discountAmount;
-            $set("{$path}.amount", number_format($amount, 2, '.', ''));
+            $lineSubtotal = $quantity * $price;
+            $originalSubtotal += $lineSubtotal;
 
-            $subtotal += $amount;
+            $lineDiscountAmount = 0;
+            if ($discountLevel === 'line_item') {
+                $lineDiscountAmount = $lineSubtotal * ($discount / 100);
+                $transactionDiscountAmount += $lineDiscountAmount;
+            }
 
-            if ($itemMasterId && $taxRate) {
-                $item = ItemMaster::with('taxes.components')->find($itemMasterId);
-                $tax = $item->taxes->firstWhere('total_rate', $taxRate);
-                if ($tax) {
-                    $components = $tax->components;
-                    if ($useCgstSgst) {
-                        $cgstComponent = $components->firstWhere('type', 'CGST');
-                        $sgstComponent = $components->firstWhere('type', 'SGST');
-                        if ($cgstComponent) {
-                            $cgstTotal += $amount * ($cgstComponent->rate / 100);
+            $lineAmount = $lineSubtotal - $lineDiscountAmount;
+            $discountedSubtotal += $lineAmount;
+
+            $set("{$path}.amount", number_format($lineAmount, 2, '.', ''));
+
+            $lineData[$key] = [
+                'gross' => $lineSubtotal,   // Keep gross for proportion allocation
+                'amount' => $lineAmount,    // Net after line discount
+                'tax_rate' => floatval($get("{$path}.tax_rate") ?? 0),
+                'item_master_id' => $get("{$path}.item_master_id"),
+            ];
+        }
+
+        // --- Transaction-level discount ---
+        if ($discountLevel === 'transaction') {
+            // Use record values in edit mode, otherwise form values
+            $discountTypeRaw = $record && $record->discount_type ? $record->discount_type : ($get('discount_type') ?? 'percentage');
+            $discountValue = $record && is_numeric($record->discount_value) ? floatval($record->discount_value) : floatval($get('discount_value') ?? 0);
+            $discountType = strtolower(trim($discountTypeRaw));
+
+            // Calculate transaction discount
+            if ($discountType === 'percentage' || $discountType === '%') {
+                $transactionDiscountAmount = $discountedSubtotal * ($discountValue / 100);
+            } else {
+                $transactionDiscountAmount = $discountValue;
+            }
+
+            // In edit mode, use stored transaction_discount if available
+            if ($record && is_numeric($record->transaction_discount)) {
+                $transactionDiscountAmount = floatval($record->transaction_discount);
+            }
+
+            $discountedSubtotal = max(0, $discountedSubtotal - $transactionDiscountAmount);
+
+            // Allocate proportionally for tax calc
+            foreach ($lineData as $key => $data) {
+                $proportion = $originalSubtotal > 0 ? ($data['gross'] / $originalSubtotal) : 0;
+                $adjustedAmount = $data['gross'] - ($transactionDiscountAmount * $proportion);
+
+                // Apply taxes on adjusted amount
+                if ($data['item_master_id'] && $data['tax_rate']) {
+                    $item = ItemMaster::with('taxes.components')->find($data['item_master_id']);
+                    $tax = $item?->taxes?->firstWhere('total_rate', $data['tax_rate']);
+                    if ($tax) {
+                        foreach ($tax->components as $component) {
+                            if ($useCgstSgst) {
+                                if ($component->type === 'CGST') {
+                                    $cgstTotal += $adjustedAmount * ($component->rate / 100);
+                                }
+                                if ($component->type === 'SGST') {
+                                    $sgstTotal += $adjustedAmount * ($component->rate / 100);
+                                }
+                            } else {
+                                if ($component->type === 'IGST') {
+                                    $igstTotal += $adjustedAmount * ($component->rate / 100);
+                                }
+                            }
                         }
-                        if ($sgstComponent) {
-                            $sgstTotal += $amount * ($sgstComponent->rate / 100);
-                        }
-                    } else {
-                        $igstComponent = $components->firstWhere('type', 'IGST');
-                        if ($igstComponent) {
-                            $igstTotal += $amount * ($igstComponent->rate / 100);
+                    }
+                }
+            }
+        } else {
+            // --- Line-level discount → already included in lineAmount ---
+            foreach ($lineData as $data) {
+                if ($data['item_master_id'] && $data['tax_rate']) {
+                    $item = ItemMaster::with('taxes.components')->find($data['item_master_id']);
+                    $tax = $item?->taxes?->firstWhere('total_rate', $data['tax_rate']);
+                    if ($tax) {
+                        foreach ($tax->components as $component) {
+                            if ($useCgstSgst) {
+                                if ($component->type === 'CGST') {
+                                    $cgstTotal += $data['amount'] * ($component->rate / 100);
+                                }
+                                if ($component->type === 'SGST') {
+                                    $sgstTotal += $data['amount'] * ($component->rate / 100);
+                                }
+                            } else {
+                                if ($component->type === 'IGST') {
+                                    $igstTotal += $data['amount'] * ($component->rate / 100);
+                                }
+                            }
                         }
                     }
                 }
             }
         }
 
-        $transactionDiscount = floatval($get('transaction_discount') ?? 0);
-        $transactionDiscountAmount = $subtotal * ($transactionDiscount / 100);
-        $subtotalAfterDiscount = $subtotal - $transactionDiscountAmount;
-        $total = $subtotalAfterDiscount + $cgstTotal + $sgstTotal + $igstTotal;
+        $tax = $cgstTotal + $sgstTotal + $igstTotal;
+        $total = $discountedSubtotal + $tax;
 
-        $set('subtotal', number_format($subtotal, 2, '.', ''));
+        // --- Set values in form state ---
+        $set('gross_total', number_format($originalSubtotal, 2, '.', ''));
+        $set('subtotal', number_format($discountedSubtotal, 2, '.', ''));
+        $set('transaction_discount', number_format($transactionDiscountAmount, 2, '.', ''));
+        // $set('discount_mode', $discountLevel);
         $set('cgst', number_format($cgstTotal, 2, '.', ''));
         $set('sgst', number_format($sgstTotal, 2, '.', ''));
         $set('igst', number_format($igstTotal, 2, '.', ''));
+        $set('tax', number_format($tax, 2, '.', ''));
         $set('total', number_format($total, 2, '.', ''));
     }
 
@@ -531,83 +677,120 @@ trait SalesDocumentResourceTrait
     }
 
     protected function saveTaxDetailsFromModel(): void
-    {
-        $record = $this->record ?? null;
+{
+    $record = $this->record ?? null;
 
-        if (!$record) {
-            return;
+    if (!$record) {
+        return;
+    }
+
+    // Reload items
+    $record->load('items');
+    $items = $record->items;
+
+    if ($items->isEmpty()) {
+        return;
+    }
+
+    // Delete existing tax details
+    TaxDetail::where('taxable_type', get_class($record))
+        ->where('taxable_id', $record->id)
+        ->delete();
+
+    $useCgstSgst = $this->shouldShowCgstSgst(fn ($field) => data_get($this->form->getState(), $field));
+    $discountLevel = SalesDocumentPreference::first()?->discount_level ?? 'none';
+
+    // --- Pre-calculation ---
+    $grossTotal = 0;
+    foreach ($items as $item) {
+        $grossTotal += floatval($item->quantity ?? 1) * floatval($item->price ?? 0);
+    }
+
+    $transactionDiscountAmount = 0;
+    if ($discountLevel === 'transaction') {
+        $discountTypeRaw = data_get($this->form->getState(), 'discount_type', 'percentage');
+        $discountType = strtolower(trim($discountTypeRaw));
+        $discountValue = floatval(data_get($this->form->getState(), 'discount_value', 0));
+
+        if ($discountType === 'percentage' || $discountType === '%') {
+            $transactionDiscountAmount = $grossTotal * ($discountValue / 100);
+        } else {
+            $transactionDiscountAmount = $discountValue;
+        }
+    }
+
+    // --- Per item calculation ---
+    foreach ($items as $item) {
+        $quantity = floatval($item->quantity ?? 1);
+        $price = floatval($item->price ?? 0);
+        $discount = floatval($item->discount ?? 0);
+        $taxRate = floatval($item->tax_rate ?? 0);
+        $itemMasterId = $item->item_master_id ?? null;
+
+        $lineGross = $quantity * $price;
+        $taxableAmount = $lineGross;
+
+        if ($discountLevel === 'line_item') {
+            // line level discount only
+            $lineDiscount = $lineGross * ($discount / 100);
+            $taxableAmount = $lineGross - $lineDiscount;
+        } elseif ($discountLevel === 'transaction' && $grossTotal > 0) {
+            // allocate proportional transaction discount
+            $proportion = $lineGross / $grossTotal;
+            $allocatedDiscount = $transactionDiscountAmount * $proportion;
+            $taxableAmount = max(0, $lineGross - $allocatedDiscount);
         }
 
-        // Reload the record to ensure the 'items' relationship is up-to-date
-        $record->load('items');
-        $items = $record->items; // Get the items from the relationship, not the form state
-
-        if ($items->isEmpty()) {
-            return;
+        if (! $itemMasterId || ! $taxRate) {
+            continue;
         }
 
-        // Delete existing tax details
-        TaxDetail::where('taxable_type', get_class($record))
-            ->where('taxable_id', $record->id)
-            ->delete();
+        $itemModel = ItemMaster::with('taxes.components')->find($itemMasterId);
+        if (! $itemModel) {
+            continue;
+        }
 
-        $useCgstSgst = $this->shouldShowCgstSgst(fn ($field) => data_get($this->form->getState(), $field));
+        $tax = $itemModel->taxes->first(function ($tax) use ($taxRate) {
+            return abs($tax->total_rate - $taxRate) < 0.0001;
+        });
 
-        foreach ($items as $item) {
-            $quantity = floatval($item->quantity ?? 1);
-            $price = floatval($item->price ?? 0);
-            $discount = floatval($item->discount ?? 0);
-            $taxRate = floatval($item->tax_rate ?? 0);
-            $itemMasterId = $item->item_master_id ?? null;
+        if (! $tax || $tax->components->isEmpty()) {
+            continue;
+        }
 
-            $discountAmount = ($quantity * $price) * ($discount / 100);
-            $taxableAmount = ($quantity * $price) - $discountAmount;
+        $components = $tax->components;
 
-            if (! $itemMasterId || ! $taxRate) {
-                continue;
-            }
-
-            $itemModel = ItemMaster::with('taxes.components')->find($itemMasterId);
-            if (! $itemModel) continue;
-
-            $tax = $itemModel->taxes->first(function ($tax) use ($taxRate) {
-                return abs($tax->total_rate - $taxRate) < 0.0001;
-            });
-
-            if (! $tax || $tax->components->isEmpty()) continue;
-
-            $components = $tax->components;
-
-            if ($useCgstSgst) {
-                foreach (['CGST', 'SGST'] as $type) {
-                    $component = $components->firstWhere('type', $type);
-                    if ($component) {
-                        TaxDetail::create([
-                            'taxable_type' => get_class($record),
-                            'taxable_id' => $record->id,
-                            'tax_id' => $tax->id,
-                            'tax_component_id' => $component->id,
-                            'type' => $component->type,
-                            'rate' => $component->rate,
-                            'amount' => $taxableAmount * ($component->rate / 100),
-                        ]);
-                    }
-                }
-            } else {
-                $igst = $components->firstWhere('type', 'IGST');
-                if ($igst) {
+        if ($useCgstSgst) {
+            foreach (['CGST', 'SGST'] as $type) {
+                $component = $components->firstWhere('type', $type);
+                if ($component) {
                     TaxDetail::create([
                         'taxable_type' => get_class($record),
-                        'taxable_id' => $record->id,
-                        'tax_id' => $tax->id,
-                        'tax_component_id' => $igst->id,
-                        'type' => $igst->type,
-                        'rate' => $igst->rate,
-                        'amount' => $taxableAmount * ($igst->rate / 100),
+                        'taxable_id'   => $record->id,
+                        'tax_id'       => $tax->id,
+                        'tax_component_id' => $component->id,
+                        'type'         => $component->type,
+                        'rate'         => $component->rate,
+                        'amount'       => $taxableAmount * ($component->rate / 100),
                     ]);
                 }
             }
+        } else {
+            $igst = $components->firstWhere('type', 'IGST');
+            if ($igst) {
+                TaxDetail::create([
+                    'taxable_type' => get_class($record),
+                    'taxable_id'   => $record->id,
+                    'tax_id'       => $tax->id,
+                    'tax_component_id' => $igst->id,
+                    'type'         => $igst->type,
+                    'rate'         => $igst->rate,
+                    'amount'       => $taxableAmount * ($igst->rate / 100),
+                ]);
+            }
         }
     }
+}
+
 
 }

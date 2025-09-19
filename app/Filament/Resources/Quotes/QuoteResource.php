@@ -134,6 +134,7 @@ class QuoteResource extends Resource
                                 strtolower(class_basename($record)), 
                                 $record->id
                             ]),
+                            'organization' => \App\Models\Organization::first(),
                         ])),
 
                     Action::make('downloadPdf')

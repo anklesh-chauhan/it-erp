@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('contact_person_phone')->nullable();
             $table->string('legal_name')->nullable();
             $table->string('registration_number')->nullable();
-            $table->string('GST Number')->nullable();
+            $table->string('gst_number')->nullable();
             $table->date('registration_date')->nullable();
             $table->string('legal_status')->nullable();
             $table->unsignedBigInteger('parent_organization_id')->nullable();

@@ -15,5 +15,11 @@ class CreateQuote extends CreateRecord
 {
     use SalesDocumentResourceTrait;
     protected static string $resource = QuoteResource::class;
-
+    
+    protected function getHeaderActions(): array
+    {
+        return [
+            static::getSalesDocumentPreferenceAction(), // ⚙ at top
+        ];
+    }
 }

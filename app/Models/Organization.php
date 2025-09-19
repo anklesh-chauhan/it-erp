@@ -30,7 +30,7 @@ class Organization extends Model
         'contact_person_phone',
         'legal_name',
         'registration_number',
-        'GST Number',
+        'gst_number',
         'registration_date',
         'legal_status',
         'parent_organization_id',
