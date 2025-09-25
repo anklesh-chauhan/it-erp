@@ -72,8 +72,8 @@ trait SalesDocumentResourceTrait
             ?? (SalesDocumentPreference::first()?->discount_level ?? 'none');
 
         // Now, define the visibility booleans using the callable's result
-        $showLineItemDiscount = fn(callable $get) => $discountModeCallable($get) === 'line_item';
-        $showTransactionDiscount = fn(callable $get) => $discountModeCallable($get) === 'transaction';
+        $showLineItemDiscount = fn(callable $get) => in_array($discountModeCallable($get), ['line_item', 'both']);
+        $showTransactionDiscount = fn(callable $get) => in_array($discountModeCallable($get), ['transaction', 'both']);
 
 
         // $showLineItemDiscount = SalesDocumentPreference::first()?->discount_level === 'line_item';
@@ -385,10 +385,9 @@ trait SalesDocumentResourceTrait
                             ->hidden(fn (callable $get) => !$showTransactionDiscount($get)),
 
                             // Show computed discount amount (read-only)
-                        TextInput::make('transaction_discount')
-                            ->label('Disc Amount')
+                        TextInput::make('total_discount_amount') // 🚀 CHANGED field name
+                            ->label('Total Disc Amt') // 🚀 CHANGED label
                             ->readOnly()
-                            ->default(fn () => $record && is_numeric($record->transaction_discount) ? number_format((float) $record->transaction_discount, 2, '.', '') : '0.00')
                             ->extraInputAttributes(['class' => 'text-right'])
                             ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
                 
@@ -428,6 +427,10 @@ trait SalesDocumentResourceTrait
                         Hidden::make('discount_mode'),
                         Hidden::make('gross_total'),
                         Hidden::make('tax'),
+                        // 🚀 NEW: Add a hidden field for the total line item discount
+                        Hidden::make('total_line_item_discount'),
+                        // 🚀 NEW: Rename old transaction_discount to just transaction_discount_amount to avoid conflicts
+                        Hidden::make('transaction_discount'),
                     ])
                 ]), // Empty section for spacing
             ])->columnSpanFull(),
@@ -538,12 +541,13 @@ trait SalesDocumentResourceTrait
             ?? optional($record)->discount_mode
             ?? (SalesDocumentPreference::first()?->discount_level ?? 'none');
 
-        $originalSubtotal = 0;       // Subtotal before ANY discount
-        $discountedSubtotal = 0;     // After applying discount
+        $originalSubtotal = 0;
+        $discountedSubtotal = 0;
         $cgstTotal = 0;
         $sgstTotal = 0;
         $igstTotal = 0;
         $transactionDiscountAmount = 0;
+        $totalLineItemDiscount = 0; // 🚀 NEW: total line item discount
 
         $useCgstSgst = self::shouldShowCgstSgst($get);
         $lineData = [];
@@ -559,9 +563,9 @@ trait SalesDocumentResourceTrait
             $originalSubtotal += $lineSubtotal;
 
             $lineDiscountAmount = 0;
-            if ($discountLevel === 'line_item') {
+            if ($discountLevel === 'line_item' || $discountLevel === 'both') {
                 $lineDiscountAmount = $lineSubtotal * ($discount / 100);
-                $transactionDiscountAmount += $lineDiscountAmount;
+                $totalLineItemDiscount += $lineDiscountAmount; // 🚀 NEW: sum line discounts
             }
 
             $lineAmount = $lineSubtotal - $lineDiscountAmount;
@@ -578,12 +582,12 @@ trait SalesDocumentResourceTrait
         }
 
         // --- Transaction-level discount ---
-        if ($discountLevel === 'transaction') {
+        if ($discountLevel === 'transaction' || $discountLevel === 'both') {
             // Use record values in edit mode, otherwise form values
             $discountTypeRaw = $record && $record->discount_type ? $record->discount_type : ($get('discount_type') ?? 'percentage');
             $discountValue = $record && is_numeric($record->discount_value) ? floatval($record->discount_value) : floatval($get('discount_value') ?? 0);
             $discountType = strtolower(trim($discountTypeRaw));
-
+            
             // Calculate transaction discount
             if ($discountType === 'percentage' || $discountType === '%') {
                 $transactionDiscountAmount = $discountedSubtotal * ($discountValue / 100);
@@ -592,58 +596,38 @@ trait SalesDocumentResourceTrait
             }
 
             // In edit mode, use stored transaction_discount if available
-            if ($record && is_numeric($record->transaction_discount)) {
+            if ($record && is_numeric($record->transaction_discount) && $discountLevel === 'both') {
                 $transactionDiscountAmount = floatval($record->transaction_discount);
             }
 
             $discountedSubtotal = max(0, $discountedSubtotal - $transactionDiscountAmount);
+        }
 
-            // Allocate proportionally for tax calc
-            foreach ($lineData as $key => $data) {
-                $proportion = $originalSubtotal > 0 ? ($data['gross'] / $originalSubtotal) : 0;
-                $adjustedAmount = $data['gross'] - ($transactionDiscountAmount * $proportion);
+        // --- Calculate Taxes on final discounted amount (after both discounts if applicable) ---
+        foreach ($lineData as $key => $data) {
+            $proportion = $originalSubtotal > 0 ? ($data['gross'] / $originalSubtotal) : 0;
+            $adjustedAmount = $data['amount']; // Start with line-level discounted amount
 
-                // Apply taxes on adjusted amount
-                if ($data['item_master_id'] && $data['tax_rate']) {
-                    $item = ItemMaster::with('taxes.components')->find($data['item_master_id']);
-                    $tax = $item?->taxes?->firstWhere('total_rate', $data['tax_rate']);
-                    if ($tax) {
-                        foreach ($tax->components as $component) {
-                            if ($useCgstSgst) {
-                                if ($component->type === 'CGST') {
-                                    $cgstTotal += $adjustedAmount * ($component->rate / 100);
-                                }
-                                if ($component->type === 'SGST') {
-                                    $sgstTotal += $adjustedAmount * ($component->rate / 100);
-                                }
-                            } else {
-                                if ($component->type === 'IGST') {
-                                    $igstTotal += $adjustedAmount * ($component->rate / 100);
-                                }
-                            }
-                        }
-                    }
-                }
+            if ($discountLevel === 'transaction' || $discountLevel === 'both') {
+                $allocatedTransactionDiscount = $transactionDiscountAmount * $proportion;
+                $adjustedAmount = max(0, $adjustedAmount - $allocatedTransactionDiscount);
             }
-        } else {
-            // --- Line-level discount → already included in lineAmount ---
-            foreach ($lineData as $data) {
-                if ($data['item_master_id'] && $data['tax_rate']) {
-                    $item = ItemMaster::with('taxes.components')->find($data['item_master_id']);
-                    $tax = $item?->taxes?->firstWhere('total_rate', $data['tax_rate']);
-                    if ($tax) {
-                        foreach ($tax->components as $component) {
-                            if ($useCgstSgst) {
-                                if ($component->type === 'CGST') {
-                                    $cgstTotal += $data['amount'] * ($component->rate / 100);
-                                }
-                                if ($component->type === 'SGST') {
-                                    $sgstTotal += $data['amount'] * ($component->rate / 100);
-                                }
-                            } else {
-                                if ($component->type === 'IGST') {
-                                    $igstTotal += $data['amount'] * ($component->rate / 100);
-                                }
+
+            if ($data['item_master_id'] && $data['tax_rate']) {
+                $item = ItemMaster::with('taxes.components')->find($data['item_master_id']);
+                $tax = $item?->taxes?->firstWhere('total_rate', $data['tax_rate']);
+                if ($tax) {
+                    foreach ($tax->components as $component) {
+                        if ($useCgstSgst) {
+                            if ($component->type === 'CGST') {
+                                $cgstTotal += $adjustedAmount * ($component->rate / 100);
+                            }
+                            if ($component->type === 'SGST') {
+                                $sgstTotal += $adjustedAmount * ($component->rate / 100);
+                            }
+                        } else {
+                            if ($component->type === 'IGST') {
+                                $igstTotal += $adjustedAmount * ($component->rate / 100);
                             }
                         }
                     }
@@ -657,8 +641,13 @@ trait SalesDocumentResourceTrait
         // --- Set values in form state ---
         $set('gross_total', number_format($originalSubtotal, 2, '.', ''));
         $set('subtotal', number_format($discountedSubtotal, 2, '.', ''));
+        
+        // 🚀 NEW: Set the total line item discount and the total of all discounts
+        $set('total_line_item_discount', number_format($totalLineItemDiscount, 2, '.', ''));
         $set('transaction_discount', number_format($transactionDiscountAmount, 2, '.', ''));
-        // $set('discount_mode', $discountLevel);
+        $totalDiscount = $totalLineItemDiscount + $transactionDiscountAmount;
+        $set('total_discount_amount', number_format($totalDiscount, 2, '.', ''));
+        
         $set('cgst', number_format($cgstTotal, 2, '.', ''));
         $set('sgst', number_format($sgstTotal, 2, '.', ''));
         $set('igst', number_format($igstTotal, 2, '.', ''));
@@ -707,17 +696,32 @@ trait SalesDocumentResourceTrait
     }
 
     $transactionDiscountAmount = 0;
-    if ($discountLevel === 'transaction') {
+    $lineItemDiscountedTotal = $grossTotal;
+    $totalLineItemDiscount = 0; // 🚀 NEW: Track line item discount total
+    if ($discountLevel === 'line_item' || $discountLevel === 'both') {
+        $lineItemDiscountedTotal = 0;
+        foreach ($items as $item) {
+            $lineGross = floatval($item->quantity ?? 1) * floatval($item->price ?? 0);
+            $lineDiscount = $lineGross * (floatval($item->discount ?? 0) / 100);
+            $lineItemDiscountedTotal += $lineGross - $lineDiscount;
+            $totalLineItemDiscount += $lineDiscount; // 🚀 NEW: Add to line item discount total
+        }
+    }
+
+    if ($discountLevel === 'transaction' || $discountLevel === 'both') {
         $discountTypeRaw = data_get($this->form->getState(), 'discount_type', 'percentage');
         $discountType = strtolower(trim($discountTypeRaw));
         $discountValue = floatval(data_get($this->form->getState(), 'discount_value', 0));
+        
+        $baseForTransactionDiscount = ($discountLevel === 'both') ? $lineItemDiscountedTotal : $grossTotal;
 
         if ($discountType === 'percentage' || $discountType === '%') {
-            $transactionDiscountAmount = $grossTotal * ($discountValue / 100);
+            $transactionDiscountAmount = $baseForTransactionDiscount * ($discountValue / 100);
         } else {
             $transactionDiscountAmount = $discountValue;
         }
     }
+
 
     // --- Per item calculation ---
     foreach ($items as $item) {
@@ -730,15 +734,18 @@ trait SalesDocumentResourceTrait
         $lineGross = $quantity * $price;
         $taxableAmount = $lineGross;
 
-        if ($discountLevel === 'line_item') {
+        if ($discountLevel === 'line_item' || $discountLevel === 'both') {
             // line level discount only
             $lineDiscount = $lineGross * ($discount / 100);
             $taxableAmount = $lineGross - $lineDiscount;
-        } elseif ($discountLevel === 'transaction' && $grossTotal > 0) {
+        }
+
+        if ($discountLevel === 'transaction' || $discountLevel === 'both') {
             // allocate proportional transaction discount
-            $proportion = $lineGross / $grossTotal;
+            $baseForTransactionDiscount = ($discountLevel === 'both') ? $lineItemDiscountedTotal : $grossTotal;
+            $proportion = $baseForTransactionDiscount > 0 ? ($taxableAmount / $baseForTransactionDiscount) : 0;
             $allocatedDiscount = $transactionDiscountAmount * $proportion;
-            $taxableAmount = max(0, $lineGross - $allocatedDiscount);
+            $taxableAmount = max(0, $taxableAmount - $allocatedDiscount);
         }
 
         if (! $itemMasterId || ! $taxRate) {

@@ -35159,7 +35159,7 @@ class CityPinCodeSeeder extends Seeder
             ['pin_code' => '721646', 'area_town' => 'Nandigram-ii', 'city_id' => 171, 'state_id' =>37, 'country_id' => 1],
             ['pin_code' => '721627', 'area_town' => 'Tamluk', 'city_id' => 171, 'state_id' =>37, 'country_id' => 1],
             ['pin_code' => '721649', 'area_town' => 'Nandakumar', 'city_id' => 171, 'state_id' =>37, 'country_id' => 1],
-            ['pin_code' => '721626', 'area_town' => 'Bhagawanpur', 'city_id' => 171, 'state_id' =>37, 'country_id' => 1],
+            ['pin_code' => '721626', 'area_town' => 'Bhagawanpur', 'city_id' => 171, 'state_id' =>37, 'country_id' => 1]
         ];
         // Batch Insert in Chunks (e.g., 500 records per batch)
         $chunks = array_chunk($data, 500);

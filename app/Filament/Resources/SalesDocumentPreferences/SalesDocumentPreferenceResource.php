@@ -51,6 +51,7 @@ class SalesDocumentPreferenceResource extends Resource
                                 'none' => 'No Discount',
                                 'line_item' => 'At Line Item Level',
                                 'transaction' => 'At Transaction Level',
+                                'both' => 'Both Line Item & Transaction Level',
                             ])
                             ->required(),
                     ]),

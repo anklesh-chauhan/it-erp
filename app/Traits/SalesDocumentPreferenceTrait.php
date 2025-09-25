@@ -23,6 +23,7 @@ trait SalesDocumentPreferenceTrait
                         'none' => 'No Discount',
                         'line_item' => 'Line Item Discount',
                         'transaction' => 'Transaction Discount',
+                        'both' => 'Both Line Item and Transaction Discount',
                     ])
                     ->required()
                     ->default(fn () => SalesDocumentPreference::first()?->discount_level ?? 'none'),

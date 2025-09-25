@@ -54,11 +54,18 @@ class ContactDetailsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('full_name')
                     ->label('Name')
-                    ->sortable()
-                    ->searchable(),
+                    ->sortable(),
                 TextColumn::make('email')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(query: function ($query, string $search) {
+                        $query->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('mobile_number', 'like', "%{$search}%")
+                            ->orWhereHas('company', fn ($q) =>
+                                $q->where('name', 'like', "%{$search}%")
+                            );
+                    }),
                 TextColumn::make('mobile_number')
                     ->label('Phone')
                     ->sortable()
@@ -94,12 +101,14 @@ class ContactDetailsRelationManager extends RelationManager
                                 ->getSearchResultsUsing(function (string $search) {
                                     return ContactDetail::query()
                                         ->where(function ($query) use ($search) {
+                                            // Search across first_name and last_name instead of a single full_name column
                                             $query->where('first_name', 'like', "%{$search}%")
                                                 ->orWhere('last_name', 'like', "%{$search}%")
-                                                ->orWhereHas('company', fn ($query) =>
-                                                    $query->where('name', 'like', "%{$search}%")
-                                                );
+                                                ->orWhere('email', 'like', "%{$search}%")
+                                                ->orWhere('mobile_number', 'like', "%{$search}%")
+                                                ->orWhereHas('company', fn ($q) => $q->where('name', 'like', "%{$search}%"));
                                         })
+                                        ->limit(50)
                                         ->get()
                                         ->mapWithKeys(fn ($contact) => [
                                             $contact->id => "{$contact->full_name} — " . ($contact->company?->name ?? 'No Company')

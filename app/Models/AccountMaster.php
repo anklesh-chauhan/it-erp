@@ -171,7 +171,7 @@ class AccountMaster extends Model
             $account_master->contactDetails()->forceDelete();
         });
         static::updated(function ($account_master) {
-            $account_master->addresses()->sync($account_master->addresses()->pluck('addresses.id')->toArray());
+            // $account_master->addresses()->sync($account_master->addresses()->pluck('addresses.id')->toArray());
             $account_master->contactDetails()->sync($account_master->contactDetails()->pluck('contact_details.id')->toArray());
         });
         static::restored(function ($account_master) {

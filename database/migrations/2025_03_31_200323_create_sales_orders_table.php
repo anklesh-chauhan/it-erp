@@ -31,6 +31,8 @@ return new class extends Migration
             $table->decimal('tax', 15, 2)->default(0);
             $table->decimal('round_off', 15, 2)->default(0); //round off to 2 decimal places
             $table->decimal('total', 15, 2)->default(0);
+            $table->enum('discount_mode', ['none', 'line_item', 'transaction', 'both'])->default('none'); // adjust column placement as needed
+            $table->decimal('gross_total', 15, 2)->default(0);
             $table->string('currency', 3)->default('INR'); // Assuming INR as default currency
             $table->string('payment_terms')->nullable(); // e.g., 'Net 30', 'Due on receipt'
             $table->string('payment_method')->nullable(); // e.g., 'Credit Card', 'Bank Transfer'
