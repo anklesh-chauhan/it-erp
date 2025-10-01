@@ -25,14 +25,14 @@ abstract class SalesDocument extends Model
         'round_off',
         'total',
         'currency',
-        'payment_terms',
-        'payment_method',
+        'payment_term_id',
+        'payment_method_id',
         'sales_person_id',
         'description',
         'rejected_at',
         'canceled_at',
         'sent_at',
-        'shipping_method',
+        'shipping_method_id',
         'shipping_cost',
         'created_by',
         'updated_by',
@@ -40,6 +40,21 @@ abstract class SalesDocument extends Model
     ];
 
     protected $fillable = self::FILLABLE;
+
+    public function paymentTerm()
+    {
+        return $this->belongsTo(PaymentTerm::class);
+    }   
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class);
+    }
+
+    public function shippingMethod()
+    {
+        return $this->belongsTo(ShippingMethod::class);
+    }
 
     public function lead()
     {

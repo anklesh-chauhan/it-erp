@@ -33,9 +33,9 @@ return new class extends Migration
             $table->enum('discount_mode', ['none', 'line_item', 'transaction', 'both'])->default('none'); // adjust column placement as needed
             $table->decimal('gross_total', 15, 2)->default(0);
             $table->string('currency', 3)->default('INR'); // Assuming INR as default currency
-            $table->string('payment_terms')->nullable(); // e.g., 'Net 30', 'Due on receipt'
-            $table->string('payment_method')->nullable(); // e.g., 'Credit Card', 'Bank Transfer'
-            $table->string('shipping_method')->nullable(); // e.g., 'Standard', 'Express'
+            $table->foreignId('payment_term_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('payment_method_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('shipping_method_id')->nullable()->constrained()->onDelete('set null');
             $table->string('shipping_cost')->nullable(); // e.g., '5.00'
             $table->text('description')->nullable();
             $table->date('accepted_at')->nullable(); // e.g., '2025-12-31'

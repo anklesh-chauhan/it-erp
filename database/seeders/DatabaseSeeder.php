@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Tax;
 use App\Models\TaxComponent;
+use Faker\Provider\ar_EG\Payment;
 
 class DatabaseSeeder extends Seeder
 {
@@ -59,37 +60,40 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
-            // UsersTableSeeder::class,
-            // ModelHasRolesSeeder::class,
-            // CountrySeeder::class,
-            // StateSeeder::class,
-            // CitySeeder::class,  
-            // CityPinCodeSeeder::class,
-            // IndustryTypeSeeder::class,
-            // LeadSourceSeeder::class,
-            // LeadStatusSeeder::class,
-            // RatingTypeSeeder::class,
-            // FollowUpMediaSeeder::class,
-            // FollowUpResultSeeder::class,
-            // FollowUpStatusSeeder::class,
-            // FollowUpPrioritySeeder::class,
-            // UnitOfMeasurementSeeder::class,
-            // ItemBrandSeeder::class,
-            // TransportModeSeeder::class,
-            // VisitTypeSeeder::class,
-            // PackingTypeSeeder::class,
-            // DealStageSeeder::class,
-            // TypeMasterSeeder::class,
-            // CategorySeeder::class,
-            // EmpDepartmentSeeder::class,
-            // EmpGradeSeeder::class,
-            // EmpJobTitleSeeder::class,
-            // AccountTypeSeeder::class,
-            // ChartOfAccountSeeder::class,
-            // OrganizationSeeder::class,
-            // TaxSeeder::class,
-            // TaxComponentSeeder::class,
+            UsersTableSeeder::class,
+            ModelHasRolesSeeder::class,
+            CountrySeeder::class,
+            StateSeeder::class,
+            CitySeeder::class,  
+            CityPinCodeSeeder::class,
+            IndustryTypeSeeder::class,
+            LeadSourceSeeder::class,
+            LeadStatusSeeder::class,
+            RatingTypeSeeder::class,
+            FollowUpMediaSeeder::class,
+            FollowUpResultSeeder::class,
+            FollowUpStatusSeeder::class,
+            FollowUpPrioritySeeder::class,
+            UnitOfMeasurementSeeder::class,
+            ItemBrandSeeder::class,
+            TransportModeSeeder::class,
+            VisitTypeSeeder::class,
+            PackingTypeSeeder::class,
+            DealStageSeeder::class,
+            TypeMasterSeeder::class,
+            CategorySeeder::class,
+            EmpDepartmentSeeder::class,
+            EmpGradeSeeder::class,
+            EmpJobTitleSeeder::class,
+            AccountTypeSeeder::class,
+            ChartOfAccountSeeder::class,
+            OrganizationSeeder::class,
+            TaxSeeder::class,
+            TaxComponentSeeder::class,
             SalesDocumentPreferenceSeeder::class,
+            PaymentTermSeeder::class,
+            PaymentMethodSeeder::class,
+            ShippingMethodSeeder::class,
         ]);
     }
 }

@@ -434,24 +434,42 @@ trait SalesDocumentResourceTrait
                     ])
                 ]), // Empty section for spacing
             ])->columnSpanFull(),
+            Grid::make(4)
+                ->schema([
+                    Select::make('payment_term_id')
+                        ->label('Payment Terms')
+                        ->relationship('paymentTerm', 'name')
+                        ->preload()
+                        ->searchable()
+                        ->placeholder('Select payment terms...'),
+                    Select::make('payment_method_id')
+                        ->label('Payment Method')
+                        ->relationship('paymentMethod', 'name')
+                        ->preload()
+                        ->searchable()
+                        ->placeholder('Select payment method...'),
+                    Select::make('shipping_method_id')
+                        ->label('Shipping Method')
+                        ->relationship('shippingMethod', 'name')
+                        ->preload()
+                        ->searchable()
+                        ->placeholder('Select shipping method...'),
+                    TextInput::make('shipping_cost')
+                        ->maxLength(255),
+                ])->columnSpanFull(),
 
-                Textarea::make('description')
-                    ->label('Description'),
-                TextInput::make('currency')
-                    ->required()
-                    ->maxLength(3)
-                    ->default('INR'),
-                TextInput::make('payment_terms')
-                    ->maxLength(255),
-                TextInput::make('payment_method')
-                    ->maxLength(255),
-                TextInput::make('shipping_method')
-                    ->maxLength(255),
-                TextInput::make('shipping_cost')
-                    ->maxLength(255),
-                DatePicker::make('rejected_at'),
-                DatePicker::make('canceled_at'),
-                DatePicker::make('sent_at'),
+            Grid::make(4)
+                ->schema([
+                    DatePicker::make('rejected_at'),
+                    DatePicker::make('canceled_at'),
+                    DatePicker::make('sent_at'),
+                    TextInput::make('currency')
+                        ->required()
+                        ->maxLength(3)
+                        ->default('INR'),
+                ])->columnSpanFull(),
+                    Textarea::make('description')
+                        ->label('Description'),
             ];
     }
 
