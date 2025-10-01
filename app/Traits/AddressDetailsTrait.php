@@ -175,15 +175,6 @@ trait AddressDetailsTrait
                                     // Create the address
                                     $address = Address::create($data);
 
-                                    // Debug: Log the created address
-                                    Log::info('getAddressDetailsTraitField: Address created', [
-                                        'address_id' => $address->id,
-                                        'account_master_id' => $data['addressable_id'],
-                                        'addressable_type' => $data['addressable_type'],
-                                        'contact_detail_id' => $data['contact_detail_id'],
-                                        'company_id' => $data['company_id'],
-                                    ]);
-
                                     // Update the form state
                                     $set($fieldName, $address->id);
 
