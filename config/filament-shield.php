@@ -15,9 +15,11 @@ return [
 
     'tenant_model' => \App\Models\Tenant::class,
 
-    'auth_provider_model' => [
-        'fqcn' => 'App\\Models\\User',
-    ],
+    'auth_provider_model' => \App\Models\User::class,
+
+    // 'auth_provider_model' => [
+    //     'fqcn' => 'App\\Models\\User',
+    // ],
 
     'super_admin' => [
         'enabled' => true,

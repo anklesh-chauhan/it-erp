@@ -46,6 +46,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->globalSearch(true)
+            ->topbar(false)
             ->globalSearchKeyBindings(['command + k', 'ctrl + k'])
             ->globalSearchDebounce(500) // ✅ Debounce search requests
             ->id('admin')
