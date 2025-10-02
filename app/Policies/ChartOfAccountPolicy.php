@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\ChartOfAccount;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ChartOfAccountPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_chart::of::accounts::chart::of::account');
+        return $authUser->can('ViewAny:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, ChartOfAccount $chartOfAccount): bool
+    public function view(AuthUser $authUser, ChartOfAccount $chartOfAccount): bool
     {
-        return $user->can('view_chart::of::accounts::chart::of::account');
+        return $authUser->can('View:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_chart::of::accounts::chart::of::account');
+        return $authUser->can('Create:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, ChartOfAccount $chartOfAccount): bool
+    public function update(AuthUser $authUser, ChartOfAccount $chartOfAccount): bool
     {
-        return $user->can('update_chart::of::accounts::chart::of::account');
+        return $authUser->can('Update:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, ChartOfAccount $chartOfAccount): bool
+    public function delete(AuthUser $authUser, ChartOfAccount $chartOfAccount): bool
     {
-        return $user->can('delete_chart::of::accounts::chart::of::account');
+        return $authUser->can('Delete:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, ChartOfAccount $chartOfAccount): bool
     {
-        return $user->can('delete_any_chart::of::accounts::chart::of::account');
+        return $authUser->can('Restore:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, ChartOfAccount $chartOfAccount): bool
+    public function forceDelete(AuthUser $authUser, ChartOfAccount $chartOfAccount): bool
     {
-        return $user->can('force_delete_chart::of::accounts::chart::of::account');
+        return $authUser->can('ForceDelete:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_chart::of::accounts::chart::of::account');
+        return $authUser->can('ForceDeleteAny:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, ChartOfAccount $chartOfAccount): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_chart::of::accounts::chart::of::account');
+        return $authUser->can('RestoreAny:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, ChartOfAccount $chartOfAccount): bool
     {
-        return $user->can('restore_any_chart::of::accounts::chart::of::account');
+        return $authUser->can('Replicate:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, ChartOfAccount $chartOfAccount): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_chart::of::accounts::chart::of::account');
+        return $authUser->can('Reorder:ChartOfAccount');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_chart::of::accounts::chart::of::account');
-    }
 }

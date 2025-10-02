@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\SalesOrder;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SalesOrderPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_sales::orders::sales::order');
+        return $authUser->can('ViewAny:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, SalesOrder $salesOrder): bool
+    public function view(AuthUser $authUser, SalesOrder $salesOrder): bool
     {
-        return $user->can('view_sales::orders::sales::order');
+        return $authUser->can('View:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_sales::orders::sales::order');
+        return $authUser->can('Create:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, SalesOrder $salesOrder): bool
+    public function update(AuthUser $authUser, SalesOrder $salesOrder): bool
     {
-        return $user->can('update_sales::orders::sales::order');
+        return $authUser->can('Update:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, SalesOrder $salesOrder): bool
+    public function delete(AuthUser $authUser, SalesOrder $salesOrder): bool
     {
-        return $user->can('delete_sales::orders::sales::order');
+        return $authUser->can('Delete:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, SalesOrder $salesOrder): bool
     {
-        return $user->can('delete_any_sales::orders::sales::order');
+        return $authUser->can('Restore:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, SalesOrder $salesOrder): bool
+    public function forceDelete(AuthUser $authUser, SalesOrder $salesOrder): bool
     {
-        return $user->can('force_delete_sales::orders::sales::order');
+        return $authUser->can('ForceDelete:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_sales::orders::sales::order');
+        return $authUser->can('ForceDeleteAny:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, SalesOrder $salesOrder): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_sales::orders::sales::order');
+        return $authUser->can('RestoreAny:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, SalesOrder $salesOrder): bool
     {
-        return $user->can('restore_any_sales::orders::sales::order');
+        return $authUser->can('Replicate:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, SalesOrder $salesOrder): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_sales::orders::sales::order');
+        return $authUser->can('Reorder:SalesOrder');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_sales::orders::sales::order');
-    }
 }

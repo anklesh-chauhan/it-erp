@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Territory;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TerritoryPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_territories::territory');
+        return $authUser->can('ViewAny:Territory');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Territory $territory): bool
+    public function view(AuthUser $authUser, Territory $territory): bool
     {
-        return $user->can('view_territories::territory');
+        return $authUser->can('View:Territory');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_territories::territory');
+        return $authUser->can('Create:Territory');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Territory $territory): bool
+    public function update(AuthUser $authUser, Territory $territory): bool
     {
-        return $user->can('update_territories::territory');
+        return $authUser->can('Update:Territory');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Territory $territory): bool
+    public function delete(AuthUser $authUser, Territory $territory): bool
     {
-        return $user->can('delete_territories::territory');
+        return $authUser->can('Delete:Territory');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, Territory $territory): bool
     {
-        return $user->can('delete_any_territories::territory');
+        return $authUser->can('Restore:Territory');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, Territory $territory): bool
+    public function forceDelete(AuthUser $authUser, Territory $territory): bool
     {
-        return $user->can('force_delete_territories::territory');
+        return $authUser->can('ForceDelete:Territory');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_territories::territory');
+        return $authUser->can('ForceDeleteAny:Territory');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, Territory $territory): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_territories::territory');
+        return $authUser->can('RestoreAny:Territory');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, Territory $territory): bool
     {
-        return $user->can('restore_any_territories::territory');
+        return $authUser->can('Replicate:Territory');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, Territory $territory): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_territories::territory');
+        return $authUser->can('Reorder:Territory');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_territories::territory');
-    }
 }

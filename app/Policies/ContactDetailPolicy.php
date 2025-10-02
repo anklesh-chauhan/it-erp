@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\ContactDetail;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ContactDetailPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_contact::details::contact::detail');
+        return $authUser->can('ViewAny:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, ContactDetail $contactDetail): bool
+    public function view(AuthUser $authUser, ContactDetail $contactDetail): bool
     {
-        return $user->can('view_contact::details::contact::detail');
+        return $authUser->can('View:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_contact::details::contact::detail');
+        return $authUser->can('Create:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, ContactDetail $contactDetail): bool
+    public function update(AuthUser $authUser, ContactDetail $contactDetail): bool
     {
-        return $user->can('update_contact::details::contact::detail');
+        return $authUser->can('Update:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, ContactDetail $contactDetail): bool
+    public function delete(AuthUser $authUser, ContactDetail $contactDetail): bool
     {
-        return $user->can('delete_contact::details::contact::detail');
+        return $authUser->can('Delete:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, ContactDetail $contactDetail): bool
     {
-        return $user->can('delete_any_contact::details::contact::detail');
+        return $authUser->can('Restore:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, ContactDetail $contactDetail): bool
+    public function forceDelete(AuthUser $authUser, ContactDetail $contactDetail): bool
     {
-        return $user->can('force_delete_contact::details::contact::detail');
+        return $authUser->can('ForceDelete:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_contact::details::contact::detail');
+        return $authUser->can('ForceDeleteAny:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, ContactDetail $contactDetail): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_contact::details::contact::detail');
+        return $authUser->can('RestoreAny:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, ContactDetail $contactDetail): bool
     {
-        return $user->can('restore_any_contact::details::contact::detail');
+        return $authUser->can('Replicate:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, ContactDetail $contactDetail): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_contact::details::contact::detail');
+        return $authUser->can('Reorder:ContactDetail');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_contact::details::contact::detail');
-    }
 }

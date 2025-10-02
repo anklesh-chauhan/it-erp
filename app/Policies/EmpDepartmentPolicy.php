@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\EmpDepartment;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class EmpDepartmentPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_emp::departments::emp::department');
+        return $authUser->can('ViewAny:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, EmpDepartment $empDepartment): bool
+    public function view(AuthUser $authUser, EmpDepartment $empDepartment): bool
     {
-        return $user->can('view_emp::departments::emp::department');
+        return $authUser->can('View:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_emp::departments::emp::department');
+        return $authUser->can('Create:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, EmpDepartment $empDepartment): bool
+    public function update(AuthUser $authUser, EmpDepartment $empDepartment): bool
     {
-        return $user->can('update_emp::departments::emp::department');
+        return $authUser->can('Update:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, EmpDepartment $empDepartment): bool
+    public function delete(AuthUser $authUser, EmpDepartment $empDepartment): bool
     {
-        return $user->can('delete_emp::departments::emp::department');
+        return $authUser->can('Delete:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, EmpDepartment $empDepartment): bool
     {
-        return $user->can('delete_any_emp::departments::emp::department');
+        return $authUser->can('Restore:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, EmpDepartment $empDepartment): bool
+    public function forceDelete(AuthUser $authUser, EmpDepartment $empDepartment): bool
     {
-        return $user->can('force_delete_emp::departments::emp::department');
+        return $authUser->can('ForceDelete:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_emp::departments::emp::department');
+        return $authUser->can('ForceDeleteAny:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, EmpDepartment $empDepartment): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_emp::departments::emp::department');
+        return $authUser->can('RestoreAny:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, EmpDepartment $empDepartment): bool
     {
-        return $user->can('restore_any_emp::departments::emp::department');
+        return $authUser->can('Replicate:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, EmpDepartment $empDepartment): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_emp::departments::emp::department');
+        return $authUser->can('Reorder:EmpDepartment');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_emp::departments::emp::department');
-    }
 }

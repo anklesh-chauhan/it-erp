@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\VisitPurpose;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class VisitPurposePolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_visit::purposes::visit::purpose');
+        return $authUser->can('ViewAny:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, VisitPurpose $visitPurpose): bool
+    public function view(AuthUser $authUser, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('view_visit::purposes::visit::purpose');
+        return $authUser->can('View:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_visit::purposes::visit::purpose');
+        return $authUser->can('Create:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, VisitPurpose $visitPurpose): bool
+    public function update(AuthUser $authUser, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('update_visit::purposes::visit::purpose');
+        return $authUser->can('Update:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, VisitPurpose $visitPurpose): bool
+    public function delete(AuthUser $authUser, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('delete_visit::purposes::visit::purpose');
+        return $authUser->can('Delete:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('delete_any_visit::purposes::visit::purpose');
+        return $authUser->can('Restore:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, VisitPurpose $visitPurpose): bool
+    public function forceDelete(AuthUser $authUser, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('force_delete_visit::purposes::visit::purpose');
+        return $authUser->can('ForceDelete:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_visit::purposes::visit::purpose');
+        return $authUser->can('ForceDeleteAny:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, VisitPurpose $visitPurpose): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_visit::purposes::visit::purpose');
+        return $authUser->can('RestoreAny:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, VisitPurpose $visitPurpose): bool
     {
-        return $user->can('restore_any_visit::purposes::visit::purpose');
+        return $authUser->can('Replicate:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, VisitPurpose $visitPurpose): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_visit::purposes::visit::purpose');
+        return $authUser->can('Reorder:VisitPurpose');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_visit::purposes::visit::purpose');
-    }
 }

@@ -12,6 +12,13 @@ use App\Models\User;
 use Filament\Forms\Components\Checkbox;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use App\Traits\ContactDetailsTrait;
+use App\Traits\CompanyDetailsTrait;
+use App\Traits\AddressDetailsTrait;
+use App\Traits\ItemMasterTrait;
+use App\Traits\AccountMasterDetailsTrait;
+use App\Traits\SalesDocumentPreferenceTrait;
+use Filament\Forms\Components\RichEditor;
 use App\Models\ItemMaster;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
@@ -30,6 +37,8 @@ use App\Models\SalesDocumentPreference;
 use App\Models\Address;
 use App\Models\Organization;
 use App\Models\TaxDetail;
+use Illuminate\Support\Collection;
+use App\Models\TermsAndConditionsMaster;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Form;
@@ -468,9 +477,49 @@ trait SalesDocumentResourceTrait
                         ->maxLength(3)
                         ->default('INR'),
                 ])->columnSpanFull(),
-                    Textarea::make('description')
-                        ->label('Description'),
-            ];
+            
+            RichEditor::make('terms_and_conditions')
+                ->label('Terms and Conditions')
+                ->toolbarButtons([
+                    'bold', 'italic', 'underline',
+                    'orderedList', 'bulletList',
+                    'h2', 'h3', 'undo', 'redo',
+                ])
+                ->maxLength(65535)
+                ->columnSpanFull()
+                ->default(function (?Model $record) {
+                    // Determine document type
+                    $documentType = strtolower((new \ReflectionClass(static::resolveModelClass()))->getShortName());
+                   
+                    // Fetch default terms from master table
+                    $defaultTerms = \App\Models\TermsAndConditionsMaster::where('document_type', $documentType)
+                        ->where('is_default', true)
+                        ->orderBy('id')
+                        ->get();
+
+                    // Combine all default contents into a single string for RichEditor
+                    $content = $defaultTerms->map(fn($term) => (string) $term->content)->implode("\n\n");
+
+                    return $content;
+                })
+                ->afterStateHydrated(function ($component, $state, $record) {
+                    // If a polymorphic record exists, show its content
+                    if ($record && $record->termsAndCondition) {
+                        $component->state($record->termsAndCondition->content);
+                    }
+                })
+                ->saveRelationshipsUsing(function ($state, $record) {
+                    // Create or update single polymorphic record
+                    $record->termsAndCondition()->updateOrCreate(
+                        [], // match by model_id/model_type
+                        ['content' => $state]
+                    );
+                }), 
+
+                Textarea::make('description')
+                    ->label('Internal Notes')
+                    ->columnSpanFull(),
+        ];
     }
 
     public static function getCommonTableColumns(): array

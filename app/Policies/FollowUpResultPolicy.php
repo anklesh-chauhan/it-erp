@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\FollowUpResult;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FollowUpResultPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_follow::up::results::follow::up::result');
+        return $authUser->can('ViewAny:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, FollowUpResult $followUpResult): bool
+    public function view(AuthUser $authUser, FollowUpResult $followUpResult): bool
     {
-        return $user->can('view_follow::up::results::follow::up::result');
+        return $authUser->can('View:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_follow::up::results::follow::up::result');
+        return $authUser->can('Create:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, FollowUpResult $followUpResult): bool
+    public function update(AuthUser $authUser, FollowUpResult $followUpResult): bool
     {
-        return $user->can('update_follow::up::results::follow::up::result');
+        return $authUser->can('Update:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, FollowUpResult $followUpResult): bool
+    public function delete(AuthUser $authUser, FollowUpResult $followUpResult): bool
     {
-        return $user->can('delete_follow::up::results::follow::up::result');
+        return $authUser->can('Delete:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, FollowUpResult $followUpResult): bool
     {
-        return $user->can('delete_any_follow::up::results::follow::up::result');
+        return $authUser->can('Restore:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, FollowUpResult $followUpResult): bool
+    public function forceDelete(AuthUser $authUser, FollowUpResult $followUpResult): bool
     {
-        return $user->can('force_delete_follow::up::results::follow::up::result');
+        return $authUser->can('ForceDelete:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_follow::up::results::follow::up::result');
+        return $authUser->can('ForceDeleteAny:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, FollowUpResult $followUpResult): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_follow::up::results::follow::up::result');
+        return $authUser->can('RestoreAny:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, FollowUpResult $followUpResult): bool
     {
-        return $user->can('restore_any_follow::up::results::follow::up::result');
+        return $authUser->can('Replicate:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, FollowUpResult $followUpResult): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_follow::up::results::follow::up::result');
+        return $authUser->can('Reorder:FollowUpResult');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_follow::up::results::follow::up::result');
-    }
 }

@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Deal;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DealPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_deals::deal');
+        return $authUser->can('ViewAny:Deal');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Deal $deal): bool
+    public function view(AuthUser $authUser, Deal $deal): bool
     {
-        return $user->can('view_deals::deal');
+        return $authUser->can('View:Deal');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_deals::deal');
+        return $authUser->can('Create:Deal');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Deal $deal): bool
+    public function update(AuthUser $authUser, Deal $deal): bool
     {
-        return $user->can('update_deals::deal');
+        return $authUser->can('Update:Deal');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Deal $deal): bool
+    public function delete(AuthUser $authUser, Deal $deal): bool
     {
-        return $user->can('delete_deals::deal');
+        return $authUser->can('Delete:Deal');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, Deal $deal): bool
     {
-        return $user->can('delete_any_deals::deal');
+        return $authUser->can('Restore:Deal');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, Deal $deal): bool
+    public function forceDelete(AuthUser $authUser, Deal $deal): bool
     {
-        return $user->can('force_delete_deals::deal');
+        return $authUser->can('ForceDelete:Deal');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_deals::deal');
+        return $authUser->can('ForceDeleteAny:Deal');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, Deal $deal): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_deals::deal');
+        return $authUser->can('RestoreAny:Deal');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, Deal $deal): bool
     {
-        return $user->can('restore_any_deals::deal');
+        return $authUser->can('Replicate:Deal');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, Deal $deal): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_deals::deal');
+        return $authUser->can('Reorder:Deal');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_deals::deal');
-    }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 abstract class SalesDocument extends Model
 {
@@ -40,6 +41,11 @@ abstract class SalesDocument extends Model
     ];
 
     protected $fillable = self::FILLABLE;
+
+    public function termsAndCondition(): MorphOne
+    {
+        return $this->morphOne(TermsAndCondition::class, 'model');
+    }
 
     public function paymentTerm()
     {

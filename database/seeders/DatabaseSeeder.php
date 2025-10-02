@@ -91,9 +91,9 @@ class DatabaseSeeder extends Seeder
             TaxSeeder::class,
             TaxComponentSeeder::class,
             SalesDocumentPreferenceSeeder::class,
-            PaymentTermSeeder::class,
-            PaymentMethodSeeder::class,
-            ShippingMethodSeeder::class,
+            PaymentTermsSeeder::class,
+            PaymentMethodsSeeder::class,
+            ShippingMethodsSeeder::class,
         ]);
     }
 }

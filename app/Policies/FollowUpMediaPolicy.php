@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\FollowUpMedia;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FollowUpMediaPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_follow::up::media::follow::up::media');
+        return $authUser->can('ViewAny:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, FollowUpMedia $followUpMedia): bool
+    public function view(AuthUser $authUser, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('view_follow::up::media::follow::up::media');
+        return $authUser->can('View:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_follow::up::media::follow::up::media');
+        return $authUser->can('Create:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, FollowUpMedia $followUpMedia): bool
+    public function update(AuthUser $authUser, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('update_follow::up::media::follow::up::media');
+        return $authUser->can('Update:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, FollowUpMedia $followUpMedia): bool
+    public function delete(AuthUser $authUser, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('delete_follow::up::media::follow::up::media');
+        return $authUser->can('Delete:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('delete_any_follow::up::media::follow::up::media');
+        return $authUser->can('Restore:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, FollowUpMedia $followUpMedia): bool
+    public function forceDelete(AuthUser $authUser, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('force_delete_follow::up::media::follow::up::media');
+        return $authUser->can('ForceDelete:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_follow::up::media::follow::up::media');
+        return $authUser->can('ForceDeleteAny:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, FollowUpMedia $followUpMedia): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_follow::up::media::follow::up::media');
+        return $authUser->can('RestoreAny:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, FollowUpMedia $followUpMedia): bool
     {
-        return $user->can('restore_any_follow::up::media::follow::up::media');
+        return $authUser->can('Replicate:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, FollowUpMedia $followUpMedia): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_follow::up::media::follow::up::media');
+        return $authUser->can('Reorder:FollowUpMedia');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_follow::up::media::follow::up::media');
-    }
 }

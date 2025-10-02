@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\ExpenseConfiguration;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ExpenseConfigurationPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_expense::configurations::expense::configuration');
+        return $authUser->can('ViewAny:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, ExpenseConfiguration $expenseConfiguration): bool
+    public function view(AuthUser $authUser, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('view_expense::configurations::expense::configuration');
+        return $authUser->can('View:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_expense::configurations::expense::configuration');
+        return $authUser->can('Create:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, ExpenseConfiguration $expenseConfiguration): bool
+    public function update(AuthUser $authUser, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('update_expense::configurations::expense::configuration');
+        return $authUser->can('Update:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, ExpenseConfiguration $expenseConfiguration): bool
+    public function delete(AuthUser $authUser, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('delete_expense::configurations::expense::configuration');
+        return $authUser->can('Delete:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('delete_any_expense::configurations::expense::configuration');
+        return $authUser->can('Restore:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, ExpenseConfiguration $expenseConfiguration): bool
+    public function forceDelete(AuthUser $authUser, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('force_delete_expense::configurations::expense::configuration');
+        return $authUser->can('ForceDelete:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_expense::configurations::expense::configuration');
+        return $authUser->can('ForceDeleteAny:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, ExpenseConfiguration $expenseConfiguration): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_expense::configurations::expense::configuration');
+        return $authUser->can('RestoreAny:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, ExpenseConfiguration $expenseConfiguration): bool
     {
-        return $user->can('restore_any_expense::configurations::expense::configuration');
+        return $authUser->can('Replicate:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, ExpenseConfiguration $expenseConfiguration): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_expense::configurations::expense::configuration');
+        return $authUser->can('Reorder:ExpenseConfiguration');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_expense::configurations::expense::configuration');
-    }
 }

@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\AccountType;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AccountTypePolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_account::types::account::type');
+        return $authUser->can('ViewAny:AccountType');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, AccountType $accountType): bool
+    public function view(AuthUser $authUser, AccountType $accountType): bool
     {
-        return $user->can('view_account::types::account::type');
+        return $authUser->can('View:AccountType');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_account::types::account::type');
+        return $authUser->can('Create:AccountType');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, AccountType $accountType): bool
+    public function update(AuthUser $authUser, AccountType $accountType): bool
     {
-        return $user->can('update_account::types::account::type');
+        return $authUser->can('Update:AccountType');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, AccountType $accountType): bool
+    public function delete(AuthUser $authUser, AccountType $accountType): bool
     {
-        return $user->can('delete_account::types::account::type');
+        return $authUser->can('Delete:AccountType');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, AccountType $accountType): bool
     {
-        return $user->can('delete_any_account::types::account::type');
+        return $authUser->can('Restore:AccountType');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, AccountType $accountType): bool
+    public function forceDelete(AuthUser $authUser, AccountType $accountType): bool
     {
-        return $user->can('force_delete_account::types::account::type');
+        return $authUser->can('ForceDelete:AccountType');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_account::types::account::type');
+        return $authUser->can('ForceDeleteAny:AccountType');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, AccountType $accountType): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_account::types::account::type');
+        return $authUser->can('RestoreAny:AccountType');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, AccountType $accountType): bool
     {
-        return $user->can('restore_any_account::types::account::type');
+        return $authUser->can('Replicate:AccountType');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, AccountType $accountType): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_account::types::account::type');
+        return $authUser->can('Reorder:AccountType');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_account::types::account::type');
-    }
 }

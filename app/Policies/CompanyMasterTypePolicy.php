@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\CompanyMasterType;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CompanyMasterTypePolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_company::master::types::company::master::type');
+        return $authUser->can('ViewAny:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, CompanyMasterType $companyMasterType): bool
+    public function view(AuthUser $authUser, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('view_company::master::types::company::master::type');
+        return $authUser->can('View:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_company::master::types::company::master::type');
+        return $authUser->can('Create:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, CompanyMasterType $companyMasterType): bool
+    public function update(AuthUser $authUser, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('update_company::master::types::company::master::type');
+        return $authUser->can('Update:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, CompanyMasterType $companyMasterType): bool
+    public function delete(AuthUser $authUser, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('delete_company::master::types::company::master::type');
+        return $authUser->can('Delete:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('delete_any_company::master::types::company::master::type');
+        return $authUser->can('Restore:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, CompanyMasterType $companyMasterType): bool
+    public function forceDelete(AuthUser $authUser, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('force_delete_company::master::types::company::master::type');
+        return $authUser->can('ForceDelete:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_company::master::types::company::master::type');
+        return $authUser->can('ForceDeleteAny:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, CompanyMasterType $companyMasterType): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_company::master::types::company::master::type');
+        return $authUser->can('RestoreAny:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, CompanyMasterType $companyMasterType): bool
     {
-        return $user->can('restore_any_company::master::types::company::master::type');
+        return $authUser->can('Replicate:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, CompanyMasterType $companyMasterType): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_company::master::types::company::master::type');
+        return $authUser->can('Reorder:CompanyMasterType');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_company::master::types::company::master::type');
-    }
 }

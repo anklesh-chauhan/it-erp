@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\TourPlan;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TourPlanPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_tour::plans::tour::plan');
+        return $authUser->can('ViewAny:TourPlan');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, TourPlan $tourPlan): bool
+    public function view(AuthUser $authUser, TourPlan $tourPlan): bool
     {
-        return $user->can('view_tour::plans::tour::plan');
+        return $authUser->can('View:TourPlan');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_tour::plans::tour::plan');
+        return $authUser->can('Create:TourPlan');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, TourPlan $tourPlan): bool
+    public function update(AuthUser $authUser, TourPlan $tourPlan): bool
     {
-        return $user->can('update_tour::plans::tour::plan');
+        return $authUser->can('Update:TourPlan');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, TourPlan $tourPlan): bool
+    public function delete(AuthUser $authUser, TourPlan $tourPlan): bool
     {
-        return $user->can('delete_tour::plans::tour::plan');
+        return $authUser->can('Delete:TourPlan');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, TourPlan $tourPlan): bool
     {
-        return $user->can('delete_any_tour::plans::tour::plan');
+        return $authUser->can('Restore:TourPlan');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, TourPlan $tourPlan): bool
+    public function forceDelete(AuthUser $authUser, TourPlan $tourPlan): bool
     {
-        return $user->can('force_delete_tour::plans::tour::plan');
+        return $authUser->can('ForceDelete:TourPlan');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_tour::plans::tour::plan');
+        return $authUser->can('ForceDeleteAny:TourPlan');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, TourPlan $tourPlan): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_tour::plans::tour::plan');
+        return $authUser->can('RestoreAny:TourPlan');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, TourPlan $tourPlan): bool
     {
-        return $user->can('restore_any_tour::plans::tour::plan');
+        return $authUser->can('Replicate:TourPlan');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, TourPlan $tourPlan): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_tour::plans::tour::plan');
+        return $authUser->can('Reorder:TourPlan');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_tour::plans::tour::plan');
-    }
 }

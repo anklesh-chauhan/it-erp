@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\EmpGrade;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class EmpGradePolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_emp::grades::emp::grade');
+        return $authUser->can('ViewAny:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, EmpGrade $empGrade): bool
+    public function view(AuthUser $authUser, EmpGrade $empGrade): bool
     {
-        return $user->can('view_emp::grades::emp::grade');
+        return $authUser->can('View:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_emp::grades::emp::grade');
+        return $authUser->can('Create:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, EmpGrade $empGrade): bool
+    public function update(AuthUser $authUser, EmpGrade $empGrade): bool
     {
-        return $user->can('update_emp::grades::emp::grade');
+        return $authUser->can('Update:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, EmpGrade $empGrade): bool
+    public function delete(AuthUser $authUser, EmpGrade $empGrade): bool
     {
-        return $user->can('delete_emp::grades::emp::grade');
+        return $authUser->can('Delete:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, EmpGrade $empGrade): bool
     {
-        return $user->can('delete_any_emp::grades::emp::grade');
+        return $authUser->can('Restore:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, EmpGrade $empGrade): bool
+    public function forceDelete(AuthUser $authUser, EmpGrade $empGrade): bool
     {
-        return $user->can('force_delete_emp::grades::emp::grade');
+        return $authUser->can('ForceDelete:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_emp::grades::emp::grade');
+        return $authUser->can('ForceDeleteAny:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, EmpGrade $empGrade): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_emp::grades::emp::grade');
+        return $authUser->can('RestoreAny:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, EmpGrade $empGrade): bool
     {
-        return $user->can('restore_any_emp::grades::emp::grade');
+        return $authUser->can('Replicate:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, EmpGrade $empGrade): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_emp::grades::emp::grade');
+        return $authUser->can('Reorder:EmpGrade');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_emp::grades::emp::grade');
-    }
 }

@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Lead;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class LeadPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_leads::lead');
+        return $authUser->can('ViewAny:Lead');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Lead $lead): bool
+    public function view(AuthUser $authUser, Lead $lead): bool
     {
-        return $user->can('view_leads::lead');
+        return $authUser->can('View:Lead');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_leads::lead');
+        return $authUser->can('Create:Lead');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Lead $lead): bool
+    public function update(AuthUser $authUser, Lead $lead): bool
     {
-        return $user->can('update_leads::lead');
+        return $authUser->can('Update:Lead');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Lead $lead): bool
+    public function delete(AuthUser $authUser, Lead $lead): bool
     {
-        return $user->can('delete_leads::lead');
+        return $authUser->can('Delete:Lead');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, Lead $lead): bool
     {
-        return $user->can('delete_any_leads::lead');
+        return $authUser->can('Restore:Lead');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, Lead $lead): bool
+    public function forceDelete(AuthUser $authUser, Lead $lead): bool
     {
-        return $user->can('force_delete_leads::lead');
+        return $authUser->can('ForceDelete:Lead');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_leads::lead');
+        return $authUser->can('ForceDeleteAny:Lead');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, Lead $lead): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_leads::lead');
+        return $authUser->can('RestoreAny:Lead');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, Lead $lead): bool
     {
-        return $user->can('restore_any_leads::lead');
+        return $authUser->can('Replicate:Lead');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, Lead $lead): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_leads::lead');
+        return $authUser->can('Reorder:Lead');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_leads::lead');
-    }
 }

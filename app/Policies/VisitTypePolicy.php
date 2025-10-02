@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\VisitType;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class VisitTypePolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_visit::types::visit::type');
+        return $authUser->can('ViewAny:VisitType');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, VisitType $visitType): bool
+    public function view(AuthUser $authUser, VisitType $visitType): bool
     {
-        return $user->can('view_visit::types::visit::type');
+        return $authUser->can('View:VisitType');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_visit::types::visit::type');
+        return $authUser->can('Create:VisitType');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, VisitType $visitType): bool
+    public function update(AuthUser $authUser, VisitType $visitType): bool
     {
-        return $user->can('update_visit::types::visit::type');
+        return $authUser->can('Update:VisitType');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, VisitType $visitType): bool
+    public function delete(AuthUser $authUser, VisitType $visitType): bool
     {
-        return $user->can('delete_visit::types::visit::type');
+        return $authUser->can('Delete:VisitType');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, VisitType $visitType): bool
     {
-        return $user->can('delete_any_visit::types::visit::type');
+        return $authUser->can('Restore:VisitType');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, VisitType $visitType): bool
+    public function forceDelete(AuthUser $authUser, VisitType $visitType): bool
     {
-        return $user->can('force_delete_visit::types::visit::type');
+        return $authUser->can('ForceDelete:VisitType');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_visit::types::visit::type');
+        return $authUser->can('ForceDeleteAny:VisitType');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, VisitType $visitType): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_visit::types::visit::type');
+        return $authUser->can('RestoreAny:VisitType');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, VisitType $visitType): bool
     {
-        return $user->can('restore_any_visit::types::visit::type');
+        return $authUser->can('Replicate:VisitType');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, VisitType $visitType): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_visit::types::visit::type');
+        return $authUser->can('Reorder:VisitType');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_visit::types::visit::type');
-    }
 }

@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\TransportMode;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TransportModePolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_transport::modes::transport::mode');
+        return $authUser->can('ViewAny:TransportMode');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, TransportMode $transportMode): bool
+    public function view(AuthUser $authUser, TransportMode $transportMode): bool
     {
-        return $user->can('view_transport::modes::transport::mode');
+        return $authUser->can('View:TransportMode');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_transport::modes::transport::mode');
+        return $authUser->can('Create:TransportMode');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, TransportMode $transportMode): bool
+    public function update(AuthUser $authUser, TransportMode $transportMode): bool
     {
-        return $user->can('update_transport::modes::transport::mode');
+        return $authUser->can('Update:TransportMode');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, TransportMode $transportMode): bool
+    public function delete(AuthUser $authUser, TransportMode $transportMode): bool
     {
-        return $user->can('delete_transport::modes::transport::mode');
+        return $authUser->can('Delete:TransportMode');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, TransportMode $transportMode): bool
     {
-        return $user->can('delete_any_transport::modes::transport::mode');
+        return $authUser->can('Restore:TransportMode');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, TransportMode $transportMode): bool
+    public function forceDelete(AuthUser $authUser, TransportMode $transportMode): bool
     {
-        return $user->can('force_delete_transport::modes::transport::mode');
+        return $authUser->can('ForceDelete:TransportMode');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_transport::modes::transport::mode');
+        return $authUser->can('ForceDeleteAny:TransportMode');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, TransportMode $transportMode): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_transport::modes::transport::mode');
+        return $authUser->can('RestoreAny:TransportMode');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, TransportMode $transportMode): bool
     {
-        return $user->can('restore_any_transport::modes::transport::mode');
+        return $authUser->can('Replicate:TransportMode');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, TransportMode $transportMode): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_transport::modes::transport::mode');
+        return $authUser->can('Reorder:TransportMode');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_transport::modes::transport::mode');
-    }
 }

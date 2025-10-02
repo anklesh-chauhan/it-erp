@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Image;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ImagePolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_images::image');
+        return $authUser->can('ViewAny:Image');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Image $image): bool
+    public function view(AuthUser $authUser, Image $image): bool
     {
-        return $user->can('view_images::image');
+        return $authUser->can('View:Image');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_images::image');
+        return $authUser->can('Create:Image');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Image $image): bool
+    public function update(AuthUser $authUser, Image $image): bool
     {
-        return $user->can('update_images::image');
+        return $authUser->can('Update:Image');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Image $image): bool
+    public function delete(AuthUser $authUser, Image $image): bool
     {
-        return $user->can('delete_images::image');
+        return $authUser->can('Delete:Image');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, Image $image): bool
     {
-        return $user->can('delete_any_images::image');
+        return $authUser->can('Restore:Image');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, Image $image): bool
+    public function forceDelete(AuthUser $authUser, Image $image): bool
     {
-        return $user->can('force_delete_images::image');
+        return $authUser->can('ForceDelete:Image');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_images::image');
+        return $authUser->can('ForceDeleteAny:Image');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, Image $image): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_images::image');
+        return $authUser->can('RestoreAny:Image');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, Image $image): bool
     {
-        return $user->can('restore_any_images::image');
+        return $authUser->can('Replicate:Image');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, Image $image): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_images::image');
+        return $authUser->can('Reorder:Image');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_images::image');
-    }
 }

@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Tax;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TaxPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_taxes::tax');
+        return $authUser->can('ViewAny:Tax');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Tax $tax): bool
+    public function view(AuthUser $authUser, Tax $tax): bool
     {
-        return $user->can('view_taxes::tax');
+        return $authUser->can('View:Tax');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_taxes::tax');
+        return $authUser->can('Create:Tax');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Tax $tax): bool
+    public function update(AuthUser $authUser, Tax $tax): bool
     {
-        return $user->can('update_taxes::tax');
+        return $authUser->can('Update:Tax');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Tax $tax): bool
+    public function delete(AuthUser $authUser, Tax $tax): bool
     {
-        return $user->can('delete_taxes::tax');
+        return $authUser->can('Delete:Tax');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, Tax $tax): bool
     {
-        return $user->can('delete_any_taxes::tax');
+        return $authUser->can('Restore:Tax');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, Tax $tax): bool
+    public function forceDelete(AuthUser $authUser, Tax $tax): bool
     {
-        return $user->can('force_delete_taxes::tax');
+        return $authUser->can('ForceDelete:Tax');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_taxes::tax');
+        return $authUser->can('ForceDeleteAny:Tax');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, Tax $tax): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_taxes::tax');
+        return $authUser->can('RestoreAny:Tax');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, Tax $tax): bool
     {
-        return $user->can('restore_any_taxes::tax');
+        return $authUser->can('Replicate:Tax');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, Tax $tax): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_taxes::tax');
+        return $authUser->can('Reorder:Tax');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_taxes::tax');
-    }
 }

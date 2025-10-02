@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('terms_types', function (Blueprint $table) {
+        Schema::create('terms_and_conditions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->morphs('model'); // quote_id, so_id, po_id, invoice_id
+            $table->string('title')->nullable();
+            $table->text('content');
+            $table->unsignedInteger('order')->default(0);
             $table->timestamps();
         });
     }
@@ -23,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('terms_types');
+        Schema::dropIfExists('terms_and_conditions');
     }
 };

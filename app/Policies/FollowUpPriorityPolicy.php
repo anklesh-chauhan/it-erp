@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\FollowUpPriority;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FollowUpPriorityPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_follow::up::priorities::follow::up::priority');
+        return $authUser->can('ViewAny:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, FollowUpPriority $followUpPriority): bool
+    public function view(AuthUser $authUser, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('view_follow::up::priorities::follow::up::priority');
+        return $authUser->can('View:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_follow::up::priorities::follow::up::priority');
+        return $authUser->can('Create:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, FollowUpPriority $followUpPriority): bool
+    public function update(AuthUser $authUser, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('update_follow::up::priorities::follow::up::priority');
+        return $authUser->can('Update:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, FollowUpPriority $followUpPriority): bool
+    public function delete(AuthUser $authUser, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('delete_follow::up::priorities::follow::up::priority');
+        return $authUser->can('Delete:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('delete_any_follow::up::priorities::follow::up::priority');
+        return $authUser->can('Restore:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, FollowUpPriority $followUpPriority): bool
+    public function forceDelete(AuthUser $authUser, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('force_delete_follow::up::priorities::follow::up::priority');
+        return $authUser->can('ForceDelete:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_follow::up::priorities::follow::up::priority');
+        return $authUser->can('ForceDeleteAny:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, FollowUpPriority $followUpPriority): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_follow::up::priorities::follow::up::priority');
+        return $authUser->can('RestoreAny:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, FollowUpPriority $followUpPriority): bool
     {
-        return $user->can('restore_any_follow::up::priorities::follow::up::priority');
+        return $authUser->can('Replicate:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, FollowUpPriority $followUpPriority): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_follow::up::priorities::follow::up::priority');
+        return $authUser->can('Reorder:FollowUpPriority');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_follow::up::priorities::follow::up::priority');
-    }
 }

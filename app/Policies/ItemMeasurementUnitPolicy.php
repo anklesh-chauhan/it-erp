@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\ItemMeasurementUnit;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ItemMeasurementUnitPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_item::measurement::units::item::measurement::unit');
+        return $authUser->can('ViewAny:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, ItemMeasurementUnit $itemMeasurementUnit): bool
+    public function view(AuthUser $authUser, ItemMeasurementUnit $itemMeasurementUnit): bool
     {
-        return $user->can('view_item::measurement::units::item::measurement::unit');
+        return $authUser->can('View:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_item::measurement::units::item::measurement::unit');
+        return $authUser->can('Create:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, ItemMeasurementUnit $itemMeasurementUnit): bool
+    public function update(AuthUser $authUser, ItemMeasurementUnit $itemMeasurementUnit): bool
     {
-        return $user->can('update_item::measurement::units::item::measurement::unit');
+        return $authUser->can('Update:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, ItemMeasurementUnit $itemMeasurementUnit): bool
+    public function delete(AuthUser $authUser, ItemMeasurementUnit $itemMeasurementUnit): bool
     {
-        return $user->can('delete_item::measurement::units::item::measurement::unit');
+        return $authUser->can('Delete:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, ItemMeasurementUnit $itemMeasurementUnit): bool
     {
-        return $user->can('delete_any_item::measurement::units::item::measurement::unit');
+        return $authUser->can('Restore:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, ItemMeasurementUnit $itemMeasurementUnit): bool
+    public function forceDelete(AuthUser $authUser, ItemMeasurementUnit $itemMeasurementUnit): bool
     {
-        return $user->can('force_delete_item::measurement::units::item::measurement::unit');
+        return $authUser->can('ForceDelete:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_item::measurement::units::item::measurement::unit');
+        return $authUser->can('ForceDeleteAny:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, ItemMeasurementUnit $itemMeasurementUnit): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_item::measurement::units::item::measurement::unit');
+        return $authUser->can('RestoreAny:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, ItemMeasurementUnit $itemMeasurementUnit): bool
     {
-        return $user->can('restore_any_item::measurement::units::item::measurement::unit');
+        return $authUser->can('Replicate:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, ItemMeasurementUnit $itemMeasurementUnit): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_item::measurement::units::item::measurement::unit');
+        return $authUser->can('Reorder:ItemMeasurementUnit');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_item::measurement::units::item::measurement::unit');
-    }
 }

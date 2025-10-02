@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\OrganizationalUnit;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class OrganizationalUnitPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_organizational::units::organizational::unit');
+        return $authUser->can('ViewAny:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, OrganizationalUnit $organizationalUnit): bool
+    public function view(AuthUser $authUser, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('view_organizational::units::organizational::unit');
+        return $authUser->can('View:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_organizational::units::organizational::unit');
+        return $authUser->can('Create:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, OrganizationalUnit $organizationalUnit): bool
+    public function update(AuthUser $authUser, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('update_organizational::units::organizational::unit');
+        return $authUser->can('Update:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, OrganizationalUnit $organizationalUnit): bool
+    public function delete(AuthUser $authUser, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('delete_organizational::units::organizational::unit');
+        return $authUser->can('Delete:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('delete_any_organizational::units::organizational::unit');
+        return $authUser->can('Restore:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, OrganizationalUnit $organizationalUnit): bool
+    public function forceDelete(AuthUser $authUser, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('force_delete_organizational::units::organizational::unit');
+        return $authUser->can('ForceDelete:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_organizational::units::organizational::unit');
+        return $authUser->can('ForceDeleteAny:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, OrganizationalUnit $organizationalUnit): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_organizational::units::organizational::unit');
+        return $authUser->can('RestoreAny:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, OrganizationalUnit $organizationalUnit): bool
     {
-        return $user->can('restore_any_organizational::units::organizational::unit');
+        return $authUser->can('Replicate:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, OrganizationalUnit $organizationalUnit): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_organizational::units::organizational::unit');
+        return $authUser->can('Reorder:OrganizationalUnit');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_organizational::units::organizational::unit');
-    }
 }

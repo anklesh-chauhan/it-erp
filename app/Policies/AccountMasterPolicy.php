@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\AccountMaster;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AccountMasterPolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_account::masters::account::master');
+        return $authUser->can('ViewAny:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, AccountMaster $accountMaster): bool
+    public function view(AuthUser $authUser, AccountMaster $accountMaster): bool
     {
-        return $user->can('view_account::masters::account::master');
+        return $authUser->can('View:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_account::masters::account::master');
+        return $authUser->can('Create:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, AccountMaster $accountMaster): bool
+    public function update(AuthUser $authUser, AccountMaster $accountMaster): bool
     {
-        return $user->can('update_account::masters::account::master');
+        return $authUser->can('Update:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, AccountMaster $accountMaster): bool
+    public function delete(AuthUser $authUser, AccountMaster $accountMaster): bool
     {
-        return $user->can('delete_account::masters::account::master');
+        return $authUser->can('Delete:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, AccountMaster $accountMaster): bool
     {
-        return $user->can('delete_any_account::masters::account::master');
+        return $authUser->can('Restore:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, AccountMaster $accountMaster): bool
+    public function forceDelete(AuthUser $authUser, AccountMaster $accountMaster): bool
     {
-        return $user->can('force_delete_account::masters::account::master');
+        return $authUser->can('ForceDelete:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_account::masters::account::master');
+        return $authUser->can('ForceDeleteAny:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, AccountMaster $accountMaster): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_account::masters::account::master');
+        return $authUser->can('RestoreAny:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, AccountMaster $accountMaster): bool
     {
-        return $user->can('restore_any_account::masters::account::master');
+        return $authUser->can('Replicate:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, AccountMaster $accountMaster): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_account::masters::account::master');
+        return $authUser->can('Reorder:AccountMaster');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_account::masters::account::master');
-    }
 }

@@ -1,108 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\CityPinCode;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CityPinCodePolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_city::pin::codes::city::pin::code');
+        return $authUser->can('ViewAny:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, CityPinCode $cityPinCode): bool
+    public function view(AuthUser $authUser, CityPinCode $cityPinCode): bool
     {
-        return $user->can('view_city::pin::codes::city::pin::code');
+        return $authUser->can('View:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_city::pin::codes::city::pin::code');
+        return $authUser->can('Create:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, CityPinCode $cityPinCode): bool
+    public function update(AuthUser $authUser, CityPinCode $cityPinCode): bool
     {
-        return $user->can('update_city::pin::codes::city::pin::code');
+        return $authUser->can('Update:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, CityPinCode $cityPinCode): bool
+    public function delete(AuthUser $authUser, CityPinCode $cityPinCode): bool
     {
-        return $user->can('delete_city::pin::codes::city::pin::code');
+        return $authUser->can('Delete:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, CityPinCode $cityPinCode): bool
     {
-        return $user->can('delete_any_city::pin::codes::city::pin::code');
+        return $authUser->can('Restore:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
-    public function forceDelete(User $user, CityPinCode $cityPinCode): bool
+    public function forceDelete(AuthUser $authUser, CityPinCode $cityPinCode): bool
     {
-        return $user->can('force_delete_city::pin::codes::city::pin::code');
+        return $authUser->can('ForceDelete:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_city::pin::codes::city::pin::code');
+        return $authUser->can('ForceDeleteAny:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
-    public function restore(User $user, CityPinCode $cityPinCode): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_city::pin::codes::city::pin::code');
+        return $authUser->can('RestoreAny:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
-    public function restoreAny(User $user): bool
+    public function replicate(AuthUser $authUser, CityPinCode $cityPinCode): bool
     {
-        return $user->can('restore_any_city::pin::codes::city::pin::code');
+        return $authUser->can('Replicate:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, CityPinCode $cityPinCode): bool
+    public function reorder(AuthUser $authUser): bool
     {
-        return $user->can('replicate_city::pin::codes::city::pin::code');
+        return $authUser->can('Reorder:CityPinCode');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('reorder_city::pin::codes::city::pin::code');
-    }
 }
