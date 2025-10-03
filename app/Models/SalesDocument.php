@@ -116,6 +116,12 @@ abstract class SalesDocument extends Model
         $this->save();
     }
 
+    protected $casts = [
+        'date' => 'date',
+        'due_date' => 'date',
+        'expiration_date' => 'date',
+    ];
+
     protected static function boot()
     {
         parent::boot();

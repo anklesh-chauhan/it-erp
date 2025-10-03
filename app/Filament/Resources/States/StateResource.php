@@ -46,6 +46,10 @@ class StateResource extends Resource
                     ->label('Country')
                     ->relationship('country', 'name')
                     ->required(),
+                TextInput::make('gst_code')
+                    ->label('GST State Code')
+                    ->maxLength(10)
+                    ->nullable(),
             ]);
     }
 
@@ -53,7 +57,8 @@ class StateResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->sortable(),
+                TextColumn::make('name')->sortable()->searchable(),
+                TextColumn::make('gst_code')->label('GST Code')->sortable()->searchable(),
                 TextColumn::make('country.name')->label('Country'),
             ])
             ->filters([

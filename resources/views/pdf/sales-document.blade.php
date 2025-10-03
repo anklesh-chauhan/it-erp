@@ -41,21 +41,45 @@
                 </div>
              </td>
             <td style="border:none; text-align:right;">
-                <h2>TAX INVOICE</h2>
+                <h2>
+                    @if ($document instanceof \App\Models\Quote)
+                        QUOTE
+                    @elseif ($document instanceof \App\Models\SalesInvoice)
+                        TAX INVOICE
+                    @else
+                        DOCUMENT
+                    @endif
+                </h2>
             </td>
         </tr>
     </table>
     <table>
         <tr>
             <td style="text-align:left; width:50%;">
-                    Invoice No: :177720252601151</br>
-                    Invoice Date: :27 Aug 2025</br>
-                    Due Date: :27 Aug 2025</br>
+                @if ($document instanceof \App\Models\Quote)
+                    Quote No: {{ $document->document_number }}<br>
+                    Quote Date: {{ $document->date?->format('d M Y') }}<br>
+                    Valid Till: {{ $document->expiration_date?->format('d M Y') }}<br>
+                @elseif ($document instanceof \App\Models\SalesOrder)
+                    Sales Order No: {{ $document->document_number }}<br>
+                    Sales Order Date: {{ $document->date?->format('d M Y') }}<br>
+                @elseif ($document instanceof \App\Models\SalesInvoice)
+                    Invoice No: {{ $document->document_number }}<br>
+                    Invoice Date: {{ $document->date?->format('d M Y') }}<br>
+                    Due Date: {{ $document->due_date?->format('d M Y') }}<br>
+                @endif
             </td>
             <td style="text-align:left; width:50%;">
-                    Place Of Supply: :Gujarat (24)</br>
-                    Terms: :gujaratpolyplast.com</br>
-            </td>   
+                @php
+                    $placeOfSupplyState = $document->shippingAddress?->state?->name 
+                                        ?? $document->billingAddress?->state?->name;
+                    $stateGstCode = $document->shippingAddress?->gstDetail?->state_code 
+                                        ?? $document->billingAddress?->gstDetail?->state_code;
+                @endphp
+
+                Place Of Supply: {{ $placeOfSupplyState }} {{$stateGstCode}}<br>
+                Payment Term: {{ $document->paymentTerm?->name ?? '-' }}<br>
+            </td>
         </tr>
     </table>
    <table>
@@ -64,20 +88,31 @@
             <th style="text-align:left; font-size:16px;">Ship To</th>
         </tr>
             <td style="text-align:left; width:50%;">
-                Searce India Private Limited<br>
-                11 Arham, Subhash Road, Motilal Tanki, Rajkot Gujarat 360001<br>
-                India<br>
-                GSTIN: 24AAJCS1368L1ZZ<br>
-                PAN: ABUJCS1368L
+                <b>{{ $document->accountMaster?->name }}</b><br>
+                @if($document->billingAddress)
+                    {{ $document->billingAddress->street }}<br>
+                    {{ $document->billingAddress->city?->name }},
+                    {{ $document->billingAddress->state?->name }}
+                    {{ $document->billingAddress->pin_code }}<br>
+                    {{ $document->billingAddress->country?->name }}<br>
+                    GSTIN: {{ $document->billingAddress->gstDetail->gst_number ?? '-' }}<br>
+                    PAN: {{ $document->billingAddress->gstDetail->pan_number ?? '-' }}
+                @endif
             </td>
             <td style="text-align:left; width:50%;">
-                Gujarat Polyplast Pvt. Ltd.<br>
-                Vah Estate,Plot No.559,Shed No.3, Nr.Acute Surgical,Rakanpur,<br>
-                Kalol<br>
-                382721 Gujarat<br>
-                India<br>
-                GSTIN: 24AACCG9417E1ZT<br>
-                PAN: AACCG9417E
+                @php
+                    $shipTo = $document->shippingAddress ?? $document->billingAddress;
+                @endphp
+                <b>{{ $document->accountMaster?->name }}</b><br>
+                @if($shipTo)
+                    {{ $shipTo->street }}<br>
+                    {{ $shipTo->city?->name }},
+                    {{ $shipTo->state?->name }}
+                    {{ $shipTo->pin_code }}<br>
+                    {{ $shipTo->country?->name }}<br>
+                    GSTIN: {{ $shipTo->gstDetail->gst_number ?? '-' }}<br>
+                    PAN: {{ $shipTo->gstDetail->pan_number ?? '-' }}
+                @endif
             </td>
         </tr>
     </table>
@@ -107,11 +142,9 @@
             <th>Description</th>
             <th>Qty</th>
             <th>Price</th>
-
             @if($hasDiscount)
                 <th>Disc %</th>
             @endif
-
             @if($hasTax)
                 <th>Tax %</th>
             @endif

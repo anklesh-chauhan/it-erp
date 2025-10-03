@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Address extends Model
 {
@@ -57,6 +60,12 @@ class Address extends Model
     public function accountMasters()
     {
         return $this->belongsToMany(AccountMaster::class, 'account_master_address_details', 'address_id', 'account_master_id');
+    }
+
+    public function gstDetail(): HasOne
+    {
+        // Assuming the relationship is 1:1 or 1:0 for a registered GST address
+        return $this->hasOne(AccountMasterGSTDetail::class);
     }
 
 }

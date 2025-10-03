@@ -16,8 +16,10 @@ class Quote extends SalesDocument
     ];
 
     protected $casts = [
-        'expiration_date' => 'date',
+        'date' => 'date',
+        'due_date' => 'date',
         'accepted_at' => 'datetime',
+        'expiration_date' => 'date',
     ];
 
     public function accountMaster()

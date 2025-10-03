@@ -13,6 +13,7 @@ class AccountMasterGSTDetail extends Model
 
     protected $fillable = [
         'account_master_id',
+        'address_id',
         'gst_number',
         'state_name',
         'state_code',
@@ -28,5 +29,13 @@ class AccountMasterGSTDetail extends Model
     public function accountMaster(): BelongsTo
     {
         return $this->belongsTo(AccountMaster::class);
+    }
+
+    /**
+     * Relationship: GST detail belongs to Address.
+     */
+    public function address(): BelongsTo
+    {
+        return $this->belongsTo(Address::class);
     }
 }
