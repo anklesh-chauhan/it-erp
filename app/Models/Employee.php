@@ -30,6 +30,11 @@ class Employee extends Model
         'date_of_birth' => 'date',
     ];
 
+    public function bankDetail()
+    {
+        return $this->morphMany(BankDetail::class, 'bankable');
+    }
+    
     public function getFullNameAttribute()
     {
         return trim("{$this->first_name} {$this->middle_name} {$this->last_name}");

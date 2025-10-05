@@ -16,6 +16,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Grid;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -39,6 +40,8 @@ class BankDetailRelationManager extends RelationManager
                     ->maxLength(255),
                 TextInput::make('bank_account_ifsc_code')
                     ->maxLength(255),
+                TextInput::make('bank_account_branch')
+                        ->maxLength(255),
                 TextInput::make('bank_account_swift_code')
                     ->maxLength(255),
 
@@ -49,47 +52,49 @@ class BankDetailRelationManager extends RelationManager
                     ->reactive(),
                 Section::make('More Bank Details')
                 ->schema([
-                    TextInput::make('bank_account_branch')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_iban')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_bic')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_phone')
-                        ->tel()
-                        ->maxLength(255),
-                    TextInput::make('bank_account_email')
-                        ->email()
-                        ->maxLength(255),
-                    TextInput::make('bank_account_address')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_city')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_state')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_country')
-                        ->required()
-                        ->maxLength(255)
-                        ->default('India'),
-                    TextInput::make('bank_account_zip')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_tax_id')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_micr_code')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_rtgs_code')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_ecs_code')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_code')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_type')
-                        ->maxLength(255),
-                    TextInput::make('bank_account_currency')
-                        ->required()
-                        ->maxLength(255)
-                        ->default('INR'),
+                    Grid::make(4)
+                        ->schema([
+                        TextInput::make('bank_account_iban')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_bic')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_phone')
+                            ->tel()
+                            ->maxLength(255),
+                        TextInput::make('bank_account_email')
+                            ->email()
+                            ->maxLength(255),
+                        TextInput::make('bank_account_address')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_city')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_state')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_country')
+                            ->required()
+                            ->maxLength(255)
+                            ->default('India'),
+                        TextInput::make('bank_account_zip')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_tax_id')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_micr_code')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_rtgs_code')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_ecs_code')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_code')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_type')
+                            ->maxLength(255),
+                        TextInput::make('bank_account_currency')
+                            ->required()
+                            ->maxLength(255)
+                            ->default('INR'),
+                    ])->columnSpanFull(),
                 ])
+                ->columnSpanFull()
                 ->visible(fn (Get $get) => $get('show_more')),
 
                 Toggle::make('bank_account_status')

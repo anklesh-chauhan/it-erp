@@ -20,6 +20,7 @@ class SalesDocumentItem extends Model
         'hsn_sac', // Harmonized System Nomenclature/SAC (Service Accounting Code)
         'tax_rate',
         'amount',
+        'final_taxable_amount',
         'description',
     ];
 

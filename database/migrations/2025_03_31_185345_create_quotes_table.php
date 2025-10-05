@@ -25,7 +25,7 @@ return new class extends Migration
             $table->enum('status', ['draft', 'sent', 'accepted', 'rejected', 'canceled'])->default('draft');
             $table->foreignId('sales_person_id')->nullable()->constrained('users')->onDelete('cascade'); // Assuming you have a users table
             $table->decimal('subtotal', 15, 2)->default(0);
-            $table->enum('discount_type', ['percentage', 'amoount'])->nullable(); // e.g., 'percentage' or 'fixed'
+            $table->enum('discount_type', ['percentage', 'amount'])->nullable(); // e.g., 'percentage' or 'fixed'
             $table->decimal('discount_value', 15, 2)->nullable(); // e.g., '10.00' for 10% or '50.00' for fixed amount
             $table->decimal('transaction_discount', 15, 2)->default(0); // Computed discount amount
             $table->decimal('tax', 15, 2)->default(0);
@@ -37,7 +37,7 @@ return new class extends Migration
             $table->foreignId('payment_term_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('payment_method_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('shipping_method_id')->nullable()->constrained()->onDelete('set null');
-            $table->string('shipping_cost')->nullable(); // e.g., '5.00'
+            $table->decimal('shipping_cost', 15, 2)->nullable(); // e.g., '5.00'
             $table->text('description')->nullable();
             $table->date('accepted_at')->nullable(); // e.g., '2025-12-31'
             $table->date('rejected_at')->nullable();

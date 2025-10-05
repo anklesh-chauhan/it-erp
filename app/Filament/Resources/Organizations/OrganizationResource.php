@@ -25,6 +25,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use App\Filament\Resources\AccountMasters\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\AccountMasterBankDetailResource\RelationManagers\BankDetailRelationManager;
 use App\Filament\Resources\Organizations\Pages\ListOrganizations;
 use App\Filament\Resources\Organizations\Pages\CreateOrganization;
 use App\Filament\Resources\Organizations\Pages\EditOrganization;
@@ -328,11 +329,8 @@ class OrganizationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Consider renaming 'AccountMasterResource' to something more general or ensuring it's correct.
-            // If AddressesRelationManager only manages addresses for 'AccountMaster', you might need a dedicated
-            // OrganizationAddressesRelationManager if organizations have their own addresses.
-            AddressesRelationManager::class
-            // Add other relation managers here if needed, e.g., UsersRelationManager, DepartmentsRelationManager
+            AddressesRelationManager::class,
+            BankDetailRelationManager::class,  
         ];
     }
 

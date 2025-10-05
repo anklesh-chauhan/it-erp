@@ -39,6 +39,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth; // Import Tabs
 use Filament\Forms\Components\Repeater; // Import Tab
+use App\Filament\Resources\AccountMasterBankDetailResource\RelationManagers\BankDetailRelationManager;
 
 class EmployeeResource extends Resource
 {
@@ -776,7 +777,7 @@ class EmployeeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Relation Managers are not needed since tabs handle related data
+            BankDetailRelationManager::class,
         ];
     }
 

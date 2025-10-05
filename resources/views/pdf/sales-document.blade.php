@@ -8,9 +8,10 @@
         .company { font-size: 24px; font-weight: bold; }
         .invoice-details { margin: 20px 0; }
         table { width: 100%; border-collapse: collapse; vertical-align: text-top;}
-        th, td { border: 1px solid black; padding: 8px; text-align: left; vertical-align: top;}
+        th, td { border: 1px solid black; padding: 2px 4px; text-align: left; vertical-align: top;}
         th { background-color: #f2f2f2; }
         .total { font-weight: bold; }
+        p {margin: 0px; padding: 0px; }
     </style>
 </head>
 <body>
@@ -118,12 +119,19 @@
     </table>
 
     @php
-        $hasDiscount = $document->items->contains(fn($i) => !empty($i->discount) && $i->discount > 0);
+        $discountMode = $document->discount_mode ?? null;
+
+        $hasLineDiscount = in_array($discountMode, ['line_item', 'both'], true);
+
         $hasTax = $document->items->contains(fn($i) => !empty($i->tax_rate) && $i->tax_rate > 0);
 
-        $subTotal = $document->items->sum(fn($i) => $i->quantity * $i->price);
-        $transactionDiscount = $document->transaction_discount ?? 0;
-        $transactionDiscountAmount = $subTotal * ($transactionDiscount / 100);
+        $subTotal = $document->subtotal ?? null;
+
+        $hasTransactionDiscount = in_array($discountMode, ['transaction', 'both'], true);
+        $discountType = $document->discount_type;        // "percentage" or "amount"
+        $discountValue = $document->discount_value;      // raw input (20% or 500 Rs)
+        $transactionDiscountAmount = $document->transaction_discount ?? 0; // final stored value
+
         $subTotalAfterDiscount = $subTotal - $transactionDiscountAmount;
 
         // Group tax details
@@ -132,17 +140,22 @@
             ->map(fn($group) => $group->sum('amount'));
 
         $totalTax = $taxGroups->sum();
-        $grandTotal = $subTotalAfterDiscount + $totalTax;
+        $shippingCost = $document->shipping_cost ?? 0;
+        $packingForwarding = $document->packing_forwarding ?? 0;
+        $insuranceCharges = $document->insurance_charges ?? 0;
+        $otherCharges = $document->other_charges ?? 0;
+        $grandTotal = $subTotalAfterDiscount + $totalTax + $shippingCost 
+                        + $packingForwarding + $insuranceCharges + $otherCharges;
     @endphp
     
     <table>
         <tr>
             <th>#</th>
             <th>Item</th>
-            <th>Description</th>
+            <th>HSC/SAC</th>
             <th>Qty</th>
-            <th>Price</th>
-            @if($hasDiscount)
+            <th>Rate</th>
+            @if($hasLineDiscount)
                 <th>Disc %</th>
             @endif
             @if($hasTax)
@@ -155,66 +168,292 @@
             @foreach ($document->items as $index => $item)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->itemMaster?->item_name ?? '-' }}</td>
-                    <td>{{ $item->description ?? '-' }}</td>
+                    <td>{{ $item->itemMaster?->item_name ?? '-' }} <br/>
+                        <i>{{ $item->description ?? '-' }}<i></td>
+                    <td>{{ $item->hsn_sac ?? '-' }}</td>
                     <td>{{ $item->quantity }}</td>
-                    <td>{{ number_format($item->price, 2) }}</td>
+                    <td>{{ number_format($item->unit_price, 2) }}</td>
 
-                    @if($hasDiscount)
-                        <td>{{ $item->discount ? number_format($item->discount, 2) : '-' }}</td>
+                    @if($hasLineDiscount)
+                        <td>{{ $item->discount ? number_format($item->discount).'%' : '-' }}</td>
                     @endif
 
                     @if($hasTax)
                         <td>{{ $item->tax_rate ? rtrim(rtrim(number_format($item->tax_rate, 2), '0'), '.') . '%' : '-' }}</td>
                     @endif
-                    <td>{{ number_format($item->amount, 2) }}</td>
+                    <td style="text-align:right;">{{ number_format($item->amount, 2) }}</td>
                 </tr>
             @endforeach
         </tr>
     </table>
+
+    @php
+        /**
+         * Convert number to Indian currency words.
+         */
+        function numberToIndianCurrencyWords($number)
+        {
+            $no = floor($number);
+            $decimal = round($number - $no, 2) * 100;
+            $digits_length = strlen($no);
+            $i = 0;
+            $str = [];
+            $words = [
+                0 => '', 1 => 'One', 2 => 'Two', 3 => 'Three', 4 => 'Four', 5 => 'Five',
+                6 => 'Six', 7 => 'Seven', 8 => 'Eight', 9 => 'Nine', 10 => 'Ten',
+                11 => 'Eleven', 12 => 'Twelve', 13 => 'Thirteen', 14 => 'Fourteen',
+                15 => 'Fifteen', 16 => 'Sixteen', 17 => 'Seventeen', 18 => 'Eighteen',
+                19 => 'Nineteen', 20 => 'Twenty', 30 => 'Thirty', 40 => 'Forty',
+                50 => 'Fifty', 60 => 'Sixty', 70 => 'Seventy', 80 => 'Eighty',
+                90 => 'Ninety'
+            ];
+            $digits = ['', 'Hundred', 'Thousand', 'Lakh', 'Crore'];
+            while ($i < $digits_length) {
+                $divider = ($i == 2) ? 10 : 100;
+                $number_chunk = $no % $divider;
+                $no = floor($no / $divider);
+                $i += ($divider == 10) ? 1 : 2;
+                if ($number_chunk) {
+                    $plural = (($counter = count($str)) && $number_chunk > 9) ? 's' : null;
+                    $hundred = ($counter == 1 && $str[0]) ? ' and ' : null;
+                    $str [] = ($number_chunk < 21) ? $words[$number_chunk] . " " . $digits[$counter] . $plural . " " . $hundred
+                        : $words[floor($number_chunk / 10) * 10] . " " . $words[$number_chunk % 10] . " " . $digits[$counter] . $plural . " " . $hundred;
+                } else $str[] = null;
+            }
+            $str = array_reverse($str);
+            $result = implode('', $str);
+            $points = ($decimal) ? " and " . $words[floor($decimal / 10) * 10] . " " . $words[$decimal % 10] . " Paise" : '';
+            return 'Indian Rupees ' . trim($result) . ' Only' . $points;
+        }
+    @endphp
     
-    <!-- Summary Table -->
-    <table style="width: 40%; margin-left: auto; border-collapse: collapse; margin-top: 15px;" border="1">
-        <tr>
-            <td style="text-align:right; font-weight:bold;">Subtotal</td>
-            <td style="text-align:right;">{{ number_format($subTotal, 2) }}</td>
-        </tr>
+    <table style="width:100%; border-collapse:collapse; border:none;">
+        <tr  style="border-collapse:collapse; border:none;">
+            <!-- LEFT SIDE TABLE -->
+            <td style="width:70%; vertical-align:top; padding:0; margin:0; border:none;">
+                @if($hasTax)
+                    @php
+                    // Group items by HSN/SAC
+                    $taxSummary = $document->items
+                        ->groupBy('hsn_sac')
+                        ->map(function ($group) {
+                            $taxableValue = $group->sum('final_taxable_amount'); // taxable value before tax
+                            $firstItem = $group->first();
+                            $taxRate = $firstItem->tax_rate ?? 0;
 
-        @if($transactionDiscount > 0)
-            <tr>
-                <td style="text-align:right; font-weight:bold;">Transaction Discount ({{ $transactionDiscount }}%)</td>
-                <td style="text-align:right;">-{{ number_format($transactionDiscountAmount, 2) }}</td>
-            </tr>
-        @endif
+                            // Assuming your tax split logic:
+                            $cgst = $sgst = $igst = 0;
 
-        @foreach($taxGroups as $label => $amount)
-            <tr>
-                <td style="text-align:right; font-weight:bold;">{{ $label }}</td>
-                <td style="text-align:right;">+{{ number_format($amount, 2) }}</td>
-            </tr>
-        @endforeach
+                            // Example: if intra-state (CGST + SGST), else IGST — adjust based on your system logic
+                            if ($firstItem->is_intra_state ?? true) {
+                                $cgst = $taxableValue * ($taxRate / 2) / 100;
+                                $sgst = $taxableValue * ($taxRate / 2) / 100;
+                            } else {
+                                $igst = $taxableValue * ($taxRate) / 100;
+                            }
 
-        <tr>
-            <td style="text-align:right; font-weight:bold;">Grand Total</td>
-            <td style="text-align:right; font-weight:bold;">{{ number_format($grandTotal, 2) }}</td>
+                            return [
+                                'hsn_sac' => $group->first()->hsn_sac ?? '-',
+                                'taxable_value' => $taxableValue,
+                                'cgst' => $cgst,
+                                'sgst' => $sgst,
+                                'igst' => $igst,
+                                'total_tax' => $cgst + $sgst + $igst,
+                            ];
+                        });
+                    @endphp
+                    <table style="width:100%; border-collapse: collapse;" border="1">
+                        <tr>
+                            <td style="font-weight:bold;">Tax Details</td>
+                        </tr>
+                        <tr>
+                            <th>HSN/SAC</th>
+                            <th>Taxable Value</th>
+                            <th>CGST</th>
+                            <th>SGST</th>
+                            <th>IGST</th>
+                            <th>Total Tax Amount</th>
+                        </tr>
+                        @foreach($taxSummary as $tax)
+                            <tr>
+                                <td>{{ $tax['hsn_sac'] }}</td>
+                                <td style="text-align:right;">
+                                    {{ number_format($tax['taxable_value'], 2) }}
+                                </td>
+                                <td style="text-align:right;">
+                                    {{ number_format($tax['cgst'], 2) }}
+                                </td>
+                                <td style="text-align:right;">
+                                    {{ number_format($tax['sgst'], 2) }}
+                                </td>
+                                <td style="text-align:right;">
+                                    {{ number_format($tax['igst'], 2) }}
+                                </td>
+                                <td style="text-align:right;">
+                                    {{ number_format($tax['total_tax'], 2) }}
+                                </td>
+                            </tr>
+                        @endforeach
+
+                        <!-- TOTAL ROW -->
+                        <tr style="font-weight:bold;">
+                            <td >Total</td>
+                            <td style="text-align:right;">
+                                {{ number_format($taxSummary->sum('taxable_value'), 2) }}
+                            </td>
+                            <td style="text-align:right;">
+                                {{ number_format($taxSummary->sum('cgst'), 2) }}
+                            </td>
+                            <td style="text-align:right;">
+                                {{ number_format($taxSummary->sum('sgst'), 2) }}
+                            </td>
+                            <td style="text-align:right;">
+                                {{ number_format($taxSummary->sum('igst'), 2) }}
+                            </td>
+                            <td style="text-align:right;">
+                                {{ number_format($taxSummary->sum('total_tax'), 2) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" style="text-align:left; font-size:10px;">
+                                Tax Amount in Words: {{ numberToIndianCurrencyWords($totalTax) }}
+                            </td>
+                        </tr>
+                    </table>
+                @endif
+            </td>
+
+            <!-- RIGHT SIDE TABLE (Your Existing Summary Table) -->
+            <td style="width:30%; vertical-align:top; padding:0; margin:0; border:none;">
+                <table style="
+                        width:100%;
+                        border-collapse: collapse;
+                        border-spacing: 0;
+                        border: none;
+                        margin: 0;
+                        padding: 0;
+                    ">
+                    @php
+                        // Calculate Gross Amount directly from items
+                        $grossAmount = $document->items->sum('amount');
+                    @endphp
+
+                    <tr>
+                        <td style="text-align:right; font-weight:bold;">Gross Amount</td>
+                        <td style="text-align:right;">{{ number_format($grossAmount, 2) }}</td>
+                    </tr>
+
+                    @if($hasTransactionDiscount && $transactionDiscountAmount > 0)
+                        <tr>
+                            <td style="text-align:right; font-weight:bold;">
+                                Transaction Discount 
+                                @if($discountType === 'percentage')
+                                    ({{ $discountValue }}%)
+                                @endif
+                            :</td>
+                            <td style="text-align:right;">-{{ number_format($transactionDiscountAmount, 2) }}</td>
+                        </tr>
+                    @endif
+
+                    <tr>
+                        <td style="text-align:right; font-weight:bold;">Subtotal</td>
+                        <td style="text-align:right;">{{ number_format($subTotal, 2) }}</td>
+                    </tr>
+
+                    @foreach($taxGroups as $label => $amount)
+                        <tr>
+                            <td style="text-align:right; font-weight:bold;">{{ $label }}</td>
+                            <td style="text-align:right;">+{{ number_format($amount, 2) }}</td>
+                        </tr>
+                    @endforeach
+
+                    @if($shippingCost > 0)
+                        <tr>
+                            <td style="text-align:right; font-weight:bold;">Shipping Cost</td>
+                            <td style="text-align:right;">+{{ number_format($shippingCost, 2) }}</td>
+                        </tr>
+                    @endif
+
+                    @if($packingForwarding > 0)
+                        <tr>
+                            <td style="text-align:right; font-weight:bold;">Packing & Forwarding</td>
+                            <td style="text-align:right;">+{{ number_format($packingForwarding, 2) }}</td>
+                        </tr>
+                    @endif
+                    @if($insuranceCharges > 0)
+                        <tr>
+                            <td style="text-align:right; font-weight:bold;">Insurance Charges</td>
+                            <td style="text-align:right;">+{{ number_format($insuranceCharges, 2) }}</td>
+                        </tr>
+                    @endif
+                    @if($otherCharges > 0)  
+                        <tr>
+                            <td style="text-align:right; font-weight:bold;">Other Charges</td>
+                            <td style="text-align:right;">+{{ number_format($otherCharges, 2) }}</td>
+                        </tr>
+                    @endif
+
+                    <tr>
+                        <td style="text-align:right; font-weight:bold;">Grand Total</td>
+                        <td style="text-align:right; font-weight:bold;">{{ number_format($grandTotal, 2) }}</td>
+                    </tr>
+                </table>
+            </td>
         </tr>
     </table>
 
     <div>
-        <p>Total in Words: Indian Rupee One Thousand Seven Hundred Seventy-Six Only</p>
-        <p>Notes: Thanks for your business.</p>
+        <p style="margin-top:10px; font-weight:bold;">
+            Total Amount in Words: {{ numberToIndianCurrencyWords($grandTotal) }}
+        </p>
     </div>
     <div>
-        <p><strong>Payment Options</strong></p>
-        <p>Bank Name & Branch - HSBC Bank, Bund Garden, Pune</p>
-        <p>Account Type | Current Account</p>
-        <p>Account Number # 05-00947-001</p>
-        <p>IFSC | HSBC0411002</p>
-        <p>Swift Code | HSBCINBB</p>
+        <br>
+        <p><strong>Terms & Conditions</strong></p>
+       {!! $document->termsAndCondition->content ?? 'N/A' !!}
     </div>
-    <p>Name: Searce India Private Limited</p>
-    <p>Digitally signed by ABHISHEK JHAGARAWAT</p>
-    <p>Date: 27-08-2025 11:52:03</p>
-    <p>Supply meant for export/supply to SEZ unit or SEZ developer for authorized operations under Letter of Undertaking without payment of integrated tax vide LUT # AD2042320327713 valid upto 31-03-2026.</p>
+    
+    @if ($document instanceof \App\Models\SalesInvoice)
+
+        @php
+            // $organization = $document->organization ?? \App\Models\Organization::first();
+            $bankDetails = $organization?->bankDetail;
+        @endphp
+
+        <div style="margin-top: 20px;">
+            <p><strong>Bank Account Details</strong></p>
+
+            @if($bankDetails && $bankDetails->count())
+                <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">Bank Name</th>
+                            <th style="text-align:left;">Account Name</th>
+                            <th style="text-align:left;">Account Number</th>
+                            <th style="text-align:left;">IFSC Code</th>
+                            <th style="text-align:left;">Branch</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($bankDetails as $bank)
+                            <tr>
+                                <td>{{ $bank->bank_name }}</td>
+                                <td>{{ $bank->bank_account_name }}</td>
+                                <td>{{ $bank->bank_account_number }}</td>
+                                <td>{{ $bank->bank_account_ifsc_code }}</td>
+                                <td>{{ $bank->bank_account_branch }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
+    @endif
+
+    <div style="margin-top:50px;">
+        <p>For <strong>{{ $organization->name }}</strong></p>
+        <br><br><br>
+        <p>Authorised Signatory</p>
+    </div>
 </body>
 </html>

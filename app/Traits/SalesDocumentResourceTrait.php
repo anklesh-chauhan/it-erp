@@ -12,6 +12,7 @@ use App\Models\User;
 use Filament\Forms\Components\Checkbox;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Fieldset;
 use App\Traits\ContactDetailsTrait;
 use App\Traits\CompanyDetailsTrait;
 use App\Traits\AddressDetailsTrait;
@@ -42,6 +43,8 @@ use App\Models\TermsAndConditionsMaster;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Form;
+use Filament\Schemas\Components\Tabs;
+use Filament\Infolists\Components\TextEntry;
 
 trait SalesDocumentResourceTrait
 {
@@ -161,7 +164,8 @@ trait SalesDocumentResourceTrait
                             TableColumn::make('Description                                                            ')->width('450px'),
                             TableColumn::make('Quantity           ')->width('100px'),
                             TableColumn::make('HSN/SAC'),
-                            TableColumn::make('Price                      ')->width('100px'),
+                            TableColumn::make('Unit Price       ')->width('100px'),
+                            TableColumn::make('Line Gross Amt')->width('100px'),
                             
                             // 🚀 Correctly execute the callable here with the $get from the closure
                             $showLineItemDiscount($get)
@@ -169,7 +173,8 @@ trait SalesDocumentResourceTrait
                                 : null,
 
                             TableColumn::make('Tax Rate %              ')->width('100px'),
-                            TableColumn::make('Taxable Amount                      ')->width('100px'),
+                            TableColumn::make('Amount                      ')->width('100px'),
+                            TableColumn::make('Taxable Amt        ')->width('100px'),
                             TableColumn::make(' ')->width('10px'),
                         ])->filter()->all()
                     )
@@ -223,7 +228,7 @@ trait SalesDocumentResourceTrait
                                     if ($item) {
                                         $set('description', $item?->description ?? '');
                                         $set('hsn_sac', $item?->hsn_code ?? ''); // Auto-fetch HSN/SAC
-                                        $set('price', $item->selling_price ?? 0); // Auto-fetch Price (assuming 'sale_price' field in ItemMaster)
+                                        $set('unit_price', $item->selling_price ?? 0); // Auto-fetch Price (assuming 'sale_price' field in ItemMaster)
                                             // ✅ Automatically calculate total tax rate from related taxes
                                         $totalTaxRate = $item->taxes->sum('total_rate');
                                         $set('tax_rate', number_format($totalTaxRate, 2, '.', ''));
@@ -236,7 +241,7 @@ trait SalesDocumentResourceTrait
                                 } else {
                                     $set('description', '');
                                     $set('hsn_sac', '');
-                                    $set('price', 0);
+                                    $set('unit_price', 0);
                                     $set('tax_rate', 0);
                                 }
                             }),
@@ -267,6 +272,18 @@ trait SalesDocumentResourceTrait
                                 ->extraFieldWrapperAttributes(['class' => 'min-w-[100px]'])
                                 ->placeholder('HSN/SAC'),
 
+                            TextInput::make('unit_price')
+                                ->label(false)
+                                ->numeric()
+                                ->default(0)
+                                ->required()
+                                ->live(onBlur: true)
+                                ->extraFieldWrapperAttributes(['class' => 'min-w-[100px]'])
+                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    self::updateItemAmount($set, $get);
+                                    self::updateTotals($set, $get);
+                                }),
+                            
                             TextInput::make('price')
                                 ->label(false)
                                 ->numeric()
@@ -343,6 +360,23 @@ trait SalesDocumentResourceTrait
                                     // Always format to 2 decimal places
                                     return number_format($value, 2, '.', '');
                                 }),
+                            TextInput::make('final_taxable_amount')
+                                ->label(false)
+                                ->readOnly()
+                                ->extraFieldWrapperAttributes(['class' => 'min-w-[100px]'])
+                                ->dehydrated(true)
+                                ->inputMode('decimal') // Enforce decimal input behavior
+                                ->step('0.01')
+                                ->extraInputAttributes([
+                                    'min' => 0,
+                                    'step' => '0.01', // Reinforce 2 decimal places in the HTML input
+                                ])
+                                ->formatStateUsing(function ($state): string {
+                                    // Convert state to float to handle null, empty, or integer values
+                                    $value = (float) ($state ?? 0);
+                                    // Always format to 2 decimal places
+                                    return number_format($value, 2, '.', '');
+                                }), 
                         ])->filter()->all() // removes null entries safely
                     )
                     ->afterStateHydrated(function (callable $set, callable $get) {
@@ -362,87 +396,232 @@ trait SalesDocumentResourceTrait
                     })
                     ->columnSpanFull()
                     ->addActionLabel('Add Item'),
-                Section::make()
-                ->schema([
-                    Grid::make(7)
-                    ->schema([
-                        Select::make('discount_type')
-                            ->label('Disc Type')
-                            ->options([
-                                'percentage' => '%',
-                                'amount'     => '₹',
-                            ])
-                            ->native(false)
-                            ->default(fn () => $record && $record->discount_type ? $record->discount_type : 'percentage')
-                            ->live() // make the select reactive
-                            ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
-                                self::updateTotals($set, $get)
-                            )
-                            ->hidden(fn (callable $get) => !$showTransactionDiscount($get)),
-
-                        TextInput::make('discount_value')
-                            ->label('Disc Value')
-                            ->numeric()
-                            ->default(fn () => $record && is_numeric($record->discount_value) ? $record->discount_value : 0)
-                                ->minValue(0)
-                                ->maxValue(fn (callable $get) => $get('discount_type') === 'percentage' ? 100 : 99999999)
-                            ->suffix(fn (callable $get) => $get('discount_type') === 'percentage' ? '%' : '₹')
-                            ->live() // make the select reactive
-                            ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
-                                self::updateTotals($set, $get)
-                            )
-                            ->hidden(fn (callable $get) => !$showTransactionDiscount($get)),
-
-                            // Show computed discount amount (read-only)
-                        TextInput::make('total_discount_amount') // 🚀 CHANGED field name
-                            ->label('Total Disc Amt') // 🚀 CHANGED label
-                            ->readOnly()
-                            ->extraInputAttributes(['class' => 'text-right'])
-                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
-                
-                        TextInput::make('subtotal')
-                            ->label('Subtotal')
-                            ->readOnly()
-                            ->extraInputAttributes(['class' => 'text-right'])
-                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
-
-                        TextInput::make('cgst')
-                            ->label('CGST')
-                            ->readOnly()
-                            ->extraInputAttributes(['class' => 'text-right'])
-                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
-                            ->visible(fn (callable $get) => self::shouldShowCgstSgst($get)),
-
-                        TextInput::make('sgst')
-                            ->label('SGST')
-                            ->readOnly()
-                            ->extraInputAttributes(['class' => 'text-right'])
-                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
-                            ->visible(fn (callable $get) => self::shouldShowCgstSgst($get)),
-
-                        TextInput::make('igst')
-                            ->label('IGST')
-                            ->readOnly()
-                            ->extraInputAttributes(['class' => 'text-right'])
-                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
-                            ->visible(fn (callable $get) => !self::shouldShowCgstSgst($get)),
-
-                        TextInput::make('total')
-                            ->label('Total')
-                            ->readOnly()
-                            ->extraInputAttributes(['class' => 'text-right'])
-                            ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
-                        
-                        Hidden::make('discount_mode'),
-                        Hidden::make('gross_total'),
-                        Hidden::make('tax'),
-                        // 🚀 NEW: Add a hidden field for the total line item discount
-                        Hidden::make('total_line_item_discount'),
-                        // 🚀 NEW: Rename old transaction_discount to just transaction_discount_amount to avoid conflicts
-                        Hidden::make('transaction_discount'),
-                    ])
-                ]), // Empty section for spacing
             ])->columnSpanFull(),
+
+            Section::make()
+                ->schema([
+                    // 1. Replace Grid with Tabs
+                    Tabs::make('Totals and Calculations')
+                        ->tabs([
+                            // 2. Tab for User Input/Summary (The fields you showed)
+                            Tabs\Tab::make('Summary')
+                                ->schema([
+                                    Grid::make(7) // You can keep the grid inside the tab
+                                        ->schema([
+                                            // The first set of fields goes here (Discount Type, Value, Discount Total, Subtotal, Total)
+                                            Select::make('discount_type')
+                                                ->label('Trn Disc Type')
+                                                ->options([
+                                                    'percentage' => '%',
+                                                    'amount'     => '₹',
+                                                ])
+                                                ->native(false)
+                                                ->default(fn () => $record && $record->discount_type ? $record->discount_type : 'percentage')
+                                                ->live() // make the select reactive
+                                                ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                                    self::updateTotals($set, $get)
+                                                )
+                                                ->hidden(fn (callable $get) => !$showTransactionDiscount($get)),
+
+                                            TextInput::make('discount_value')
+                                                ->label('Trn Disc Value')
+                                                ->numeric()
+                                                ->default(fn () => $record && is_numeric($record->discount_value) ? $record->discount_value : 0)
+                                                    ->minValue(0)
+                                                    ->maxValue(fn (callable $get) => $get('discount_type') === 'percentage' ? 100 : 99999999)
+                                                ->suffix(fn (callable $get) => $get('discount_type') === 'percentage' ? '%' : '₹')
+                                                ->live() // make the select reactive
+                                                ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                                    self::updateTotals($set, $get)
+                                                )
+                                                ->hidden(fn (callable $get) => !$showTransactionDiscount($get)),
+
+                                                // Show computed discount amount (read-only)
+                                            TextInput::make('total_discount_amount') // 🚀 CHANGED field name
+                                                ->label('Discount Total') // 🚀 CHANGED label
+                                                ->readOnly()
+                                                ->extraInputAttributes(['class' => 'text-right'])
+                                                ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format('-'.(float) $state, 2, '.', '') : $state),
+                                    
+                                            TextInput::make('subtotal')
+                                                ->label('Subtotal')
+                                                ->readOnly()
+                                                ->extraInputAttributes(['class' => 'text-right'])
+                                                ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+
+                                            TextInput::make('cgst')
+                                                ->label('CGST')
+                                                ->readOnly()
+                                                ->extraInputAttributes(['class' => 'text-right'])
+                                                ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                                                ->visible(fn (callable $get) => self::shouldShowCgstSgst($get)),
+
+                                            TextInput::make('sgst')
+                                                ->label('SGST')
+                                                ->readOnly()
+                                                ->extraInputAttributes(['class' => 'text-right'])
+                                                ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                                                ->visible(fn (callable $get) => self::shouldShowCgstSgst($get)),
+
+                                            TextInput::make('igst')
+                                                ->label('IGST')
+                                                ->readOnly()
+                                                ->extraInputAttributes(['class' => 'text-right'])
+                                                ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                                                ->visible(fn (callable $get) => !self::shouldShowCgstSgst($get)),
+
+                                            TextInput::make('total')
+                                                ->label('Total')
+                                                ->reactive()
+                                                ->readOnly()
+                                                ->extraInputAttributes(['class' => 'text-right'])
+                                                ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+                                        ]),
+                                ]),
+
+                            // 3. Tab for Full Calculations/Tax Details
+                            Tabs\Tab::make('Detailed Calculations')
+                                ->schema([
+                                    TextInput::make('gross_total')
+                                        ->label('Total Before Discount')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+                                    TextInput::make('total_line_item_discount')
+                                        ->label('Total Line Item Discount (-)')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+                                    TextInput::make('transaction_discount')
+                                        ->label('Transaction Discount (-)')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+                                    
+                                    TextInput::make('subtotal')
+                                        ->label('Subtotal After Discounts')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+
+                                    TextInput::make('tax')
+                                        ->label('Total Tax Amount (+)')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+                                    TextInput::make('round_off')
+                                        ->label('Round Off')
+                                        ->inlineLabel()
+                                        ->default(0)
+                                        ->readOnly()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->hidden(fn ($get) => ($get('round_off') ?? 0) <= 0)
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+                                    TextInput::make('shipping_cost')
+                                        ->label('Shipping Charges (+)')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->reactive()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->hidden(fn ($get) => ($get('shipping_cost') ?? 0) <= 0)
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                                        ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                            self::updateTotals($set, $get)
+                                        ),
+
+                                    TextInput::make('packing_forwarding')
+                                        ->label('Packing & Forwarding (+)')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->hidden(fn ($get) => ($get('packing_forwarding') ?? 0) <= 0)
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                                        ->reactive()
+                                        ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                            self::updateTotals($set, $get)
+                                        ),
+
+                                    TextInput::make('insurance_charges')
+                                        ->label('Insurance Charges (+)')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->hidden(fn ($get) => ($get('insurance_charges') ?? 0) <= 0)
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                                        ->reactive()
+                                        ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                            self::updateTotals($set, $get)
+                                        ),
+
+                                    TextInput::make('other_charges')
+                                        ->label('Other Charges (+)')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->hidden(fn ($get) => ($get('other_charges') ?? 0) <= 0)
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state)
+                                        ->reactive()
+                                        ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                            self::updateTotals($set, $get)
+                                        ),
+
+                                    TextInput::make('total')
+                                        ->label('Final Total')
+                                        ->inlineLabel()
+                                        ->readOnly()
+                                        ->extraInputAttributes(['class' => 'text-right'])
+                                        ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
+                                    
+                                ]),
+                        ])->columnSpanFull(),
+
+                    // Keep all hidden fields here, outside of the Tabs, for simplicity
+                    Hidden::make('discount_mode'),
+                    Hidden::make('gross_total'),
+                    Hidden::make('tax'),
+                    Hidden::make('total_line_item_discount'),
+                    Hidden::make('transaction_discount'),
+                ])
+                ->columnSpanFull(),
+
+                Grid::make(4)
+                    ->schema([
+                        TextInput::make('shipping_cost')
+                            ->maxLength(255)
+                            ->numeric()
+                            ->reactive()
+                            ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                self::updateTotals($set, $get)
+                            ),
+                        TextInput::make('packing_forwarding')
+                            ->label('Packing & Forwarding')
+                            ->numeric()
+                            ->live()
+                            ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                self::updateTotals($set, $get)
+                            ),
+                        TextInput::make('insurance_charges')
+                            ->label('Insurance Charges')
+                            ->numeric()
+                            ->live()
+                            ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                self::updateTotals($set, $get)
+                            ),
+                        TextInput::make('other_charges')
+                            ->label('Other Charges')
+                            ->numeric()
+                            ->live()
+                            ->afterStateUpdated(fn ($state, callable $set, callable $get) =>
+                                self::updateTotals($set, $get)
+                            ),
+                ])
+                ->columnSpanFull(),
+
             Grid::make(4)
                 ->schema([
                     Select::make('payment_term_id')
@@ -463,8 +642,7 @@ trait SalesDocumentResourceTrait
                         ->preload()
                         ->searchable()
                         ->placeholder('Select shipping method...'),
-                    TextInput::make('shipping_cost')
-                        ->maxLength(255),
+                    
                 ])->columnSpanFull(),
 
             Grid::make(4)
@@ -581,19 +759,26 @@ trait SalesDocumentResourceTrait
     private static function updateItemAmount(callable $set, callable $get): void
     {
         $quantity = floatval($get('quantity') ?? 1);
-        $price = floatval($get('price') ?? 0);
+        $unit_price = floatval($get('unit_price') ?? 0);
         $discount = floatval($get('discount') ?? 0);
 
-        $discountAmount = ($quantity * $price) * ($discount / 100);
-        $amount = ($quantity * $price) - $discountAmount;
+        $lineGross = $quantity * $unit_price;
+        $discountAmount = ($quantity * $unit_price) * ($discount / 100);
+        $amount = ($quantity * $unit_price) - $discountAmount;
 
-        $set('amount', number_format($amount, 2, '.', ''));
+        $set('price', number_format($lineGross, 2, '.', ''));
+        // $set('amount', number_format($amount, 2, '.', ''));
 
     }
 
     private static function updateTotals(callable $set, callable $get): void
     {
         $items = $get('items') ?? [];
+
+        $shipping = floatval($get('shipping_cost') ?? 0);
+        $packing  = floatval($get('packing_forwarding') ?? 0);
+        $insurance = floatval($get('insurance_charges') ?? 0);
+        $other = floatval($get('other_charges') ?? 0);
 
         // Get the record from the route
         $record = request()->route('record');
@@ -623,10 +808,10 @@ trait SalesDocumentResourceTrait
         foreach ($items as $key => $item) {
             $path = "items.{$key}";
             $quantity = floatval($get("{$path}.quantity") ?? 1);
-            $price = floatval($get("{$path}.price") ?? 0);
+            $unit_price = floatval($get("{$path}.unit_price") ?? 0);
             $discount = floatval($get("{$path}.discount") ?? 0);
 
-            $lineSubtotal = $quantity * $price;
+            $lineSubtotal = $quantity * $unit_price;
             $originalSubtotal += $lineSubtotal;
 
             $lineDiscountAmount = 0;
@@ -672,6 +857,7 @@ trait SalesDocumentResourceTrait
 
         // --- Calculate Taxes on final discounted amount (after both discounts if applicable) ---
         foreach ($lineData as $key => $data) {
+            $path = "items.{$key}";
             $proportion = $originalSubtotal > 0 ? ($data['gross'] / $originalSubtotal) : 0;
             $adjustedAmount = $data['amount']; // Start with line-level discounted amount
 
@@ -679,6 +865,8 @@ trait SalesDocumentResourceTrait
                 $allocatedTransactionDiscount = $transactionDiscountAmount * $proportion;
                 $adjustedAmount = max(0, $adjustedAmount - $allocatedTransactionDiscount);
             }
+
+            $set("{$path}.final_taxable_amount", number_format($adjustedAmount, 2, '.', ''));
 
             if ($data['item_master_id'] && $data['tax_rate']) {
                 $item = ItemMaster::with('taxes.components')->find($data['item_master_id']);
@@ -703,7 +891,7 @@ trait SalesDocumentResourceTrait
         }
 
         $tax = $cgstTotal + $sgstTotal + $igstTotal;
-        $total = $discountedSubtotal + $tax;
+        $total = $discountedSubtotal + $tax + $shipping + $packing + $insurance + $other;
 
         // --- Set values in form state ---
         $set('gross_total', number_format($originalSubtotal, 2, '.', ''));
@@ -759,7 +947,7 @@ trait SalesDocumentResourceTrait
     // --- Pre-calculation ---
     $grossTotal = 0;
     foreach ($items as $item) {
-        $grossTotal += floatval($item->quantity ?? 1) * floatval($item->price ?? 0);
+        $grossTotal += floatval($item->quantity ?? 1) * floatval($item->unit_price ?? 0);
     }
 
     $transactionDiscountAmount = 0;
@@ -768,7 +956,7 @@ trait SalesDocumentResourceTrait
     if ($discountLevel === 'line_item' || $discountLevel === 'both') {
         $lineItemDiscountedTotal = 0;
         foreach ($items as $item) {
-            $lineGross = floatval($item->quantity ?? 1) * floatval($item->price ?? 0);
+            $lineGross = floatval($item->quantity ?? 1) * floatval($item->unit_price ?? 0);
             $lineDiscount = $lineGross * (floatval($item->discount ?? 0) / 100);
             $lineItemDiscountedTotal += $lineGross - $lineDiscount;
             $totalLineItemDiscount += $lineDiscount; // 🚀 NEW: Add to line item discount total
@@ -793,12 +981,12 @@ trait SalesDocumentResourceTrait
     // --- Per item calculation ---
     foreach ($items as $item) {
         $quantity = floatval($item->quantity ?? 1);
-        $price = floatval($item->price ?? 0);
+        $unit_price = floatval($item->unit_price ?? 0);
         $discount = floatval($item->discount ?? 0);
         $taxRate = floatval($item->tax_rate ?? 0);
         $itemMasterId = $item->item_master_id ?? null;
 
-        $lineGross = $quantity * $price;
+        $lineGross = $quantity * $unit_price;
         $taxableAmount = $lineGross;
 
         if ($discountLevel === 'line_item' || $discountLevel === 'both') {

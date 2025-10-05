@@ -63,6 +63,11 @@ class Organization extends Model
         'metadata' => 'array',
     ];
 
+    public function bankDetail()
+    {
+        return $this->morphMany(BankDetail::class, 'bankable');
+    }
+
     /**
      * Get the addresses associated with the organization.
      */

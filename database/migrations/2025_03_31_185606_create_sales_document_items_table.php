@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('price', 15, 2)->default(0);
             $table->decimal('discount', 15, 2)->nullable();
             $table->string('unit')->nullable();
-            $table->string('unit_price')->nullable();
+            $table->decimal('unit_price',15,2)->nullable();
             $table->string('hsn_sac')->nullable(); // Harmonized System Nomenclature/SAC (Service Accounting Code)
             $table->decimal('tax_rate', 5, 2)->default(0);
             $table->decimal('amount', 15, 2)->default(0);
