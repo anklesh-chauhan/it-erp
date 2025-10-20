@@ -38,6 +38,11 @@ class ItemMaster extends Model
         'sku',
     ];
 
+    public function customerPrices()
+    {
+        return $this->hasMany(CustomerPrice::class);
+    }
+
     public function variants()
     {
         return $this->hasMany(ItemVariant::class);

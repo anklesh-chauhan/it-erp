@@ -26,19 +26,9 @@ class ItemVariant extends Model
         'per_packing_qty',
     ];
 
-    protected static function boot()
+    public function customerPrices()
     {
-        parent::boot();
-
-        static::created(function ($variant) {
-            $variant->itemMaster->update(['has_variants' => true]);
-        });
-
-        static::deleted(function ($variant) {
-            $itemMaster = $variant->itemMaster;
-            $hasVariants = $itemMaster->variants()->count() > 0;
-            $itemMaster->update(['has_variants' => $hasVariants]);
-        });
+        return $this->hasMany(CustomerPrice::class);
     }
 
     public function itemMaster()
@@ -71,4 +61,20 @@ class ItemVariant extends Model
         return $this->belongsToMany(Tax::class, 'item_variant_tax_pivots')
             ->withTimestamps();
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($variant) {
+            $variant->itemMaster->update(['has_variants' => true]);
+        });
+
+        static::deleted(function ($variant) {
+            $itemMaster = $variant->itemMaster;
+            $hasVariants = $itemMaster->variants()->count() > 0;
+            $itemMaster->update(['has_variants' => $hasVariants]);
+        });
+    }
+
 }

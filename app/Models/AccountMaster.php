@@ -39,6 +39,11 @@ class AccountMaster extends Model
         'account_ownership_id',
     ];
 
+    public function customerPrices()
+    {
+        return $this->hasMany(CustomerPrice::class);
+    }
+
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_id');
