@@ -10,6 +10,7 @@ use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\ItemMasters\RelationManagers\LocationsRelationManager;
 use App\Filament\Resources\ItemMasters\RelationManagers\LeadsRelationManager;
 use App\Filament\Resources\ItemMasters\RelationManagers\SuppliersRelationManager;
+use App\Filament\Resources\ItemMasters\RelationManagers\VariantsRelationManager;
 use App\Filament\Resources\ItemMasters\Pages\ListItemMasters;
 use App\Filament\Resources\ItemMasters\Pages\CreateItemMaster;
 use App\Filament\Resources\ItemMasters\Pages\EditItemMaster;
@@ -111,7 +112,8 @@ class ItemMasterResource extends Resource
         return [
             LocationsRelationManager::class,
             LeadsRelationManager::class,
-            SuppliersRelationManager::class
+            SuppliersRelationManager::class,
+            VariantsRelationManager::class,
             // RelationManagers\SalesOrdersRelationManager::class,
             // RelationManagers\PurchaseOrdersRelationManager::class,
             // RelationManagers\PurchaseInvoicesRelationManager::class,

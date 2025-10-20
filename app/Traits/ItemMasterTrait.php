@@ -18,6 +18,7 @@ use App\Models\Category;
 use App\Models\NumberSeries;
 use App\Models\PackagingType;
 use App\Models\CompanyMaster;
+use Dom\Text;
 
 trait ItemMasterTrait
 {
@@ -46,12 +47,15 @@ trait ItemMasterTrait
                         ->searchable()
                         ->preload()
                         ->required(),
+
+                    TextInput::make('sku')
+                        ->label('SKU'),
+
                     Select::make('unit_of_measurement_id')
                         ->relationship('unitOfMeasurement', 'name')
                         ->label('Unit of Measurement'),
                     TextInput::make('hsn_code')
                         ->label('HSN/SAC Code'),
-
 
                     Select::make('taxes')
                         ->label('Applicable Taxes')
@@ -59,8 +63,7 @@ trait ItemMasterTrait
                         ->multiple()
                         ->preload()
                         ->searchable()
-                        ->required(false)
-                        ->helperText('Choose one or more applicable taxes from the master list'),
+                        ->required(false),
 
                     Select::make('item_brand_id')
                         ->relationship('brand', 'name')

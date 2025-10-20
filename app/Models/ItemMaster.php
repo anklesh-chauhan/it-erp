@@ -34,11 +34,15 @@ class ItemMaster extends Model
         'expiry_date',
         'packaging_type_id',
         'per_packing_qty',
+        'has_variants',
+        'sku',
     ];
 
-    /**
-     * Polymorphic Category Relation
-     */
+    public function variants()
+    {
+        return $this->hasMany(ItemVariant::class);
+    }
+
     public function category()
     {
         return $this->morphTo();
