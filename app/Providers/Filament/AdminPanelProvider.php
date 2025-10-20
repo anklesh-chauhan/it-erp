@@ -33,6 +33,8 @@ use App\Models\Lead;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Actions\Action;
+use App\Filament\Resources\Organizations\OrganizationResource;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -54,6 +56,15 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Amber,
+            ])
+            ->userMenuItems([
+                'organization-profile' => Action::make('organization-profile')
+                    ->label('Organization Profile')
+                    // ⬇️ FIX: Wrap the getUrl() call in an arrow function (fn())
+                    // This ensures it only runs after the application and routes are loaded.
+                    ->url(fn (): string => OrganizationResource::getUrl('edit', ['record' => 1])) 
+                    ->icon('heroicon-o-building-office')
+                    ->visible(fn () => OrganizationResource::canViewAny()),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

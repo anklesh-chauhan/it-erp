@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Organization;
 use App\Models\Quote;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -23,8 +24,8 @@ class SalesDocumentPdfController extends Controller
         $canvas = $dompdf->getCanvas();
         $fontMetrics = new \Dompdf\FontMetrics($canvas, $dompdf->getOptions());
 
-        $canvas->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) {
-            $text = "Page $pageNumber of $pageCount";
+        $canvas->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) use ($organization, $document) {
+            $text = "{$organization->name} - Document No {$document->document_number} - Page $pageNumber of $pageCount";
             $font = $fontMetrics->getFont("Helvetica", "normal");
             $size = 9;
 
