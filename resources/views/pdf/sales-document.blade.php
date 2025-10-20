@@ -15,46 +15,48 @@
     </style>
 </head>
 <body>
-    <table style="border: 1px solid black;>
-        <tr>
-            @if($organization->logo)
+    <table style="border: 1px solid black;">
+        <thead>
+            <tr>
+                @if($organization->logo)
+                    <td style="border:none; text-align:left;">
+                        <img src="{{ public_path('storage/' . $organization->logo) }}" 
+                            alt="{{ $organization->name }} Logo" 
+                            style="max-widht: 120px; max-height: 120px; vertical-align: top;">
+                    </td>
+                @endif
                 <td style="border:none; text-align:left;">
-                    <img src="{{ public_path('storage/' . $organization->logo) }}" 
-                        alt="{{ $organization->name }} Logo" 
-                        style="max-widht: 120px; max-height: 120px; vertical-align: top;">
+                    <div class="header">
+                        <div class="company">{{ $organization->name }}</div>
+                        @if($organization->primaryAddress())
+                            <div>
+                                {{ Str::title($organization->primaryAddress()?->street) }},
+                                {{ Str::title($organization->primaryAddress()?->area_town) }},
+                                {{ Str::title($organization->primaryAddress()?->city?->name) }},
+                                {{ Str::title($organization->primaryAddress()?->state?->name) }},
+                                {{ Str::title($organization->primaryAddress()?->pin_code) }}
+                            </div>
+                        @endif
+                        <div>Email: {{ $organization->email }}</div>
+                        <div>Phone: {{ $organization->phone }}</div>
+                        <div>GSTIN: {{ $organization->gst_number }}</div>
+                    </div>
                 </td>
-             @endif
-            <td style="border:none; text-align:left;">
-                <div class="header">
-                    <div class="company">{{ $organization->name }}</div>
-                    @if($organization->primaryAddress())
-                        <div>
-                            {{ Str::title($organization->primaryAddress()?->street) }},
-                            {{ Str::title($organization->primaryAddress()?->area_town) }},
-                            {{ Str::title($organization->primaryAddress()?->city?->name) }},
-                            {{ Str::title($organization->primaryAddress()?->state?->name) }},
-                            {{ Str::title($organization->primaryAddress()?->pin_code) }}
-                        </div>
-                    @endif
-                    <div>Email: {{ $organization->email }}</div>
-                    <div>Phone: {{ $organization->phone }}</div>
-                    <div>GSTIN: {{ $organization->gst_number }}</div>
-                </div>
-             </td>
-            <td style="border:none; text-align:right;">
-                <h2>
-                    @if ($document instanceof \App\Models\Quote)
-                        QUOTE
-                    @elseif ($document instanceof \App\Models\SalesInvoice)
-                        TAX INVOICE
-                    @elseif ($document instanceof \App\Models\SalesOrder)
-                        SALES ORDER
-                    @else
-                        DOCUMENT
-                    @endif
-                </h2>
-            </td>
-        </tr>
+                <td style="border:none; text-align:right;">
+                    <h2>
+                        @if ($document instanceof \App\Models\Quote)
+                            QUOTE
+                        @elseif ($document instanceof \App\Models\SalesInvoice)
+                            TAX INVOICE
+                        @elseif ($document instanceof \App\Models\SalesOrder)
+                            SALES ORDER
+                        @else
+                            DOCUMENT
+                        @endif
+                    </h2>
+                </td>
+            </tr>
+        </thead>
     </table>
     <table>
         <tr>

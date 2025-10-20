@@ -16,6 +16,25 @@ class SalesDocumentPdfController extends Controller
         
         $pdf = Pdf::loadView('pdf.sales-document', compact('document', 'organization'));
 
+        // Force render before adding page_script
+        $dompdf = $pdf->getDomPDF();
+        $dompdf->render();
+
+        $canvas = $dompdf->getCanvas();
+        $fontMetrics = new \Dompdf\FontMetrics($canvas, $dompdf->getOptions());
+
+        $canvas->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) {
+            $text = "Page $pageNumber of $pageCount";
+            $font = $fontMetrics->getFont("Helvetica", "normal");
+            $size = 9;
+
+            $width = $fontMetrics->getTextWidth($text, $font, $size);
+            $x = $canvas->get_width() - $width - 20; // right-align
+            $y = $canvas->get_height() - 25;         // 25px from bottom
+
+            $canvas->text($x, $y, $text, $font, $size);
+        });
+
         return $pdf->stream(strtolower($type) . '-' . $document->document_number . '.pdf');
     }
 
@@ -26,6 +45,25 @@ class SalesDocumentPdfController extends Controller
         $organization = \App\Models\Organization::first();
         
         $pdf = Pdf::loadView('pdf.sales-document', compact('document', 'organization'));
+
+        // Force render before adding page_script
+        $dompdf = $pdf->getDomPDF();
+        $dompdf->render();
+
+        $canvas = $dompdf->getCanvas();
+        $fontMetrics = new \Dompdf\FontMetrics($canvas, $dompdf->getOptions());
+
+        $canvas->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) {
+            $text = "Page $pageNumber of $pageCount";
+            $font = $fontMetrics->getFont("Helvetica", "normal");
+            $size = 9;
+
+            $width = $fontMetrics->getTextWidth($text, $font, $size);
+            $x = $canvas->get_width() - $width - 20; // right-align
+            $y = $canvas->get_height() - 25;         // 25px from bottom
+
+            $canvas->text($x, $y, $text, $font, $size);
+        });
 
         return $pdf->download(strtolower($type) . '-' . $document->document_number . '.pdf');
     }
