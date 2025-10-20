@@ -45,7 +45,7 @@ class ItemMasterResource extends Resource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static string | \UnitEnum | null $navigationGroup = 'Masters';
-    protected static ?int $navigationSort = 200;
+    protected static ?int $navigationSort = 198;
     protected static ?string $navigationLabel = 'Item Master';
 
     public static function form(Schema $schema): Schema

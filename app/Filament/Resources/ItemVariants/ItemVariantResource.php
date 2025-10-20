@@ -21,6 +21,9 @@ class ItemVariantResource extends Resource
     protected static ?string $model = ItemVariant::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
+    protected static ?int $navigationSort = 199;
+    protected static ?string $navigationLabel = 'Item Variants';
 
     public static function form(Schema $schema): Schema
     {

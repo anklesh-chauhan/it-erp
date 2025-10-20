@@ -20,6 +20,10 @@ class CustomerPriceResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
+    protected static ?int $navigationSort = 190;
+    protected static ?string $navigationLabel = 'Customer Prices';
+
     protected static ?string $recordTitleAttribute = 'CustomerPrice';
 
     public static function form(Schema $schema): Schema
