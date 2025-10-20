@@ -27,7 +27,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Traits\SalesDocumentResourceTrait;
+use Filament\Actions\ActionGroup;
 use Illuminate\Support\Str;
+use Filament\Tables\Enums\RecordActionsPosition;
+use App\Helpers\SalesDocumentHelper;
 
 class SalesOrderResource extends Resource
 {
@@ -141,47 +144,46 @@ class SalesOrderResource extends Resource
                     }),
             ])
             ->recordActions([
+                ActionGroup::make([
                 EditAction::make(),
+                
                 Action::make('createInvoice')
                     ->label('Create Invoice')
                     ->icon('heroicon-o-document-text')
                     ->requiresConfirmation()
                     ->color('success')
                     ->action(function (SalesOrder $record, $livewire) {
-                        // Copy relevant data from Sales Order to Sales Invoice
-                        $invoice = SalesInvoice::create([
-                            'sales_order_id' => $record->id,
-                            'document_number' => NumberSeries::getNextNumber(SalesInvoice::class),
-                            'date' => now(),
-                            'lead_id' => $record->lead_id,
-                            'sales_person_id' => $record->sales_person_id,
-                            'contact_detail_id' => $record->contact_detail_id,
-                            'account_master_id' => $record->account_master_id,
-                            'billing_address_id' => $record->billing_address_id,
-                            'shipping_address_id' => $record->shipping_address_id,
-                            'currency' => $record->currency,
-                            'payment_terms' => $record->payment_terms,
-                            'shipping_method' => $record->shipping_method,
-                            'total' => $record->total,
-                            'status' => 'draft', // or your default status
-                        ]);
-
-                        // Copy item lines (if you have a relation like salesOrderItems or similar)
-                        foreach ($record->items as $item) {
-                            $invoice->items()->create([
-                                'item_master_id' => $item->item_master_id,
-                                'quantity' => $item->quantity,
-                                'price' => $item->price,
-                                'discount' => $item->discount,
-                                'tax' => $item->tax,
-                                'total' => $item->total,
-                            ]);
-                        }
-
-                        // Redirect to the edit page of the new invoice
+                        $invoice = SalesDocumentHelper::createFrom($record, SalesInvoice::class);
                         return redirect(route('filament.admin.resources.sales-invoices.edit', $invoice));
-                    })
-            ])
+                    }),
+
+                Action::make('previewPdf')
+                        ->icon('heroicon-o-eye')
+                        ->label('Preview PDF')
+                        ->modalHeading('PDF Preview')
+                        ->modalSubmitActionLabel('Close')
+                        ->modalWidth('full')
+                        ->modalContent(function ($record) {
+                            $url = route('sales-documents.preview', [
+                                strtolower(class_basename($record)),
+                                $record->id,
+                            ]);
+
+                            return view('components.pdf-preview', [
+                                'url' => $url,
+                                'organization' => \App\Models\Organization::first(),
+                            ]);
+                        }),
+
+                    Action::make('downloadPdf')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->label('Download PDF')
+                        ->url(fn($record) => route('sales-documents.download', [
+                            strtolower(class_basename($record)), $record->id
+                        ])),
+                ]),
+
+            ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

@@ -24,6 +24,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Traits\SalesDocumentResourceTrait;
+use Filament\Actions\ActionGroup;
+use Illuminate\Support\Str;
+use Filament\Tables\Enums\RecordActionsPosition;
+use App\Helpers\SalesDocumentHelper;
+use Filament\Actions\Action;
+
 
 class SalesInvoiceResource extends Resource
 {
@@ -127,8 +133,36 @@ class SalesInvoiceResource extends Resource
                     }),
             ])
             ->recordActions([
+                ActionGroup::make([
                 EditAction::make(),
-            ])
+
+                Action::make('previewPdf')
+                        ->icon('heroicon-o-eye')
+                        ->label('Preview PDF')
+                        ->modalHeading('PDF Preview')
+                        ->modalSubmitActionLabel('Close')
+                        ->modalWidth('full')
+                        ->modalContent(function ($record) {
+                            $url = route('sales-documents.preview', [
+                                strtolower(class_basename($record)),
+                                $record->id,
+                            ]);
+
+                            return view('components.pdf-preview', [
+                                'url' => $url,
+                                'organization' => \App\Models\Organization::first(),
+                            ]);
+                        }),
+
+                    Action::make('downloadPdf')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->label('Download PDF')
+                        ->url(fn($record) => route('sales-documents.download', [
+                            strtolower(class_basename($record)), $record->id
+                        ])),
+                ]),
+
+            ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

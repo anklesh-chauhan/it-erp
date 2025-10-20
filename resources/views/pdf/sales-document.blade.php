@@ -17,13 +17,13 @@
 <body>
     <table style="border: 1px solid black;>
         <tr>
-            <td style="border:none; text-align:left;">
-                @if($organization->logo)
+            @if($organization->logo)
+                <td style="border:none; text-align:left;">
                     <img src="{{ public_path('storage/' . $organization->logo) }}" 
                         alt="{{ $organization->name }} Logo" 
                         style="max-widht: 120px; max-height: 120px; vertical-align: top;">
-                @endif
-            </td>
+                </td>
+             @endif
             <td style="border:none; text-align:left;">
                 <div class="header">
                     <div class="company">{{ $organization->name }}</div>
@@ -47,6 +47,8 @@
                         QUOTE
                     @elseif ($document instanceof \App\Models\SalesInvoice)
                         TAX INVOICE
+                    @elseif ($document instanceof \App\Models\SalesOrder)
+                        SALES ORDER
                     @else
                         DOCUMENT
                     @endif
@@ -150,7 +152,7 @@
     
     <table>
         <tr>
-            <th>#</th>
+            <th >#</th>
             <th>Item</th>
             <th>HSC/SAC</th>
             <th>Qty</th>
@@ -247,33 +249,50 @@
                             // Example: if intra-state (CGST + SGST), else IGST — adjust based on your system logic
                             if ($firstItem->is_intra_state ?? true) {
                                 $cgst = $taxableValue * ($taxRate / 2) / 100;
+                                $cgst_rate = $taxRate / 2;
                                 $sgst = $taxableValue * ($taxRate / 2) / 100;
+                                $sgst_rate = $taxRate / 2;
                             } else {
                                 $igst = $taxableValue * ($taxRate) / 100;
+                                $igst_rate = $taxRate;
                             }
 
                             return [
                                 'hsn_sac' => $group->first()->hsn_sac ?? '-',
                                 'taxable_value' => $taxableValue,
-                                'cgst' => $cgst,
-                                'sgst' => $sgst,
-                                'igst' => $igst,
+                                'cgst_rate' => $cgst_rate ?? 0,
+                                'sgst_rate' => $sgst_rate ?? 0,
+                                'igst_rate' => $igst_rate ?? 0,
+                                'cgst' => $cgst ?? 0,
+                                'sgst' => $sgst ?? 0,
+                                'igst' => $igst ?? 0,
                                 'total_tax' => $cgst + $sgst + $igst,
                             ];
                         });
                     @endphp
                     <table style="width:100%; border-collapse: collapse;" border="1">
                         <tr>
-                            <td style="font-weight:bold;">Tax Details</td>
+                            <td colspan="9" style="text-align: center; margin:0px; padding:7; font-weight:bold;">
+        
+                            </td>
                         </tr>
                         <tr>
-                            <th>HSN/SAC</th>
-                            <th>Taxable Value</th>
-                            <th>CGST</th>
-                            <th>SGST</th>
-                            <th>IGST</th>
-                            <th>Total Tax Amount</th>
+                            <th rowspan="2">HSN/SAC</th>
+                            <th rowspan="2">Taxable Value</th>
+                            <th colspan="2">CGST</th>
+                            <th colspan="2">SGST</th>
+                            <th colspan="2">IGST</th>
+                            <th rowspan="2">Tax Amount</th>
                         </tr>
+                        <tr>
+                            <th>%</th>
+                            <th>Amt</th>
+                            <th>%</th>
+                            <th>Amt</th>
+                            <th>%</th>
+                            <th>Amt</th>
+                        </tr>
+                        <!-- DYNAMIC TAX ROWS -->
                         @foreach($taxSummary as $tax)
                             <tr>
                                 <td>{{ $tax['hsn_sac'] }}</td>
@@ -281,13 +300,22 @@
                                     {{ number_format($tax['taxable_value'], 2) }}
                                 </td>
                                 <td style="text-align:right;">
-                                    {{ number_format($tax['cgst'], 2) }}
+                                    {{ $tax['cgst_rate'] > 0 ? number_format($tax['cgst_rate'], 2).'%' : '0' }}
                                 </td>
                                 <td style="text-align:right;">
-                                    {{ number_format($tax['sgst'], 2) }}
+                                    {{ $tax['cgst'] > 0 ? number_format($tax['cgst'], 2) : '0' }}
                                 </td>
                                 <td style="text-align:right;">
-                                    {{ number_format($tax['igst'], 2) }}
+                                    {{ $tax['sgst_rate'] > 0 ? number_format($tax['sgst_rate'], 2).'%' : '0' }}
+                                </td>
+                                <td style="text-align:right;">
+                                    {{ $tax['sgst'] > 0 ? number_format($tax['sgst'], 2) : '0' }}
+                                </td>
+                                <td style="text-align:right;">
+                                    {{ $tax['igst_rate'] > 0 ? number_format($tax['igst_rate'], 2).'%' : '0' }}
+                                </td>
+                                <td style="text-align:right;">
+                                    {{ $tax['igst'] > 0 ? number_format($tax['igst'], 2) : '0' }}
                                 </td>
                                 <td style="text-align:right;">
                                     {{ number_format($tax['total_tax'], 2) }}
@@ -301,13 +329,13 @@
                             <td style="text-align:right;">
                                 {{ number_format($taxSummary->sum('taxable_value'), 2) }}
                             </td>
-                            <td style="text-align:right;">
+                            <td colspan="2" style="text-align:right;">
                                 {{ number_format($taxSummary->sum('cgst'), 2) }}
                             </td>
-                            <td style="text-align:right;">
+                            <td colspan="2" style="text-align:right;">
                                 {{ number_format($taxSummary->sum('sgst'), 2) }}
                             </td>
-                            <td style="text-align:right;">
+                            <td colspan="2" style="text-align:right;">
                                 {{ number_format($taxSummary->sum('igst'), 2) }}
                             </td>
                             <td style="text-align:right;">
@@ -315,7 +343,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="6" style="text-align:left; font-size:10px;">
+                            <td colspan="9" style="text-align:left; font-size:10px;">
                                 Tax Amount in Words: {{ numberToIndianCurrencyWords($totalTax) }}
                             </td>
                         </tr>
@@ -339,24 +367,27 @@
                     @endphp
 
                     <tr>
-                        <td style="text-align:right; font-weight:bold;">Gross Amount</td>
+                        <td style="text-align:right; font-weight:bold;">Subtotal</td>
                         <td style="text-align:right;">{{ number_format($grossAmount, 2) }}</td>
                     </tr>
 
                     @if($hasTransactionDiscount && $transactionDiscountAmount > 0)
                         <tr>
                             <td style="text-align:right; font-weight:bold;">
-                                Transaction Discount 
+                                Transaction Disc. 
                                 @if($discountType === 'percentage')
-                                    ({{ $discountValue }}%)
+                                    -{{ $discountValue }}%
+                                @elseif($discountType === 'amount')
+                                    -{{ number_format($discountValue, 2) }}
                                 @endif
-                            :</td>
+
+                            </td>
                             <td style="text-align:right;">-{{ number_format($transactionDiscountAmount, 2) }}</td>
                         </tr>
                     @endif
 
                     <tr>
-                        <td style="text-align:right; font-weight:bold;">Subtotal</td>
+                        <td style="text-align:right; font-weight:bold;">Amount After All Disc</td>
                         <td style="text-align:right;">{{ number_format($subTotal, 2) }}</td>
                     </tr>
 
@@ -404,7 +435,7 @@
 
     <div>
         <p style="margin-top:10px; font-weight:bold;">
-            Total Amount in Words: {{ numberToIndianCurrencyWords($grandTotal) }}
+            <b>Chargeable Amount in Words: {{ numberToIndianCurrencyWords($grandTotal) }}</b>
         </p>
     </div>
     <div>

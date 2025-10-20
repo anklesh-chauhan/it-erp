@@ -60,6 +60,15 @@ trait SalesDocumentResourceTrait
         return method_exists(static::class, 'getModel') ? static::getModel() : Quote::class;
     }
 
+    protected static function hasRelation(string $relation): bool
+    {
+        $modelClass = static::resolveModelClass();
+
+        $model = is_string($modelClass) ? new $modelClass() : $modelClass;
+
+        return method_exists($model, $relation);
+    }
+
     public static function getCommonFormFields(): array
     {
 
@@ -91,7 +100,7 @@ trait SalesDocumentResourceTrait
         // $showLineItemDiscount = SalesDocumentPreference::first()?->discount_level === 'line_item';
 
         return [
-            Grid::make(4)
+            Grid::make(5)
                 ->schema([
                     TextInput::make('document_number')
                         ->label('Document Number')
@@ -102,11 +111,7 @@ trait SalesDocumentResourceTrait
                         ->label('Date')
                         ->default(now()->toDateString())
                         ->required(),
-                    Select::make('lead_id')
-                        ->label('Lead')
-                        ->relationship('lead', 'reference_code')
-                        ->preload()
-                        ->searchable(),
+                    
                     Select::make('sales_person_id')
                         ->label('Sales Person')
                         ->options(function () {
@@ -117,6 +122,38 @@ trait SalesDocumentResourceTrait
                         ->placeholder('Select a sales person...')
                         ->required()
                         ->default(Auth::id()),
+                    
+                    Select::make('quote_ids')
+                        ->label('Related Quotes')
+                        ->multiple()
+                        ->searchable()
+                        ->preload()
+                        ->when(static::hasRelation('quotes'), function ($field) {
+                            return $field->relationship('quotes', 'document_number');
+                        })
+                        ->hidden(fn () => static::resolveModelClass() === \App\Models\Quote::class),
+
+                    Select::make('sales_order_ids')
+                        ->label('Related Sales Orders')
+                        ->multiple()
+                        ->searchable()
+                        ->preload()
+                        ->when(static::hasRelation('salesOrders'), function ($field) {
+                            return $field->relationship('salesOrders', 'document_number');
+                        })
+                        ->hidden(fn () => static::resolveModelClass() === \App\Models\SalesOrder::class),
+
+                    Select::make('sales_invoice_ids')
+                        ->label('Related Sales Invoices')
+                        ->multiple()
+                        ->searchable()
+                        ->preload()
+                        ->when(static::hasRelation('salesInvoices'), function ($field) {
+                            return $field->relationship('salesInvoices', 'document_number');
+                        })
+                        ->hidden(fn () => static::resolveModelClass() === \App\Models\SalesInvoice::class),
+
+
                     Hidden::make('discount_mode')
                         ->default(fn () => 
                             optional($record)->discount_mode 
@@ -441,7 +478,7 @@ trait SalesDocumentResourceTrait
                                                 ->label('Discount Total') // 🚀 CHANGED label
                                                 ->readOnly()
                                                 ->extraInputAttributes(['class' => 'text-right'])
-                                                ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format('-'.(float) $state, 2, '.', '') : $state),
+                                                ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
                                     
                                             TextInput::make('subtotal')
                                                 ->label('Subtotal')
@@ -642,6 +679,11 @@ trait SalesDocumentResourceTrait
                         ->preload()
                         ->searchable()
                         ->placeholder('Select shipping method...'),
+                    Select::make('lead_id')
+                        ->label('Lead')
+                        ->relationship('lead', 'reference_code')
+                        ->preload()
+                        ->searchable(),
                     
                 ])->columnSpanFull(),
 

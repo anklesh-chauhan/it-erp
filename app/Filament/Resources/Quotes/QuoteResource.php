@@ -31,6 +31,10 @@ use Illuminate\Support\Facades\Log;
 use Filament\Actions\Action;
 use Filament\Tables\Enums\RecordActionsPosition;
 use Filament\Actions\ActionGroup;
+use App\Models\SalesOrder;
+use App\Models\SalesInvoice;
+use App\Models\NumberSeries;
+use App\Helpers\SalesDocumentHelper;
 
 class QuoteResource extends Resource
 {
@@ -123,6 +127,27 @@ class QuoteResource extends Resource
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make(),
+
+                    Action::make('createSalesOrder')
+                        ->label('Create Sales Order')
+                        ->icon('heroicon-o-document-plus')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(function (Quote $record) {
+                            $salesOrder = SalesDocumentHelper::createFrom($record, SalesOrder::class);
+                            return redirect()->route('filament.admin.resources.sales-orders.edit', $salesOrder);
+                        }),
+
+                    Action::make('createSalesInvoice')
+                        ->label('Create Sales Invoice')
+                        ->icon('heroicon-o-document-plus')
+                        ->requiresConfirmation()
+                        ->color('warning')
+                        ->action(function (Quote $record) {
+                            $salesInvoice = SalesDocumentHelper::createFrom($record, SalesInvoice::class);
+                            return redirect()->route('filament.admin.resources.sales-invoices.edit', $salesInvoice);
+                        }),
+                    
                     Action::make('previewPdf')
                         ->icon('heroicon-o-eye')
                         ->label('Preview PDF')
@@ -143,6 +168,7 @@ class QuoteResource extends Resource
                         ->url(fn($record) => route('sales-documents.download', [
                             strtolower(class_basename($record)), $record->id
                         ])),
+
                     ])
                     ], position: RecordActionsPosition::BeforeColumns)
             ->filters([
@@ -229,7 +255,7 @@ class QuoteResource extends Resource
              return $this->handleRecordCreation($data);
          }
 
-         protected function handleRecordUpdate(Model $record, array $data): Model
+    protected function handleRecordUpdate(Model $record, array $data): Model
          {
              Log::debug('QuoteResource handleRecordUpdate called');
              return $this->handleRecordUpdate($record, $data);

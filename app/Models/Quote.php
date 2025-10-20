@@ -22,6 +22,16 @@ class Quote extends SalesDocument
         'expiration_date' => 'date',
     ];
 
+    public function salesOrders()
+    {
+        return $this->belongsToMany(SalesOrder::class, 'quote_sales_order_pivot', 'quote_id', 'sales_order_id');
+    }
+
+    public function salesInvoices()
+    {
+        return $this->belongsToMany(SalesInvoice::class, 'quote_sales_invoice_pivot', 'quote_id', 'sales_invoice_id');
+    }
+
     public function accountMaster()
     {
         return $this->belongsTo(AccountMaster::class);

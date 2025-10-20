@@ -14,13 +14,27 @@ class SalesInvoice extends SalesDocument
         'due_date',
         'payment_status',
         'paid_at',
+        'other_ref'
     ];
-
 
     protected $casts = [
         'due_date' => 'date',
         'paid_at' => 'datetime',
+        'date' => 'date',
+        'created_by' => 'integer',
+        'updated_by' => 'integer',
+        'deleted_by' => 'integer',
     ];
+
+    public function salesOrders()
+    {
+        return $this->belongsToMany(SalesOrder::class, 'sales_order_sales_invoice_pivot');
+    }
+
+    public function quotes()
+    {
+        return $this->belongsToMany(Quote::class, 'quote_sales_invoice_pivot');
+    }
 
     public function accountMaster()
     {

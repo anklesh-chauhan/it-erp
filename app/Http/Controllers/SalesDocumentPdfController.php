@@ -34,8 +34,8 @@ class SalesDocumentPdfController extends Controller
     {
         return match (strtolower($type)) {
             'quote' => \App\Models\Quote::class,
-            'order' => \App\Models\SalesOrder::class,
-            'invoice' => \App\Models\SalesInvoice::class,
+            'salesorder' => \App\Models\SalesOrder::class,
+            'salesinvoice' => \App\Models\SalesInvoice::class,
             default => abort(404, 'Invalid document type'),
         };
     }
