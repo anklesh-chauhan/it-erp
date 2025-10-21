@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ItemMasters;
 
 use App\Traits\ItemMasterTrait;
+use App\Traits\ItemMasterTableTrait;
 use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
@@ -40,6 +41,7 @@ use Filament\Tables\Filters\Filter;
 class ItemMasterResource extends Resource
 {
     use ItemMasterTrait;
+    use ItemMasterTableTrait;
 
     protected static ?string $model = ItemMaster::class;
 
@@ -60,40 +62,13 @@ class ItemMasterResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('item_code')->label('Item Code')->sortable()->searchable(),
-                TextColumn::make('item_name')->label('Item Name')->sortable()->searchable(),
-                TextColumn::make('category.name')
-                    ->label('Category')
-                    ->formatStateUsing(function ($state, $record) {
-                        if (!$record->category) {
-                            return '-';
-                        }
-
-                        // Find the root parent of the category
-                        $category = $record->category;
-                        $rootCategory = $category;
-                        while ($rootCategory->parent) {
-                            $rootCategory = $rootCategory->parent;
-                        }
-
-                        // Fetch the hierarchy starting from the root
-                        $categories = Category::with('subCategories')
-                            ->where('id', $rootCategory->id)
-                            ->get();
-
-                        $formatted = Category::formatCategories($categories);
-                        return $formatted[$record->category->id] ?? $record->category->name;
-                    })
-                    ->searchable(),
-
-                TextColumn::make('brand.name')->label('Brand')->sortable(),
-                TextColumn::make('storage_location')->label('Storage'),
-                TextColumn::make('expiry_date')->label('Expiry Date')->date()->badge(),
-                TextColumn::make('locations.name')
-                    ->label('Locations')
-                    ->sortable(),
+                ...self::getItemMasterTableTrait(),
             ])
             ->filters([
+                // Use the new filter here
+                self::getItemTypeFilter(), 
+                
+                // Your existing filter
                 Filter::make('expiry_date')->label('Expired Items')
                     ->query(fn ($query) => $query->whereDate('expiry_date', '<', now())),
             ])

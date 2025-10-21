@@ -13,14 +13,25 @@ return new class extends Migration
     {
         Schema::create('customer_prices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('customer_id')->constrained('account_masters')->cascadeOnDelete();
-            $table->foreignId('item_master_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('item_variant_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->decimal('price', 15, 2)->nullable(); // customer-specific price
-            $table->decimal('discount', 5, 2)->default(0); // in percentage
+
+            // Customer reference
+            $table->foreignId('customer_id')
+                ->constrained('account_masters')
+                ->cascadeOnDelete();
+
+            // Item reference (can be parent or variant)
+            $table->foreignId('item_master_id')
+                ->constrained('item_masters')
+                ->cascadeOnDelete();
+
+            // Price and discount
+            $table->decimal('price', 15, 2)->nullable();
+            $table->decimal('discount', 5, 2)->default(0);
+
             $table->timestamps();
 
-            $table->unique(['customer_id', 'item_master_id', 'item_variant_id'], 'customer_price_unique');
+            // ✅ Ensure uniqueness — customer can have only one price per item (parent or variant)
+            $table->unique(['customer_id', 'item_master_id'], 'customer_price_unique');
         });
     }
 

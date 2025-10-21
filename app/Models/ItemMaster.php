@@ -13,6 +13,9 @@ class ItemMaster extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'variant_name',
+        'parent_id',
+        'sku',
         'item_code',
         'item_name',
         'description',
@@ -35,7 +38,6 @@ class ItemMaster extends Model
         'packaging_type_id',
         'per_packing_qty',
         'has_variants',
-        'sku',
     ];
 
     public function customerPrices()
@@ -43,9 +45,14 @@ class ItemMaster extends Model
         return $this->hasMany(CustomerPrice::class);
     }
 
+    public function parent()
+    {
+        return $this->belongsTo(ItemMaster::class, 'parent_id');
+    }
+
     public function variants()
     {
-        return $this->hasMany(ItemVariant::class);
+        return $this->hasMany(ItemMaster::class, 'parent_id');
     }
 
     public function category()

@@ -25,43 +25,23 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\PackagingType;
 use Filament\Forms\Components\Select;
+use App\Traits\ItemMasterTrait;
+use App\Traits\ItemMasterTableTrait;
 
 class VariantsRelationManager extends RelationManager
 {
+    use ItemMasterTrait;
+    use ItemMasterTableTrait;
+
     protected static string $relationship = 'variants';
+
+    protected static ?string $title = 'Item Variants';
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextInput::make('variant_name')
-                    ->required(),
-                TextInput::make('sku')
-                    ->label('SKU')
-                    ->required(),
-                TextInput::make('barcode'),
-                TextInput::make('purchase_price')
-                    ->numeric(),
-                TextInput::make('selling_price')
-                    ->numeric(),
-                TextInput::make('tax_rate')
-                    ->numeric(),
-                TextInput::make('discount')
-                    ->numeric(),
-                TextInput::make('stock')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                Select::make('unit_of_measurement_id')
-                    ->relationship('unitOfMeasurement', 'name')
-                    ->label('Unit of Measurement'),
-                Select::make('packaging_type_id')
-                    ->label('Packaging Type')
-                    ->options(PackagingType::pluck('name', 'id'))
-                    ->searchable()
-                    ->preload()
-                    ->nullable(),
-                DatePicker::make('expiry_date'),
+                ...self::getItemMasterTraitField($this),
             ]);
     }
 
@@ -69,50 +49,8 @@ class VariantsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('variants')
-            ->columns([
-                TextColumn::make('variant_name')
-                    ->searchable(),
-                TextColumn::make('sku')
-                    ->label('SKU')
-                    ->searchable(),
-                TextColumn::make('barcode')
-                    ->searchable(),
-                TextColumn::make('purchase_price')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('selling_price')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('tax_rate')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('discount')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('stock')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('unitOfMeasurement.name')
-                    ->label('Unit of Measurement')
-                    ->sortable(),
-                TextColumn::make('packagingType.name')
-                    ->label('Packaging Type')
-                    ->sortable(),
-                TextColumn::make('expiry_date')
-                    ->date()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+             ->columns([
+                ...self::getItemMasterTableTrait(),
             ])
             ->filters([
                 TrashedFilter::make(),
@@ -137,6 +75,7 @@ class VariantsRelationManager extends RelationManager
                 ]),
             ])
             ->modifyQueryUsing(fn (Builder $query) => $query
+                ->where('id', '!=', $this->getOwnerRecord()->id)
                 ->withoutGlobalScopes([
                     SoftDeletingScope::class,
                 ]));

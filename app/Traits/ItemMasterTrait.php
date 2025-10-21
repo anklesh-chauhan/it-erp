@@ -19,6 +19,7 @@ use App\Models\NumberSeries;
 use App\Models\PackagingType;
 use App\Models\CompanyMaster;
 use Dom\Text;
+use App\Filament\Resources\ItemMasters\RelationManagers\VariantsRelationManager;
 
 trait ItemMasterTrait
 {
@@ -27,8 +28,11 @@ trait ItemMasterTrait
      *
      * @return array
      */
-    public static function getItemMasterTraitField(): array
+    public static function getItemMasterTraitField($livewire = null): array
     {
+        $isVariant = $livewire instanceof VariantsRelationManager;
+        $parentItem = $isVariant ? $livewire->ownerRecord : null;
+
         return [
             Grid::make(3)
                 ->schema([
@@ -37,9 +41,6 @@ trait ItemMasterTrait
                         ->default(fn () => NumberSeries::getNextNumber(ItemMaster::class))
                         ->disabled()
                         ->dehydrated(true),
-                    TextInput::make('item_name')
-                        ->label('Item Name')
-                        ->required(),
 
                     Select::make('category_id')
                         ->label('Category')
@@ -51,12 +52,24 @@ trait ItemMasterTrait
                     TextInput::make('sku')
                         ->label('SKU'),
 
-                    Select::make('unit_of_measurement_id')
-                        ->relationship('unitOfMeasurement', 'name')
-                        ->label('Unit of Measurement'),
+                    TextInput::make('item_name')
+                        ->label('Item Name')
+                        ->required(!$isVariant) // Required for main item only
+                        ->default(fn () => $isVariant ? $parentItem->item_name : null) // Inherit name from parent
+                        ->readOnly($isVariant)
+                        ->dehydrateStateUsing(fn ($state) => $state ?? ($parentItem->item_name ?? null)),
+                    
+                    TextInput::make('variant_name')
+                        ->label('Variant Name')
+                        ->required($isVariant),
+
                     TextInput::make('hsn_code')
                         ->label('HSN/SAC Code'),
 
+                    Select::make('unit_of_measurement_id')
+                        ->relationship('unitOfMeasurement', 'name')
+                        ->label('Unit of Measurement'),
+                        
                     Select::make('taxes')
                         ->label('Applicable Taxes')
                         ->relationship('taxes', 'name')
