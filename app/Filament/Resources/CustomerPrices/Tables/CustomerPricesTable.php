@@ -14,15 +14,44 @@ class CustomerPricesTable
     {
         return $table
             ->columns([
-                TextColumn::make('customer.name')->label('Customer'),
-                TextColumn::make('itemMaster.item_name')->label('Item'),
-                TextColumn::make('itemVariant.variant_name')->label('Variant'),
-                TextColumn::make('price')->money('INR'),
-                TextColumn::make('discount')->suffix('%'),
+                // Customer
+                TextColumn::make('customer.name')
+                    ->label('Customer')
+                    ->searchable()
+                    ->sortable(),
+
+                // Item (shows parent + variant if applicable)
+                TextColumn::make('item.item_name')
+                    ->label('Item / Variant')
+                    ->formatStateUsing(function ($record) {
+                        $item = $record->item;
+                        if ($item?->parent) {
+                            // show "Parent - Variant"
+                            return "{$item->parent->item_name} – {$item->variant_name}";
+                        }
+                        return $item?->item_name ?? '-';
+                    })
+                    ->searchable()
+                    ->sortable(),
+
+                // Price
+                TextColumn::make('price')
+                    ->label('Price')
+                    ->money('INR')
+                    ->sortable(),
+
+                // Discount
+                TextColumn::make('discount')
+                    ->label('Discount')
+                    ->suffix('%')
+                    ->sortable(),
+
+                // Created & Updated timestamps
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()

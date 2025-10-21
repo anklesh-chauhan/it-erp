@@ -12,24 +12,35 @@ class CustomerPrice extends Model
     protected $fillable = [
         'customer_id',
         'item_master_id',
-        'item_variant_id',
         'price',
         'discount',
     ];
 
+    /**
+     * Relationships
+     */
+
     public function customer()
     {
-        return $this->belongsTo(AccountMaster::class);
+        return $this->belongsTo(AccountMaster::class, 'customer_id');
     }
 
-    public function itemMaster()
+    public function item()
     {
-        return $this->belongsTo(ItemMaster::class);
+        return $this->belongsTo(ItemMaster::class, 'item_master_id');
     }
 
-    public function itemVariant()
+    /**
+     * Accessors
+     */
+
+    public function getItemNameAttribute(): string
     {
-        return $this->belongsTo(ItemVariant::class);
+        return $this->item?->item_name ?? '-';
+    }
+
+    public function getIsVariantAttribute(): bool
+    {
+        return !is_null($this->item?->parent_id);
     }
 }
-

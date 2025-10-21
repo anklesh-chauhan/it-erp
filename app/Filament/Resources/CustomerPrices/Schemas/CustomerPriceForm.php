@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\CustomerPrices\Schemas;
 
-use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Decimal;
+use Filament\Forms\Components\TextInput;
 use App\Models\CustomerPrice;
 
 class CustomerPriceForm
@@ -14,74 +13,66 @@ class CustomerPriceForm
     {
         return $schema
             ->components([
+                // Select Customer
                 Select::make('customer_id')
                     ->label('Customer')
                     ->relationship('customer', 'name')
+                    ->searchable()
+                    ->preload()
                     ->required()
-                    ->reactive()
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('item_variant_id', null)),
-
-                Select::make('item_master_id')
-                    ->label('Item')
-                    ->relationship('itemMaster', 'item_name')
-                    ->required()
-                    ->reactive()
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('item_variant_id', null))
-                    ->rules([
-                        function ($get, $component) {
-                            return function ($attribute, $value, $fail) use ($get, $component) {
-                                $customerId = $get('customer_id');
-                                $itemMasterId = $value; // item_master_id is the current field value
-                                $itemVariantId = $get('item_variant_id'); // Can be null
-                                $recordId = $component->getLivewire()->record?->id;
-
-                                if (!$customerId || !$itemMasterId) {
-                                    return; // Skip if required fields are missing
-                                }
-
-                                $query = CustomerPrice::where('customer_id', $customerId)
-                                    ->where('item_master_id', $itemMasterId);
-
-                                if ($itemVariantId === null) {
-                                    $query->whereNull('item_variant_id');
-                                } else {
-                                    $query->where('item_variant_id', $itemVariantId);
-                                }
-
-                                if ($recordId) {
-                                    $query->where('id', '!=', $recordId);
-                                }
-
-                                if ($query->exists()) {
-                                    $errorMessage = $itemVariantId === null
-                                        ? 'A general price for this customer and item already exists.'
-                                        : 'A price for this customer, item, and variant combination already exists.';
-                                    $fail($errorMessage);
-                                }
-                            };
-                        },
-                    ]),
-
-                Select::make('item_variant_id')
-                    ->label('Variant')
-                    ->relationship('itemVariant', 'variant_name', function ($query, $get) {
-                        $itemMasterId = $get('item_master_id');
-                        if ($itemMasterId) {
-                            $query->where('item_master_id', $itemMasterId);
-                        }
-                    })
-                    ->nullable()
                     ->reactive(),
 
+                // Select Item (can be main item or variant)
+                Select::make('item_master_id')
+    ->label('Item / Variant')
+    ->relationship('item', 'item_name', function ($query) {
+        $query->orderBy('parent_id')->orderBy('item_name');
+    })
+    ->getOptionLabelFromRecordUsing(function ($record) {
+        // If the item has a parent, show as "Parent – Child"
+        return $record->parent
+            ? "{$record->parent->item_name} – {$record->variant_name}"
+            : $record->item_name;
+    })
+    ->searchable()
+    ->preload()
+    ->required()
+    ->rules([
+        function ($get, $component) {
+            return function ($attribute, $value, $fail) use ($get, $component) {
+                $customerId = $get('customer_id');
+                $itemMasterId = $value;
+                $recordId = $component->getLivewire()->record?->id;
+
+                if (!$customerId || !$itemMasterId) {
+                    return;
+                }
+
+                $exists = \App\Models\CustomerPrice::where('customer_id', $customerId)
+                    ->where('item_master_id', $itemMasterId)
+                    ->when($recordId, fn($q) => $q->where('id', '!=', $recordId))
+                    ->exists();
+
+                if ($exists) {
+                    $fail('A price for this customer and item/variant already exists.');
+                }
+            };
+        },
+    ]),
+
+                // Price
                 TextInput::make('price')
+                    ->label('Price')
                     ->numeric()
                     ->required()
                     ->inputMode('decimal'),
 
+                // Discount
                 TextInput::make('discount')
+                    ->label('Discount (%)')
                     ->numeric()
-                    ->suffix('%')
                     ->default(0)
+                    ->suffix('%')
                     ->inputMode('decimal')
                     ->maxValue(100),
             ]);
