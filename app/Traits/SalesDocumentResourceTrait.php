@@ -222,18 +222,45 @@ trait SalesDocumentResourceTrait
                             ->label(false)
                             ->relationship('itemMaster', 'item_name')
                             ->searchable()
-                            ->native(false) // Ensure Filament uses Popper.js instead of native select
-                            ->preload()
+                            ->native(false)
                             ->required()
-                            ->live() // Optional: for reactivity
-                            ->getSearchResultsUsing(function (string $search): array {
-                                // Fetch the search results
-                                $items = ItemMaster::where('item_name', 'like', "%{$search}%")
-                                    ->limit(50)
-                                    ->pluck('item_name', 'id')
-                                    ->toArray();
+                            ->live() 
+                            ->options(function () {
+                                return \App\Models\ItemMaster::with('parent')
+                                    ->orderByRaw('COALESCE(parent_id, id), parent_id, item_name')
+                                    ->get()
+                                    ->mapWithKeys(function ($item) {
+                                        $label = $item->parent
+                                            ? "{$item->parent->item_name} – {$item->variant_name}"
+                                            : $item->item_name;
 
-                                return $items;
+                                        return [$item->id => $label];
+                                    })
+                                    ->toArray();
+                            })
+                            ->getSearchResultsUsing(function (string $search): array {
+                                return \App\Models\ItemMaster::with('parent')
+                                    ->where('item_name', 'like', "%{$search}%")
+                                    ->limit(50)
+                                    ->get()
+                                    ->mapWithKeys(function ($item) {
+                                        $label = $item->parent
+                                            ? "{$item->parent->item_name} – {$item->variant_name}"
+                                            : $item->item_name;
+
+                                        return [$item->id => $label];
+                                    })
+                                    ->toArray();
+                            })
+                            ->getOptionLabelUsing(function ($value) {
+                                $item = \App\Models\ItemMaster::with('parent')->find($value);
+                                if (!$item) {
+                                    return null;
+                                }
+
+                                return $item->parent
+                                    ? "{$item->parent->item_name} – {$item->variant_name}"
+                                    : $item->item_name;
                             })
                             ->createOptionForm([
                                 ...self::getItemMasterTraitField()
@@ -258,30 +285,52 @@ trait SalesDocumentResourceTrait
                                     ->closeModalByClickingAway(false)
                                     ->visible(fn ($get) => !empty($get('item_master_id'))); // Show only if item_master_id is set
                             })
-                            ->afterStateUpdated(function ($state, callable $set) {
-                                // When an item is selected, fetch its description and update the Textarea
-                                if ($state) {
-                                    $item = ItemMaster::with('taxes')->find($state);
-                                    if ($item) {
-                                        $set('description', $item?->description ?? '');
-                                        $set('hsn_sac', $item?->hsn_code ?? ''); // Auto-fetch HSN/SAC
-                                        $set('unit_price', $item->selling_price ?? 0); // Auto-fetch Price (assuming 'sale_price' field in ItemMaster)
-                                            // ✅ Automatically calculate total tax rate from related taxes
-                                        $totalTaxRate = $item->taxes->sum('total_rate');
-                                        $set('tax_rate', number_format($totalTaxRate, 2, '.', ''));
-                                    } else {
-                                        $set('description', '');
-                                        $set('hsn_sac', '');
-                                        $set('hsn_sac', '');
-                                        $set('tax_rate', 0);
-                                    }
-                                } else {
-                                    $set('description', '');
-                                    $set('hsn_sac', '');
-                                    $set('unit_price', 0);
-                                    $set('tax_rate', 0);
-                                }
-                            }),
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+    if (!$state) {
+        $set('description', '');
+        $set('hsn_sac', '');
+        $set('unit_price', 0);
+        $set('tax_rate', 0);
+        $set('discount', 0);
+        return;
+    }
+
+    $item = \App\Models\ItemMaster::with('taxes')->find($state);
+    $accountMasterId = $get('../../account_master_id');
+    
+    if (!$item) {
+        $set('description', '');
+        $set('hsn_sac', '');
+        $set('unit_price', 0);
+        $set('tax_rate', 0);
+        $set('discount', 0);
+        return;
+    }
+
+    // ✅ Base item details
+    $set('description', $item->description ?? '');
+    $set('hsn_sac', $item->hsn_code ?? '');
+
+    // ✅ Default values (fallback from ItemMaster)
+    $defaultPrice = $item->selling_price ?? 0;
+    $defaultDiscount = $item->discount ?? 0;
+
+    // ✅ Calculate total tax rate from related taxes
+    $totalTaxRate = $item->taxes->sum('total_rate');
+    $set('tax_rate', number_format($totalTaxRate, 2, '.', ''));
+
+    // ✅ Try to fetch account-specific price
+    $accountPrice = null;
+    if ($accountMasterId) {
+        $accountPrice = \App\Models\CustomerPrice::where('customer_id', $accountMasterId)
+            ->where('item_master_id', $item->id)
+            ->first();
+    }
+
+    // ✅ Use account-specific price if available, else fallback to item defaults
+    $set('unit_price', $accountPrice->price ?? $defaultPrice);
+    $set('discount', $accountPrice->discount ?? $defaultDiscount);
+}),
 
                             Textarea::make('description')
                                 ->label(false)

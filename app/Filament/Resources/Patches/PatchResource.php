@@ -244,8 +244,19 @@ class PatchResource extends Resource
 
                 TextColumn::make('territory.name')
                     ->label('Territory')
-                    ->sortable()
-                    ->searchable(), // Allow searching by territory name
+                    // Explicitly retrieve the name state to ensure clean display
+                    ->getStateUsing(fn ($record) => $record->territory?->name)
+                    // Custom search on the relationship
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->whereHas('territory', fn (Builder $subQuery) => $subQuery->where('name', 'like', "%{$search}%"));
+                    })
+                    // Custom sort on the relationship
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        // Order by territory name
+                        return $query->join('territories', 'patches.territory_id', '=', 'territories.id')
+                            ->orderBy('territories.name', $direction)
+                            ->select('patches.*'); // Select patches.* to avoid conflicts with territory columns
+                    }),
 
                 TextColumn::make('cityPinCodes.pin_code') // Corrected relationship name if it's many-to-many
                     ->label('Associated Pin Codes') // More accurate label

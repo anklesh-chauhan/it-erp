@@ -53,9 +53,12 @@ class TerritoryResource extends Resource
                         ->nullable(),
 
                     Select::make('status')
-                        ->options(TerritoryStatus::class)
-                        ->default(TerritoryStatus::Active)
-                        ->required(),
+                        ->options(collect(TerritoryStatus::cases())->mapWithKeys(fn ($case) => [
+                            $case->value => $case->getLabel(),
+                        ])->toArray())
+                        ->default(TerritoryStatus::Active->value)
+                        ->required()
+                        ->label('Status'),
 
                     Select::make('parent_territory_id')
                         ->relationship('parentTerritory', 'name')
@@ -250,7 +253,7 @@ class TerritoryResource extends Resource
     {
         return [
             'Code'   => $record->code,
-            'Status' => $record->status,
+            'Status' => $record->status->getLabel(),
         ];
     }
 }
