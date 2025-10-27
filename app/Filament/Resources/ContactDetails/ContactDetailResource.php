@@ -92,21 +92,26 @@ class ContactDetailResource extends Resource
                 Grid::make(3) // ✅ Three-column layout
                     ->schema([
                         Select::make('designation_id')
-                            ->relationship('designation', 'name')
+                            ->label('Designation')
+                            ->options(function () {
+                                return \App\Models\Designation::pluck('name', 'id')->toArray();
+                            })
                             ->searchable()
                             ->nullable()
-                            ->label('Designation')
                             ->createOptionForm([
                                 TextInput::make('name')
                                     ->required()
                                     ->label('New Designation')
                             ])
                             ->createOptionUsing(function (array $data) {
-                                return Designation::create($data)->id;  // ✅ Create and return ID
-                            })->preload(),
+                                return \App\Models\Designation::create($data)->id;
+                            })
+                            ->preload(),
 
                         Select::make('department_id')
-                            ->relationship('department', 'name')
+                            ->options(function () {
+                                return Department::pluck('name', 'id')->toArray();
+                            })
                             ->searchable()
                             ->nullable()
                             ->label('Department')

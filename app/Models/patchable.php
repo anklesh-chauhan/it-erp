@@ -9,10 +9,16 @@ class Patchable extends MorphPivot
 {
     protected $table = 'patchables';
 
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
     protected $fillable = [
+        'id',
         'patch_id',
         'patchable_id',
         'patchable_type',
+        'order',
         'created_at',
         'updated_at', // Include if timestamps are present
     ];
@@ -30,4 +36,9 @@ class Patchable extends MorphPivot
     {
         return $this->morphTo();
     }
+
+    public function patchablePivots() // <-- CORRECT NEW RELATIONSHIP
+{
+    return $this->hasMany(Patchable::class, 'patch_id');
+}
 }

@@ -78,14 +78,14 @@ class TerritoryResource extends Resource
                         ->nullable()
                         ->columnSpanFull(),
                 ]),
-            
+
             Section::make('Associated Locations')
                 ->schema([
                     Select::make('cityPinCodes')
                         ->multiple()
                         ->relationship('cityPinCodes', 'id')
                         ->searchable()
-                        ->getSearchResultsUsing(fn (string $search) => 
+                        ->getSearchResultsUsing(fn (string $search) =>
                             CityPinCode::query()
                                 ->whereHas('city', fn ($q) => $q->where('name', 'like', "%{$search}%"))
                                 ->orWhere('area_town', 'like', "%{$search}%")
@@ -97,7 +97,7 @@ class TerritoryResource extends Resource
                                     $item->id => "{$item->city->name} - {$item->area_town} ({$item->pin_code})"
                                 ])
                         )
-                        ->getOptionLabelsUsing(fn ($values) => 
+                        ->getOptionLabelsUsing(fn ($values) =>
                             CityPinCode::whereIn('id', $values)
                                 ->with('city')
                                 ->get()
@@ -108,7 +108,7 @@ class TerritoryResource extends Resource
                         ->label('Cities and Areas')
                         ->required(),
                 ]),
-            
+
             Section::make('Associated Positions')
                 ->schema([
                     Select::make('positions')
@@ -154,25 +154,6 @@ class TerritoryResource extends Resource
                     ->badge()
                     ->color(fn (string $state) => TerritoryStatus::from($state)->getColor())
                     ->searchable(),
-
-                TextColumn::make('cityPinCodes')
-                    ->label('Cities/Areas')
-                    ->formatStateUsing(function (Model $record) {
-                        $record->loadMissing('cityPinCodes.city');
-                        return $record->cityPinCodes
-                            ->map(fn ($pin) => "{$pin->city->name} - {$pin->area_town}")
-                            ->implode(', ');
-                    })
-                    ->wrap()
-                    ->toggleable()
-                    ->searchable(query: fn (Builder $query, string $search) =>
-                        $query->whereHas('cityPinCodes.city', fn ($q) =>
-                            $q->where('name', 'like', "%{$search}%")
-                        )->orWhereHas('cityPinCodes', fn ($q) =>
-                            $q->where('area_town', 'like', "%{$search}%")
-                              ->orWhere('pin_code', 'like', "%{$search}%")
-                        )
-                    ),
 
                 TextColumn::make('created_at')
                     ->dateTime()
