@@ -40,6 +40,11 @@ class Territory extends Model
         return $this->hasMany(Territory::class, 'parent_territory_id');
     }
 
+    public function patches()
+    {
+        return $this->hasMany(\App\Models\Patch::class, 'territory_id');
+    }
+
     /**
      * Get the organizational units associated with the territory.
      */

@@ -20,7 +20,7 @@ use App\Filament\Resources\Territories\Pages\ListTerritories;
 use App\Filament\Resources\Territories\Pages\CreateTerritory;
 use App\Filament\Resources\Territories\Pages\EditTerritory;
 use App\Enums\TerritoryStatus;
-use App\Filament\Resources\TerritoryResource\Pages;
+use App\Filament\Resources\TerritoryResource\RelationManagers;
 use App\Models\Territory;
 use Filament\Forms;
 use Filament\Resources\Resource;
@@ -40,7 +40,7 @@ class TerritoryResource extends Resource
     {
         return $schema->components([
             Section::make('Territory Details')
-                ->columns(2)
+                ->columns(5)
                 ->schema([
                     TextInput::make('name')
                         ->required()
@@ -64,20 +64,18 @@ class TerritoryResource extends Resource
                         ->relationship('parentTerritory', 'name')
                         ->searchable()
                         ->nullable()
-                        ->placeholder('Select a Parent Territory')
                         ->label('Parent Territory'),
 
                     Select::make('type_master_id')
                         ->relationship('typeMaster', 'name')
                         ->searchable()
                         ->nullable()
-                        ->placeholder('Select a Type Master')
                         ->label('Type Master'),
 
                     Textarea::make('description')
                         ->nullable()
                         ->columnSpanFull(),
-                ]),
+                ])->columnSpanFull(),
 
             Section::make('Associated Locations')
                 ->schema([
@@ -107,7 +105,7 @@ class TerritoryResource extends Resource
                         )
                         ->label('Cities and Areas')
                         ->required(),
-                ]),
+                ])->columnSpanFull(),
 
             Section::make('Associated Positions')
                 ->schema([
@@ -207,7 +205,7 @@ class TerritoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Example: RelationManagers\OrganizationalUnitsRelationManager::class,
+            \App\Filament\Resources\Territories\RelationManagers\PatchesRelationManager::class,
         ];
     }
 

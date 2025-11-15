@@ -258,50 +258,50 @@ class PatchResource extends Resource
 
                         // store the related model id
                         Select::make('patchable_id')
-            ->label('Name')
-            ->options(function (Get $get) {
-                $territoryId = $get('../../territory_id'); // 👈 get selected Territory ID
-                $type = $get('patchable_type');
+                            ->label('Name')
+                            ->options(function (Get $get) {
+                                $territoryId = $get('../../territory_id'); // 👈 get selected Territory ID
+                                $type = $get('patchable_type');
 
-                if (! $territoryId) {
-                    return []; // no territory selected
-                }
+                                if (! $territoryId) {
+                                    return []; // no territory selected
+                                }
 
-                // Get all pin codes linked to this territory
-                $territory = \App\Models\Territory::with('cityPinCodes')->find($territoryId);
-                $pinCodes = $territory?->cityPinCodes?->pluck('pin_code') ?? collect();
+                                // Get all pin codes linked to this territory
+                                $territory = \App\Models\Territory::with('cityPinCodes')->find($territoryId);
+                                $pinCodes = $territory?->cityPinCodes?->pluck('pin_code') ?? collect();
 
-                if ($pinCodes->isEmpty()) {
-                    return [];
-                }
+                                if ($pinCodes->isEmpty()) {
+                                    return [];
+                                }
 
-                // Filter based on patchable type
-                if ($type === \App\Models\AccountMaster::class) {
-                    return \App\Models\AccountMaster::whereHas('addresses', function ($q) use ($pinCodes) {
-                            $q->whereIn('pin_code', $pinCodes);
-                        })
-                        ->orderBy('name')
-                        ->pluck('name', 'id')
-                        ->toArray();
-                }
+                                // Filter based on patchable type
+                                if ($type === \App\Models\AccountMaster::class) {
+                                    return \App\Models\AccountMaster::whereHas('addresses', function ($q) use ($pinCodes) {
+                                            $q->whereIn('pin_code', $pinCodes);
+                                        })
+                                        ->orderBy('name')
+                                        ->pluck('name', 'id')
+                                        ->toArray();
+                                }
 
-                if ($type === \App\Models\ContactDetail::class) {
-                    return \App\Models\ContactDetail::whereHas('addresses', function ($q) use ($pinCodes) {
-                            $q->whereIn('pin_code', $pinCodes);
-                        })
-                        ->orderBy('first_name')
-                        ->get()
-                        ->mapWithKeys(fn ($c) => [
-                            $c->id => "{$c->first_name} {$c->last_name} ({$c->email})",
-                        ])
-                        ->toArray();
-                }
+                                if ($type === \App\Models\ContactDetail::class) {
+                                    return \App\Models\ContactDetail::whereHas('addresses', function ($q) use ($pinCodes) {
+                                            $q->whereIn('pin_code', $pinCodes);
+                                        })
+                                        ->orderBy('first_name')
+                                        ->get()
+                                        ->mapWithKeys(fn ($c) => [
+                                            $c->id => "{$c->first_name} {$c->last_name} ({$c->email})",
+                                        ])
+                                        ->toArray();
+                                }
 
-                return [];
-            })
-            ->reactive()
-            ->searchable()
-            ->required(),
+                                return [];
+                            })
+                            ->reactive()
+                            ->searchable()
+                            ->required(),
 
                         // keep order visible but Filament manages persisting it
                         Hidden::make('order'), // use hidden so user doesn't edit it manually
@@ -333,12 +333,6 @@ class PatchResource extends Resource
                     ->columnSpanFull(),
                     //End of patchables field
 
-                ColorPicker::make('color')
-                    ->nullable()
-                    ->label('Patch Color')
-                    ->helperText('Choose a color to visually represent the patch.')
-                    ->columnSpanFull(),
-
                 Textarea::make('description')
                     ->nullable()
                     ->maxLength(65535)
@@ -346,17 +340,28 @@ class PatchResource extends Resource
                     ->rows(3) // Provide a reasonable default height
                     ->helperText('A brief description of the patch.'),
 
-                TextInput::make('created_by')
-                    ->default(Auth::user()->name ?? 'System') // Fallback if user is somehow not available
-                    ->disabled()
-                    ->dehydrated(false)
-                    ->label('Created By'),
+                Group::make()
+                    ->columns(3)
+                    ->schema([
+                        ColorPicker::make('color')
+                            ->nullable()
+                            ->label('Patch Color')
+                            ->helperText('Choose a color to visually represent the patch.'),
 
-                TextInput::make('updated_by')
-                    ->default(Auth::user()->name ?? 'System')
-                    ->disabled()
-                    ->dehydrated(false)
-                    ->label('Last Updated By'),
+                        TextInput::make('created_by')
+                            ->default(Auth::user()->name ?? 'System') // Fallback if user is somehow not available
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->label('Created By'),
+
+                        TextInput::make('updated_by')
+                            ->default(Auth::user()->name ?? 'System')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->label('Last Updated By'),
+                     ])
+                    ->columnSpanFull(),
+
             ])->columns(2); // Set a default number of columns for the form
     }
 
