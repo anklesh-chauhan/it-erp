@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\GstPans;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
@@ -83,6 +85,7 @@ class GstPanResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

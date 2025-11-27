@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Images;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -81,6 +83,7 @@ class ImageResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

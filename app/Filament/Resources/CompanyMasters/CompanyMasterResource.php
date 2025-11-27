@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CompanyMasters;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use App\Models\ContactDetail;
 use Filament\Forms\Components\Placeholder;
@@ -410,6 +412,7 @@ class CompanyMasterResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

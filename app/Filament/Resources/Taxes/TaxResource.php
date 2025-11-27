@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Taxes;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
@@ -97,6 +99,7 @@ class TaxResource extends Resource
             ->filters([])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

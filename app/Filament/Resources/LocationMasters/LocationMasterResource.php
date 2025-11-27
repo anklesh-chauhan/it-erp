@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\LocationMasters;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Tables\Filters\Filter;
 use Filament\Actions\ViewAction;
@@ -122,6 +124,7 @@ class LocationMasterResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

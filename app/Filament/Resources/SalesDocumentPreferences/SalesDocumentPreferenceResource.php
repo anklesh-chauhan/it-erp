@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SalesDocumentPreferences;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Toggle;
@@ -141,6 +143,7 @@ class SalesDocumentPreferenceResource extends Resource
             ->filters([])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([]);
             

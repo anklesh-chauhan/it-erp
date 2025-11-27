@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\TypeMasters;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
@@ -75,6 +77,7 @@ class TypeMasterResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

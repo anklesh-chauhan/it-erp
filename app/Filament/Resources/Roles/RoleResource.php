@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Roles;
 
+use App\Filament\Actions\ApprovalAction;
+
 use App\Traits\HasSafeGlobalSearch;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
@@ -69,6 +71,7 @@ class RoleResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

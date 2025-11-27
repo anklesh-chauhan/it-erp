@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\EmpDepartments;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -135,6 +137,7 @@ class EmpDepartmentResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                ApprovalAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

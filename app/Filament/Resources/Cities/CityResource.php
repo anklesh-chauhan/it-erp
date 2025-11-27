@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Cities;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -60,6 +62,7 @@ class CityResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

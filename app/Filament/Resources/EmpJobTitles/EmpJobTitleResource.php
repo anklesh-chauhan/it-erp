@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\EmpJobTitles;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -99,6 +101,7 @@ class EmpJobTitleResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

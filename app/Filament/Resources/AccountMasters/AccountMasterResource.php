@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\AccountMasters;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
@@ -82,6 +84,7 @@ class AccountMasterResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
                 DeleteAction::make(),
                 RestoreAction::make(),
             ])

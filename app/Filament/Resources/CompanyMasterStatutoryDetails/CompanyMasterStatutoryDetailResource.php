@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CompanyMasterStatutoryDetails;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -89,6 +91,7 @@ class CompanyMasterStatutoryDetailResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

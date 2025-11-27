@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\LeadActivities;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -113,6 +115,7 @@ class LeadActivityResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

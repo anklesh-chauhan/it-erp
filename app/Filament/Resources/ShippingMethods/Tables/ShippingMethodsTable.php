@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ShippingMethods\Tables;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -30,6 +32,7 @@ class ShippingMethodsTable
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Categories;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
@@ -107,6 +109,7 @@ class CategoryResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
                 RestoreAction::make()
                     ->visible(fn ($record) => $record !== null && $record->trashed())
                     ->requiresConfirmation(),

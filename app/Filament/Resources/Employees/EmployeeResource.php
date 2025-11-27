@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Employees;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -765,6 +767,7 @@ class EmployeeResource extends Resource
             ])->filtersFormColumns(2)
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

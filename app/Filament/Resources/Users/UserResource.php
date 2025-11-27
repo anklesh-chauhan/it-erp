@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Users;
 
+use App\Filament\Actions\ApprovalAction;
+
 use App\Traits\HasSafeGlobalSearch;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
@@ -93,6 +95,7 @@ class UserResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

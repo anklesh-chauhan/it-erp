@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Leads;
 
+use App\Filament\Actions\ApprovalAction;
+
 use App\Traits\AddressDetailsTrait;
 use App\Traits\HasSafeGlobalSearch;
 use App\Models\LeadStatus;
@@ -282,6 +284,7 @@ class LeadResource extends Resource
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make(),
+                ApprovalAction::make(),
                     DeleteAction::make(),
                     \Filament\Actions\Action::make('convert_to_deal')
                         ->label('Convert to Deal')

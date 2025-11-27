@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\FollowUps;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
@@ -149,6 +151,7 @@ class FollowUpResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

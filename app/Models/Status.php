@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-abstract use App\Traits\HasApprovalWorkflow;
+use App\Traits\HasApprovalWorkflow;
 
 class Status extends Model
 {

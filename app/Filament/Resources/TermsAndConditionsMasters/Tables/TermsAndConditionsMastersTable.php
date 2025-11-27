@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\TermsAndConditionsMasters\Tables;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -25,6 +27,7 @@ class TermsAndConditionsMastersTable
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

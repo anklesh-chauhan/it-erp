@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ItemMasters;
 
+use App\Filament\Actions\ApprovalAction;
+
 use App\Traits\ItemMasterTrait;
 use App\Traits\ItemMasterTableTrait;
 use Filament\Schemas\Schema;
@@ -74,6 +76,7 @@ class ItemMasterResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

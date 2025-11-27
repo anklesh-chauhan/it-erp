@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\NumberSeries;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Grid;
@@ -102,6 +104,7 @@ class NumberSeriesResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SalesOrders;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -146,6 +148,7 @@ class SalesOrderResource extends Resource
             ->recordActions([
                 ActionGroup::make([
                 EditAction::make(),
+                ApprovalAction::make(),
                 
                 Action::make('createInvoice')
                     ->label('Create Invoice')

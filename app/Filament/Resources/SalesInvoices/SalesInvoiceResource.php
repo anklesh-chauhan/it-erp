@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SalesInvoices;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -135,6 +137,7 @@ class SalesInvoiceResource extends Resource
             ->recordActions([
                 ActionGroup::make([
                 EditAction::make(),
+                ApprovalAction::make(),
 
                 Action::make('previewPdf')
                         ->icon('heroicon-o-eye')

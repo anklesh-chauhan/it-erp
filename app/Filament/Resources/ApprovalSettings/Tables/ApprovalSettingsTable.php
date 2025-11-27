@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ApprovalSettings\Tables;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -26,6 +28,7 @@ class ApprovalSettingsTable
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

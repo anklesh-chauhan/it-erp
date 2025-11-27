@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Positions;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -289,6 +291,7 @@ class PositionResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                ApprovalAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

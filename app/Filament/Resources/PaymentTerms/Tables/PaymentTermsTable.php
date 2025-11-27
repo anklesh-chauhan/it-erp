@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\PaymentTerms\Tables;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -35,6 +37,7 @@ class PaymentTermsTable
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

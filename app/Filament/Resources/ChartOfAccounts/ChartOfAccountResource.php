@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ChartOfAccounts;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
@@ -243,6 +245,7 @@ class ChartOfAccountResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                ApprovalAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

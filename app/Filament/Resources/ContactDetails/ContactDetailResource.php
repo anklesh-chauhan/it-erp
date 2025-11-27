@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ContactDetails;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
@@ -344,6 +346,7 @@ class ContactDetailResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 DeleteBulkAction::make(),

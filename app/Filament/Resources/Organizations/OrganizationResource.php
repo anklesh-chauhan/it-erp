@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Organizations;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -314,6 +316,7 @@ class OrganizationResource extends Resource
             ->recordActions([
                 ViewAction::make(), // Add a view action
                 EditAction::make(),
+                ApprovalAction::make(),
                 DeleteAction::make(), // Add direct delete action
             ])
             ->toolbarActions([

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Deals;
 
+use App\Filament\Actions\ApprovalAction;
+
 use App\Traits\HasSafeGlobalSearch;
 use App\Models\DealStage;
 use Filament\Schemas\Schema;
@@ -209,6 +211,7 @@ class DealResource extends Resource
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make(),
+                ApprovalAction::make(),
                 ])
             ])
             ->toolbarActions([

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Ledgers;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\DatePicker;
@@ -198,6 +200,7 @@ class LedgerResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

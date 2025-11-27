@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Approvals\Tables;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Dom\Text;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -99,6 +101,7 @@ class ApprovalsTable
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
+                ApprovalAction::make(),
 
                     Action::make('approve')
                         ->label('Approve')

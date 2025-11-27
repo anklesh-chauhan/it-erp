@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ExpenseTypes;
 
+use App\Filament\Actions\ApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Actions\EditAction;
@@ -56,6 +58,7 @@ class ExpenseTypeResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
