@@ -33,20 +33,35 @@ trait AccountMasterDetailsTrait
                             ->options(function (callable $get) {
                                 $contactId = $get('contact_detail_id');
 
+                                // Check if ApprovalRule exists for AccountMaster module
+                                $approvalRuleExists = \App\Models\ApprovalRule::where('module', 'AccountMaster')->where('active', true)->exists();
+
                                 if ($contactId) {
-                                    // Load contact and its related account masters
-                                    $contact = ContactDetail::with('accountMasters')->find($contactId);
-                                    if (!$contact) {
-                                        return [];
+                                    $contact = \App\Models\ContactDetail::with('accountMasters')->find($contactId);
+                                    if (!$contact) return [];
+
+                                    $query = $contact->accountMasters();
+
+                                    // If approval rule exists, filter only approved account masters
+                                    if ($approvalRuleExists) {
+                                        $query = $query->whereHas('approvals', function ($q) {
+                                            $q->where('status', 'approved');
+                                        });
                                     }
-                                    // Explicitly specify the table for id to avoid ambiguity
-                                    return $contact->accountMasters()
-                                        ->pluck('account_masters.name', 'account_masters.id')
-                                        ->toArray();
+
+                                    return $query->pluck('account_masters.name', 'account_masters.id')->toArray();
                                 }
 
-                                // If no contact is selected, show all account masters
-                                return AccountMaster::pluck('name', 'account_masters.id')->toArray();
+                                // No contact selected
+                                $query = \App\Models\AccountMaster::query();
+
+                                if ($approvalRuleExists) {
+                                    $query = $query->whereHas('approvals', function ($q) {
+                                        $q->where('status', 'approved');
+                                    });
+                                }
+
+                                return $query->pluck('name', 'id')->toArray();
                             })
                             ->searchable()
                             ->nullable()

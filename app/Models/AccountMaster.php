@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+
 use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class AccountMaster extends Model
 {
@@ -40,6 +42,11 @@ class AccountMaster extends Model
         'rating_type_id',
         'account_ownership_id',
     ];
+
+    public function approvals(): MorphMany
+    {
+        return $this->morphMany(Approval::class, 'approvable');
+    }
 
     public function customerPrices()
     {

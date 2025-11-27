@@ -8,6 +8,7 @@ use App\Filament\Resources\ApprovalRules\Pages\ListApprovalRules;
 use App\Filament\Resources\ApprovalRules\Schemas\ApprovalRuleForm;
 use App\Filament\Resources\ApprovalRules\Tables\ApprovalRulesTable;
 use App\Models\ApprovalRule;
+use App\Traits\HasSafeGlobalSearch;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class ApprovalRuleResource extends Resource
 {
+    use HasSafeGlobalSearch;
+
     protected static ?string $model = ApprovalRule::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::CheckCircle;
