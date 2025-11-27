@@ -10,9 +10,11 @@ use Filament\Models\Contracts\FilamentUser;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
+use App\Traits\HasApprovalWorkflow;
+
 class TenantUser extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, UsesTenantConnection;
+    use HasFactory, Notifiable, HasRoles, UsesTenantConnection, HasApprovalWorkflow;
 
     protected $connection = 'tenant';
 

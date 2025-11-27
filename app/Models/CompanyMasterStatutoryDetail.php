@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\HasApprovalWorkflow;
+
 class CompanyMasterStatutoryDetail extends Model
 {
-    use HasFactory;
+    use HasFactory, HasApprovalWorkflow;
 
     protected $fillable = [
         'company_master_id',

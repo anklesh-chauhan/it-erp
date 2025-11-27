@@ -5,9 +5,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\HasApprovalWorkflow;
+
 class Company extends Model
 {
-    use HasFactory;
+    use HasFactory, HasApprovalWorkflow;
 
     protected $fillable = [
         'name',

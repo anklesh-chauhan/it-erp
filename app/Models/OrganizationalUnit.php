@@ -6,8 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\HasApprovalWorkflow;
+
 class OrganizationalUnit extends Model
 {
+    use HasApprovalWorkflow;
+
     protected $fillable = ['name', 'code', 'description', 'parent_id', 'is_active'];
 
     // Parent OU (for hierarchy)

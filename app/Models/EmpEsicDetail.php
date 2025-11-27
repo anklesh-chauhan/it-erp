@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Traits\HasApprovalWorkflow;
+
 class EmpEsicDetail extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasApprovalWorkflow;
 
     protected $fillable = [
         'employee_id', 'esic_flag', 'esic_old_no', 'esic_new_version', 'esic_imp_code',

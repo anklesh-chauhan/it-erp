@@ -7,8 +7,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\HasApprovalWorkflow;
+
 class Approval extends Model
 {
+    use HasApprovalWorkflow;
+
     protected $table = 'approvals';
 
     protected $fillable = ['approvable_type','approvable_id','requested_by','status','completed_at'];

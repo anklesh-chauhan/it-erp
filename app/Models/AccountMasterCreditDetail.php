@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use App\Enums\AccountMasterCreditType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+use App\Traits\HasApprovalWorkflow;
+
 class AccountMasterCreditDetail extends Model
 {
-    use HasFactory;
+    use HasFactory, HasApprovalWorkflow;
 
     protected $table = 'account_master_credit_details';
 

@@ -4,8 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\HasApprovalWorkflow;
+
 class EmpJobTitle extends Model
 {
+    use HasApprovalWorkflow;
+
     protected $fillable = ['title', 'description', 'department_id'];
 
     public function department()

@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+use App\Traits\HasApprovalWorkflow;
+
 class Address extends Model
 {
-    use HasFactory;
+    use HasFactory, HasApprovalWorkflow;
 
     protected $fillable = [
         'company_id', 'contact_detail_id', 'address_type', 'street', 'area_town', 'pin_code',

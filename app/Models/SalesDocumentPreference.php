@@ -4,8 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\HasApprovalWorkflow;
+
 class SalesDocumentPreference extends Model
 {
+    use HasApprovalWorkflow;
+
     protected $fillable = [
         'attach_pdf_in_email',
         'encrypt_pdf',

@@ -14,8 +14,12 @@ use Filament\Panel;
 use App\Models\OrganizationalUnit;
 use Filament\Models\Contracts\FilamentUser;
 
+use App\Traits\HasApprovalWorkflow;
+
 class User extends Authenticatable
 {
+    use HasApprovalWorkflow;
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles;
 

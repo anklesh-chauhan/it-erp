@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Traits\HasApprovalWorkflow;
+
 class LocationMaster extends Model
 {
-    use HasFactory;
+    use HasFactory, HasApprovalWorkflow;
 
     protected $fillable = [
         'name',

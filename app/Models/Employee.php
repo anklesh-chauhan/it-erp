@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+use App\Traits\HasApprovalWorkflow;
+
 class Employee extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasApprovalWorkflow;
 
     protected $primaryKey = 'id';
 

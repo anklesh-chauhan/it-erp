@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Traits\HasApprovalWorkflow;
+
 class EmpStatutoryId extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasApprovalWorkflow;
 
     protected $fillable = [
         'employee_id', 'pan', 'uan_no', 'group_join_date', 'gratuity_code', 'pran',

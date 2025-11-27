@@ -4,8 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\HasApprovalWorkflow;
+
 class SalesInvoice extends SalesDocument
 {
+    use HasApprovalWorkflow;
+
     protected $table = 'sales_invoices';
 
     protected $fillable = [

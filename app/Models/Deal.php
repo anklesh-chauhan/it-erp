@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\HasApprovalWorkflow;
+
 class Deal extends Model
 {
-    use HasFactory, HasCustomerInteractionFields;
+    use HasFactory, HasCustomerInteractionFields, HasApprovalWorkflow;
 
     protected $fillable = [
         'owner_id', 'reference_code','deal_name', 'transaction_date', 'contact_detail_id', 'company_id', 'account_master_id', 'address_id',

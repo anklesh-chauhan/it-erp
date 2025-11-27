@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Traits\HasApprovalWorkflow;
+
 class EmploymentDetail extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasApprovalWorkflow;
 
     protected $fillable = [
         'employee_id', 'ticket_no', 'department_id', 'job_title_id', 'grade_id',

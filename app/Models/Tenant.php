@@ -13,8 +13,12 @@ use Database\Seeders\DatabaseSeeder;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 use App\Jobs\ManageCloudflareCname;
 
+use App\Traits\HasApprovalWorkflow;
+
 class Tenant extends BaseTenant
 {
+    use HasApprovalWorkflow;
+
     // use UsesTenantConnection;
 
     public function getDatabaseName(): string

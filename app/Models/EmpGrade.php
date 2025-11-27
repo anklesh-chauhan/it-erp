@@ -4,8 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\HasApprovalWorkflow;
+
 class EmpGrade extends Model
 {
+    use HasApprovalWorkflow;
+
     protected $fillable = ['grade_name', 'description', 'department_id'];
 
     public function department()

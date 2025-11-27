@@ -4,8 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-abstract class Status extends Model
+abstract use App\Traits\HasApprovalWorkflow;
+
+class Status extends Model
 {
+    use HasApprovalWorkflow;
+
     // Define common attributes or methods if needed
     protected $fillable = ['name', 'color', 'order'];
 

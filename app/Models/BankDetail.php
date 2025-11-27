@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+use App\Traits\HasApprovalWorkflow;
+
 class BankDetail extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasApprovalWorkflow;
 
     protected $table = 'bank_details';
 

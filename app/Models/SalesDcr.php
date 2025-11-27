@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\ExpenseConfiguration;
 
+use App\Traits\HasApprovalWorkflow;
+
 class SalesDcr extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasApprovalWorkflow;
 
     protected $fillable = [
         'date',

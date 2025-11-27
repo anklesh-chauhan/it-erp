@@ -5,8 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\HasApprovalWorkflow;
+
 class FollowUpMedia extends Model
 {
+    use HasApprovalWorkflow;
+
     protected $fillable = ['name'];
 
     public function followUps(): HasMany

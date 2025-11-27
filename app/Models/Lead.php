@@ -13,9 +13,11 @@ use App\Models\NumberSeries;
 use App\Models\DealStage;
 use Illuminate\Support\Facades\DB;
 
+use App\Traits\HasApprovalWorkflow;
+
 class Lead extends Model
 {
-    use HasFactory, HasCustomerInteractionFields;
+    use HasFactory, HasCustomerInteractionFields, HasApprovalWorkflow;
 
     protected $fillable = [
         'owner_id',

@@ -6,8 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
-abstract class SalesDocument extends Model
+use App\Traits\HasApprovalWorkflow;
+
+class SalesDocument extends Model
 {
+    use HasApprovalWorkflow;
+
     public const FILLABLE = [
         'document_number',
         'lead_id',
@@ -53,7 +57,7 @@ abstract class SalesDocument extends Model
     public function paymentTerm()
     {
         return $this->belongsTo(PaymentTerm::class);
-    }   
+    }
 
     public function paymentMethod()
     {

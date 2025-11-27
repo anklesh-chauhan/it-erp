@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Traits\HasApprovalWorkflow;
+
 class EmpProfessionalTax extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasApprovalWorkflow;
 
     protected $fillable = [
         'employee_id', 'pt_flag', 'pt_no', 'pt_amount', 'pt_join_date', 'pt_remarks',

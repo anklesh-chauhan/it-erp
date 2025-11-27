@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Enums\PositionStatus; // Import the new enum
 
+use App\Traits\HasApprovalWorkflow;
+
 class Position extends Model
 {
-    use HasFactory;
+    use HasFactory, HasApprovalWorkflow;
 
     /**
      * The table associated with the model.

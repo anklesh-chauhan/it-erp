@@ -5,8 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 
+use App\Traits\HasApprovalWorkflow;
+
 class Patchable extends MorphPivot
 {
+    use HasApprovalWorkflow;
+
     protected $table = 'patchables';
 
     protected $primaryKey = 'id';

@@ -5,8 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Traits\HasApprovalWorkflow;
+
 class ApprovalRule extends Model
 {
+    use HasApprovalWorkflow;
+
     protected $table = 'approval_rules';
 
     protected $fillable = [
