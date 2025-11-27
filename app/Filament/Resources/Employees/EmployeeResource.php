@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Employees;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -45,6 +47,7 @@ use App\Filament\Resources\AccountMasterBankDetailResource\RelationManagers\Bank
 
 class EmployeeResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Employee::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-group';

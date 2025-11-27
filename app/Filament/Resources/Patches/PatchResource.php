@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Patches;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Actions\EditAction;
@@ -38,6 +40,7 @@ use App\Filament\Actions\ApprovalAction;
 
 class PatchResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Patch::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-wrench-screwdriver';

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Quotes;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -41,6 +43,7 @@ use App\Filament\Actions\ApprovalAction;
 
 class QuoteResource extends Resource
 {
+    use HasSafeGlobalSearch;
     use SalesDocumentResourceTrait;
 
     protected static ?string $model = Quote::class;

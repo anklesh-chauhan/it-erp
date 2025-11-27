@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Countries;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -25,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CountryResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Country::class;
 
     protected static string | \UnitEnum | null $navigationGroup = 'Global Config';

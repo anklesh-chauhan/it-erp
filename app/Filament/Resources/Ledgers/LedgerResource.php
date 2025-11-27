@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Ledgers;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -33,6 +35,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LedgerResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Ledger::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

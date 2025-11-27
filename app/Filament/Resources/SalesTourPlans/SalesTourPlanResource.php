@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SalesTourPlans;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\SalesTourPlans\Pages\CreateSalesTourPlan;
 use App\Filament\Resources\SalesTourPlans\Pages\EditSalesTourPlan;
 use App\Filament\Resources\SalesTourPlans\Pages\ListSalesTourPlans;
@@ -16,6 +18,7 @@ use Filament\Tables\Table;
 
 class SalesTourPlanResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = SalesTourPlan::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

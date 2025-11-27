@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\LocationMasters;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -37,6 +39,7 @@ use Filament\Tables\Columns\ImageColumn;
 
 class LocationMasterResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = LocationMaster::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

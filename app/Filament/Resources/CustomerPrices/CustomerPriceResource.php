@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CustomerPrices;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\CustomerPrices\Pages\CreateCustomerPrice;
 use App\Filament\Resources\CustomerPrices\Pages\EditCustomerPrice;
 use App\Filament\Resources\CustomerPrices\Pages\ListCustomerPrices;
@@ -16,6 +18,7 @@ use Filament\Tables\Table;
 
 class CustomerPriceResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = CustomerPrice::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

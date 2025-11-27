@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ItemMasters;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use App\Traits\ItemMasterTrait;
@@ -42,6 +44,7 @@ use Filament\Tables\Filters\Filter;
 
 class ItemMasterResource extends Resource
 {
+    use HasSafeGlobalSearch;
     use ItemMasterTrait;
     use ItemMasterTableTrait;
 

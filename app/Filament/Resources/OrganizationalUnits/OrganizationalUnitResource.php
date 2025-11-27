@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\OrganizationalUnits;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -38,6 +40,7 @@ use Illuminate\Support\Str;
 
 class OrganizationalUnitResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = OrganizationalUnit::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office-2';

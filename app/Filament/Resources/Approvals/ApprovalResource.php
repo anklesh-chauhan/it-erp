@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Approvals;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\Approvals\Pages\CreateApproval;
 use App\Filament\Resources\Approvals\Pages\EditApproval;
 use App\Filament\Resources\Approvals\Pages\ListApprovals;
@@ -20,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ApprovalResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Approval::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

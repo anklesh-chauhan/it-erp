@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ApprovalSettings;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\ApprovalSettings\Pages\CreateApprovalSetting;
 use App\Filament\Resources\ApprovalSettings\Pages\EditApprovalSetting;
 use App\Filament\Resources\ApprovalSettings\Pages\ListApprovalSettings;
@@ -16,6 +18,7 @@ use Filament\Tables\Table;
 
 class ApprovalSettingResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = ApprovalSetting::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

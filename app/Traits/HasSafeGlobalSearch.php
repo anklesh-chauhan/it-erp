@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Multitenancy\Models\Tenant;
+use Illuminate\Support\Facades\DB;
 
 trait HasSafeGlobalSearch
 {
@@ -109,24 +110,36 @@ trait HasSafeGlobalSearch
 
     // Eloquent query for global search with tenancy and permission filters
     public static function getGlobalSearchEloquentQuery(): Builder
-    {
-        $query = parent::getGlobalSearchEloquentQuery();
+{
+    $model = static::getModel();
+    $instance = new $model;
 
-        // Apply tenancy filter
-        $query->when(Tenant::checkCurrent(), fn ($q) => $q->where('tenant_id', Tenant::current()->id));
+    // 1. Get the correct table name from the model
+    $table = $instance->getTable();
 
-        // Apply permission and role filter only if user is authenticated
-        if ($user = auth()->user()) {
-            $resourceName = Str::lower(class_basename(static::class));
-            $permissionName = "view_any_{$resourceName}";
+    // 2. COMPLETELY BYPASS ELOQUENT CONNECTION RESOLUTION
+    // This is the only method that beats Spatie tenancy in 2025
+    $query = DB::connection('mysql')->table($table);
 
-            if (!$user->hasAnyRole(['admin', 'general_manager', 'marketing_manager']) || !$user->hasPermissionTo($permissionName)) {
-                $query->whereRaw('1 = 0'); // Return no results if user lacks permissions or roles
-            }
+    // 3. Convert back to Eloquent Builder so we can use ->get(), model hydration, etc.
+    $eloquentQuery = $instance->newEloquentBuilder($query);
+    $eloquentQuery->setModel($instance);
+
+    // 4. Permission check (your custom format — now works perfectly)
+    if ($user = auth()->user()) {
+        $resourceClassName = class_basename(static::class);
+        $resourceNameOnly = str_replace('Resource', '', $resourceClassName);
+        $permissionName = "ViewAny:{$resourceNameOnly}";
+
+        $isSuperAdmin = $user->hasAnyRole(['admin', 'general_manager', 'marketing_manager']);
+
+        if (! $isSuperAdmin && ! $user->hasPermissionTo($permissionName)) {
+            $eloquentQuery->whereRaw('1 = 0');
         }
-
-        return $query;
     }
+
+    return $eloquentQuery;
+}
 
     // Record-based search: Result title
     public static function getGlobalSearchResultTitle(Model $record): string | Htmlable

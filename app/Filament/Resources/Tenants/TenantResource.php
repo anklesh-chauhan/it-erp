@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Tenants;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -26,6 +28,7 @@ use Spatie\Multitenancy\Models\Tenant as BaseTenant;
 
 class TenantResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Tenant::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

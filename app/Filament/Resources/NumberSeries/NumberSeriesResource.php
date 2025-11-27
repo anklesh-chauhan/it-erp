@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\NumberSeries;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -31,6 +33,7 @@ use App\Helpers\ModelHelper;
 
 class NumberSeriesResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = NumberSeries::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

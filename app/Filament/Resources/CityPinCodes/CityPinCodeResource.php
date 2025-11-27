@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CityPinCodes;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -28,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CityPinCodeResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = CityPinCode::class;
 
     protected static string | \UnitEnum | null $navigationGroup = 'Global Config';

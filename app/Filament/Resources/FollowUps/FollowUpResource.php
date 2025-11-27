@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\FollowUps;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -29,6 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class FollowUpResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = FollowUp::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

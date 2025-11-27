@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Companies;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -30,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CompanyResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Company::class;
 
     protected static string | \UnitEnum | null $navigationGroup = 'Marketing';

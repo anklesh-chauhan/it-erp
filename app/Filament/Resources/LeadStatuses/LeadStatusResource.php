@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\LeadStatuses;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -25,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LeadStatusResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = LeadStatus::class;
 
     protected static string | \UnitEnum | null $navigationGroup = 'Global Config';

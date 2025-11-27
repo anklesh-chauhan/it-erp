@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ShippingMethods;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\ShippingMethods\Pages\CreateShippingMethod;
 use App\Filament\Resources\ShippingMethods\Pages\EditShippingMethod;
 use App\Filament\Resources\ShippingMethods\Pages\ListShippingMethods;
@@ -16,6 +18,7 @@ use Filament\Tables\Table;
 
 class ShippingMethodResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = ShippingMethod::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Positions;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -33,6 +35,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PositionResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Position::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-briefcase';

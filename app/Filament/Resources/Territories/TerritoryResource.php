@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Territories;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -33,6 +35,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TerritoryResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Territory::class;
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map';
     protected static string | \UnitEnum | null $navigationGroup = 'Marketing';

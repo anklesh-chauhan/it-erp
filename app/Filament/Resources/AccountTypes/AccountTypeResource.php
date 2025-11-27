@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\AccountTypes;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -34,6 +36,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AccountTypeResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = AccountType::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-banknotes';

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\PaymentTerms;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\PaymentTerms\Pages\CreatePaymentTerm;
 use App\Filament\Resources\PaymentTerms\Pages\EditPaymentTerm;
 use App\Filament\Resources\PaymentTerms\Pages\ListPaymentTerms;
@@ -16,6 +18,7 @@ use Filament\Tables\Table;
 
 class PaymentTermResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = PaymentTerm::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

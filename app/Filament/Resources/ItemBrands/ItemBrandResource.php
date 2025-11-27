@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ItemBrands;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -25,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ItemBrandResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = ItemBrand::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

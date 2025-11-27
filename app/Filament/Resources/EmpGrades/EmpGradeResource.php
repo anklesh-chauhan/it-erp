@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\EmpGrades;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -31,6 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EmpGradeResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = EmpGrade::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar'; // Icon for grades

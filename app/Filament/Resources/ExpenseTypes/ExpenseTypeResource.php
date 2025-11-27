@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ExpenseTypes;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -24,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ExpenseTypeResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = ExpenseType::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

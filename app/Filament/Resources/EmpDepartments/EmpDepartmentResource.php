@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\EmpDepartments;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -44,6 +46,7 @@ use Illuminate\Support\Facades\Auth;
 
 class EmpDepartmentResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = EmpDepartment::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';

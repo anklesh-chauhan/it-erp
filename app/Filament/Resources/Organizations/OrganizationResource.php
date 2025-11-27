@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Organizations;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -44,6 +46,7 @@ use Filament\Forms\Components\Grid; // Import ViewAction
 
 class OrganizationResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Organization::class;
 
     protected static string | \UnitEnum | null $navigationGroup = 'Global Config';

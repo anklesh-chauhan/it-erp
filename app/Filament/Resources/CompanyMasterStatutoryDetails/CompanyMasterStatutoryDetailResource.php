@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CompanyMasterStatutoryDetails;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -27,6 +29,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CompanyMasterStatutoryDetailResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = CompanyMasterStatutoryDetail::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

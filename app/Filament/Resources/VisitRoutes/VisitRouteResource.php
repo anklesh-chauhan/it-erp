@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\VisitRoutes;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -26,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class VisitRouteResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = VisitRoute::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

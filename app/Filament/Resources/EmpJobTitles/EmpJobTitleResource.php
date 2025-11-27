@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\EmpJobTitles;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -31,6 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EmpJobTitleResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = EmpJobTitle::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag'; // Changed icon to something more suitable for job titles

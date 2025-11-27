@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\TypeMasters;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -27,6 +29,7 @@ use App\Helpers\ModelHelper;
 
 class TypeMasterResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = TypeMaster::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

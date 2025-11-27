@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SalesOrders;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -36,6 +38,7 @@ use App\Helpers\SalesDocumentHelper;
 
 class SalesOrderResource extends Resource
 {
+    use HasSafeGlobalSearch;
     use SalesDocumentResourceTrait;
 
     protected static ?string $model = SalesOrder::class;

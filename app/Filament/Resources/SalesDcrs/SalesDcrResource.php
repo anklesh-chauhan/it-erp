@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SalesDcrs;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -26,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SalesDcrResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = SalesDcr::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

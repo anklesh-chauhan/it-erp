@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\AccountMasters;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -35,6 +37,7 @@ use App\Filament\Resources\AccountMasterStatutoryDetailResource\RelationManagers
 
 class AccountMasterResource extends Resource
 {
+    use HasSafeGlobalSearch;
     use CreateAccountMasterTrait;
 
     protected static ?string $model = AccountMaster::class;

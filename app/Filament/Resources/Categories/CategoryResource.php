@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Categories;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -33,6 +35,7 @@ use App\Helpers\ModelHelper;
 
 class CategoryResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Category::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-folder';

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\EmpDivisions;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -31,6 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EmpDivisionResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = EmpDivision::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office-2'; // Icon for divisions

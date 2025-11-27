@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ContactDetails;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -34,6 +36,7 @@ use Filament\Tables\Table;
 
 class ContactDetailResource extends Resource
 {
+    use HasSafeGlobalSearch;
 
     protected static ?string $model = ContactDetail::class;
 

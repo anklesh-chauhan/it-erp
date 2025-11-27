@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CompanyMasters;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -47,6 +49,7 @@ use Filament\Facades\Filament;
 
 class CompanyMasterResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = CompanyMaster::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\IndustryTypes;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -25,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class IndustryTypeResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = IndustryType::class;
 
     protected static string | \UnitEnum | null $navigationGroup = 'Global Config';

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SalesInvoices;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -35,6 +37,7 @@ use Filament\Actions\Action;
 
 class SalesInvoiceResource extends Resource
 {
+    use HasSafeGlobalSearch;
     use SalesDocumentResourceTrait;
 
     protected static ?string $model = SalesInvoice::class;

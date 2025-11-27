@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\PaymentMethods;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\PaymentMethods\Pages\CreatePaymentMethod;
 use App\Filament\Resources\PaymentMethods\Pages\EditPaymentMethod;
 use App\Filament\Resources\PaymentMethods\Pages\ListPaymentMethods;
@@ -16,6 +18,7 @@ use Filament\Tables\Table;
 
 class PaymentMethodResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = PaymentMethod::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\TermsAndConditionsMasters;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\TermsAndConditionsMasters\Pages\CreateTermsAndConditionsMaster;
 use App\Filament\Resources\TermsAndConditionsMasters\Pages\EditTermsAndConditionsMaster;
 use App\Filament\Resources\TermsAndConditionsMasters\Pages\ListTermsAndConditionsMasters;
@@ -16,6 +18,7 @@ use Filament\Tables\Table;
 
 class TermsAndConditionsMasterResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = TermsAndConditionsMaster::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Cities;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -26,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CityResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = City::class;
 
     protected static string | \UnitEnum | null $navigationGroup = 'Global Config';

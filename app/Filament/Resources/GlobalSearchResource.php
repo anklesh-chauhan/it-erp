@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\CompanyMasters\CompanyMasterResource;
 use App\Filament\Resources\ContactDetails\ContactDetailResource;
 use App\Filament\Resources\ItemMasters\ItemMasterResource;

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Taxes;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Actions\ApprovalAction;
 
 use Filament\Schemas\Schema;
@@ -30,6 +32,7 @@ use App\Filament\Resources\TaxResource\Pages;
 
 class TaxResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = Tax::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-receipt-percent';
