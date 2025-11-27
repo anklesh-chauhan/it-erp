@@ -6,6 +6,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Multitenancy\Commands\TenantsArtisanCommand;
+use App\Filament\Support\GlobalApprovalActionInjector;
+use Filament\Actions\Action;
+use Filament\Facades\Filament;
+use Filament\Tables\Table;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -25,10 +29,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // DB::listen(function ($query) {
-        //     Log::info($query->sql, $query->bindings);
-        // });
-
         DB::listen(function ($query) {
             Log::debug('SQL Query:', [
                 'query' => $query->sql,

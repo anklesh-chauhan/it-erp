@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\SalesTourPlans\Tables;
 
+use App\Filament\Actions\ApprovalAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Actions\Action;
 
 class SalesTourPlansTable
 {
@@ -31,6 +33,8 @@ class SalesTourPlansTable
             ])
             ->recordActions([
                 EditAction::make(),
+                ApprovalAction::make(),
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

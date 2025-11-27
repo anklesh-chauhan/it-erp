@@ -43,6 +43,8 @@ class NumberSeriesResource extends Resource
                 Select::make('model_type')
                     ->label('Number Series Type')
                     ->options(ModelHelper::getModelOptions()) // Dynamic Model Names
+                    ->preload()
+                    ->searchable()
                     ->required(),
                 Grid::make(3)
                     ->schema([

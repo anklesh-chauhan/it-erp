@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasApprovalWorkflow;
 
 class Quote extends SalesDocument
 {
+    use HasApprovalWorkflow;
+
     protected $table = 'quotes';
 
     protected $fillable = [

@@ -35,6 +35,9 @@ use App\Models\SalesOrder;
 use App\Models\SalesInvoice;
 use App\Models\NumberSeries;
 use App\Helpers\SalesDocumentHelper;
+use Filament\Notifications\Notification;
+use Filament\Actions\BulkAction;
+use App\Filament\Actions\ApprovalAction;
 
 class QuoteResource extends Resource
 {
@@ -50,7 +53,7 @@ class QuoteResource extends Resource
     {
         return method_exists(static::class, 'getModel') ? static::getModel() : Quote::class;
     }
-    
+
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -127,7 +130,7 @@ class QuoteResource extends Resource
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make(),
-
+                    ApprovalAction::make(),
                     Action::make('createSalesOrder')
                         ->label('Create Sales Order')
                         ->icon('heroicon-o-document-plus')
@@ -147,7 +150,7 @@ class QuoteResource extends Resource
                             $salesInvoice = SalesDocumentHelper::createFrom($record, SalesInvoice::class);
                             return redirect()->route('filament.admin.resources.sales-invoices.edit', $salesInvoice);
                         }),
-                    
+
                     Action::make('previewPdf')
                         ->icon('heroicon-o-eye')
                         ->label('Preview PDF')
@@ -156,7 +159,7 @@ class QuoteResource extends Resource
                         ->modalWidth('full')
                         ->modalContent(fn ($record) => view('components.pdf-preview', [
                             'url' => route('sales-documents.preview', [
-                                strtolower(class_basename($record)), 
+                                strtolower(class_basename($record)),
                                 $record->id
                             ]),
                             'organization' => \App\Models\Organization::first(),
@@ -238,6 +241,29 @@ class QuoteResource extends Resource
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+
+                // SEND FOR APPROVAL
+                BulkAction::make('sendForApproval')
+                    ->label('Send for Approval')
+                    ->icon('heroicon-o-arrow-up-tray')
+                    ->color('primary')
+                    ->action(function ($records) {
+                        $count = 0;
+                        foreach ($records as $record) {
+                            try {
+                                if ($record->canStartApproval()) {
+                                    $record->startApprovalFromRules();
+                                    $count++;
+                                }
+                            } catch (\Exception $e) {
+                                // skip or collect errors
+                            }
+                        }
+                        \Filament\Notifications\Notification::make()
+                            ->title("Sent approval for {$count} records")
+                            ->success()
+                            ->send();
+                    }),
                 ]),
             ]);
     }
@@ -269,5 +295,5 @@ class QuoteResource extends Resource
             'edit' => EditQuote::route('/{record}/edit'),
         ];
     }
-    
+
 }

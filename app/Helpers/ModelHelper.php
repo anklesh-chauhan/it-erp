@@ -1,70 +1,45 @@
 <?php
 
 namespace App\Helpers;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
+use ReflectionClass;
 
 class ModelHelper
 {
     public static function getModelOptions(): array
     {
-        return array (
-            'App\\Models\\AccountMaster' => 'AcountMaster',
-            'App\\Models\\Address' => 'Address',
-            'App\\Models\\AddressType' => 'AddressType',
-            'App\\Models\\Attachment' => 'Attachment',
-            'App\\Models\\Category' => 'Category',
-            'App\\Models\\City' => 'City',
-            'App\\Models\\CityPinCode' => 'CityPinCode',
-            'App\\Models\\Company' => 'Company',
-            'App\\Models\\CompanyMaster' => 'CompanyMaster',
-            'App\\Models\\CompanyMasterBankDetail' => 'CompanyMasterBankDetail',
-            'App\\Models\\CompanyMasterStatutoryDetail' => 'CompanyMasterStatutoryDetail',
-            'App\\Models\\CompanyMasterType' => 'CompanyMasterType',
-            'App\\Models\\ContactDetail' => 'ContactDetail',
-            'App\\Models\\Country' => 'Country',
-            'App\\Models\\Department' => 'Department',
-            'App\\Models\\Designation' => 'Designation',
-            'App\\Models\\ExpenseConfiguration' => 'ExpenseConfiguration',
-            'App\\Models\\ExpenseType' => 'ExpenseType',
-            'App\\Models\\FollowUp' => 'FollowUp',
-            'App\\Models\\FollowUpMedia' => 'FollowUpMedia',
-            'App\\Models\\FollowUpPriority' => 'FollowUpPriority',
-            'App\\Models\\FollowUpResult' => 'FollowUpResult',
-            'App\\Models\\FollowUpStatus' => 'FollowUpStatus',
-            'App\\Models\\GstPan' => 'GstPan',
-            'App\\Models\\Image' => 'Image',
-            'App\\Models\\IndustryType' => 'IndustryType',
-            'App\\Models\\ItemBrand' => 'ItemBrand',
-            'App\\Models\\ItemCategory' => 'ItemCategory',
-            'App\\Models\\ItemMaster' => 'ItemMaster',
-            'App\\Models\\ItemMeasurementUnit' => 'ItemMeasurementUnit',
-            'App\\Models\\Lead' => 'Lead',
-            'App\\Models\\LeadCustomField' => 'LeadCustomField',
-            'App\\Models\\LeadSource' => 'LeadSource',
-            'App\\Models\\LeadStatus' => 'LeadStatus',
-            'App\\Models\\NumberSeries' => 'NumberSeries',
-            'App\\Models\\RatingType' => 'RatingType',
-            'App\\Models\\Region' => 'Region',
-            'App\\Models\\SalesDailyExpense' => 'SalesDailyExpense',
-            'App\\Models\\SalesDcr' => 'SalesDcr',
-            'App\\Models\\State' => 'State',
-            'App\\Models\\Tenant' => 'Tenant',
-            'App\\Models\\TenantUser' => 'TenantUser',
-            'App\\Models\\TermsAndCondition' => 'TermsAndCondition',
-            'App\\Models\\TermsType' => 'TermsType',
-            'App\\Models\\TourPlan' => 'TourPlan',
-            'App\\Models\\TransportMode' => 'TransportMode',
-            'App\\Models\\UnitOfMeasurement' => 'UnitOfMeasurement',
-            'App\\Models\\User' => 'User',
-            'App\\Models\\VisitPurpose' => 'VisitPurpose',
-            'App\\Models\\VisitRoute' => 'VisitRoute',
-            'App\\Models\\VisitRouteTourPlan' => 'VisitRouteTourPlan',
-            'App\\Models\\VisitType' => 'VisitType',
-            'App\\Models\\LocationMaster' => 'LocationMaster',
-            'App\\Models\\Deal' => 'Deal',
-            'App\\Models\\Quote' => 'Quote',
-            'App\\Models\\SalesOrder' => 'SalesOrder',
-            'App\\Models\\SalesInvoice' => 'SalesInvoice',
-            'App\\Models\\Territory' => 'Territory',
-            );
+        $modelPath = app_path('Models');
+        $models = [];
+
+        if (! File::exists($modelPath)) {
+            return [];
+        }
+
+        foreach (File::allFiles($modelPath) as $file) {
+            $namespace = "App\\Models\\";
+            $class = $namespace . $file->getFilenameWithoutExtension();
+
+            if (! class_exists($class)) {
+                continue;
+            }
+
+            // Make sure it's a valid Eloquent Model
+            if (is_subclass_of($class, Model::class)) {
+                $models[$class] = self::labelFromClass($class);
+            }
+        }
+
+        return $models;
+    }
+
+    /**
+     * Convert model class into label — e.g. "App\Models\SalesOrder" → "Sales Order"
+     */
+    private static function labelFromClass(string $class): string
+    {
+        $short = (new ReflectionClass($class))->getShortName();
+
+        return trim(preg_replace('/(?<!^)[A-Z]/', ' $0', $short));
     }
 }

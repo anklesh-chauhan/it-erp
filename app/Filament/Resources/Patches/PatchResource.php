@@ -32,6 +32,9 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Group;
 use App\Models\Territory;
+use Filament\Actions\ActionGroup;
+use Filament\Tables\Enums\RecordActionsPosition;
+use App\Filament\Actions\ApprovalAction;
 
 class PatchResource extends Resource
 {
@@ -367,6 +370,7 @@ class PatchResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $table = parent::table($table);
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -481,13 +485,16 @@ class PatchResource extends Resource
                 //     ->label('Filter by Territory'),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make()
-                    ->before(function (DeleteAction $action, $record) {
-                        // Ensure 'deleted_by' is set before deletion
-                        $record->update(['deleted_by' => Auth::user()->name ?? 'System']);
-                    }),
-            ])
+                ActionGroup::make([
+                    ApprovalAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make()
+                        ->before(function (DeleteAction $action, $record) {
+                            // Ensure 'deleted_by' is set before deletion
+                            $record->update(['deleted_by' => Auth::user()->name ?? 'System']);
+                        }),
+                ]),
+            ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 DeleteBulkAction::make()
                     ->before(function (DeleteBulkAction $action, $records) {
