@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Quotes;
 
+use App\Filament\Actions\BulkApprovalAction;
+
 use App\Traits\HasSafeGlobalSearch;
 
 use Filament\Schemas\Schema;
@@ -243,7 +245,10 @@ class QuoteResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    
+                        BulkApprovalAction::make(),
+
+DeleteBulkAction::make(),
 
                 // SEND FOR APPROVAL
                 BulkAction::make('sendForApproval')

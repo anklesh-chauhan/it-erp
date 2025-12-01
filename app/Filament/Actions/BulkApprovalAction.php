@@ -75,7 +75,7 @@ class BulkApprovalAction extends BulkAction
                 ->title('Bulk Approval Summary')
                 ->body("
                     ✔️ <b>{$success}</b> sent for approval<br>
-                    ⚠️ <b>{$skipped}</b> skipped (already sent)<br>
+                    ⚠️ <b>{$skipped}</b> skipped<br>
                     ❌ <b>{$unsupported}</b> not supported
                 ")
                 ->success()

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SalesDcrs;
 
+use App\Filament\Actions\BulkApprovalAction;
+
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
@@ -106,7 +108,10 @@ class SalesDcrResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    
+                        BulkApprovalAction::make(),
+
+DeleteBulkAction::make(),
                 ]),
             ]);
     }

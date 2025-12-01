@@ -26,13 +26,14 @@ use Illuminate\Database\Eloquent\Collection;
 use League\Uri\Components\Component;
 use Livewire\Component as LivewireComponent;
 use Termwind\Components\Li;
+use Illuminate\Database\Eloquent\Builder;
 
 class ApprovalsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('approvable_type', 'asc')
+            ->defaultSort('status', 'asc')
             ->columns([
                 TextColumn::make('approvable_type')
                     ->label('Module')

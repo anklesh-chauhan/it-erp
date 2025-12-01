@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\States;
 
+use App\Filament\Actions\BulkApprovalAction;
+
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
@@ -75,7 +77,10 @@ class StateResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    
+                        BulkApprovalAction::make(),
+
+DeleteBulkAction::make(),
                 ]),
             ]);
     }

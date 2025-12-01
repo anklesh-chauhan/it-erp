@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Deals;
 
+use App\Filament\Actions\BulkApprovalAction;
+
 use App\Filament\Actions\ApprovalAction;
 
 use App\Traits\HasSafeGlobalSearch;
@@ -216,7 +218,10 @@ class DealResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    
+                        BulkApprovalAction::make(),
+
+DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('transaction_date', 'desc')

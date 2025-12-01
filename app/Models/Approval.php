@@ -57,4 +57,9 @@ class Approval extends Model
                                    ->limit(1); // Optimize the subquery
                      });
     }
+
+    public static function scopeSortByStatusPriority(Builder $query, string $direction): Builder
+    {
+        return $query->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected') $direction");
+    }
 }

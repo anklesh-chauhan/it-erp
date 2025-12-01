@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CompanyMasterStatutoryDetails;
 
+use App\Filament\Actions\BulkApprovalAction;
+
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
@@ -98,7 +100,10 @@ class CompanyMasterStatutoryDetailResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    
+                        BulkApprovalAction::make(),
+
+DeleteBulkAction::make(),
                 ]),
             ]);
     }

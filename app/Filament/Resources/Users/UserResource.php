@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Users;
 
+use App\Filament\Actions\BulkApprovalAction;
+
 use App\Filament\Actions\ApprovalAction;
 
 use App\Traits\HasSafeGlobalSearch;
@@ -99,7 +101,10 @@ class UserResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    
+                        BulkApprovalAction::make(),
+
+DeleteBulkAction::make(),
                 ]),
             ]);
     }
