@@ -6,6 +6,7 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use App\Models\Patch;
 use App\Models\User;
+use App\Models\SalesTourPlan;
 use Dompdf\FrameDecorator\Table;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
@@ -67,17 +68,53 @@ class SalesTourPlanForm
 
                     Select::make('month')
                         ->label('Month')
-                        ->options(function () {
+                        ->options(function (callable $get) {
+                            $userId = $get('user_id') ?? Auth::id();
+
+                            // Get months already created by this user
+                            $existingMonths = SalesTourPlan::where('user_id', $userId)
+                                ->pluck('month')
+                                ->toArray();
+
+                            // Build available months
                             $months = [];
                             $start = now()->startOfMonth();
+
                             for ($i = 0; $i < 12; $i++) {
                                 $monthKey = $start->copy()->addMonths($i)->format('Y-m');
+
+                                // Skip if already created
+                                if (in_array($monthKey, $existingMonths)) {
+                                    continue;
+                                }
+
                                 $monthLabel = $start->copy()->addMonths($i)->format('F Y');
                                 $months[$monthKey] = $monthLabel;
                             }
+
                             return $months;
                         })
-                        ->default(now()->format('Y-m'))
+                        ->default(function (callable $get) {
+                            $userId = $get('user_id') ?? Auth::id();
+
+                            // Get months already created
+                            $existingMonths = SalesTourPlan::where('user_id', $userId)
+                                ->pluck('month')
+                                ->toArray();
+
+                            // Identify the first free month starting from NOW
+                            $start = now()->startOfMonth();
+
+                            for ($i = 0; $i < 12; $i++) {
+                                $monthKey = $start->copy()->addMonths($i)->format('Y-m');
+
+                                if (!in_array($monthKey, $existingMonths)) {
+                                    return $monthKey;  // <-- FIRST AVAILABLE MONTH
+                                }
+                            }
+
+                            return now()->format('Y-m'); // fallback
+                        })
                         ->required()
                         ->reactive() // 👈 this makes downstream components re-evaluate
                         ->afterStateUpdated(function ($state, callable $set) {
@@ -122,6 +159,7 @@ class SalesTourPlanForm
                                 ->label('Date')
                                 ->required()
                                 ->native(false)
+                                ->displayFormat('j M, (D)')
                                 ->default(fn(Get $get) => self::resolveNextDate($get))
                                 ->dehydrateStateUsing(function ($state, Get $get) {
                                     // Normalize or rebuild the date before save
@@ -142,33 +180,33 @@ class SalesTourPlanForm
                                     }
                                 })
                                 ->afterStateUpdated(function ($state, callable $get, callable $set) {
-        // Get the repeater data from the same level
-        $rows = $get('../') ?? []; // ✅ Filament 4.1 way to access repeater parent
+                                    // Get the repeater data from the same level
+                                    $rows = $get('../') ?? []; // ✅ Filament 4.1 way to access repeater parent
 
-        // Normalize all dates to 'Y-m-d'
-        $normalized = collect($rows)
-            ->pluck('date')
-            ->filter()
-            ->map(fn($d) => \Illuminate\Support\Carbon::parse($d)->format('Y-m-d'))
-            ->toArray();
+                                    // Normalize all dates to 'Y-m-d'
+                                    $normalized = collect($rows)
+                                        ->pluck('date')
+                                        ->filter()
+                                        ->map(fn($d) => \Illuminate\Support\Carbon::parse($d)->format('Y-m-d'))
+                                        ->toArray();
 
-        // Normalize current date
-        $current = null;
-        try {
-            $current = \Illuminate\Support\Carbon::parse($state)->format('Y-m-d');
-        } catch (\Throwable $e) {}
+                                    // Normalize current date
+                                    $current = null;
+                                    try {
+                                        $current = \Illuminate\Support\Carbon::parse($state)->format('Y-m-d');
+                                    } catch (\Throwable $e) {}
 
-        // Check for duplicates
-        if ($current && collect($normalized)->filter(fn($d) => $d === $current)->count() > 1) {
-            $set('date', null);
+                                    // Check for duplicates
+                                    if ($current && collect($normalized)->filter(fn($d) => $d === $current)->count() > 1) {
+                                        $set('date', null);
 
-            \Filament\Notifications\Notification::make()
-                ->title('Duplicate date not allowed')
-                ->body("The date {$current} is already used in another row.")
-                ->danger()
-                ->send();
-        }
-    })
+                                        \Filament\Notifications\Notification::make()
+                                            ->title('Duplicate date not allowed')
+                                            ->body("The date {$current} is already used in another row.")
+                                            ->danger()
+                                            ->send();
+                                    }
+                                })
                                 ->reactive(),
 
                             Select::make('territory_id')

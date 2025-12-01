@@ -4,6 +4,7 @@ namespace App\Filament\Actions;
 
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Livewire\Component;
 
 class ApprovalAction extends Action
 {
@@ -20,7 +21,7 @@ class ApprovalAction extends Action
             && $record->canSendForApproval()
         );
 
-        $this->action(function ($record) {
+        $this->action(function ($record, Component $livewire) {
             if (! method_exists($record, 'startApprovalFromRules')) {
                 Notification::make()
                     ->title('Model does not support approval.')
@@ -30,6 +31,8 @@ class ApprovalAction extends Action
             }
 
             $record->startApprovalFromRules();
+
+            $livewire->dispatch('refresh-sidebar');
 
             Notification::make()
                 ->title('Approval workflow started')

@@ -23,11 +23,18 @@ use Illuminate\Database\Eloquent\Builder;
 class ApprovalResource extends Resource
 {
     use HasSafeGlobalSearch;
+
     protected static ?string $model = Approval::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'ApprovalResource';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::pendingForUser()->count();
+    }
+
 
     public static function form(Schema $schema): Schema
     {

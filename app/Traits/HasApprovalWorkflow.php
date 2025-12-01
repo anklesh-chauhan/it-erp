@@ -103,9 +103,13 @@ trait HasApprovalWorkflow
             return false;
         }
 
-        // Already pending?
-        if ($this->approval && $this->approval->status === 'pending') {
-            return false;
+        if ($this->approval) {
+
+            $notAllowedStatuses = ['pending', 'approved', 'in_review'];
+
+            if (in_array($this->approval->status, $notAllowedStatuses)) {
+                return false;
+            }
         }
 
         return true;
@@ -117,5 +121,15 @@ trait HasApprovalWorkflow
     public function canStartApproval(?string $module = null): bool
     {
         return $this->canSendForApproval($module);
+    }
+
+    public function getApprovalStatus(): ?string
+    {
+        return $this->approval?->status;
+    }
+
+    public function isApprovalComplete(): bool
+    {
+        return $this->approval !== null && $this->approval->status !== 'pending';
     }
 }

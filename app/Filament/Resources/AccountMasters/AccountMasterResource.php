@@ -6,6 +6,8 @@ use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
 
+use App\Filament\Actions\BulkApprovalAction;
+
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
@@ -93,6 +95,7 @@ class AccountMasterResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkApprovalAction::make(),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

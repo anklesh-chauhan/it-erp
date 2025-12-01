@@ -62,7 +62,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Organization Profile')
                     // ⬇️ FIX: Wrap the getUrl() call in an arrow function (fn())
                     // This ensures it only runs after the application and routes are loaded.
-                    ->url(fn (): string => OrganizationResource::getUrl('edit', ['record' => 1])) 
+                    ->url(fn (): string => OrganizationResource::getUrl('edit', ['record' => 1]))
                     ->icon('heroicon-o-building-office')
                     ->visible(fn () => OrganizationResource::canViewAny()),
             ])

@@ -23,6 +23,9 @@ use Filament\Actions\ActionGroup;
 use Filament\Notifications\Notification;
 use Filament\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Collection;
+use League\Uri\Components\Component;
+use Livewire\Component as LivewireComponent;
+use Termwind\Components\Li;
 
 class ApprovalsTable
 {
@@ -101,7 +104,7 @@ class ApprovalsTable
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
-                ApprovalAction::make(),
+                    ApprovalAction::make(),
 
                     Action::make('approve')
                         ->label('Approve')
@@ -115,9 +118,11 @@ class ApprovalsTable
                                 ->where('status', 'pending')
                                 ->exists()
                         )
-                        ->action(function ($record, array $data) {
+                        ->action(function ($record, array $data, LivewireComponent $livewire) {
                             app(\App\Services\ApprovalService::class)
                                 ->approveStepByUser($record, Auth::id(), $data['comments'] ?? null);
+
+                            $livewire->dispatch('refresh-sidebar');
 
                             Notification::make()
                                 ->success()
@@ -137,9 +142,11 @@ class ApprovalsTable
                                 ->where('status', 'pending')
                                 ->exists()
                         )
-                        ->action(function ($record, array $data) {
+                        ->action(function ($record, array $data, LivewireComponent $livewire) {
                             app(\App\Services\ApprovalService::class)
                                 ->rejectStepByUser($record, Auth::id(), $data['comments'] ?? null);
+
+                            $livewire->dispatch('refresh-sidebar');
 
                             Notification::make()
                                 ->danger()
@@ -156,7 +163,7 @@ class ApprovalsTable
                         ->label('Approve Selected')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->action(function (\Illuminate\Database\Eloquent\Collection $records) {
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records, LivewireComponent $livewire) {
 
                             $service = app(\App\Services\ApprovalService::class);
                             $userId = Auth::id();
@@ -173,6 +180,8 @@ class ApprovalsTable
                                 }
                             }
 
+                            $livewire->dispatch('refresh-sidebar');
+
                             \Filament\Notifications\Notification::make()
                                 ->success()
                                 ->title('Selected approvals approved!')
@@ -184,7 +193,7 @@ class ApprovalsTable
                         ->color('danger')
                         ->requiresConfirmation()
                         ->icon('heroicon-o-x-circle')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records, LivewireComponent $livewire) {
 
                             $service = app(\App\Services\ApprovalService::class);
                             $userId = Auth::id();
@@ -200,6 +209,8 @@ class ApprovalsTable
                                     $service->rejectStepByUser($record, $userId, null);
                                 }
                             }
+
+                            $livewire->dispatch('refresh-sidebar');
 
                             Notification::make()
                                 ->danger()
