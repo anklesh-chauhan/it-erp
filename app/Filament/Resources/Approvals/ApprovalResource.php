@@ -51,11 +51,16 @@ class ApprovalResource extends Resource
         ];
     }
 
+    public static function canCreate(): bool
+    {
+        return false; // disables create page & button
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListApprovals::route('/'),
-            'create' => CreateApproval::route('/create'),
+            // 'create' => CreateApproval::route('/create'),
             'view' => ViewApproval::route('/{record}'),
             'edit' => EditApproval::route('/{record}/edit'),
         ];

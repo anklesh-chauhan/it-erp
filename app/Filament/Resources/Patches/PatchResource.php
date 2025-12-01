@@ -41,6 +41,7 @@ use App\Filament\Actions\ApprovalAction;
 class PatchResource extends Resource
 {
     use HasSafeGlobalSearch;
+
     protected static ?string $model = Patch::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-wrench-screwdriver';

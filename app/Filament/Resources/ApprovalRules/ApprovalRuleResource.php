@@ -23,6 +23,8 @@ class ApprovalRuleResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::CheckCircle;
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
+
     protected static ?string $recordTitleAttribute = 'ApprovalRuleResource';
 
     public static function form(Schema $schema): Schema

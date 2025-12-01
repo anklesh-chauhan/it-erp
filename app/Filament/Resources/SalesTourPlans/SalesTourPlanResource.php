@@ -19,9 +19,13 @@ use Filament\Tables\Table;
 class SalesTourPlanResource extends Resource
 {
     use HasSafeGlobalSearch;
+
     protected static ?string $model = SalesTourPlan::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-calendar-date-range';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    // Added a label for better readability in the navigation
+    protected static ?string $navigationLabel = 'Sales Tour Plan';
 
     protected static ?string $recordTitleAttribute = 'SalesTourPlan';
 
