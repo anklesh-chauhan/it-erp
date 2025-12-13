@@ -36,50 +36,31 @@ use Illuminate\Support\Facades\Blade;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 
-class AdminPanelProvider extends PanelProvider
+
+class SalesPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        FilamentAsset::register([
-            Css::make('custom-css', asset('css/filament-custom.css')), // Custom CSS
-            // Js::make('sidebar-js', asset('js/sidebar.js')),             // Sidebar JavaScript
-        ], true); // ✅ Use `isGlobal` to load for all panels
-
         return $panel
-            ->default()
+            ->id('sales')
+            ->path('sales')
             ->globalSearch(true)
             ->topbar(false)
-            ->globalSearchKeyBindings(['command + k', 'ctrl + k'])
-            ->globalSearchDebounce(500) // ✅ Debounce search requests
-            ->id('admin')
-            ->path('admin')
             ->login()
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->userMenuItems([
-                'organization-profile' => Action::make('organization-profile')
-                    ->label('Organization Profile')
-                    // ⬇️ FIX: Wrap the getUrl() call in an arrow function (fn())
-                    // This ensures it only runs after the application and routes are loaded.
-                    ->url(fn (): string => OrganizationResource::getUrl('edit', ['record' => 1]))
-                    ->icon('heroicon-o-building-office')
-                    ->visible(fn () => OrganizationResource::canViewAny()),
-            ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/Sales/Resources'), for: 'App\Filament\Sales\Resources')
+            ->discoverPages(in: app_path('Filament/Sales/Pages'), for: 'App\Filament\Sales\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->resources([
-                //
+                LeadResource::class,
             ])
-            ->plugins([
-                FilamentShieldPlugin::make(),
-            ])
+            ->discoverWidgets(in: app_path('Filament/Sales/Widgets'), for: 'App\Filament\Sales\Widgets')
             ->widgets([
-                // Widgets displayed in the dashboard
+                //
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -94,6 +75,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->plugins([
+                // FilamentShieldPlugin::make(),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('14rem')

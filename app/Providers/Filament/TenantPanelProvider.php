@@ -42,7 +42,7 @@ class TenantPanelProvider extends PanelProvider
             TenantUserResource::class,
         ])
         ->widgets([
-            CurrentDatabase::class,
+            //
         ])
         ->pages([
             Dashboard::class,

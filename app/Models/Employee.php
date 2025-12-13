@@ -32,11 +32,18 @@ class Employee extends Model
         'date_of_birth' => 'date',
     ];
 
+    protected $appends = ['full_name'];
+
+    public function attendance()
+    {
+        return $this->hasMany(EmployeeAttendance::class);
+    }
+
     public function bankDetail()
     {
         return $this->morphMany(BankDetail::class, 'bankable');
     }
-    
+
     public function getFullNameAttribute()
     {
         return trim("{$this->first_name} {$this->middle_name} {$this->last_name}");

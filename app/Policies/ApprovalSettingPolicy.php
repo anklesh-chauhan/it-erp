@@ -11,7 +11,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class ApprovalSettingPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:ApprovalSetting');
@@ -24,7 +24,7 @@ class ApprovalSettingPolicy
 
     public function create(AuthUser $authUser): bool
     {
-        return false;
+        return $authUser->can('Create:ApprovalSetting');
     }
 
     public function update(AuthUser $authUser, ApprovalSetting $approvalSetting): bool

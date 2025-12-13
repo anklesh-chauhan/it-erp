@@ -8,5 +8,6 @@ return [
     App\Providers\FilamentServiceProvider::class,
     App\Providers\Filament\AdminPanelProvider::class,
     App\Providers\Filament\LandlordPanelProvider::class,
+    App\Providers\Filament\SalesPanelProvider::class,
     App\Providers\Filament\TenantPanelProvider::class,
 ];

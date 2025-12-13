@@ -127,9 +127,9 @@ class EmployeeResource extends Resource
                                     ->schema([
                                         TextInput::make('email')
                                             ->email()
+                                            ->required()
                                             ->unique(ignoreRecord: true)
-                                            ->maxLength(100)
-                                            ->nullable(),
+                                            ->maxLength(100),
                                         TextInput::make('mobile_number')
                                             ->tel()
                                             ->unique(ignoreRecord: true)
@@ -139,6 +139,14 @@ class EmployeeResource extends Resource
                                             ->tel()
                                             ->maxLength(15)
                                             ->nullable(),
+
+                                        Select::make('login_id')
+                                            ->relationship('user', 'email')
+                                            ->searchable()
+                                            ->preload()
+                                            ->label('User Login ID')
+                                            ->nullable(),
+
                                         Textarea::make('contact_details')
                                             ->columnSpanFull() // This field correctly spans full width
                                             ->nullable(),
@@ -165,12 +173,6 @@ class EmployeeResource extends Resource
                                             ->nullable(),
                                         Toggle::make('is_active')
                                             ->default(true),
-                                        Select::make('login_id')
-                                            ->relationship('user', 'email')
-                                            ->searchable()
-                                            ->preload()
-                                            ->label('Linked User')
-                                            ->nullable(),
                                         Hidden::make('updated_by_user_id')
                                             ->default(optional(Auth::user())->id),
                                     ]),
@@ -777,7 +779,7 @@ class EmployeeResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),
