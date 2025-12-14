@@ -51,7 +51,7 @@ class Dashboard extends BaseDashboard
                             'check_in_ip' => Request::ip(),
                             'check_in_latitude' => $arguments['latitude'],
                             'check_in_longitude' => $arguments['longitude'],
-                            'status_id' => 1,
+                            'status_id' => 9,
                         ]);
 
                         Notification::make()->title('Checked In Successfully!')->success()->send();
@@ -80,6 +80,7 @@ class Dashboard extends BaseDashboard
                             'check_out_ip' => Request::ip(),
                             'check_out_latitude' => $arguments['latitude'] ?? null,
                             'check_out_longitude' => $arguments['longitude'] ?? null,
+                            'status_id' => 1,
                         ]);
 
                         Notification::make()->title('Checked Out Successfully!')->warning()->send();

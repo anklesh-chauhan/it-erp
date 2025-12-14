@@ -99,7 +99,7 @@ class TenantPanelProvider extends PanelProvider
         })
         ->renderHook('panels::body.end', fn () => '</div>')
         ->plugins([
-            FilamentShieldPlugin::make(),
+            // FilamentShieldPlugin::make(),
         ]);
     }
 }

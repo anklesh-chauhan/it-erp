@@ -26,12 +26,13 @@ class EmployeeAttendancesTable
                 Tables\Columns\TextColumn::make('check_out'),
                 Tables\Columns\TextColumn::make('status.status')
                     ->badge()
+                    ->tooltip(fn ($record) => $record->status->remarks ?? 'No remarks')
                     ->color(fn ($record) => match ($record->status->status_code) {
                         'P' => 'success',
                         'A' => 'danger',
                         'L' => 'warning',
-                        'HD' => 'info',
-                        'LV' => 'primary',
+                        'OD' => 'info',
+                        'H' => 'primary',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('total_hours'),

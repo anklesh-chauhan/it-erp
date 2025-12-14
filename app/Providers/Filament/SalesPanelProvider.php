@@ -17,6 +17,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Pages\Dashboard;
+use App\Filament\Resources\Deals\DealResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Permissions\PermissionResource;
@@ -57,6 +58,9 @@ class SalesPanelProvider extends PanelProvider
             ])
             ->resources([
                 LeadResource::class,
+                OrganizationResource::class,
+                DealResource::class,
+
             ])
             ->discoverWidgets(in: app_path('Filament/Sales/Widgets'), for: 'App\Filament\Sales\Widgets')
             ->widgets([

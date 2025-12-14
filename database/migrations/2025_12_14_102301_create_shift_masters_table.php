@@ -11,15 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('employee_attendance_statuses', function (Blueprint $table) {
+        Schema::create('shift_masters', function (Blueprint $table) {
             $table->id();
-
-            $table->string('status_code');
-            $table->string('status');
-            $table->string('color_code')->nullable();
-            $table->boolean('is_system')->default(false);
-            $table->text('remarks')->nullable();
-
             $table->timestamps();
         });
     }
@@ -29,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('employee_attendance_statuses');
+        Schema::dropIfExists('shift_masters');
     }
 };

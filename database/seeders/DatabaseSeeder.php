@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
         // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         // Truncate all tables you want to reset
-        // DB::table('type_masters')->truncate();
+        // DB::table('employee_attendance_statuses')->truncate();
         // DB::table('')->truncate();
         // DB::table('')->truncate();
         // DB::table('')->truncate();
@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
             ModelHasRolesSeeder::class,
             CountrySeeder::class,
             StateSeeder::class,
-            CitySeeder::class,  
+            CitySeeder::class,
             CityPinCodeSeeder::class,
             IndustryTypeSeeder::class,
             LeadSourceSeeder::class,
@@ -94,6 +94,8 @@ class DatabaseSeeder extends Seeder
             PaymentTermsSeeder::class,
             PaymentMethodsSeeder::class,
             ShippingMethodsSeeder::class,
+            AddressTypeSeeder::class,
+            EmployeeAttendanceStatusSeeder::class,
         ]);
     }
 }

@@ -104,7 +104,7 @@ class AdminPanelProvider extends PanelProvider
     {
         FilamentView::registerRenderHook(
             // This hook places content at the start of the user menu (top right)
-            PanelsRenderHook::GLOBAL_SEARCH_AFTER,
+            PanelsRenderHook::TOPBAR_BEFORE,
             fn (): string => Blade::render('@livewire(\'app.filament.widgets.check-in-widget\')'),
         );
     }
