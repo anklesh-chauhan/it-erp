@@ -20,7 +20,7 @@ class Employee extends Model
         'date_of_birth', 'gender', 'country_id', 'marital_status', 'phone_number',
         'emergency_contact_name', 'emergency_contact_number', 'age', 'contact_details',
         'profile_picture', 'blood_group', 'is_active', 'login_id', 'created_by_user_id',
-        'updated_by_user_id', 'deleted_by_user_id', 'is_deleted'
+        'updated_by_user_id', 'deleted_by_user_id', 'is_deleted', 'shift_master_id',
     ];
 
     protected $casts = [
@@ -113,6 +113,25 @@ class Employee extends Model
     {
         return $this->belongsToMany(Position::class, 'employee_position_pivot', 'employee_id', 'position_id')
                     ->withTimestamps();
+    }
+
+    public function shiftAssignments()
+    {
+        return $this->hasMany(EmployeeShift::class);
+    }
+
+    public function currentShiftForDate($date = null)
+    {
+        $date ??= today();
+
+        return $this->shiftAssignments()
+            ->whereDate('effective_from', '<=', $date)
+            ->where(function ($q) use ($date) {
+                $q->whereNull('effective_to')
+                ->orWhereDate('effective_to', '>=', $date);
+            })
+            ->orderByDesc('effective_from')
+            ->first()?->shift;
     }
 
 }

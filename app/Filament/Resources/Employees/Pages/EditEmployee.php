@@ -24,6 +24,20 @@ class EditEmployee extends EditRecord
      */
     protected array $employmentDetailData = [];
 
+    public function getHeading(): string
+    {
+        /** @var Model $record */
+        $record = $this->getRecord();
+
+        // Assuming your Employee model has 'name' and 'employee_id' columns
+        $first_name = $record->first_name;
+        $last_name = $record->last_name;
+        $employeeId = $record->employee_id;
+
+        // Return your custom heading
+        return "{$first_name} {$last_name} (ID: {$employeeId})";
+    }
+
     protected function mutateFormDataBeforeSave(array $data): array
     {
         // Extract employment_detail data
@@ -58,10 +72,25 @@ class EditEmployee extends EditRecord
     {
         return [
             ViewAction::make(),
-            DeleteAction::make(),
-            ForceDeleteAction::make(),
             RestoreAction::make(),
             CreateAction::make(),
         ];
+    }
+
+    public function hasCombinedRelationManagerTabsWithContent(): bool
+    {
+        return true;
+    }
+
+    public function getContentTabLabel(): ?string
+    {
+        /** @var Model $record */
+        $record = $this->getRecord();
+
+        // Assuming your Employee model has a column named 'employee_id'
+        $employeeId = $record->employee_id;
+
+        // Construct the label
+        return "Employee Details";
     }
 }

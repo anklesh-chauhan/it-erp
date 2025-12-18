@@ -31,6 +31,16 @@ class EmployeeAttendanceStatusSeeder extends Seeder
             ],
 
             [
+                'status_code' => 'HD',
+                'status'      => 'Half Day',
+                'remarks'     => 'Employee present for half day.',
+                'color_code'  => '#FFB703',
+                'is_system'  => true,
+                'created_at'  => now(),
+                'updated_at'  => now(),
+            ],
+
+            [
                 'status_code' => 'ABS',
                 'status'      => 'Absent',
                 'remarks'     => 'Employee was absent for the day.',

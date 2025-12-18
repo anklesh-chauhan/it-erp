@@ -35,7 +35,6 @@ use App\Filament\Resources\Employees\Pages\ListEmployees;
 use App\Filament\Resources\Employees\Pages\CreateEmployee;
 use App\Filament\Resources\Employees\Pages\EditEmployee;
 use App\Filament\Resources\EmployeeResource\Pages;
-use App\Filament\Resources\EmployeeResource\RelationManagers;
 use App\Models\Employee;
 use Filament\Forms;
 use Filament\Resources\Resource;
@@ -46,6 +45,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth; // Import Tabs
 use Filament\Forms\Components\Repeater; // Import Tab
 use App\Filament\Resources\AccountMasterBankDetailResource\RelationManagers\BankDetailRelationManager;
+use Filament\Resources\RelationManagers\RelationManager;
 
 class EmployeeResource extends Resource
 {
@@ -69,7 +69,7 @@ class EmployeeResource extends Resource
                     ->columnSpanFull() // Ensure the tabs span the full width
                     ->tabs([
                         // Converted 'General Information' Step to a Tab
-                        Tab::make('General Information')
+                        Tab::make('General')
                             ->icon('heroicon-o-user')
                             ->schema([
                                 Section::make('Personal Details')
@@ -179,7 +179,7 @@ class EmployeeResource extends Resource
                             ]),
 
                         // Converted 'Employment Details' Step to a Tab
-                        Tab::make('Employment Details')
+                        Tab::make('Employment')
                             ->icon('heroicon-o-briefcase')
                             ->disabled(fn (string $operation, ?Employee $record): bool => $operation === 'create' && !$record?->exists)
                             ->schema([
@@ -305,7 +305,7 @@ class EmployeeResource extends Resource
                             ]),
 
                         // Uncommented and converted Professional Tax to a Tab
-                        Tab::make('Professional Tax')
+                        Tab::make('Prof. Tax')
                             ->icon('heroicon-o-banknotes')
                             ->disabled(fn (string $operation, ?Employee $record): bool => $operation === 'create' && !$record?->exists)
                             ->schema([
@@ -779,10 +779,8 @@ class EmployeeResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-
                         BulkApprovalAction::make(),
-
-DeleteBulkAction::make(),
+                        DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -790,6 +788,7 @@ DeleteBulkAction::make(),
     public static function getRelations(): array
     {
         return [
+            RelationManagers\ShiftAssignmentsRelationManager::class,
             BankDetailRelationManager::class,
         ];
     }
