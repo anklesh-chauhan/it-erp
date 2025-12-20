@@ -67,4 +67,9 @@ class ExpenseConfigurationPolicy
         return $authUser->can('Reorder:ExpenseConfiguration');
     }
 
+    public function viewOwn(AuthUser $authUser, ExpenseConfiguration $expenseConfiguration): bool
+    {
+        return $authUser->can('ViewOwn:ExpenseConfiguration');
+    }
+
 }

@@ -67,4 +67,9 @@ class CompanyMasterStatutoryDetailPolicy
         return $authUser->can('Reorder:CompanyMasterStatutoryDetail');
     }
 
+    public function viewOwn(AuthUser $authUser, CompanyMasterStatutoryDetail $companyMasterStatutoryDetail): bool
+    {
+        return $authUser->can('ViewOwn:CompanyMasterStatutoryDetail');
+    }
+
 }

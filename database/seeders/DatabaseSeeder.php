@@ -33,69 +33,61 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Disable foreign key checks to avoid constraint issues
-        // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        // Truncate all tables you want to reset
-        // DB::table('employee_attendance_statuses')->truncate();
-        // DB::table('')->truncate();
-        // DB::table('')->truncate();
-        // DB::table('')->truncate();
-        // DB::table('')->truncate();
-        // DB::table('')->truncate();
-        // DB::table('')->truncate();
-        // DB::table('')->truncate();
-        // DB::table('')->truncate();
-        // DB::table('')->truncate();
-        // DB::table('')->truncate();
-        // DB::table('')->truncate();
+        // // Truncate all tables you want to reset
+        DB::table('city_pin_codes')->truncate();
+        // DB::table('cities')->truncate();
+        // DB::table('states')->truncate();
 
-        // Enable foreign key checks again
-        // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        // // Enable foreign key checks again
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        try {
-            Artisan::call('shield:generate --all');
-            $this->command->info('Filament Shield permissions generated successfully.');
-        } catch (\Exception $e) {
-            $this->command->error('Failed to run shield:generate --all: ' . $e->getMessage());
-        }
+        // try {
+        //     Artisan::call('shield:generate --all');
+        //     $this->command->info('Filament Shield permissions generated successfully.');
+        // } catch (\Exception $e) {
+        //     $this->command->error('Failed to run shield:generate --all: ' . $e->getMessage());
+        // }
 
         $this->call([
-            UsersTableSeeder::class,
-            ModelHasRolesSeeder::class,
-            CountrySeeder::class,
+            // UsersTableSeeder::class,
+            // ModelHasRolesSeeder::class,
+            // CountrySeeder::class,
             StateSeeder::class,
             CitySeeder::class,
             CityPinCodeSeeder::class,
-            IndustryTypeSeeder::class,
-            LeadSourceSeeder::class,
-            LeadStatusSeeder::class,
-            RatingTypeSeeder::class,
-            FollowUpMediaSeeder::class,
-            FollowUpResultSeeder::class,
-            FollowUpStatusSeeder::class,
-            FollowUpPrioritySeeder::class,
-            UnitOfMeasurementSeeder::class,
-            ItemBrandSeeder::class,
-            TransportModeSeeder::class,
-            VisitTypeSeeder::class,
-            PackingTypeSeeder::class,
-            DealStageSeeder::class,
-            TypeMasterSeeder::class,
-            CategorySeeder::class,
-            EmpDepartmentSeeder::class,
-            EmpGradeSeeder::class,
-            EmpJobTitleSeeder::class,
-            AccountTypeSeeder::class,
-            ChartOfAccountSeeder::class,
-            OrganizationSeeder::class,
-            TaxSeeder::class,
-            TaxComponentSeeder::class,
-            SalesDocumentPreferenceSeeder::class,
-            PaymentTermsSeeder::class,
-            PaymentMethodsSeeder::class,
-            ShippingMethodsSeeder::class,
-            AddressTypeSeeder::class,
-            EmployeeAttendanceStatusSeeder::class,
+            // IndustryTypeSeeder::class,
+            // LeadSourceSeeder::class,
+            // LeadStatusSeeder::class,
+            // RatingTypeSeeder::class,
+            // FollowUpMediaSeeder::class,
+            // FollowUpResultSeeder::class,
+            // FollowUpStatusSeeder::class,
+            // FollowUpPrioritySeeder::class,
+            // UnitOfMeasurementSeeder::class,
+            // ItemBrandSeeder::class,
+            // TransportModeSeeder::class,
+            // VisitTypeSeeder::class,
+            // PackingTypeSeeder::class,
+            // DealStageSeeder::class,
+            // TypeMasterSeeder::class,
+            // CategorySeeder::class,
+            // EmpDepartmentSeeder::class,
+            // EmpGradeSeeder::class,
+            // EmpJobTitleSeeder::class,
+            // AccountTypeSeeder::class,
+            // ChartOfAccountSeeder::class,
+            // OrganizationSeeder::class,
+            // TaxSeeder::class,
+            // TaxComponentSeeder::class,
+            // SalesDocumentPreferenceSeeder::class,
+            // PaymentTermsSeeder::class,
+            // PaymentMethodsSeeder::class,
+            // ShippingMethodsSeeder::class,
+            // AddressTypeSeeder::class,
+            // EmployeeAttendanceStatusSeeder::class,
+            // DepartmentRoleSeeder::class,
         ]);
     }
 }
@@ -542,7 +534,7 @@ class EmpDepartmentSeeder extends Seeder
         $departments = [
             [
                 'department_name' => 'Sales',
-                'department_code' => 'SALES-001',
+                'department_code' => 'SALES',
                 'description' => 'Handles sales operations and client acquisition',
                 // 'organizational_unit_id' => 1,
                 'created_by_user_id' => 1,
@@ -557,7 +549,7 @@ class EmpDepartmentSeeder extends Seeder
             ],
             [
                 'department_name' => 'Marketing',
-                'department_code' => 'MKT-002',
+                'department_code' => 'MKT',
                 'description' => 'Manages marketing campaigns and brand promotion',
                 // 'organizational_unit_id' => 1,
                 'created_by_user_id' => 1,
@@ -572,7 +564,7 @@ class EmpDepartmentSeeder extends Seeder
             ],
             [
                 'department_name' => 'Human Resources',
-                'department_code' => 'HR-003',
+                'department_code' => 'HR',
                 'description' => 'Oversees recruitment, training, and employee relations',
                 // 'organizational_unit_id' => 1,
                 'created_by_user_id' => 1,
@@ -587,7 +579,7 @@ class EmpDepartmentSeeder extends Seeder
             ],
             [
                 'department_name' => 'Information Technology',
-                'department_code' => 'IT-004',
+                'department_code' => 'IT',
                 'description' => 'Manages IT infrastructure and software development',
                 // 'organizational_unit_id' => 1,
                 'created_by_user_id' => 1,
@@ -602,7 +594,7 @@ class EmpDepartmentSeeder extends Seeder
             ],
             [
                 'department_name' => 'Finance',
-                'department_code' => 'FIN-005',
+                'department_code' => 'FIN',
                 'description' => 'Handles budgeting, accounting, and financial reporting',
                 // 'organizational_unit_id' => 1,
                 'created_by_user_id' => 1,
@@ -617,7 +609,7 @@ class EmpDepartmentSeeder extends Seeder
             ],
             [
                 'department_name' => 'Operations',
-                'department_code' => 'OPS-006',
+                'department_code' => 'OPS',
                 'description' => 'Manages day-to-day operational activities and logistics',
                 // 'organizational_unit_id' => 1,
                 'created_by_user_id' => 1,
@@ -632,7 +624,7 @@ class EmpDepartmentSeeder extends Seeder
             ],
             [
                 'department_name' => 'Customer Support',
-                'department_code' => 'CS-007',
+                'department_code' => 'CS',
                 'description' => 'Provides support and assistance to customers',
                 // 'organizational_unit_id' => 1,
                 'created_by_user_id' => 1,
@@ -647,7 +639,7 @@ class EmpDepartmentSeeder extends Seeder
             ],
             [
                 'department_name' => 'Research and Development',
-                'department_code' => 'RND-008',
+                'department_code' => 'RND',
                 'description' => 'Focuses on product innovation and development',
                 // 'organizational_unit_id' => 1,
                 'created_by_user_id' => 1,
@@ -662,7 +654,7 @@ class EmpDepartmentSeeder extends Seeder
             ],
             [
                 'department_name' => 'Legal',
-                'department_code' => 'LEG-009',
+                'department_code' => 'LGL',
                 'description' => 'Manages legal compliance and contracts',
                 // 'organizational_unit_id' => 1,
                 'created_by_user_id' => 1,
@@ -677,8 +669,23 @@ class EmpDepartmentSeeder extends Seeder
             ],
             [
                 'department_name' => 'Administration',
-                'department_code' => 'ADM-010',
+                'department_code' => 'ADM',
                 'description' => 'Handles administrative tasks and office management',
+                // 'organizational_unit_id' => 1,
+                'created_by_user_id' => 1,
+                'updated_by_user_id' => 1,
+                'deleted_by_user_id' => null,
+                'is_active' => true,
+                'is_deleted' => false,
+                'remark' => null,
+                'department_head_id' => null,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'department_name' => 'Production',
+                'department_code' => 'PROD',
+                'description' => 'Handles production tasks',
                 // 'organizational_unit_id' => 1,
                 'created_by_user_id' => 1,
                 'updated_by_user_id' => 1,

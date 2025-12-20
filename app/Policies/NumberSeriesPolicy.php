@@ -67,4 +67,9 @@ class NumberSeriesPolicy
         return $authUser->can('Reorder:NumberSeries');
     }
 
+    public function viewOwn(AuthUser $authUser, NumberSeries $numberSeries): bool
+    {
+        return $authUser->can('ViewOwn:NumberSeries');
+    }
+
 }

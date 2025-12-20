@@ -67,4 +67,9 @@ class EmpJobTitlePolicy
         return $authUser->can('Reorder:EmpJobTitle');
     }
 
+    public function viewOwn(AuthUser $authUser, EmpJobTitle $empJobTitle): bool
+    {
+        return $authUser->can('ViewOwn:EmpJobTitle');
+    }
+
 }

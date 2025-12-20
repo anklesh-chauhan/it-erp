@@ -37,8 +37,6 @@ trait CreateAddressFormTrait
                     ->searchable(),
                 TextInput::make('street')
                     ->required(),
-                TextInput::make('area_town')
-                    ->required(),
                 TextInput::make('pin_code')
                     ->reactive()
                     ->afterStateUpdated(function (callable $set, $state) {
@@ -50,6 +48,9 @@ trait CreateAddressFormTrait
                             $set('country_id', $pinCodeDetails->country_id);
                         }
                     }),
+                TextInput::make('area_town')
+                    ->required(),
+
                 Select::make('city_id')
                     ->relationship('city', 'name')
                     ->searchable(),

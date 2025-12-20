@@ -67,4 +67,9 @@ class UnitOfMeasurementPolicy
         return $authUser->can('Reorder:UnitOfMeasurement');
     }
 
+    public function viewOwn(AuthUser $authUser, UnitOfMeasurement $unitOfMeasurement): bool
+    {
+        return $authUser->can('ViewOwn:UnitOfMeasurement');
+    }
+
 }

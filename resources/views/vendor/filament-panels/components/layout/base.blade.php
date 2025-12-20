@@ -161,11 +161,10 @@
             document.addEventListener('alpine:init', () => {
                 console.log("📍 Geolocation script loaded!");
 
-                window.startGeolocation = function ($wire, actionName) {
-                    console.log("🚀 Start GEO:", actionName);
-
+                // For Punch In
+                window.startPunchIn = function ($wire) {
                     if (!navigator.geolocation) {
-                        alert("Geolocation not supported by your browser.");
+                        alert("Geolocation is not supported by your browser.");
                         return;
                     }
 
@@ -174,17 +173,47 @@
                             const lat = position.coords.latitude;
                             const lon = position.coords.longitude;
 
-                            console.log("📌 Location:", lat, lon);
+                            console.log("📌 Punch In - Location acquired:", lat, lon);
 
-                            // 🔥 CORRECT for Filament 4 + Livewire 3
-                            $wire.mountAction(actionName, {
+                            $wire.call('doPunchIn', {
                                 latitude: lat,
-                                longitude: lon,
+                                longitude: lon
                             });
                         },
                         (error) => {
-                            alert("You must allow location permission to mark attendance.");
-                            console.error(error);
+                            console.error("Geolocation error:", error);
+                            alert("Location access denied. Please allow location permission and try again.");
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 15000,
+                            maximumAge: 0
+                        }
+                    );
+                };
+
+                // For Punch Out
+                window.startPunchOut = function ($wire) {
+                    if (!navigator.geolocation) {
+                        alert("Geolocation is not supported by your browser.");
+                        return;
+                    }
+
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+
+                            console.log("📌 Punch Out - Location acquired:", lat, lon);
+
+                            $wire.call('doPunchOut', {
+                                latitude: lat,
+                                longitude: lon
+                            });
+                        },
+                        (error) => {
+                            console.error("Geolocation error:", error);
+                            alert("Location access denied. Please allow location permission and try again.");
                         },
                         {
                             enableHighAccuracy: true,

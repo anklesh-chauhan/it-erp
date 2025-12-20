@@ -67,4 +67,9 @@ class SalesOrderPolicy
         return $authUser->can('Reorder:SalesOrder');
     }
 
+    public function viewOwn(AuthUser $authUser, SalesOrder $salesOrder): bool
+    {
+        return $authUser->can('ViewOwn:SalesOrder');
+    }
+
 }

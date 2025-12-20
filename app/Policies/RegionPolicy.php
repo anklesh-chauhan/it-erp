@@ -67,4 +67,9 @@ class RegionPolicy
         return $authUser->can('Reorder:Region');
     }
 
+    public function viewOwn(AuthUser $authUser, Region $region): bool
+    {
+        return $authUser->can('ViewOwn:Region');
+    }
+
 }

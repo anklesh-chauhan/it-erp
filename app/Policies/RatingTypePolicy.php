@@ -67,4 +67,9 @@ class RatingTypePolicy
         return $authUser->can('Reorder:RatingType');
     }
 
+    public function viewOwn(AuthUser $authUser, RatingType $ratingType): bool
+    {
+        return $authUser->can('ViewOwn:RatingType');
+    }
+
 }

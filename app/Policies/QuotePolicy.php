@@ -67,4 +67,9 @@ class QuotePolicy
         return $authUser->can('Reorder:Quote');
     }
 
+    public function viewOwn(AuthUser $authUser, Quote $quote): bool
+    {
+        return $authUser->can('ViewOwn:Quote');
+    }
+
 }

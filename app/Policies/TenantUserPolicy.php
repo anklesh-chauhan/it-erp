@@ -64,4 +64,9 @@ class TenantUserPolicy
         return $authUser->can('Reorder:TenantUser');
     }
 
+    public function viewOwn(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewOwn:TenantUser');
+    }
+
 }

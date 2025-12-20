@@ -67,4 +67,9 @@ class GstPanPolicy
         return $authUser->can('Reorder:GstPan');
     }
 
+    public function viewOwn(AuthUser $authUser, GstPan $gstPan): bool
+    {
+        return $authUser->can('ViewOwn:GstPan');
+    }
+
 }

@@ -67,4 +67,9 @@ class VisitPurposePolicy
         return $authUser->can('Reorder:VisitPurpose');
     }
 
+    public function viewOwn(AuthUser $authUser, VisitPurpose $visitPurpose): bool
+    {
+        return $authUser->can('ViewOwn:VisitPurpose');
+    }
+
 }

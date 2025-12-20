@@ -67,4 +67,9 @@ class FollowUpMediaPolicy
         return $authUser->can('Reorder:FollowUpMedia');
     }
 
+    public function viewOwn(AuthUser $authUser, FollowUpMedia $followUpMedia): bool
+    {
+        return $authUser->can('ViewOwn:FollowUpMedia');
+    }
+
 }

@@ -103,17 +103,17 @@ class User extends Authenticatable
 
     public function createdDepartments()
     {
-        return $this->hasMany(EmpDeparment::class, 'created_by_user_id');
+        return $this->hasMany(EmpDepartment::class, 'created_by_user_id');
     }
 
     public function updatedDepartments()
     {
-        return $this->hasMany(EmpDeparment::class, 'updated_by_user_id');
+        return $this->hasMany(EmpDepartment::class, 'updated_by_user_id');
     }
 
     public function deletedDepartments()
     {
-        return $this->hasMany(EmpDeparment::class, 'deleted_by_user_id');
+        return $this->hasMany(EmpDepartment::class, 'deleted_by_user_id');
     }
 
     public function canAccessPanel(Panel $panel): bool

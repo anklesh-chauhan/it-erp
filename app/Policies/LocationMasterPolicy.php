@@ -67,4 +67,9 @@ class LocationMasterPolicy
         return $authUser->can('Reorder:LocationMaster');
     }
 
+    public function viewOwn(AuthUser $authUser, LocationMaster $locationMaster): bool
+    {
+        return $authUser->can('ViewOwn:LocationMaster');
+    }
+
 }

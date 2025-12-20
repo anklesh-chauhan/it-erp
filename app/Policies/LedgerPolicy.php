@@ -67,4 +67,9 @@ class LedgerPolicy
         return $authUser->can('Reorder:Ledger');
     }
 
+    public function viewOwn(AuthUser $authUser, Ledger $ledger): bool
+    {
+        return $authUser->can('ViewOwn:Ledger');
+    }
+
 }

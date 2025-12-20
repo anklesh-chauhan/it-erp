@@ -118,4 +118,14 @@ class DailyAttendance extends Model
         $this->status_id = $status->id;
     }
 
+    public function scopeOwnedBy($query, $user)
+    {
+        return $query->where('employee_id', $user->employee->id);
+    }
+
+    public function isOwnedBy($user): bool
+    {
+        return $this->employee_id === $user->employee->id;
+    }
+
 }

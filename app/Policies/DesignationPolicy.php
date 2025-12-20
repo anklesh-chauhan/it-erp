@@ -67,4 +67,9 @@ class DesignationPolicy
         return $authUser->can('Reorder:Designation');
     }
 
+    public function viewOwn(AuthUser $authUser, Designation $designation): bool
+    {
+        return $authUser->can('ViewOwn:Designation');
+    }
+
 }

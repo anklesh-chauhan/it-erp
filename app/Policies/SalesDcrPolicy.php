@@ -67,4 +67,9 @@ class SalesDcrPolicy
         return $authUser->can('Reorder:SalesDcr');
     }
 
+    public function viewOwn(AuthUser $authUser, SalesDcr $salesDcr): bool
+    {
+        return $authUser->can('ViewOwn:SalesDcr');
+    }
+
 }

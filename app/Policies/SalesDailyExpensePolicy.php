@@ -67,4 +67,9 @@ class SalesDailyExpensePolicy
         return $authUser->can('Reorder:SalesDailyExpense');
     }
 
+    public function viewOwn(AuthUser $authUser, SalesDailyExpense $salesDailyExpense): bool
+    {
+        return $authUser->can('ViewOwn:SalesDailyExpense');
+    }
+
 }

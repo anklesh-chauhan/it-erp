@@ -67,4 +67,9 @@ class CompanyMasterBankDetailPolicy
         return $authUser->can('Reorder:CompanyMasterBankDetail');
     }
 
+    public function viewOwn(AuthUser $authUser, CompanyMasterBankDetail $companyMasterBankDetail): bool
+    {
+        return $authUser->can('ViewOwn:CompanyMasterBankDetail');
+    }
+
 }

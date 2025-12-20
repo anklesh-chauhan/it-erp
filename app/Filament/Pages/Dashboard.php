@@ -30,114 +30,32 @@ class Dashboard extends BaseDashboard
         // ────────────────────────────── CHECK IN ──────────────────────────────
         if (! $todayAttendance) {
             return [
-                Action::make('checkIn')
-                    ->label('👋 Check In')
+                Action::make('punchIn')
+                    ->label('👋 Punch In')
+                    ->button()
                     ->color('success')
                     ->icon('heroicon-o-clock')
                     ->modal(false)
                     ->requiresConfirmation(false)
                     ->extraAttributes([
-                        'x-on:click.prevent' => "startGeolocation(\$wire, 'checkIn')",
+                        'x-on:click.prevent' => "startPunchIn(\$wire)"
                     ])
-                    ->action(function (array $arguments) use ($employee) {
-
-                        if (! isset($arguments['latitude'], $arguments['longitude'])) {
-                            return false;
-                        }
-
-                        $shift = $employee->currentShiftForDate(today());
-
-                        if (! $shift) {
-                            Notification::make()
-                                ->title('Shift not assigned')
-                                ->body('No active shift is assigned for today. Please contact HR.')
-                                ->danger()
-                                ->send();
-
-                            return;
-                        }
-
-                        // 1️⃣ Create daily attendance shell
-                        $attendance = DailyAttendance::create([
-                            'employee_id' => $employee->id,
-                            'shift_master_id' => $shift->id,
-                            'attendance_date' => today(),
-                            'status_id' => EmployeeAttendanceStatus::where('status_code', 'SP')->value('id'),
-                        ]);
-
-                        // 2️⃣ Insert IN punch
-                        AttendancePunch::create([
-                            'employee_id' => $employee->id,
-                            'punch_date' => today(),
-                            'punch_time' => now()->format('H:i'),
-                            'punch_type' => 'in',
-                            'source' => 'dashboard',
-                            'raw_payload' => [
-                                'ip' => Request::ip(),
-                                'latitude' => $arguments['latitude'],
-                                'longitude' => $arguments['longitude'],
-                            ],
-                        ]);
-
-                        $attendance->save();
-
-                        Notification::make()
-                            ->title('Checked In Successfully!')
-                            ->success()
-                            ->send();
-                    })->after(fn (Action $action) => $action->getLivewire()->dispatch('$refresh')),
             ];
         }
 
         // ────────────────────────────── CHECK OUT ──────────────────────────────
         if ($todayAttendance && $todayAttendance->punches()->where('punch_type', 'out')->doesntExist()) {
             return [
-                Action::make('checkOut')
-                    ->label('🚪 Check Out')
+                Action::make('punchOut')
+                    ->label('🚪 Punch Out')
                     ->color('danger')
                     ->icon('heroicon-o-arrow-right-on-rectangle')
                     ->modal(false)
                     ->button()
                     ->requiresConfirmation(false)
                     ->extraAttributes([
-                        'x-on:click.prevent' => "startGeolocation(\$wire, 'checkOut')",
+                        'x-on:click.prevent' => "startPunchOut(\$wire)"
                     ])
-                    ->action(function (array $arguments) use ($todayAttendance, $employee) {
-
-                        if (! isset($arguments['latitude'], $arguments['longitude'])) {
-                            return false;
-                        }
-
-                        // 1️⃣ Insert OUT punch
-                        AttendancePunch::create([
-                            'employee_id' => $employee->id,
-                            'punch_date' => today(),
-                            'punch_time' => now()->format('H:i'),
-                            'punch_type' => 'out',
-                            'source' => 'dashboard',
-                            'raw_payload' => [
-                                'ip' => Request::ip(),
-                                'latitude' => $arguments['latitude'],
-                                'longitude' => $arguments['longitude'],
-                            ],
-                        ]);
-
-                        // dispatch(new \App\Jobs\ProcessDailyAttendanceJob(
-                        //     $employee->id,
-                        //     today()
-                        // ))->onTenant(Tenant::current());
-
-                        dispatch_sync(new \App\Jobs\ProcessDailyAttendanceJob(
-                            $todayAttendance->id
-                        ));
-
-                        // 2️⃣ Status remains SP until calculation job runs
-                        Notification::make()
-                            ->title('Checked Out Successfully!')
-                            ->warning()
-                            ->send();
-
-                    })->after(fn (Action $action) => $action->getLivewire()->dispatch('$refresh')),
             ];
         }
 
@@ -149,5 +67,115 @@ class Dashboard extends BaseDashboard
                 ->disabled()
                 ->icon('heroicon-o-check-circle'),
         ];
+    }
+
+    public function doPunchIn(array $data): void
+    {
+        $employee = Auth::user()->employee;
+
+        if (! isset($data['latitude'], $data['longitude'])) {
+            Notification::make()
+                ->title('Location permission not allowed')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        if (! $employee) {
+            Notification::make()
+                ->title('Employee not linked')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $shift = $employee->currentShiftForDate(today());
+
+        if (! $shift) {
+            Notification::make()
+                ->title('Shift not assigned')
+                ->body('No active shift is assigned for today. Please contact HR.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $firstPunchIn = now()->format('H:i');
+
+        $attendance = DailyAttendance::create([
+            'employee_id' => $employee->id,
+            'shift_master_id' => $shift->id,
+            'attendance_date' => today(),
+            'first_punch_in' => $firstPunchIn,
+            'status_id' => EmployeeAttendanceStatus::where('status_code', 'SP')->value('id'),
+        ]);
+
+        AttendancePunch::create([
+            'employee_id' => $employee->id,
+            'punch_date' => today(),
+            'punch_time' => $firstPunchIn,
+            'punch_type' => 'in',
+            'source' => 'punch-in-page',
+            'raw_payload' => [
+                'ip' => Request::ip(),
+                'latitude' => $data['latitude'],
+                'longitude' => $data['longitude'],
+            ],
+        ]);
+
+        Notification::make()
+            ->title('Punch In Successfully!')
+            ->success()
+            ->send();
+    }
+
+    public function doPunchOut(array $data): void
+    {
+        $employee = Auth::user()->employee;
+
+        if (! isset($data['latitude'], $data['longitude'])) {
+            Notification::make()
+                ->title('Location permission not allowed')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $todayAttendance = DailyAttendance::where('employee_id', $employee->id)
+            ->whereDate('attendance_date', today())
+            ->first();
+
+        if (! $todayAttendance) {
+            Notification::make()
+                ->title('No attendance record found for today')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        // Insert OUT punch
+        AttendancePunch::create([
+            'employee_id' => $employee->id,
+            'punch_date' => today(),
+            'punch_time' => now()->format('H:i'),
+            'punch_type' => 'out',
+            'source' => 'dashboard',
+            'raw_payload' => [
+                'ip' => Request::ip(),
+                'latitude' => $data['latitude'],
+                'longitude' => $data['longitude'],
+            ],
+        ]);
+
+        // Process attendance (calculate hours, status, etc.)
+        dispatch_sync(new \App\Jobs\ProcessDailyAttendanceJob($todayAttendance->id));
+
+        Notification::make()
+            ->title('Checked Out Successfully!')
+            ->success()
+            ->send();
+
+        // Refresh the dashboard to update button state
+        $this->dispatch('$refresh');
     }
 }

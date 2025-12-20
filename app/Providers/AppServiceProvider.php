@@ -10,7 +10,7 @@ use App\Filament\Support\GlobalApprovalActionInjector;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Tables\Table;
-
+use Filament\Support\Facades\FilamentView;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
         DB::listen(function ($query) {
             Log::debug('SQL Query:', [
                 'query' => $query->sql,

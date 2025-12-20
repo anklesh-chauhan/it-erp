@@ -67,4 +67,9 @@ class ImagePolicy
         return $authUser->can('Reorder:Image');
     }
 
+    public function viewOwn(AuthUser $authUser, Image $image): bool
+    {
+        return $authUser->can('ViewOwn:Image');
+    }
+
 }

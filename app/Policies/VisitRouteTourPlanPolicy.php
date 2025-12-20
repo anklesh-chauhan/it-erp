@@ -67,4 +67,9 @@ class VisitRouteTourPlanPolicy
         return $authUser->can('Reorder:VisitRouteTourPlan');
     }
 
+    public function viewOwn(AuthUser $authUser, VisitRouteTourPlan $visitRouteTourPlan): bool
+    {
+        return $authUser->can('ViewOwn:VisitRouteTourPlan');
+    }
+
 }

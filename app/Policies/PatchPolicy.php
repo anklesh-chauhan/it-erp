@@ -67,4 +67,9 @@ class PatchPolicy
         return $authUser->can('Reorder:Patch');
     }
 
+    public function viewOwn(AuthUser $authUser, Patch $patch): bool
+    {
+        return $authUser->can('ViewOwn:Patch');
+    }
+
 }

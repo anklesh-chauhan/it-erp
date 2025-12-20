@@ -67,4 +67,9 @@ class ShippingMethodPolicy
         return $authUser->can('Reorder:ShippingMethod');
     }
 
+    public function viewOwn(AuthUser $authUser, ShippingMethod $shippingMethod): bool
+    {
+        return $authUser->can('ViewOwn:ShippingMethod');
+    }
+
 }

@@ -67,4 +67,9 @@ class AccountTypePolicy
         return $authUser->can('Reorder:AccountType');
     }
 
+    public function viewOwn(AuthUser $authUser, AccountType $accountType): bool
+    {
+        return $authUser->can('ViewOwn:AccountType');
+    }
+
 }

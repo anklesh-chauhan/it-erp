@@ -137,9 +137,6 @@ trait AddressDetailsTrait
                                         ->required()
                                         ->searchable(),
 
-                                    TextInput::make('street')->required(),
-                                    TextInput::make('area_town')->required(),
-
                                     TextInput::make('pin_code')
                                         ->reactive()
                                         ->afterStateUpdated(function (callable $set, callable $get, $state) {
@@ -153,6 +150,9 @@ trait AddressDetailsTrait
                                                 }
                                             }
                                         }),
+
+                                    TextInput::make('street')->required(),
+                                    TextInput::make('area_town')->required(),
 
                                     Select::make('city_id')
                                         ->relationship('city', 'name')

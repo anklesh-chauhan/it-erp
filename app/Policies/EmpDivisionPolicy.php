@@ -67,4 +67,9 @@ class EmpDivisionPolicy
         return $authUser->can('Reorder:EmpDivision');
     }
 
+    public function viewOwn(AuthUser $authUser, EmpDivision $empDivision): bool
+    {
+        return $authUser->can('ViewOwn:EmpDivision');
+    }
+
 }

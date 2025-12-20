@@ -67,4 +67,9 @@ class TerritoryPolicy
         return $authUser->can('Reorder:Territory');
     }
 
+    public function viewOwn(AuthUser $authUser, Territory $territory): bool
+    {
+        return $authUser->can('ViewOwn:Territory');
+    }
+
 }
