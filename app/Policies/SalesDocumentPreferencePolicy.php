@@ -67,4 +67,9 @@ class SalesDocumentPreferencePolicy
         return $authUser->can('Reorder:SalesDocumentPreference');
     }
 
+    public function viewOwn(AuthUser $authUser, SalesDocumentPreference $salesDocumentPreference): bool
+    {
+        return $authUser->can('ViewOwn:SalesDocumentPreference');
+    }
+
 }

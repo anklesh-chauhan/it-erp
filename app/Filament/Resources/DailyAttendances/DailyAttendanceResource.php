@@ -13,14 +13,33 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Facades\Filament;
 
 class DailyAttendanceResource extends Resource
 {
+
     protected static ?string $model = DailyAttendance::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'DailyAttendance';
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = Filament::auth()->user();
+
+        // OWN RECORDS ONLY
+        if ($user->can('ViewOwn:DailyAttendance')) {
+            return $query->ownedBy($user);
+        } else {
+            return $query;
+        }
+
+        // NO ACCESS
+        return $query->whereRaw('1 = 0');
+    }
 
     public static function form(Schema $schema): Schema
     {

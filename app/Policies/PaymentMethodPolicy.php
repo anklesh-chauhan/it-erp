@@ -67,4 +67,9 @@ class PaymentMethodPolicy
         return $authUser->can('Reorder:PaymentMethod');
     }
 
+    public function viewOwn(AuthUser $authUser, PaymentMethod $paymentMethod): bool
+    {
+        return $authUser->can('ViewOwn:PaymentMethod');
+    }
+
 }

@@ -67,4 +67,9 @@ class ContactDetailPolicy
         return $authUser->can('Reorder:ContactDetail');
     }
 
+    public function viewOwn(AuthUser $authUser, ContactDetail $contactDetail): bool
+    {
+        return $authUser->can('ViewOwn:ContactDetail');
+    }
+
 }

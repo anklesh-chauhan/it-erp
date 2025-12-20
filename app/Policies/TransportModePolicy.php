@@ -67,4 +67,9 @@ class TransportModePolicy
         return $authUser->can('Reorder:TransportMode');
     }
 
+    public function viewOwn(AuthUser $authUser, TransportMode $transportMode): bool
+    {
+        return $authUser->can('ViewOwn:TransportMode');
+    }
+
 }

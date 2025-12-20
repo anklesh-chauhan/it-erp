@@ -67,4 +67,9 @@ class EmpGradePolicy
         return $authUser->can('Reorder:EmpGrade');
     }
 
+    public function viewOwn(AuthUser $authUser, EmpGrade $empGrade): bool
+    {
+        return $authUser->can('ViewOwn:EmpGrade');
+    }
+
 }

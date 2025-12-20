@@ -67,4 +67,9 @@ class LeadStatusPolicy
         return $authUser->can('Reorder:LeadStatus');
     }
 
+    public function viewOwn(AuthUser $authUser, LeadStatus $leadStatus): bool
+    {
+        return $authUser->can('ViewOwn:LeadStatus');
+    }
+
 }

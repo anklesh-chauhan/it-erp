@@ -67,4 +67,9 @@ class AddressTypePolicy
         return $authUser->can('Reorder:AddressType');
     }
 
+    public function viewOwn(AuthUser $authUser, AddressType $addressType): bool
+    {
+        return $authUser->can('ViewOwn:AddressType');
+    }
+
 }

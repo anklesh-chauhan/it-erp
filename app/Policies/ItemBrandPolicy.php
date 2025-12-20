@@ -67,4 +67,9 @@ class ItemBrandPolicy
         return $authUser->can('Reorder:ItemBrand');
     }
 
+    public function viewOwn(AuthUser $authUser, ItemBrand $itemBrand): bool
+    {
+        return $authUser->can('ViewOwn:ItemBrand');
+    }
+
 }

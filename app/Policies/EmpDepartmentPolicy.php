@@ -67,4 +67,9 @@ class EmpDepartmentPolicy
         return $authUser->can('Reorder:EmpDepartment');
     }
 
+    public function viewOwn(AuthUser $authUser, EmpDepartment $empDepartment): bool
+    {
+        return $authUser->can('ViewOwn:EmpDepartment');
+    }
+
 }

@@ -64,4 +64,9 @@ class UserPolicy
         return $authUser->can('Reorder:User');
     }
 
+    public function viewOwn(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewOwn:User');
+    }
+
 }

@@ -67,4 +67,9 @@ class ItemMeasurementUnitPolicy
         return $authUser->can('Reorder:ItemMeasurementUnit');
     }
 
+    public function viewOwn(AuthUser $authUser, ItemMeasurementUnit $itemMeasurementUnit): bool
+    {
+        return $authUser->can('ViewOwn:ItemMeasurementUnit');
+    }
+
 }

@@ -67,4 +67,9 @@ class FollowUpResultPolicy
         return $authUser->can('Reorder:FollowUpResult');
     }
 
+    public function viewOwn(AuthUser $authUser, FollowUpResult $followUpResult): bool
+    {
+        return $authUser->can('ViewOwn:FollowUpResult');
+    }
+
 }

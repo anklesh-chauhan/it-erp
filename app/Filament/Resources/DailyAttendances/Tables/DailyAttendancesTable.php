@@ -24,7 +24,7 @@ class DailyAttendancesTable
                     ->date()
                     ->sortable(),
 
-                TextColumn::make('employee.name')
+                TextColumn::make('employee.FullName')
                     ->searchable()
                     ->sortable(),
 

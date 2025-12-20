@@ -67,4 +67,9 @@ class OrganizationalUnitPolicy
         return $authUser->can('Reorder:OrganizationalUnit');
     }
 
+    public function viewOwn(AuthUser $authUser, OrganizationalUnit $organizationalUnit): bool
+    {
+        return $authUser->can('ViewOwn:OrganizationalUnit');
+    }
+
 }

@@ -67,4 +67,9 @@ class ApprovalRulePolicy
         return $authUser->can('Reorder:ApprovalRule');
     }
 
+    public function viewOwn(AuthUser $authUser, ApprovalRule $approvalRule): bool
+    {
+        return $authUser->can('ViewOwn:ApprovalRule');
+    }
+
 }

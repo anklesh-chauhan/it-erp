@@ -67,4 +67,9 @@ class AttachmentPolicy
         return $authUser->can('Reorder:Attachment');
     }
 
+    public function viewOwn(AuthUser $authUser, Attachment $attachment): bool
+    {
+        return $authUser->can('ViewOwn:Attachment');
+    }
+
 }

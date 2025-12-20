@@ -67,4 +67,9 @@ class StatePolicy
         return $authUser->can('Reorder:State');
     }
 
+    public function viewOwn(AuthUser $authUser, State $state): bool
+    {
+        return $authUser->can('ViewOwn:State');
+    }
+
 }

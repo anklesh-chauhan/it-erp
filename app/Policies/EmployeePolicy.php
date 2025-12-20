@@ -67,4 +67,9 @@ class EmployeePolicy
         return $authUser->can('Reorder:Employee');
     }
 
+    public function viewOwn(AuthUser $authUser, Employee $employee): bool
+    {
+        return $authUser->can('ViewOwn:Employee');
+    }
+
 }

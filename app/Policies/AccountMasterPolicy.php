@@ -67,4 +67,9 @@ class AccountMasterPolicy
         return $authUser->can('Reorder:AccountMaster');
     }
 
+    public function viewOwn(AuthUser $authUser, AccountMaster $accountMaster): bool
+    {
+        return $authUser->can('ViewOwn:AccountMaster');
+    }
+
 }

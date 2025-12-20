@@ -67,4 +67,9 @@ class PositionPolicy
         return $authUser->can('Reorder:Position');
     }
 
+    public function viewOwn(AuthUser $authUser, Position $position): bool
+    {
+        return $authUser->can('ViewOwn:Position');
+    }
+
 }

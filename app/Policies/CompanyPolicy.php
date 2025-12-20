@@ -67,4 +67,9 @@ class CompanyPolicy
         return $authUser->can('Reorder:Company');
     }
 
+    public function viewOwn(AuthUser $authUser, Company $company): bool
+    {
+        return $authUser->can('ViewOwn:Company');
+    }
+
 }

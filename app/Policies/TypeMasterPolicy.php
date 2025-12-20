@@ -67,4 +67,9 @@ class TypeMasterPolicy
         return $authUser->can('Reorder:TypeMaster');
     }
 
+    public function viewOwn(AuthUser $authUser, TypeMaster $typeMaster): bool
+    {
+        return $authUser->can('ViewOwn:TypeMaster');
+    }
+
 }

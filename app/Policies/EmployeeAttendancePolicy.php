@@ -67,4 +67,9 @@ class EmployeeAttendancePolicy
         return $authUser->can('Reorder:EmployeeAttendance');
     }
 
+    public function viewOwn(AuthUser $authUser, EmployeeAttendance $employeeAttendance): bool
+    {
+        return $authUser->can('ViewOwn:EmployeeAttendance');
+    }
+
 }

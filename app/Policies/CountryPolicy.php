@@ -67,4 +67,9 @@ class CountryPolicy
         return $authUser->can('Reorder:Country');
     }
 
+    public function viewOwn(AuthUser $authUser, Country $country): bool
+    {
+        return $authUser->can('ViewOwn:Country');
+    }
+
 }

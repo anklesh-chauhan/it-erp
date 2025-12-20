@@ -35,6 +35,7 @@ use App\Filament\Resources\Organizations\OrganizationResource;
 use Illuminate\Support\Facades\Blade;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
+use App\Http\Middleware\RedirectMarketingToPunchIn;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -91,6 +92,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                RedirectMarketingToPunchIn::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -100,12 +102,5 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard('web');
     }
 
-    public function boot(): void
-    {
-        FilamentView::registerRenderHook(
-            // This hook places content at the start of the user menu (top right)
-            PanelsRenderHook::TOPBAR_BEFORE,
-            fn (): string => Blade::render('@livewire(\'app.filament.widgets.check-in-widget\')'),
-        );
-    }
+
 }
