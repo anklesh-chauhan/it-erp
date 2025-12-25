@@ -28,6 +28,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Helpers\ModelHelper;
+use Filament\Schemas\Components\Utilities\Get;
 
 class TypeMasterResource extends Resource
 {
@@ -48,10 +49,27 @@ class TypeMasterResource extends Resource
                     ->maxLength(64),
                 TextInput::make('description')
                     ->maxLength(255),
+
                 Select::make('typeable_type')
                     ->label('Module Type')
-                    ->options(ModelHelper::getModelOptions()) // Dynamic Model Names
-                    ->nullable(),
+                    ->options(ModelHelper::getModelOptions())
+                    ->required()
+                    ->live(),
+
+                Select::make('parent_id')
+                    ->label('Parent Type')
+                    ->options(fn (Get $get) =>
+                        filled($get('typeable_type'))
+                            ? TypeMaster::where('typeable_type', $get('typeable_type'))
+                                ->whereNull('parent_id')
+                                ->pluck('name', 'id')
+                            : []
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->visible(fn (Get $get) => filled($get('typeable_type')))
+                    ->helperText('Leave blank to create a root type'),
             ]);
     }
 
@@ -61,13 +79,18 @@ class TypeMasterResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('description')
+
+                TextColumn::make('parent.name')
+                    ->label('Parent Type')
+                    ->sortable()
                     ->searchable(),
+
                 TextColumn::make('typeable_type')
+                    ->label('Module')
+                    ->formatStateUsing(fn ($state) => class_basename($state))
+                    ->sortable()
                     ->searchable(),
-                TextColumn::make('typeable_id')
-                    ->numeric()
-                    ->sortable(),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -86,7 +109,7 @@ class TypeMasterResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

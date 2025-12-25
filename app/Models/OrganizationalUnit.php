@@ -12,7 +12,7 @@ class OrganizationalUnit extends Model
 {
     use HasApprovalWorkflow;
 
-    protected $fillable = ['name', 'code', 'description', 'parent_id', 'is_active'];
+    protected $fillable = ['name', 'code','type_master_id', 'description', 'parent_id', 'is_active'];
 
     // Parent OU (for hierarchy)
     public function parent(): BelongsTo
@@ -24,6 +24,16 @@ class OrganizationalUnit extends Model
     public function children(): HasMany
     {
         return $this->hasMany(OrganizationalUnit::class, 'parent_id');
+    }
+
+    public function typeMaster()
+    {
+        return $this->belongsTo(TypeMaster::class, 'type_master_id');
+    }
+
+    public function parentType(): ?TypeMaster
+    {
+        return $this->typeMaster?->parent;
     }
 
     // Users assigned to this OU
@@ -42,5 +52,46 @@ class OrganizationalUnit extends Model
     public function deals(): HasMany
     {
         return $this->hasMany(Deal::class);
+    }
+
+    public function territories()
+    {
+        return $this->belongsToMany(
+            Territory::class,
+            'territory_division_pivot',
+            'division_ou_id',
+            'territory_id'
+        );
+    }
+
+    public function employees()
+    {
+        return $this->belongsToMany(
+            EmployeeDetail::class,
+            'employment_detail_ou_pivot',
+            'organizational_unit_id',
+            'employment_detail_id',
+        );
+    }
+
+    public static function hierarchicalOptions(?int $parentId = null, string $prefix = ''): array
+    {
+        $options = [];
+
+        $units = self::query()
+            ->where('parent_id', $parentId)
+            ->orderBy('name')
+            ->get();
+
+        foreach ($units as $unit) {
+            $options[$unit->id] = $prefix . $unit->name;
+
+            $options += self::hierarchicalOptions(
+                $unit->id,
+                $prefix . '— '
+            );
+        }
+
+        return $options;
     }
 }

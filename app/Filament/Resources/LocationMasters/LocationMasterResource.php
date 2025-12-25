@@ -38,6 +38,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput\Mask;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Schemas\Components\Utilities\Get;
 
 class LocationMasterResource extends Resource
 {
@@ -69,12 +70,54 @@ class LocationMasterResource extends Resource
 
                 Textarea::make('description')->label('Description'),
 
-                Select::make('typeable_id')
-                    ->label('Type')
-                    ->options(fn () => TypeMaster::where('typeable_type', LocationMaster::class)->pluck('name', 'id'))
+                Select::make('parent_type_id')
+                    ->label('Location Type')
                     ->searchable()
-                    ->preload()
-                    ->required(),
+                    ->options(
+                        TypeMaster::whereNull('parent_id')
+                            ->where('typeable_type', LocationMaster::class)
+                            ->pluck('name', 'id')
+                    )
+                    ->required()
+                    ->live()
+                    ->afterStateHydrated(function (callable $set, callable $get) {
+                        $typeId = $get('typeable_id');
+
+                        if (! $typeId) {
+                            return;
+                        }
+
+                        $type = TypeMaster::find($typeId);
+
+                        $set('parent_type_id', $type?->parent_id ?? $typeId);
+                    })
+                    ->afterStateUpdated(function (callable $set, $state) {
+
+                        $hasChildren = TypeMaster::where('parent_id', $state)->exists();
+
+                        if (! $hasChildren) {
+                            // No sub-types → store parent directly
+                            $set('typeable_id', $state);
+                        } else {
+                            $set('typeable_id', null);
+                        }
+                    }),
+
+                Select::make('typeable_id')
+                    ->label('Location Sub Type')
+                    ->searchable()
+                    ->options(fn (Get $get) =>
+                        TypeMaster::where('parent_id', $get('parent_type_id'))
+                            ->pluck('name', 'id')
+                    )
+                    ->visible(fn (Get $get) =>
+                        filled($get('parent_type_id')) &&
+                        TypeMaster::where('parent_id', $get('parent_type_id'))->exists()
+                    )
+                    ->required(fn (Get $get) =>
+                        TypeMaster::where('parent_id', $get('parent_type_id'))->exists()
+                    )
+                    ->live(),
 
                 Select::make('addressable_id')
                     ->label('Address')
@@ -133,7 +176,7 @@ class LocationMasterResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

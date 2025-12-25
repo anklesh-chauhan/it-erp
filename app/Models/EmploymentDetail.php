@@ -14,7 +14,7 @@ class EmploymentDetail extends Model
 
     protected $fillable = [
         'employee_id', 'ticket_no', 'department_id', 'job_title_id', 'grade_id',
-        'division_id', 'organizational_unit_id', 'hire_date', 'employment_type',
+        'division_ou_id', 'organizational_unit_id', 'hire_date', 'employment_type',
         'employment_status', 'resign_offer_date', 'last_working_date', 'probation_date',
         'confirm_date', 'fnf_retiring_date', 'last_increment_date', 'work_location_id',
         'reporting_manager_id', 'remarks', 'created_by', 'updated_by'
@@ -54,12 +54,31 @@ class EmploymentDetail extends Model
 
     public function division()
     {
-        return $this->belongsTo(EmpDivision::class, 'division_id');
+        return $this->belongsTo(
+            OrganizationalUnit::class,
+            'division_ou_id'
+        );
     }
 
-    public function organizationalUnit()
+    // public function organizationalUnit()
+    // {
+    //     return $this->belongsTo(OrganizationalUnit::class, 'organizational_unit_id');
+    // }
+
+
+    public function organizationalUnits()
     {
-        return $this->belongsTo(OrganizationalUnit::class, 'organizational_unit_id');
+        return $this->belongsToMany(
+            OrganizationalUnit::class,
+            'employment_detail_ou_pivot',
+            'employment_detail_id',
+            'organizational_unit_id',
+        )->withPivot([
+            'is_primary',
+            'role',
+            'effective_from',
+            'effective_to'
+        ]);
     }
 
     public function workLocation()

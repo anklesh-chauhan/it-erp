@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('grade_id')->nullable();
             $table->foreign('grade_id')->references('id')->on('emp_grades')->onDelete('set null');
             $table->unsignedBigInteger('division_id')->nullable();
-            $table->foreign('division_id')->references('id')->on('emp_divisions')->onDelete('set null');
+            $table->foreignId('division_ou_id')->nullable()->constrained('organizational_units')->nullOnDelete();
             $table->unsignedBigInteger('organizational_unit_id')->nullable();
             $table->foreign('organizational_unit_id')->references('id')->on('organizational_units')->onDelete('set null');
             $table->date('hire_date')->nullable();

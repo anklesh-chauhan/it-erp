@@ -15,7 +15,20 @@ return new class extends Migration
             $table->id();
             $table->string('name')->index();
             $table->string('code')->unique();
-            $table->foreignId('division_id')->nullable()->constrained('emp_divisions')->onDelete('restrict');
+
+            $table->foreignId('division_ou_id')
+                ->nullable()
+                ->constrained('organizational_units')
+                ->restrictOnDelete();
+
+            /**
+             * Organizational Unit (Plant / Branch / Dept)
+             */
+            $table->foreignId('organizational_unit_id')
+                ->nullable()
+                ->constrained('organizational_units')
+                ->nullOnDelete();
+
             $table->foreignId('department_id')->nullable()->constrained('emp_departments')->onDelete('restrict');
             $table->foreignId('job_title_id')->nullable()->constrained('emp_job_titles')->onDelete('restrict');
             $table->foreignId('job_grade_id')->nullable()->constrained('emp_grades')->onDelete('restrict');

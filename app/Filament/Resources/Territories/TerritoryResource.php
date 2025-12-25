@@ -47,7 +47,7 @@ class TerritoryResource extends Resource
     {
         return $schema->components([
             Section::make('Territory Details')
-                ->columns(5)
+                ->columns(3)
                 ->schema([
                     TextInput::make('name')
                         ->required()
@@ -79,9 +79,31 @@ class TerritoryResource extends Resource
                         ->nullable()
                         ->label('Type Master'),
 
-                    Textarea::make('description')
-                        ->nullable()
-                        ->columnSpanFull(),
+                    Select::make('divisions')
+                        ->label('Divisions Linkages')
+                        ->multiple()
+                        ->relationship(
+                            name: 'divisions',
+                            titleAttribute: 'name',
+                            modifyQueryUsing: fn ($query) =>
+                                $query->whereHas('typeMaster', fn ($q) =>
+                                    $q->where('name', 'Division')
+                                )
+                        )
+                        ->searchable()
+                        ->preload()
+                        ->helperText('Select one or more divisions operating in this territory')
+                        ->required(),
+
+                    Select::make('positions')
+                        ->label('Associated Positions')
+                        ->multiple()
+                        ->relationship('positions', 'name')
+                        ->searchable()
+                            ->preload()
+                        ->label('Positions')
+                        ->placeholder('Select positions linked to this territory'),
+
                 ])->columnSpanFull(),
 
             Section::make('Associated Locations')
@@ -114,27 +136,13 @@ class TerritoryResource extends Resource
                         ->required(),
                 ])->columnSpanFull(),
 
-            Section::make('Associated Positions')
-                ->schema([
-                    Select::make('positions')
-                        ->multiple()
-                        ->relationship('positions', 'name')
-                        ->searchable()
-                        ->preload()
-                        ->label('Positions')
-                        ->placeholder('Select positions linked to this territory'),
-                ]),
 
-            Section::make('Organizational Linkages')
-                ->schema([
-                    Select::make('organizationalUnits')
-                        ->multiple()
-                        ->relationship('organizationalUnits', 'name')
-                        ->searchable()
-                        ->preload()
-                        ->placeholder('Select Organizational Units')
-                        ->label('Organizational Units'),
-                ]),
+
+
+            Textarea::make('description')
+                        ->nullable()
+                        ->columnSpanFull(),
+
         ]);
     }
 
@@ -187,13 +195,6 @@ class TerritoryResource extends Resource
                     ->placeholder('Filter by Parent Territory')
                     ->preload(),
 
-                SelectFilter::make('organizationalUnits')
-                    ->multiple()
-                    ->relationship('organizationalUnits', 'name')
-                    ->label('Organizational Unit')
-                    ->placeholder('Filter by Organizational Unit')
-                    ->preload(),
-
                 TrashedFilter::make(),
             ])
             ->recordActions([
@@ -204,7 +205,7 @@ class TerritoryResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

@@ -36,10 +36,9 @@ class ContactDetailsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                ...self::getCreateContactFormTraitFields(),
-            ]);
+        return $schema->components(
+            self::getCreateContactFormTraitFields()
+        );
     }
 
     public function closeAttachModal()
@@ -70,11 +69,6 @@ class ContactDetailsRelationManager extends RelationManager
                     ->label('Phone')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('company.name')
-                    ->label('Company')
-                    ->sortable()
-                    ->searchable()
-                    ->default('No Company'),
             ])
             ->filters([
                 SelectFilter::make('company')

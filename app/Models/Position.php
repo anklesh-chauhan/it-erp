@@ -30,7 +30,8 @@ class Position extends Model
     protected $fillable = [
         'name',
         'code',
-        'division_id',
+        'division_ou_id',
+        'organizational_unit_id',
         'department_id',
         'job_title_id',
         'job_grade_id',
@@ -61,9 +62,17 @@ class Position extends Model
     /**
      * Get the division associated with the position.
      */
-    public function division(): BelongsTo
+    public function division()
     {
-        return $this->belongsTo(EmpDivision::class, 'division_id');
+        return $this->belongsTo(
+            OrganizationalUnit::class,
+            'division_ou_id'
+        );
+    }
+
+    public function organizationalUnit()
+    {
+        return $this->belongsTo(OrganizationalUnit::class, 'organizational_unit_id');
     }
 
     /**

@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('territory_organizational_unit_pivot', function (Blueprint $table) {
+        Schema::create('territory_division_pivot', function (Blueprint $table) {
             $table->foreignId('territory_id')->constrained('territories', 'id', 'terr_org_unit_terr_id_fk')->onDelete('cascade');
-            $table->foreignId('organizational_unit_id')->constrained('organizational_units', 'id', 'terr_org_unit_id_fk')->onDelete('cascade');
-            $table->primary(['territory_id', 'organizational_unit_id']);
+            $table->foreignId('division_ou_id')->constrained('organizational_units', 'id', 'terr_org_unit_id_fk')->onDelete('cascade');
+            $table->boolean('is_active')->default(true);
+            $table->primary(['territory_id', 'division_ou_id']);
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('territory_organizational_unit_pivot');
+        Schema::dropIfExists('territory_division_pivot');
     }
 };

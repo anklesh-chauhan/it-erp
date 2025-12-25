@@ -17,6 +17,7 @@ class Territory extends Model
         'name',
         'code',
         'parent_territory_id',
+        'division_ou_id',
         'description',
         'type_master_id',
         'status',
@@ -35,6 +36,18 @@ class Territory extends Model
     }
 
     /**
+     * Get the division associated with the position.
+     */
+    public function division()
+    {
+        return $this->belongsTo(
+            OrganizationalUnit::class,
+            'division_ou_id'
+        );
+    }
+
+
+    /**
      * Get the child territories.
      */
     public function childTerritories(): HasMany
@@ -50,9 +63,9 @@ class Territory extends Model
     /**
      * Get the organizational units associated with the territory.
      */
-    public function organizationalUnits(): BelongsToMany
+    public function divisions(): BelongsToMany
     {
-        return $this->belongsToMany(OrganizationalUnit::class, 'territory_organizational_unit_pivot', 'territory_id', 'organizational_unit_id')
+        return $this->belongsToMany(OrganizationalUnit::class, 'territory_division_pivot', 'territory_id', 'division_ou_id')
                     ->withTimestamps();
     }
 

@@ -63,6 +63,11 @@ class AccountMaster extends Model
         return $this->belongsTo(TypeMaster::class, 'type_master_id');
     }
 
+    public function parentType(): ?TypeMaster
+    {
+        return $this->typeMaster?->parent;
+    }
+
     public function industryType(): BelongsTo
     {
         return $this->belongsTo(IndustryType::class);
@@ -173,8 +178,13 @@ class AccountMaster extends Model
         });
 
         static::deleting(function ($account_master) {
-            $account_master->addresses()->detach();
+            // belongsToMany → detach
             $account_master->contactDetails()->detach();
+
+            // morphMany → delete or soft delete
+            $account_master->addresses()->each(function ($address) {
+                $address->delete(); // soft delete
+            });
         });
         static::restoring(function ($account_master) {
             $account_master->addresses()->restore();

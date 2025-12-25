@@ -69,52 +69,84 @@ class PatchResource extends Resource
                     ->helperText('A unique code for the patch.'),
 
                 Select::make('territory_id')
-                    ->relationship(name: 'territory', titleAttribute: 'name', modifyQueryUsing: function (Builder $query) {
-                        $user = Auth::user();
-                        // Ensure user has an employee and employment detail before filtering
-                        if ($user && $user->employee && $user->employee->employmentDetail) {
-                            $organizationalUnitId = $user->employee->employmentDetail->organizational_unit_id;
-                            // Filter territories based on the user's organizational unit
-                            $query->whereHas('organizationalUnits', function ($subQuery) use ($organizationalUnitId) {
-                                $subQuery->where('organizational_units.id', $organizationalUnitId);
-                            });
-                        } else {
-                            // If no organizational unit, return no territories to prevent unauthorized access
-                            $query->whereRaw('1 = 0');
-                        }
-                    })
-                    ->required()
-                    ->preload() // Eager load options for better performance
-                    ->searchable()
-                    ->live() // Crucial for dynamically updating the 'patchables' field
                     ->label('Territory')
+                    ->relationship(
+                        name: 'territory',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: function (Builder $query) {
+
+                            $user = Auth::user();
+
+                            // SAFETY CHECKS
+                            if (
+                                ! $user?->employee?->employmentDetail
+                            ) {
+                                // No employment detail → no territory
+                                $query->whereRaw('1 = 0');
+                                return;
+                            }
+
+                            // ✅ Get ALL division OU IDs
+                            $divisionOuIds = $user->employee
+                                ->employmentDetail
+                                ->organizationalUnits()
+                                ->pluck('organizational_units.id')
+                                ->toArray();
+
+                            if (empty($divisionOuIds)) {
+                                // No divisions → no territory
+                                $query->whereRaw('1 = 0');
+                                return;
+                            }
+
+                            // ✅ Filter territories by linked divisions
+                            $query->whereHas('divisions', function ($q) use ($divisionOuIds) {
+                                $q->whereIn('organizational_units.id', $divisionOuIds);
+                            });
+                        }
+                    )
+                    ->preload()
+                    ->searchable()
+                    ->required()
+                    ->live()
                     ->placeholder('Select a Territory')
-                    ->columnSpan(1), // Explicitly set column span for clarity
+                    ->columnSpan(1),
 
                 Select::make('city_pin_code_id')
                     ->label('City Pin Code')
                     ->placeholder('Select a City Pin Code')
-                    ->options(function (Get $get) {
-                        $selectedTerritoryId = $get('territory_id');
-                        if (!$selectedTerritoryId) {
-                            return []; // No territory selected, no pin codes
+                    ->relationship(
+                        name: 'cityPinCode',
+                        titleAttribute: 'pin_code',
+                        modifyQueryUsing: function (Builder $query, Get $get) {
+                            $territoryId = $get('territory_id');
+
+                            if (! $territoryId) {
+                                // No territory → no pin codes
+                                $query->whereRaw('1 = 0');
+                                return;
+                            }
+
+                            $query->whereHas('territories', function ($q) use ($territoryId) {
+                                $q->where('territories.id', $territoryId);
+                            });
                         }
-                        // Fetch CityPinCodes related to the selected territory
-                        return CityPinCode::whereHas('territories', function ($query) use ($selectedTerritoryId) {
-                            $query->where('territories.id', $selectedTerritoryId);
-                        })->pluck('pin_code', 'id')->toArray();
-                    })
+                    )
                     ->searchable()
                     ->preload()
-                    ->nullable() // Allow null if a territory doesn't have a specific pin code requirement initially
-                    ->live() // Make this live to update 'patchables' further
+                    ->nullable()
+                    ->reactive()
                     ->columnSpan(1),
 
                 // Add All from Territory button
                 Group::make()
                     ->schema([
                         Action::make('addAllFromTerritory')
-                            ->label('Add All from Territory')
+                            ->label(fn (Get $get) =>
+                                $get('city_pin_code_id')
+                                    ? 'Add All from Pin Code'
+                                    : 'Add All from Territory'
+                            )
                             ->icon('heroicon-o-plus-circle')
                             ->color('primary')
                             ->visible(fn (Get $get) => filled($get('territory_id')))
@@ -131,8 +163,22 @@ class PatchResource extends Resource
                                 }
 
                                 // Get all city_pin_code_ids linked to this territory
-                                $territory = Territory::with('cityPinCodes')->find($territoryId);
-                                $pinCodeIds = $territory->cityPinCodes()->pluck('pin_code')->toArray();
+                                $cityPinCodeId = $get('city_pin_code_id');
+
+                                $pinCodes = collect();
+
+                                // ✅ If City Pin Code selected → use ONLY that
+                                if ($cityPinCodeId) {
+                                    $pinCodes = \App\Models\CityPinCode::where('id', $cityPinCodeId)
+                                        ->pluck('pin_code');
+                                }
+                                // ✅ Else → use ALL pin codes of territory
+                                else {
+                                    $territory = Territory::with('cityPinCodes')->find($territoryId);
+                                    $pinCodes = $territory?->cityPinCodes?->pluck('pin_code') ?? collect();
+                                }
+
+                                $pinCodeIds = $pinCodes->toArray();
 
                                 if (empty($pinCodeIds)) {
                                     Notification::make()
@@ -143,34 +189,38 @@ class PatchResource extends Resource
                                     return;
                                 }
 
-                                // 🏢 Companies linked via addresses
-                                $companies = AccountMaster::whereHas('addresses', function ($query) use ($pinCodeIds) {
-                                    $query->whereIn('pin_code', $pinCodeIds);
-                                })->get();
-
-                                // 👤 Contacts linked via addresses
-                                $contacts = ContactDetail::whereHas('addresses', function ($query) use ($pinCodeIds) {
-                                    $query->whereIn('pin_code', $pinCodeIds);
-                                })->get();
-
                                 $newEntries = [];
                                 $order = 1;
 
-                                foreach ($companies as $company) {
-                                    $newEntries[] = [
-                                        'patchable_type' => AccountMaster::class,
-                                        'patchable_id'   => $company->id,
-                                        'order'          => $order++,
-                                    ];
-                                }
+                                // 🏢 Companies linked via addresses (CHUNKED)
+                                AccountMaster::whereHas('addresses', function ($query) use ($pinCodeIds) {
+                                        $query->whereIn('pin_code', $pinCodeIds);
+                                    })
+                                    ->orderBy('id') // important for chunk stability
+                                    ->chunk(500, function ($companies) use (&$newEntries, &$order) {
+                                        foreach ($companies as $company) {
+                                            $newEntries[] = [
+                                                'patchable_type' => AccountMaster::class,
+                                                'patchable_id'   => $company->id,
+                                                'order'          => $order++,
+                                            ];
+                                        }
+                                    });
 
-                                foreach ($contacts as $contact) {
-                                    $newEntries[] = [
-                                        'patchable_type' => ContactDetail::class,
-                                        'patchable_id'   => $contact->id,
-                                        'order'          => $order++,
-                                    ];
-                                }
+                                 // 👤 Contacts linked via addresses
+                                ContactDetail::whereHas('addresses', function ($query) use ($pinCodeIds) {
+                                    $query->whereIn('pin_code', $pinCodeIds);
+                                })
+                                ->orderBy('id')
+                                ->chunk(500, function ($contacts) use (&$newEntries, &$order) {
+                                    foreach ($contacts as $contact) {
+                                        $newEntries[] = [
+                                            'patchable_type' => ContactDetail::class,
+                                            'patchable_id'   => $contact->id,
+                                            'order'          => $order++,
+                                        ];
+                                    }
+                                });
 
                                 // Merge without duplicates
                                 $existing = $get('patchables') ?? [];
@@ -242,9 +292,9 @@ class PatchResource extends Resource
                     ->label('Assigned Companies or Contacts')
                     ->relationship('patchables')   // binds to Patch::patchables()
                     ->orderColumn('order')         // Filament will persist the 'order' column
-                    ->reorderable(true)
+                    ->reorderable(FALSE)
                     ->table([
-                        TableColumn::make('Type'),
+                        TableColumn::make('Customer Type'),
                         TableColumn::make('Company/Contact Name'),
                     ])
                     ->schema([
@@ -267,22 +317,42 @@ class PatchResource extends Resource
                         Select::make('patchable_id')
                             ->label('Name')
                             ->options(function (Get $get) {
-                                $territoryId = $get('../../territory_id'); // 👈 get selected Territory ID
+
+                                $territoryId = $get('../../territory_id');
+                                $cityPinCodeId = $get('../../city_pin_code_id'); // 👈 NEW
                                 $type = $get('patchable_type');
 
                                 if (! $territoryId) {
-                                    return []; // no territory selected
+                                    return [];
                                 }
 
-                                // Get all pin codes linked to this territory
-                                $territory = \App\Models\Territory::with('cityPinCodes')->find($territoryId);
-                                $pinCodes = $territory?->cityPinCodes?->pluck('pin_code') ?? collect();
+                                /*
+                                |--------------------------------------------------
+                                | 1️⃣ Decide pin codes to filter by
+                                |--------------------------------------------------
+                                */
+                                $pinCodes = collect();
+
+                                // ✅ If City Pin Code selected → use ONLY that
+                                if ($cityPinCodeId) {
+                                    $pinCodes = \App\Models\CityPinCode::where('id', $cityPinCodeId)
+                                        ->pluck('pin_code');
+                                }
+                                // ✅ Else → use ALL pin codes of territory
+                                else {
+                                    $territory = \App\Models\Territory::with('cityPinCodes')->find($territoryId);
+                                    $pinCodes = $territory?->cityPinCodes?->pluck('pin_code') ?? collect();
+                                }
 
                                 if ($pinCodes->isEmpty()) {
                                     return [];
                                 }
 
-                                // Filter based on patchable type
+                                /*
+                                |--------------------------------------------------
+                                | 2️⃣ Filter by patchable type
+                                |--------------------------------------------------
+                                */
                                 if ($type === \App\Models\AccountMaster::class) {
                                     return \App\Models\AccountMaster::whereHas('addresses', function ($q) use ($pinCodes) {
                                             $q->whereIn('pin_code', $pinCodes);

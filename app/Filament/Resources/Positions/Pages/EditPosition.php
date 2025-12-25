@@ -18,14 +18,6 @@ class EditPosition extends EditRecord
     {
         return [
             DeleteAction::make(),
-            Action::make('Assign Employees')
-                ->action(function () {
-                    $assignedIds = $this->form->getState()['assigned_employee_ids'] ?? [];
-                    $this->record->employmentDetails()->sync($assignedIds);
-                    $this->notify('success', 'Employees assigned successfully.');
-                })
-                ->requiresConfirmation()
-                ->icon('heroicon-o-user-group'),
         ];
     }
 }

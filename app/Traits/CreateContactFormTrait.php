@@ -57,7 +57,8 @@ trait CreateContactFormTrait
                         TextInput::make('last_name')
                             ->label('Last Name')
                             ->columnSpan(1),
-                        ]),
+                        ])->columnSpan(3),
+
                 Grid::make(3) // ✅ Three-column layout
                     ->schema([
                         TextInput::make('email')
@@ -76,7 +77,7 @@ trait CreateContactFormTrait
                             ->tel()
                             ->label('Alternate Phone'),
 
-                        ]),
+                        ])->columnSpan(3),
 
 
                 Section::make('Additional Information')
@@ -86,32 +87,19 @@ trait CreateContactFormTrait
                         Grid::make(3) // ✅ Three-column layout
                             ->schema([
                                 Select::make('designation_id')
-                                    ->relationship('designation', 'name')
+                                    ->options(fn () => Designation::pluck('name', 'id'))
                                     ->searchable()
                                     ->nullable()
                                     ->label('Designation')
-                                    ->createOptionForm([
-                                        TextInput::make('name')
-                                            ->required()
-                                            ->label('New Designation')
-                                    ])
-                                    ->createOptionUsing(function (array $data) {
-                                        return Designation::create($data)->id;  // ✅ Create and return ID
-                                    })->preload(),
+                                    ->preload(),
 
                                 Select::make('department_id')
-                                    ->relationship('department', 'name')
+                                    ->options(fn () => Department::pluck('name', 'id'))
                                     ->searchable()
                                     ->nullable()
                                     ->label('Department')
-                                    ->createOptionForm([
-                                        TextInput::make('name')
-                                            ->required()
-                                            ->label('New Department')
-                                    ])
-                                    ->createOptionUsing(function (array $data) {
-                                        return Department::create($data)->id;  // ✅ Create and return ID
-                                    })->preload(),
+                                    ->preload(),
+
                                 DatePicker::make('birthday')
                                     ->nullable()
                                     ->displayFormat('d M Y')
@@ -229,7 +217,7 @@ trait CreateContactFormTrait
                             ->rows(3)
                             ->label('Additional Notes'),
                         ]),
-            ]),
+            ])->columnSpanFull(),
         ];
 
     }

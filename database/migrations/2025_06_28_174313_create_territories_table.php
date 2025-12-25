@@ -16,6 +16,11 @@ return new class extends Migration
             $table->string('name')->index();
             $table->string('code')->unique()->nullable();
             $table->foreignId('parent_territory_id')->nullable()->constrained('territories')->onDelete('set null');
+            // LINK TO DIVISION (ORGANIZATIONAL UNIT)
+            $table->foreignId('division_ou_id')
+                ->nullable()
+                ->constrained('organizational_units')
+                ->nullOnDelete();
             $table->text('description')->nullable();
             $table->foreignId('type_master_id')->nullable()->references('id')->on('type_masters')->onDelete('cascade');
             $table->enum('status', ['active', 'inactive'])->default('active');

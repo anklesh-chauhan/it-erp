@@ -23,6 +23,7 @@ use Filament\Forms\Components\Section;
 use App\Models\ItemMaster;
 use App\Models\NumberSeries;
 use Illuminate\Support\Facades\Auth;
+use Filament\Schemas\Components\Utilities\Get;
 
 trait CreateAccountMasterTrait
 {
@@ -41,27 +42,71 @@ trait CreateAccountMasterTrait
                             ->default(fn () => Auth::id())
                             ->required()
                             ->label('Owner'),
+
+                        Select::make('parent_type_id')
+    ->label('Account Type')
+    ->searchable()
+    ->options(
+        TypeMaster::whereNull('parent_id')
+            ->where('typeable_type', AccountMaster::class)
+            ->pluck('name', 'id')
+    )
+    ->required()
+    ->live()
+    ->afterStateHydrated(function (callable $set, callable $get) {
+
+        $typeMasterId = $get('type_master_id');
+
+        if (! $typeMasterId) {
+            return;
+        }
+
+        $type = TypeMaster::find($typeMasterId);
+
+        // If subtype → set its parent
+        if ($type?->parent_id) {
+            $set('parent_type_id', $type->parent_id);
+        } else {
+            // Parent-only type
+            $set('parent_type_id', $typeMasterId);
+        }
+    })
+    ->afterStateUpdated(function (callable $set, callable $get, $state) {
+
+        $hasChildren = TypeMaster::where('parent_id', $state)->exists();
+
+        if (! $hasChildren) {
+            $set('type_master_id', $state);
+
+            $next = NumberSeries::getNextNumber(AccountMaster::class, $state);
+            $set('account_code', $next);
+        } else {
+            $set('type_master_id', null);
+            $set('account_code', null);
+        }
+    }),
+
                         Select::make('type_master_id')
-                            ->label('Account Type')
-                            ->options(
-                                TypeMaster::query()
-                                    ->where('typeable_type', AccountMaster::class)
+                            ->label('Account Sub Type')
+                            ->searchable()
+                            ->options(fn (Get $get) =>
+                                TypeMaster::where('parent_id', $get('parent_type_id'))
                                     ->pluck('name', 'id')
                             )
-                            ->required()
-                            ->searchable()
-                            ->nullable() // Allow null if no type is selected
-                            ->helperText('Leave blank for default sequence.')
-                            ->preload()
+                            ->visible(fn (Get $get) =>
+                                filled($get('parent_type_id')) &&
+                                TypeMaster::where('parent_id', $get('parent_type_id'))->exists()
+                            )
+                            ->required(fn (Get $get) =>
+                                TypeMaster::where('parent_id', $get('parent_type_id'))->exists()
+                            )
                             ->live()
-                            ->afterStateUpdated(function (callable $set, $state, $component) {
-                                // Get the current state of type_master_id
-                                $typeMasterId = $state;
-                                // Fetch the next number based on the selected type_master_id
-                                $nextNumber = NumberSeries::getNextNumber(AccountMaster::class, $typeMasterId);
-                                // Set the account_code field with the new number
-                                $set('account_code', $nextNumber);
+                            ->afterStateUpdated(function (callable $set, $state) {
+                                // 🔥 SUB TYPE SELECTED → USE SUB TYPE FOR NUMBER SERIES
+                                $next = NumberSeries::getNextNumber(AccountMaster::class, $state);
+                                $set('account_code', $next);
                             }),
+
                         TextInput::make('name')
                             ->required()
                             ->maxLength(255),
@@ -109,6 +154,7 @@ trait CreateAccountMasterTrait
                             ->searchable()
                             ->preload(),
                         Select::make('ref_dealer_contact')
+                            ->label('Ref Contact')
                             ->relationship('dealerName', 'id') // Use 'id' here for relationship
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->FullName),
                         TextInput::make('commission')
@@ -124,10 +170,7 @@ trait CreateAccountMasterTrait
                             ->relationship('ratingType', 'name')
                             ->searchable()
                             ->preload(),
-                        Select::make('account_ownership_id')
-                            ->relationship('accountOwnership', 'name')
-                            ->searchable()
-                            ->preload(),
+
                     ])->columnSpanFull(),
         ];
 

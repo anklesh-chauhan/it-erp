@@ -76,7 +76,7 @@ class PositionResource extends Resource
                         ->searchable()
                         ->nullable()
                         ->placeholder('Select a reporting position'),
-                    
+
                     Toggle::make('is_multi_territory')
                         ->label('Is Multi Territory')
                         ->helperText('Enable to select multiple territories. ⚠️ Once multi-territory is enabled, it cannot be reversed.')
@@ -89,7 +89,7 @@ class PositionResource extends Resource
                         ->searchable()
                         ->preload()
                         ->label(fn (Get $get) => $get('is_multi_territory') ? 'Territories (Select Multiple)' : 'Territory (Select One Only)')
-                        
+
                         // Add validation to limit selection to 1 when NOT multi-territory
                         ->rules([
                             fn (Get $get) => function (string $attribute, $value, \Closure $fail) use ($get) {
@@ -108,29 +108,50 @@ class PositionResource extends Resource
                         ->nullable()
                         ->placeholder('Select a location'),
 
-                    Select::make('organizationalUnits')
-                        ->multiple()
-                        ->relationship('organizationalUnits', 'name')
+                    Select::make('division_ou_id')
+                        ->label('Division')
+                        ->options(fn () =>
+                            \App\Models\OrganizationalUnit::query()
+                                ->whereHas('typeMaster', fn ($q) =>
+                                    $q->where('name', 'Division')
+                                )
+                                ->pluck('name', 'id')
+                        )
                         ->searchable()
                         ->preload()
-                        ->label('Organizational Units'),
+                        ->nullable()
+                        ->reactive()
+                        ->afterStateUpdated(function (callable $set) {
+                            // 🔥 RESET dependent field
+                            $set('organizational_unit_id', null);
+                        }),
+
+                    Select::make('organizational_unit_id')
+                        ->label('Organizational Unit')
+                        ->options(function (callable $get) {
+                            $divisionId = $get('division_ou_id');
+
+                            if (! $divisionId) {
+                                return [];
+                            }
+
+                            return \App\Models\OrganizationalUnit::hierarchicalOptions($divisionId);
+                        })
+                        ->live()
+                        ->searchable()
+                        ->preload()
+                        ->nullable(),
                 ]),
 
             Section::make('Job Classification')
                 ->columns(2)
                 ->schema([
-                    Select::make('division_id')
-                        ->label('Division')
-                        ->relationship('division', 'name')
-                        ->searchable()
-                        ->nullable()
-                        ->placeholder('Select a division'),
-
                     Select::make('department_id')
                         ->label('Department')
                         ->relationship('department', 'department_name')
                         ->searchable()
                         ->nullable()
+                        ->preload()
                         ->placeholder('Select a department'),
 
                     Select::make('job_title_id')
@@ -138,6 +159,7 @@ class PositionResource extends Resource
                         ->relationship('jobTitle', 'title')
                         ->searchable()
                         ->nullable()
+                        ->preload()
                         ->placeholder('Select a job title'),
 
                     Select::make('job_grade_id')
@@ -145,6 +167,7 @@ class PositionResource extends Resource
                         ->relationship('jobGrade', 'grade_name')
                         ->searchable()
                         ->nullable()
+                        ->preload()
                         ->placeholder('Select a job grade'),
                 ]),
 

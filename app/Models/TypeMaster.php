@@ -12,15 +12,33 @@ class TypeMaster extends Model
 {
     use HasFactory, HasApprovalWorkflow;
 
-    protected $fillable = ['name', 'description', 'typeable_id', 'typeable_type'];
+    protected $fillable = ['name', 'description', 'typeable_id', 'typeable_type', 'parent_id'];
 
+    /* ================== POLYMORPHIC ================== */
     public function typeable(): MorphTo
     {
         return $this->morphTo();
     }
 
+    /* ================== SCOPES ================== */
     public function scopeOfType($query, string $model)
     {
         return $query->where('typeable_type', $model);
+    }
+
+    public function scopeRoot($query)
+    {
+        return $query->whereNull('parent_id');
+    }
+
+    /* ================== HIERARCHY ================== */
+    public function parent()
+    {
+        return $this->belongsTo(TypeMaster::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(TypeMaster::class, 'parent_id');
     }
 }

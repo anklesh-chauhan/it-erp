@@ -36,6 +36,7 @@ use App\Filament\Resources\Employees\Pages\CreateEmployee;
 use App\Filament\Resources\Employees\Pages\EditEmployee;
 use App\Filament\Resources\EmployeeResource\Pages;
 use App\Models\Employee;
+use App\Models\OrganizationalUnit;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -227,18 +228,49 @@ class EmployeeResource extends Resource
                                                     ->required()
                                                     ->maxLength(100),
                                             ]),
-                                        Select::make('division_id')
+
+                                        Select::make('division_ou_id')
                                             ->label('Division')
-                                            ->relationship('division', 'name')
-                                            ->preload()
+                                            ->options(fn () =>
+                                                \App\Models\OrganizationalUnit::query()
+                                                    ->whereHas('typeMaster', fn ($q) =>
+                                                        $q->where('name', 'Division')
+                                                    )
+                                                    ->pluck('name', 'id')
+                                            )
                                             ->searchable()
-                                            ->nullable(),
-                                        Select::make('organizational_unit_id')
-                                            ->label('Organizational Unit')
-                                            ->relationship('organizationalUnit', 'name')
                                             ->preload()
+                                            ->nullable()
+                                            ->reactive()
+                                            ->afterStateUpdated(function (callable $set) {
+                                                // 🔥 RESET dependent field
+                                                $set('organizationalUnits', null);
+                                            }),
+
+                                        Select::make('organizationalUnits')
+                                            ->label('Organizational Units')
+                                            ->multiple()
+                                            ->relationship(
+                                                name: 'organizationalUnits',
+                                                titleAttribute: 'name',
+                                                modifyQueryUsing: function ($query, callable $get) {
+                                                    $divisionId = $get('division_ou_id');
+
+                                                    if (! $divisionId) {
+                                                        $query->whereRaw('1 = 0');
+                                                        return;
+                                                    }
+
+                                                    $query->where(function ($q) use ($divisionId) {
+                                                        $q->where('organizational_units.id', $divisionId)
+                                                        ->orWhere('organizational_units.parent_id', $divisionId);
+                                                    });
+                                                }
+                                            )
                                             ->searchable()
-                                            ->nullable(),
+                                            ->preload()
+                                            ->reactive(),
+
                                         DatePicker::make('hire_date')
                                             ->label('Hire Date')
                                             ->native(false)
@@ -726,11 +758,26 @@ class EmployeeResource extends Resource
                     ->preload()
                     ->label('Division'),
 
-                SelectFilter::make('organizational_unit')
-                    ->relationship('employmentDetail.organizationalUnit', 'name')
+                SelectFilter::make('organizational_units')
+                    ->label('Organizational Units')
+                    ->multiple()
+                    ->options(
+                        OrganizationalUnit::query()
+                            ->pluck('name', 'id')
+                            ->toArray()
+                    )
+                    ->query(function (Builder $query, array $data) {
+
+                        if (empty($data['values'])) {
+                            return;
+                        }
+
+                        $query->whereHas('employmentDetail.organizationalUnits', function ($q) use ($data) {
+                            $q->whereIn('organizational_units.id', $data['values']);
+                        });
+                    })
                     ->searchable()
-                    ->preload()
-                    ->label('Organizational Unit'),
+                    ->preload(),
 
                 Filter::make('hire_date')
                     ->schema([

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->index(); // e.g., "Sales Division"
             $table->string('code')->unique(); // e.g., "SALES-001"
+            $table->foreignId('type_master_id')->constrained('type_masters')->onDelete('cascade');
             $table->text('description')->nullable();
             $table->foreignId('parent_id')->nullable()->constrained('organizational_units')->nullOnDelete(); // Self-referential for hierarchy
             $table->boolean('is_active')->default(true);
