@@ -19,6 +19,8 @@ return new class extends Migration
             $table->integer('next_number')->default(1);
             $table->string('Suffix')->nullable();
             $table->foreignId('type_master_id')->nullable()->constrained('type_masters')->onDelete('cascade');
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

@@ -28,6 +28,9 @@ return new class extends Migration
             $table->decimal('price', 15, 2)->nullable();
             $table->decimal('discount', 5, 2)->default(0);
 
+            $table->blameable();
+            $table->blameableSoftDeletes();
+
             $table->timestamps();
 
             // ✅ Ensure uniqueness — customer can have only one price per item (parent or variant)

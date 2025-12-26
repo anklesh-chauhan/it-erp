@@ -15,6 +15,8 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('file_type')->nullable(); // e.g., jpg, png, etc.
             $table->text('description')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

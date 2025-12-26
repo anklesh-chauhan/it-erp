@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('purpose')->nullable();
             $table->text('remarks')->nullable();
             $table->json('joint_with')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

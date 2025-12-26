@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('item_master_id')->constrained()->onDelete('cascade');
             $table->foreignId('tax_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

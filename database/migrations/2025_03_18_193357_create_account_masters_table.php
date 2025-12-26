@@ -38,7 +38,8 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->constrained('account_masters')->onDelete('cascade');
             $table->foreignId('rating_type_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('account_ownership_id')->nullable()->constrained('account_ownerships')->onDelete('set null');
-            $table->softDeletes();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
 

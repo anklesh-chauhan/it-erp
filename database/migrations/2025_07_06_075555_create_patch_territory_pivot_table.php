@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('territory_id')->constrained()->onDelete('cascade');
             $table->foreignId('patch_id')->constrained()->onDelete('cascade');
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

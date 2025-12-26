@@ -18,6 +18,8 @@ return new class extends Migration
             $table->decimal('due_in_days')->nullable(); // Number of days until payment is due
             $table->text('description')->nullable();
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

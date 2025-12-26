@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('requested_by')->constrained('users');
             $table->enum('status', ['draft', 'pending', 'approved', 'rejected'])->default('draft');
             $table->timestamp('completed_at')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

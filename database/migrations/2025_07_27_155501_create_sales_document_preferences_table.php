@@ -50,6 +50,8 @@ return new class extends Migration
             // Print preferences
             $table->json('default_print_preferences')->nullable();
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

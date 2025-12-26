@@ -37,6 +37,8 @@ use App\Models\Territory;
 use Filament\Actions\ActionGroup;
 use Filament\Tables\Enums\RecordActionsPosition;
 use App\Filament\Actions\ApprovalAction;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Facades\Filament;
 
 class PatchResource extends Resource
 {
@@ -138,306 +140,30 @@ class PatchResource extends Resource
                     ->reactive()
                     ->columnSpan(1),
 
-                // Add All from Territory button
-                Group::make()
-                    ->schema([
-                        Action::make('addAllFromTerritory')
-                            ->label(fn (Get $get) =>
-                                $get('city_pin_code_id')
-                                    ? 'Add All from Pin Code'
-                                    : 'Add All from Territory'
-                            )
-                            ->icon('heroicon-o-plus-circle')
-                            ->color('primary')
-                            ->visible(fn (Get $get) => filled($get('territory_id')))
-                            ->action(function ($livewire, $get, $set) {
-                                $territoryId = $get('territory_id');
-
-                                if (! $territoryId) {
-                                    Notification::make()
-                                        ->title('Select Territory')
-                                        ->body('Please select a territory before adding related companies and contacts.')
-                                        ->danger()
-                                        ->send();
-                                    return;
-                                }
-
-                                // Get all city_pin_code_ids linked to this territory
-                                $cityPinCodeId = $get('city_pin_code_id');
-
-                                $pinCodes = collect();
-
-                                // ✅ If City Pin Code selected → use ONLY that
-                                if ($cityPinCodeId) {
-                                    $pinCodes = \App\Models\CityPinCode::where('id', $cityPinCodeId)
-                                        ->pluck('pin_code');
-                                }
-                                // ✅ Else → use ALL pin codes of territory
-                                else {
-                                    $territory = Territory::with('cityPinCodes')->find($territoryId);
-                                    $pinCodes = $territory?->cityPinCodes?->pluck('pin_code') ?? collect();
-                                }
-
-                                $pinCodeIds = $pinCodes->toArray();
-
-                                if (empty($pinCodeIds)) {
-                                    Notification::make()
-                                        ->title('No Pin Codes Found')
-                                        ->body('This territory has no linked city pin codes.')
-                                        ->warning()
-                                        ->send();
-                                    return;
-                                }
-
-                                $newEntries = [];
-                                $order = 1;
-
-                                // 🏢 Companies linked via addresses (CHUNKED)
-                                AccountMaster::whereHas('addresses', function ($query) use ($pinCodeIds) {
-                                        $query->whereIn('pin_code', $pinCodeIds);
-                                    })
-                                    ->orderBy('id') // important for chunk stability
-                                    ->chunk(500, function ($companies) use (&$newEntries, &$order) {
-                                        foreach ($companies as $company) {
-                                            $newEntries[] = [
-                                                'patchable_type' => AccountMaster::class,
-                                                'patchable_id'   => $company->id,
-                                                'order'          => $order++,
-                                            ];
-                                        }
-                                    });
-
-                                 // 👤 Contacts linked via addresses
-                                ContactDetail::whereHas('addresses', function ($query) use ($pinCodeIds) {
-                                    $query->whereIn('pin_code', $pinCodeIds);
-                                })
-                                ->orderBy('id')
-                                ->chunk(500, function ($contacts) use (&$newEntries, &$order) {
-                                    foreach ($contacts as $contact) {
-                                        $newEntries[] = [
-                                            'patchable_type' => ContactDetail::class,
-                                            'patchable_id'   => $contact->id,
-                                            'order'          => $order++,
-                                        ];
-                                    }
-                                });
-
-                                // Merge without duplicates
-                                $existing = $get('patchables') ?? [];
-
-                                // 🧹 Remove the default empty row Filament adds
-                                $existing = array_filter($existing, function ($row) {
-                                    return !empty($row['patchable_type']) && !empty($row['patchable_id']);
-                                });
-
-                                $existingKeys = collect($existing)
-                                    ->map(fn ($e) => $e['patchable_type'].'-'.$e['patchable_id'])
-                                    ->toArray();
-
-                                $filtered = collect($newEntries)
-                                    ->reject(fn ($entry) => in_array($entry['patchable_type'].'-'.$entry['patchable_id'], $existingKeys))
-                                    ->values()
-                                    ->all();
-
-                                $set('patchables', array_merge($existing, $filtered));
-
-                                // CREATE MODE: no record yet — we must inject into form state and then call the create method
-                                // Clean existing repeater state (remove blank rows)
-                                $existingState = $get('patchables') ?? [];
-                                $existingState = array_values(array_filter($existingState, fn($r) => !empty($r['patchable_type']) && !empty($r['patchable_id'])));
-
-                                // Merge unique new entries
-                                $existingKeys = collect($existingState)->map(fn($e) => $e['patchable_type'].'-'.$e['patchable_id'])->toArray();
-                                $toAdd = [];
-                                foreach ($newEntries as $entry) {
-                                    $key = $entry['patchable_type'].'-'.$entry['patchable_id'];
-                                    if (! in_array($key, $existingKeys)) {
-                                        $toAdd[] = $entry;
-                                    }
-                                }
-
-                                // Set repeater state so form will include these on submit
-                                $set('patchables', array_merge($existingState, $toAdd));
-
-                                // Now attempt to call the page create/store method (best-effort)
-                                if (method_exists($livewire, 'create')) {
-                                    $livewire->create();
-                                    Notification::make()->title('Created')->success()->send();
-                                    return;
-                                }
-
-                                if (method_exists($livewire, 'createRecord')) {
-                                    $livewire->createRecord();
-                                    Notification::make()->title('Created')->success()->send();
-                                    return;
-                                }
-
-                                if (method_exists($livewire, 'store')) {
-                                    $livewire->store();
-                                    Notification::make()->title('Saved')->success()->send();
-                                    return;
-                                }
-
-                                Notification::make()
-                                    ->title('Added All Related Records')
-                                    ->body('All Companies and Contacts from this Territory have been added.')
-                                    ->success()
-                                    ->send();
-
-                            }),
-                    ])->columnSpanFull(),
-
-                // Table-style repeater bound to the patchables() hasMany relationship
-                Repeater::make('patchables')
-                    ->label('Assigned Companies or Contacts')
-                    ->relationship('patchables')   // binds to Patch::patchables()
-                    ->orderColumn('order')         // Filament will persist the 'order' column
-                    ->reorderable(FALSE)
-                    ->table([
-                        TableColumn::make('Customer Type'),
-                        TableColumn::make('Company/Contact Name'),
-                    ])
-                    ->schema([
-                        // CRITICAL: the primary key name MUST be `id` so Filament can map rows to DB records
-                        Hidden::make('id'),
-
-                        // store model class (AccountMaster::class or ContactDetail::class)
-                        Select::make('patchable_type')
-                            ->label('Type')
-                            ->options([
-                                AccountMaster::class => 'Company',
-                                ContactDetail::class => 'Contact',
-                            ])
-                            ->default(AccountMaster::class)
-                            ->reactive()
-                            ->required()
-                            ->afterStateUpdated(fn ($state, $set) => $set('patchable_id', null)),
-
-                        // store the related model id
-                        Select::make('patchable_id')
-                            ->label('Name')
-                            ->options(function (Get $get) {
-
-                                $territoryId = $get('../../territory_id');
-                                $cityPinCodeId = $get('../../city_pin_code_id'); // 👈 NEW
-                                $type = $get('patchable_type');
-
-                                if (! $territoryId) {
-                                    return [];
-                                }
-
-                                /*
-                                |--------------------------------------------------
-                                | 1️⃣ Decide pin codes to filter by
-                                |--------------------------------------------------
-                                */
-                                $pinCodes = collect();
-
-                                // ✅ If City Pin Code selected → use ONLY that
-                                if ($cityPinCodeId) {
-                                    $pinCodes = \App\Models\CityPinCode::where('id', $cityPinCodeId)
-                                        ->pluck('pin_code');
-                                }
-                                // ✅ Else → use ALL pin codes of territory
-                                else {
-                                    $territory = \App\Models\Territory::with('cityPinCodes')->find($territoryId);
-                                    $pinCodes = $territory?->cityPinCodes?->pluck('pin_code') ?? collect();
-                                }
-
-                                if ($pinCodes->isEmpty()) {
-                                    return [];
-                                }
-
-                                /*
-                                |--------------------------------------------------
-                                | 2️⃣ Filter by patchable type
-                                |--------------------------------------------------
-                                */
-                                if ($type === \App\Models\AccountMaster::class) {
-                                    return \App\Models\AccountMaster::whereHas('addresses', function ($q) use ($pinCodes) {
-                                            $q->whereIn('pin_code', $pinCodes);
-                                        })
-                                        ->orderBy('name')
-                                        ->pluck('name', 'id')
-                                        ->toArray();
-                                }
-
-                                if ($type === \App\Models\ContactDetail::class) {
-                                    return \App\Models\ContactDetail::whereHas('addresses', function ($q) use ($pinCodes) {
-                                            $q->whereIn('pin_code', $pinCodes);
-                                        })
-                                        ->orderBy('first_name')
-                                        ->get()
-                                        ->mapWithKeys(fn ($c) => [
-                                            $c->id => "{$c->first_name} {$c->last_name} ({$c->email})",
-                                        ])
-                                        ->toArray();
-                                }
-
-                                return [];
-                            })
-                            ->reactive()
-                            ->searchable()
-                            ->required(),
-
-                        // keep order visible but Filament manages persisting it
-                        Hidden::make('order'), // use hidden so user doesn't edit it manually
-                    ])
-                    // hydrate only if repeater state is empty (prevents overwriting on reorder)
-                    ->afterStateHydrated(function (callable $set, $state, $record) {
-                        if (! $record) {
-                            return;
-                        }
-
-                        // If state already populated (user interaction), don't overwrite
-                        if (! empty($state) && count($state) > 0) {
-                            return;
-                        }
-
-                        $rows = $record->patchables()
-                            ->orderBy('order')
-                            ->get()
-                            ->map(fn ($p) => [
-                                'id' => $p->id,
-                                'patchable_type' => $p->patchable_type,
-                                'patchable_id' => $p->patchable_id,
-                                'order' => $p->order,
-                            ])
-                            ->toArray();
-
-                        $set('patchables', $rows);
-                    })
-                    ->columnSpanFull(),
-                    //End of patchables field
+                ColorPicker::make('color')
+                            ->nullable()
+                            ->label('Patch Color'),
 
                 Textarea::make('description')
+                    ->label('Remarks')
                     ->nullable()
                     ->maxLength(65535)
-                    ->columnSpanFull()
-                    ->rows(3) // Provide a reasonable default height
-                    ->helperText('A brief description of the patch.'),
+                    ->rows(2),
 
-                Group::make()
-                    ->columns(3)
-                    ->schema([
-                        ColorPicker::make('color')
-                            ->nullable()
-                            ->label('Patch Color')
-                            ->helperText('Choose a color to visually represent the patch.'),
 
-                        TextInput::make('created_by')
+
+                        Hidden::make('created_by')
                             ->default(Auth::user()->name ?? 'System') // Fallback if user is somehow not available
                             ->disabled()
                             ->dehydrated(false)
                             ->label('Created By'),
 
-                        TextInput::make('updated_by')
+                        Hidden::make('updated_by')
                             ->default(Auth::user()->name ?? 'System')
                             ->disabled()
                             ->dehydrated(false)
                             ->label('Last Updated By'),
-                     ])
-                    ->columnSpanFull(),
+
 
             ])->columns(2); // Set a default number of columns for the form
     }
@@ -473,61 +199,6 @@ class PatchResource extends Resource
 
                 ColorColumn::make('color')
                     ->label('Patch Color'),
-
-                TextColumn::make('patchables_summary')
-                    ->label('Assigned Entities')
-                    ->getStateUsing(function ($record) {
-                        return $record->patchables
-                            ->map(function ($patchable) {
-                                $entity = $patchable->patchable; // morphTo relation
-                                if (! $entity) {
-                                    return null;
-                                }
-
-                                if ($patchable->patchable_type === \App\Models\AccountMaster::class) {
-                                    return "🏢 {$entity->name}";
-                                }
-
-                                if ($patchable->patchable_type === \App\Models\ContactDetail::class) {
-                                    // Assuming ContactDetail has first_name, last_name, and email fields
-                                    $fullName = trim("{$entity->first_name} {$entity->last_name}");
-                                    return "👤 {$fullName}";
-                                }
-
-                                return null;
-                            })
-                            ->filter()
-                            ->implode(', ');
-                    })
-                    ->limit(70) // Limit displayed text
-                    ->tooltip(function ($record) {
-                        if (! $record->patchables) {
-                            return null;
-                        }
-
-                        return $record->patchables
-                            ->map(function ($patchable) {
-                                $entity = $patchable->patchable; // morphTo relation
-                                if (! $entity) {
-                                    return null;
-                                }
-
-                                if ($patchable->patchable_type === \App\Models\AccountMaster::class) {
-                                    return "🏢 {$entity->name}";
-                                }
-
-                                if ($patchable->patchable_type === \App\Models\ContactDetail::class) {
-                                    $fullName = trim("{$entity->first_name} {$entity->last_name}");
-                                    return "👤 {$fullName}";
-                                }
-
-                                return null;
-                            })
-                            ->filter()
-                            ->implode("\n"); // new line for each item in tooltip
-                    })
-                    ->listWithLineBreaks()
-                    ->bulleted(),
 
                 TextColumn::make('created_by')
                     ->sortable()
@@ -581,8 +252,7 @@ class PatchResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Consider adding relation managers here if you have related models that need to be managed directly from the Patch resource.
-            // Example: PatchablesRelationManager::class
+            RelationManagers\CompaniesRelationManager::class,
         ];
     }
 

@@ -21,13 +21,14 @@ return new class extends Migration
             $table->boolean('is_group')->default(false); // true = grouping account, false = ledger
             $table->boolean('is_active')->default(true);
             $table->boolean('is_system')->default(false); // Indicates if the account is a system account
-            $table->softDeletes(); // Allows for soft deletion of accounts
             $table->decimal('balance', 15, 2)->default(0.00); // Current balance of the account
             $table->decimal('opening_balance', 15, 2)->default(0.00); // Opening balance for the account
             $table->date('opening_balance_date')->nullable(); // Date of the opening balance
             $table->string('currency', 3)->default('INR'); // Currency code (e.g., USD, EUR, INR)
             $table->string('currency_symbol', 10)->default('₹'); // Symbol for  the currency
             $table->string('currency_name', 50)->default('Indian Rupee');
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

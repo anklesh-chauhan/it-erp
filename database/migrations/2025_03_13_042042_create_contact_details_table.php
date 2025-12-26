@@ -35,6 +35,8 @@ return new class extends Migration
             $table->string('twitter')->nullable();
             $table->string('website')->nullable();
             $table->text('notes')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

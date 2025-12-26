@@ -19,6 +19,8 @@ return new class extends Migration
             $table->text('interaction')->nullable();
             $table->text('outcome')->nullable();
             $table->dateTime('next_follow_up_date')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

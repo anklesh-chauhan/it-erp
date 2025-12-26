@@ -18,6 +18,8 @@ return new class extends Migration
             $table->text('note'); // Note content
             $table->string('attachment')->nullable(); // File attachment
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

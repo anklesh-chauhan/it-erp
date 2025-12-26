@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('ifsc_code');
             $table->string('name_in_bank');
             $table->text('remarks')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

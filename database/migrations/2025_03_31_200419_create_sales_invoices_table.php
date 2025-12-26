@@ -45,10 +45,8 @@ return new class extends Migration
             $table->date('due_date')->nullable(); // e.g., '2025-12-31'
             $table->enum('payment_status', ['Paid', 'Unpaid', 'Partially Paid'])->nullable();
             $table->datetime('paid_at')->nullable(); // e.g., '2025-12-31'
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade'); // Assuming you have a users table
-            $table->foreignId('updated_by')->constrained('users')->onDelete('cascade'); // Assuming you have a users table
-            $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('cascade'); // Assuming you have a users table
-            $table->softDeletes(); // For soft delete functionality
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

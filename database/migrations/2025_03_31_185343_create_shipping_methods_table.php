@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name'); // e.g. "FedEx", "DHL", "Local Pickup"
             $table->text('description')->nullable();
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

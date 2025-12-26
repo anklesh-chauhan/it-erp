@@ -19,10 +19,8 @@ return new class extends Migration
             $table->foreignId('city_pin_code_id')->nullable()->constrained('city_pin_codes')->nullOnDelete();
             $table->text('description')->nullable();
             $table->string('color')->nullable(); // For UI representation, e.g., hex color code
-            $table->string('created_by')->nullable(); // User ID or name of the creator
-            $table->string('updated_by')->nullable(); // User ID or name of the updater
-            $table->string('deleted_by')->nullable(); // User ID or name of the
-            $table->softDeletes(); // For soft delete functionality
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

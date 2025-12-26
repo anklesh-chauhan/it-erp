@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('tds_parameters')->nullable();
             $table->boolean('is_tds_deduct')->default(false);
             $table->boolean('is_tds_compulsory')->default(false);
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
 
         });

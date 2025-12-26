@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name'); // e.g., 'Kilogram', 'Brand A', 'Air', 'Initial Meeting'
             $table->string('description')->nullable();
             $table->nullableMorphs('typeable'); // Polymorphic relation
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

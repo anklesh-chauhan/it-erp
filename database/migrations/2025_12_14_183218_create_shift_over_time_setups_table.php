@@ -34,6 +34,8 @@ return new class extends Migration
             // is approval required
             $table->boolean('is_approval_required')->default(false);
 
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

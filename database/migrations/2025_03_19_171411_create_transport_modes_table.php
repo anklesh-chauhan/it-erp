@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('transport_modes', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

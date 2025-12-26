@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('position_id')->constrained()->cascadeOnDelete();
             $table->foreignId('territory_id')->constrained()->cascadeOnDelete();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

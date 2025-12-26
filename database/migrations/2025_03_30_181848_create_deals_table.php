@@ -28,6 +28,8 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->morphs('status'); // Polymorphic status columns
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

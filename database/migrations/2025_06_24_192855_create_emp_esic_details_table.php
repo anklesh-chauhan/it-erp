@@ -26,9 +26,8 @@ return new class extends Migration
             $table->string('esic_account_ifsc', 50)->nullable();
             $table->string('esic_account_branch', 100)->nullable();
             $table->string('esic_account_remarks', 255)->nullable();
-            $table->string('created_by', 50)->nullable();
-            $table->string('updated_by', 50)->nullable();
-            $table->softDeletes(); // For soft delete functionality
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

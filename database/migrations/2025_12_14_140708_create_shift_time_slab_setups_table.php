@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('from_minute')->nullable();
             $table->integer('to_minute')->nullable();
             $table->integer('diff_calc')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

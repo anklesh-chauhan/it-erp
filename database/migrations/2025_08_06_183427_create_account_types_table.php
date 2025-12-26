@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('description')->nullable(); // Optional description of the account type
             $table->boolean('is_active')->default(true); // Indicates if the account type is active
             $table->boolean('is_system')->default(false); // Indicates if the account type is a system type
-            $table->softDeletes(); // Allows for soft deletion of account types
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

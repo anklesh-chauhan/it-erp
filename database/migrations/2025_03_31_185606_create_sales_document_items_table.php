@@ -25,6 +25,8 @@ return new class extends Migration
             $table->decimal('amount', 15, 2)->default(0);
             $table->text('description')->nullable();
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

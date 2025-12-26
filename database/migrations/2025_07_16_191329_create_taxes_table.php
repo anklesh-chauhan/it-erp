@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name'); // e.g., GST 18%
             $table->decimal('total_rate', 5, 2); // e.g., 18.00
             $table->boolean('is_active')->default(true);
-            $table->softDeletes(); // For soft deletion
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

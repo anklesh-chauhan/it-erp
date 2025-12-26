@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('follow_up_results', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('tour_plan_id')->constrained('tour_plans')->onDelete('cascade');
             $table->integer('visit_order');
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

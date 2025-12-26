@@ -22,6 +22,8 @@ return new class extends Migration
 
             $table->boolean('is_current')->default(true);
 
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

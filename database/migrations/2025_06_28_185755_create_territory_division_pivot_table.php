@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('division_ou_id')->constrained('organizational_units', 'id', 'terr_org_unit_id_fk')->onDelete('cascade');
             $table->boolean('is_active')->default(true);
             $table->primary(['territory_id', 'division_ou_id']);
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

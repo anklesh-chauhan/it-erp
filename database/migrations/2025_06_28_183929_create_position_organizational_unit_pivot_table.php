@@ -17,6 +17,8 @@ return new class extends Migration
                 ->constrained('organizational_units', 'id', 'pos_org_unit_id_fk') // Short, explicit foreign key name
                 ->onDelete('cascade');
             $table->primary(['position_id', 'organizational_unit_id']);
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps(); // Optional: if you want to track when the pivot was created/updated
         });
     }

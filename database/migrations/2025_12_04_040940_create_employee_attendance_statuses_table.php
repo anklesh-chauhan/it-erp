@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('color_code')->nullable();
             $table->boolean('is_system')->default(false);
             $table->text('remarks')->nullable();
-
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

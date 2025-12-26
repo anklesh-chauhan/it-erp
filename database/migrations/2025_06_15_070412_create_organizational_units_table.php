@@ -20,6 +20,8 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->constrained('organizational_units')->nullOnDelete(); // Self-referential for hierarchy
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

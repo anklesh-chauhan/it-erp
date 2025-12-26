@@ -26,7 +26,8 @@ return new class extends Migration
             $table->foreignId('approver_id')->nullable()->constrained('users')->onDelete('set null'); // Approver Name (user_id)
             $table->text('remarks')->nullable(); // Remarks
             $table->timestamps();
-            $table->softDeletes();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

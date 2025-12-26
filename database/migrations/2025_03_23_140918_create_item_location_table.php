@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('item_master_id')->constrained('item_masters')->onDelete('cascade');
             $table->foreignId('location_master_id')->constrained('location_masters')->onDelete('cascade');
             $table->integer('quantity')->default(0);
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

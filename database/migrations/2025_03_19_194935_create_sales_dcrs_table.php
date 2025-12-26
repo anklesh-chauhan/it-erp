@@ -21,7 +21,8 @@ return new class extends Migration
             $table->nullableMorphs('category'); // Polymorphic relation for flexible category assignment
             $table->decimal('expense_total', 10, 2)->nullable();
             $table->timestamps();
-            $table->softDeletes();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

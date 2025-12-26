@@ -24,7 +24,8 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('type_master_id')->nullable()->references('id')->on('type_masters')->onDelete('cascade');
             $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->softDeletes(); // For soft delete functionality
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

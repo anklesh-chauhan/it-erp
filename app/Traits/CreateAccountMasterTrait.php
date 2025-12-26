@@ -44,47 +44,47 @@ trait CreateAccountMasterTrait
                             ->label('Owner'),
 
                         Select::make('parent_type_id')
-    ->label('Account Type')
-    ->searchable()
-    ->options(
-        TypeMaster::whereNull('parent_id')
-            ->where('typeable_type', AccountMaster::class)
-            ->pluck('name', 'id')
-    )
-    ->required()
-    ->live()
-    ->afterStateHydrated(function (callable $set, callable $get) {
+                            ->label('Account Type')
+                            ->searchable()
+                            ->options(
+                                TypeMaster::whereNull('parent_id')
+                                    ->where('typeable_type', AccountMaster::class)
+                                    ->pluck('name', 'id')
+                            )
+                            ->required()
+                            ->live()
+                            ->afterStateHydrated(function (callable $set, callable $get) {
 
-        $typeMasterId = $get('type_master_id');
+                                $typeMasterId = $get('type_master_id');
 
-        if (! $typeMasterId) {
-            return;
-        }
+                                if (! $typeMasterId) {
+                                    return;
+                                }
 
-        $type = TypeMaster::find($typeMasterId);
+                                $type = TypeMaster::find($typeMasterId);
 
-        // If subtype → set its parent
-        if ($type?->parent_id) {
-            $set('parent_type_id', $type->parent_id);
-        } else {
-            // Parent-only type
-            $set('parent_type_id', $typeMasterId);
-        }
-    })
-    ->afterStateUpdated(function (callable $set, callable $get, $state) {
+                                // If subtype → set its parent
+                                if ($type?->parent_id) {
+                                    $set('parent_type_id', $type->parent_id);
+                                } else {
+                                    // Parent-only type
+                                    $set('parent_type_id', $typeMasterId);
+                                }
+                            })
+                            ->afterStateUpdated(function (callable $set, callable $get, $state) {
 
-        $hasChildren = TypeMaster::where('parent_id', $state)->exists();
+                                $hasChildren = TypeMaster::where('parent_id', $state)->exists();
 
-        if (! $hasChildren) {
-            $set('type_master_id', $state);
+                                if (! $hasChildren) {
+                                    $set('type_master_id', $state);
 
-            $next = NumberSeries::getNextNumber(AccountMaster::class, $state);
-            $set('account_code', $next);
-        } else {
-            $set('type_master_id', null);
-            $set('account_code', null);
-        }
-    }),
+                                    $next = NumberSeries::getNextNumber(AccountMaster::class, $state);
+                                    $set('account_code', $next);
+                                } else {
+                                    $set('type_master_id', null);
+                                    $set('account_code', null);
+                                }
+                            }),
 
                         Select::make('type_master_id')
                             ->label('Account Sub Type')

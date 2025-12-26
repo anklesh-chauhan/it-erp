@@ -23,6 +23,8 @@ return new class extends Migration
             $table->foreignId('rating_type_id')->nullable()->constrained()->onDelete('set null');
             $table->decimal('annual_revenue', 15, 2)->nullable();
             $table->text('description')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

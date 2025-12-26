@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('quantity')->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

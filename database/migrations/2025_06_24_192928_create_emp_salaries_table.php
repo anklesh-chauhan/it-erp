@@ -28,9 +28,8 @@ return new class extends Migration
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
             $table->string('salary_frequency', 20)->default('Monthly'); // e.g. 'Monthly', 'Weekly', 'Bi-Weekly'
             $table->string('salary_status', 20)->default('Active'); // e.g. 'Active', 'Inactive', 'Pending', 'Processed'
-            $table->string('created_by', 50)->nullable();
-            $table->string('updated_by', 50)->nullable();
-            $table->softDeletes(); // For soft delete functionality
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

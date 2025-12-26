@@ -18,6 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('department_id')->nullable();
             $table->foreign('department_id')->references('id')->on('emp_departments')->onDelete('set null');
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

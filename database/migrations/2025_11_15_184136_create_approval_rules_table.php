@@ -21,7 +21,8 @@ return new class extends Migration
             $table->decimal('max_amount', 24, 2)->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();
-
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->index(['module', 'territory_id', 'level']);
         });
     }

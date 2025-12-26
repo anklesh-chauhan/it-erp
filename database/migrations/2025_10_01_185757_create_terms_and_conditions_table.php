@@ -18,6 +18,8 @@ return new class extends Migration
             $table->text('content');
             $table->unsignedInteger('order')->default(0);
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

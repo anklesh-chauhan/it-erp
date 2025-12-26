@@ -33,11 +33,9 @@ return new class extends Migration
             $table->enum('blood_group', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignId('login_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('created_by_user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('updated_by_user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('deleted_by_user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->boolean('is_deleted')->default(false);
-            $table->softDeletes(); // For soft delete functionality
             $table->timestamps();
         });
     }

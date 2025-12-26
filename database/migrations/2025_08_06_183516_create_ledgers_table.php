@@ -26,7 +26,8 @@ return new class extends Migration
             $table->boolean('is_reconciled')->default(false); // Indicates if the ledger entry is reconciled
             $table->boolean('is_active')->default(true); // Indicates if the ledger entry is active
             $table->boolean('is_system')->default(false); // Indicates if the ledger entry is a system entry
-            $table->softDeletes(); // Allows for soft deletion of ledger entries   
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

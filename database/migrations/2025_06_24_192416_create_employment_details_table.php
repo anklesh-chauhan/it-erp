@@ -40,9 +40,8 @@ return new class extends Migration
             $table->foreign('work_location_id')->references('id')->on('location_masters')->onDelete('set null');
             $table->foreign('reporting_manager_id')->references('id')->on('employees')->onDelete('set null');
             $table->text('remarks')->nullable();
-            $table->string('created_by', 50)->nullable();
-            $table->string('updated_by', 50)->nullable();
-            $table->softDeletes(); // For soft delete functionality
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

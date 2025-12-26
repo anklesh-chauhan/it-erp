@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('pan_number')->nullable(); // Pan number associated with the GST
             $table->text('remark')->nullable();
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

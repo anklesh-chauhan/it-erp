@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
             $table->string('pan_number');
             $table->string('gst_number');
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

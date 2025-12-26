@@ -26,9 +26,8 @@ return new class extends Migration
             $table->string('tax_exemption_reason', 255)->nullable();
             $table->string('tax_exemption_validity', 50)->nullable();
             $table->string('tax_exemption_remarks', 255)->nullable();
-            $table->string('created_by', 50)->nullable();
-            $table->string('updated_by', 50)->nullable();
-            $table->softDeletes(); // For soft delete functionality
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

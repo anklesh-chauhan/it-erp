@@ -22,7 +22,8 @@ return new class extends Migration
             $table->text('credit_terms')->nullable(); // Notes or terms for credit
             $table->text('remark')->nullable(); // Internal notes
             $table->foreignId('account_master_id')->constrained()->cascadeOnDelete(); // Foreign key to account master
-
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

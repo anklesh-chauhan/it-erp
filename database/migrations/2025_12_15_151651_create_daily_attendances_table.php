@@ -50,6 +50,8 @@ return new class extends Migration
 
             $table->unique(['employee_id', 'attendance_date']);
 
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

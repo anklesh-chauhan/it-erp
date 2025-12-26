@@ -29,7 +29,8 @@ return new class extends Migration
 
             $table->integer('monthly_early_in_grace_no_of_times')->nullable();
             $table->integer('monthly_late_out_grace_no_of_times')->nullable();
-
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

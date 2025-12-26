@@ -20,6 +20,8 @@ return new class extends Migration
             $table->foreignId('city_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('state_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('country_id')->nullable()->constrained()->onDelete('cascade');
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
 
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');

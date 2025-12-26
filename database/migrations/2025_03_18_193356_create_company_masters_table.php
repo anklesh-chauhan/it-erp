@@ -22,7 +22,8 @@ return new class extends Migration
             $table->nullableMorphs('category'); // Polymorphic relation for Category
             $table->nullableMorphs('typeable');
             $table->timestamps();
-            $table->softDeletes();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
 
         // Pivot Table for Multiple Contact Details

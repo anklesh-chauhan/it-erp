@@ -25,7 +25,8 @@ return new class extends Migration
             $table->decimal('distance_travelled', 8, 2)->nullable(); // Distance travelled in kilometers
             $table->decimal('travel_expenses', 8, 2)->nullable(); // Travel expenses (fuel, tolls, etc.)
             $table->timestamps();
-            $table->softDeletes();
+            $table->blameable();
+            $table->blameableSoftDeletes();
 
         });
     }

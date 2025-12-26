@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('color')->nullable(); // Optional: for UI purposes
             $table->integer('order')->nullable(); // For sorting statuses
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

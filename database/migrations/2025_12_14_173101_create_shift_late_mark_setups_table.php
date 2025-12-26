@@ -27,6 +27,8 @@ return new class extends Migration
             $table->integer('conversion_rate_grace_late_mark_count')->nullable();
             $table->integer('conversion_rate_no_of_late_mark_count')->nullable();
             $table->integer('conversion_rate_no_of_day_absent')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

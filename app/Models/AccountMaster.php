@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use App\Traits\HasApprovalWorkflow;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-class AccountMaster extends Model
+class AccountMaster extends BaseModel
 {
     use SoftDeletes, HasFactory, HasApprovalWorkflow;
 
@@ -144,6 +144,12 @@ class AccountMaster extends Model
     public function typeable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function patches(): BelongsToMany
+    {
+        return $this->belongsToMany(Patch::class)
+            ->withTimestamps();
     }
 
     protected static function boot()

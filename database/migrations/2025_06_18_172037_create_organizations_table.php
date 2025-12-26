@@ -40,16 +40,13 @@ return new class extends Migration
             $table->string('facebook_url')->nullable();
             $table->string('instagram_url')->nullable();
             $table->string('status')->default('active');
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
             $table->json('metadata')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
-            $table->softDeletes();
             $table->foreignId('industry_type_id')->nullable()->constrained('industry_types')->onDelete('set null');
             $table->foreign('parent_organization_id')->references('id')->on('organizations')->onDelete('set null');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

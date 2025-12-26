@@ -32,6 +32,8 @@ return new class extends Migration
                 'emp_det_ou_unique'
             );
 
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

@@ -23,6 +23,8 @@ return new class extends Migration
             $table->integer('conversion_daily_ot_hours')->nullable();
             $table->integer('conversion_co_plus_credit_days')->nullable();
 
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

@@ -23,6 +23,8 @@ return new class extends Migration
             $table->boolean('is_allow_auto_shift')->default(false);
             $table->boolean('is_allow_half_day_leave')->default(false);
             $table->boolean('is_allow_shift_change_request')->default(false);
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

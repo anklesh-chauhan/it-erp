@@ -18,6 +18,8 @@ return new class extends Migration
             $table->text('content'); // actual terms text
             $table->boolean('is_default')->default(false); // mark default term for each document type
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

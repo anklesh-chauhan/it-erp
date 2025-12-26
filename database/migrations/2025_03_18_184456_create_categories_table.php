@@ -20,7 +20,8 @@ return new class extends Migration
             $table->string('image_path')->nullable();
             $table->nullableMorphs('modelable'); // Added Morph Relation
             $table->timestamps();
-		    $table->softDeletes();
+		    $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

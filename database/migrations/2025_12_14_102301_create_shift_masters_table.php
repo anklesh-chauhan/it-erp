@@ -54,6 +54,8 @@ return new class extends Migration
             $table->time('break_start_time')->nullable();
             $table->time('break_end_time')->nullable();
 
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('file_type')->nullable();
             $table->text('description')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

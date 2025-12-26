@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->text('description')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
 
@@ -41,7 +43,8 @@ return new class extends Migration
             $table->foreignId('packaging_type_id')->nullable()->constrained('packing_types');
             $table->integer('per_packing_qty')->nullable();
             $table->timestamps();
-            $table->softDeletes();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
 
         // Pivot Table for Multiple Address Details
@@ -50,6 +53,8 @@ return new class extends Migration
             $table->foreignId('account_master_id')->constrained('account_masters')->onDelete('cascade');
             $table->foreignId('item_master_id')->constrained('item_masters')->onDelete('cascade');
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

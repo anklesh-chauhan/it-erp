@@ -22,7 +22,8 @@ return new class extends Migration
             $table->foreignId('address_id')->nullable()->constrained()->onDelete('set null');
             $table->string('description')->nullable(); // Optional description of the route
             $table->timestamps();
-            $table->softDeletes();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

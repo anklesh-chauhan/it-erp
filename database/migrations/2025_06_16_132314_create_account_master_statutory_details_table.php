@@ -25,6 +25,8 @@ return new class extends Migration
             $table->string('tds_remark')->nullable(); // Remarks related to TDS
             $table->foreignId('account_master_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

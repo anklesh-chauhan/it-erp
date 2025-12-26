@@ -15,6 +15,8 @@ return new class extends Migration
             $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
             $table->foreignId('position_id')->constrained('positions')->onDelete('cascade');
             $table->primary(['employee_id', 'position_id']); // Composite primary key
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps(); // Add timestamps if you want to track when associations were made
         });
     }

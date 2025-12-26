@@ -20,9 +20,8 @@ return new class extends Migration
             $table->date('activity_date');
             $table->string('performed_by', 50)->nullable(); // User/admin who performed the action
             $table->text('remarks')->nullable();
-            $table->string('created_by', 50)->nullable();
-            $table->string('updated_by', 50)->nullable();
-            $table->softDeletes(); // For soft delete functionality
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
             $table->timestamps();
         });

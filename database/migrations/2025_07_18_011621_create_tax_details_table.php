@@ -25,6 +25,8 @@ return new class extends Migration
             $table->decimal('rate', 8, 2); // e.g. 9.00 (%)
             $table->decimal('amount', 15, 2); // e.g. 1234.56
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

@@ -19,6 +19,8 @@ return new class extends Migration
             $table->decimal('rate_per_km', 8, 2)->nullable(); // For travel-based expenses
             $table->decimal('fixed_expense', 10, 2)->nullable(); // For fixed expenses like meals, etc.
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

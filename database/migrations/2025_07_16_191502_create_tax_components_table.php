@@ -18,6 +18,8 @@ return new class extends Migration
             $table->decimal('rate', 6, 2); // e.g. 9.00, 22.00, 5.00
             $table->string('description')->nullable(); // Optional note about CESS type or usage
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

@@ -22,9 +22,8 @@ return new class extends Migration
             $table->string('grade', 50)->nullable();
             $table->string('percentage', 10)->nullable();
             $table->string('remarks', 255)->nullable();
-            $table->string('created_by', 50)->nullable();
-            $table->string('updated_by', 50)->nullable();
-            $table->softDeletes(); // For soft delete functionality
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

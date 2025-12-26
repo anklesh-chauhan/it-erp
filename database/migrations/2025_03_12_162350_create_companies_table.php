@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('twitter')->nullable();
             $table->string('linked_in')->nullable();
             $table->text('description')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

@@ -24,6 +24,8 @@ return new class extends Migration
             $table->decimal('longitude', 10, 7)->nullable();
             $table->string('image')->nullable();
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

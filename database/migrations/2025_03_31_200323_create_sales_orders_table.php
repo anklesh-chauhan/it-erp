@@ -45,10 +45,8 @@ return new class extends Migration
             $table->date('sent_at')->nullable(); // e.g., '2025-12-31'
             $table->date('delivery_date')->nullable(); // e.g., '2025-12-31'
             $table->dateTime('order_confirmation_at')->nullable(); // e.g., '2025-12-31'
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade'); // Assuming you have a users table
-            $table->foreignId('updated_by')->constrained('users')->onDelete('cascade'); // Assuming you have a users table
-            $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('cascade'); // Assuming you have a users table
-            $table->softDeletes(); // For soft delete functionality
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }
