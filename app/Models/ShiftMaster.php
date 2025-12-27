@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 
-class ShiftMaster extends Model
+use App\Models\BaseModel;
+class ShiftMaster extends BaseModel
 {
     protected $table = 'shift_masters';
 

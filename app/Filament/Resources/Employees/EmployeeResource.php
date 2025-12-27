@@ -174,8 +174,6 @@ class EmployeeResource extends Resource
                                             ->nullable(),
                                         Toggle::make('is_active')
                                             ->default(true),
-                                        Hidden::make('updated_by_user_id')
-                                            ->default(optional(Auth::user())->id),
                                     ]),
                             ]),
 
@@ -318,10 +316,6 @@ class EmployeeResource extends Resource
                                             ->label('Remarks')
                                             ->columnSpanFull()
                                             ->nullable(),
-                                        Hidden::make('created_by')
-                                            ->default(optional(Auth::user())->id),
-                                        Hidden::make('updated_by')
-                                            ->default(optional(Auth::user())->id),
                                     ]),
                                 Section::make('Assigned Positions')
                                     ->description('Select the positions this employee holds.')

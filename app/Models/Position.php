@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -11,7 +12,7 @@ use App\Enums\PositionStatus; // Import the new enum
 
 use App\Traits\HasApprovalWorkflow;
 
-class Position extends Model
+class Position extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 

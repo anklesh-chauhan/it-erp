@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use App\Traits\HasApprovalWorkflow;
 
-class Tax extends Model
+class Tax extends BaseModel
 {
     use HasFactory, SoftDeletes, HasApprovalWorkflow;
 

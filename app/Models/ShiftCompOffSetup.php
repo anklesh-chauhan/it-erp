@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ShiftCompOffSetup extends Model
+class ShiftCompOffSetup extends BaseModel
 {
     protected $table = 'shift_comp_off_setups';
 

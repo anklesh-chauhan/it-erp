@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ShiftLateMarkSetup extends Model
+class ShiftLateMarkSetup extends BaseModel
 {
     protected $table = 'shift_late_mark_setups';
 

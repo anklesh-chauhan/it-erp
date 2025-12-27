@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ShiftDayWorkSetup extends Model
+class ShiftDayWorkSetup extends BaseModel
 {
     protected $table = 'shift_day_work_setups';
 

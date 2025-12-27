@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+
+use App\Models\BaseModel;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Traits\HasApprovalWorkflow;
 
-class NumberSeries extends Model
+class NumberSeries extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 

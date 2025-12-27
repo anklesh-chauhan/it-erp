@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Traits\HasApprovalWorkflow;
 
-class EmpQualification extends Model
+class EmpQualification extends BaseModel
 {
     use SoftDeletes, HasApprovalWorkflow;
 

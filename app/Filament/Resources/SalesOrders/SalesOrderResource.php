@@ -50,6 +50,12 @@ class SalesOrderResource extends Resource
     protected static ?int $navigationSort = 20;
     protected static ?string $navigationLabel = 'Sales Orders';
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->applyVisibility(static::getModelLabel());
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -154,7 +160,7 @@ class SalesOrderResource extends Resource
                 ActionGroup::make([
                 EditAction::make(),
                 ApprovalAction::make(),
-                
+
                 Action::make('createInvoice')
                     ->label('Create Invoice')
                     ->icon('heroicon-o-document-text')
@@ -194,7 +200,7 @@ class SalesOrderResource extends Resource
             ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

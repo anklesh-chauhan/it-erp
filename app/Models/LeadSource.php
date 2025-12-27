@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 
+use App\Models\BaseModel;
 use App\Traits\HasApprovalWorkflow;
 
-class LeadSource extends Model
+class LeadSource extends BaseModel
 {
     use HasApprovalWorkflow;
 

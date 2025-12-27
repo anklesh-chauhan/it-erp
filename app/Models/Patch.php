@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\HasApprovalWorkflow;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Patch extends Model
+class Patch extends BaseModel
 {
     use SoftDeletes, HasApprovalWorkflow;
 

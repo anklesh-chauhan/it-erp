@@ -1,13 +1,13 @@
 <?php
 
 namespace App\Models;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use App\Traits\HasApprovalWorkflow;
 
-class Company extends Model
+class Company extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 

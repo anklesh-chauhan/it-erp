@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use App\Traits\HasApprovalWorkflow;
 
-class TransportMode extends Model
+class TransportMode extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
     protected $fillable = ['name'];

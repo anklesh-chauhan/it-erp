@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+
+use App\Models\BaseModel;
 use App\Traits\HasCustomerInteractionFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 use App\Traits\HasApprovalWorkflow;
 
-class Deal extends Model
+class Deal extends BaseModel
 {
     use HasFactory, HasCustomerInteractionFields, HasApprovalWorkflow;
 

@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 
 use App\Traits\HasApprovalWorkflow;
 
-class SalesTourPlanDetail extends Model
+class SalesTourPlanDetail extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 

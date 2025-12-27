@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Traits\HasApprovalWorkflow;
 
-class Ledger extends Model
+class Ledger extends BaseModel
 {
     use SoftDeletes, HasApprovalWorkflow;
 

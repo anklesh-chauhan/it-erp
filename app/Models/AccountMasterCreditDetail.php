@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use App\Enums\AccountMasterCreditType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use App\Traits\HasApprovalWorkflow;
 
-class AccountMasterCreditDetail extends Model
+class AccountMasterCreditDetail extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 

@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Validation\ValidationException;
 
-class ShiftTimeSlabSetup extends Model
+class ShiftTimeSlabSetup extends BaseModel
 {
     protected $table = 'shift_time_slab_setups';
 

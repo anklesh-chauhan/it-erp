@@ -1,15 +1,14 @@
 <?php
 
 namespace App\Models;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-use Illuminate\Database\Eloquent\Model;
-
-
 use App\Traits\HasApprovalWorkflow;
 
-class FollowUp extends Model
+class FollowUp extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 

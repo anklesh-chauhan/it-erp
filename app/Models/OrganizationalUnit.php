@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 use App\Traits\HasApprovalWorkflow;
 
-class OrganizationalUnit extends Model
+class OrganizationalUnit extends BaseModel
 {
     use HasApprovalWorkflow;
 

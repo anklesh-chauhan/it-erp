@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ShiftOverTimeSetup extends Model
+class ShiftOverTimeSetup extends BaseModel
 {
     protected $table = 'shift_over_time_setups';
 

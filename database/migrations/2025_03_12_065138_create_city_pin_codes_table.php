@@ -19,6 +19,8 @@ return new class extends Migration
             $table->foreignId('state_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('country_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
 
         });
     }

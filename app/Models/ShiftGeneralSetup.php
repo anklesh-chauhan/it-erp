@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ShiftGeneralSetup extends Model
+class ShiftGeneralSetup extends BaseModel
 {
     protected $table = 'shift_general_setups';
 

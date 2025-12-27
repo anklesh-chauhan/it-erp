@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 
+use App\Models\BaseModel;
 use App\Traits\HasApprovalWorkflow;
 
-class PaymentTerm extends Model
+class PaymentTerm extends BaseModel
 {
     use HasApprovalWorkflow;
 

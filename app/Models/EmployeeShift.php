@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Validation\ValidationException;
 use Filament\Notifications\Notification;
 
-class EmployeeShift extends Model
+class EmployeeShift extends BaseModel
 {
     protected $table = 'employee_shifts_pivot';
 

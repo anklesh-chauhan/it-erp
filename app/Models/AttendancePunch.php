@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class AttendancePunch extends Model
+class AttendancePunch extends BaseModel
 {
     protected $table = 'attendance_punches';
 

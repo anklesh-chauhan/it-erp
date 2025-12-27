@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 use App\Traits\HasApprovalWorkflow;
 
-class SalesDocument extends Model
+class SalesDocument extends BaseModel
 {
     use HasApprovalWorkflow;
 

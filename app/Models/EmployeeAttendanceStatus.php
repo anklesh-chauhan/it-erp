@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+
+use App\Models\BaseModel;
 use App\Traits\HasSafeGlobalSearch;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\ValidationException;
 use Filament\Notifications\Notification;
 
-class EmployeeAttendanceStatus extends Model
+class EmployeeAttendanceStatus extends BaseModel
 {
     use HasSafeGlobalSearch;
 

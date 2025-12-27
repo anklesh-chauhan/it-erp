@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 
 use App\Traits\HasApprovalWorkflow;
 
-class EmployeeAttendance extends Model
+class EmployeeAttendance extends BaseModel
 {
     use HasApprovalWorkflow;
 

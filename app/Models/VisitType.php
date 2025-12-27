@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use App\Traits\HasApprovalWorkflow;
 
-class VisitType extends Model
+class VisitType extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 

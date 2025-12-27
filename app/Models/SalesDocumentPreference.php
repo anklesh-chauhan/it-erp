@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 
+use App\Models\BaseModel;
 use App\Traits\HasApprovalWorkflow;
 
-class SalesDocumentPreference extends Model
+class SalesDocumentPreference extends BaseModel
 {
     use HasApprovalWorkflow;
 

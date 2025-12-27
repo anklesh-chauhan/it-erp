@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+
+use App\Models\BaseModel;
 use Exception;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\HasCustomerInteractionFields;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 use App\Traits\HasApprovalWorkflow;
 
-class Lead extends Model
+class Lead extends BaseModel
 {
     use HasFactory, HasCustomerInteractionFields, HasApprovalWorkflow;
 

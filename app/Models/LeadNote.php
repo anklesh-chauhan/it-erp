@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
 
 use App\Traits\HasApprovalWorkflow;
 
-class LeadNote extends Model
+class LeadNote extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 

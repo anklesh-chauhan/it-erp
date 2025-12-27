@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 use App\Traits\HasApprovalWorkflow;
 
-class TypeMaster extends Model
+class TypeMaster extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 use App\Traits\HasApprovalWorkflow;
 
-class LocationMaster extends Model
+class LocationMaster extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 

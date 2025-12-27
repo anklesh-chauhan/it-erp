@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 use App\Traits\HasApprovalWorkflow;
 
-class FollowUpStatus extends Model
+class FollowUpStatus extends BaseModel
 {
     use HasApprovalWorkflow;
 
