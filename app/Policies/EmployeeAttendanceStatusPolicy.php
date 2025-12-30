@@ -67,6 +67,11 @@ class EmployeeAttendanceStatusPolicy
         return $authUser->can('Reorder:EmployeeAttendanceStatus');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, EmployeeAttendanceStatus $employeeAttendanceStatus): bool
+    {
+        return $authUser->can('ViewOwnTerritory:EmployeeAttendanceStatus');
+    }
+
     public function viewOwn(AuthUser $authUser, EmployeeAttendanceStatus $employeeAttendanceStatus): bool
     {
         return $authUser->can('ViewOwn:EmployeeAttendanceStatus');

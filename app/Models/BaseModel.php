@@ -14,4 +14,9 @@ abstract class BaseModel extends Model
     use HasBlameable;
     use HasSoftDeleteBlameable;
     use HasVisibilityScope;
+
+    protected $casts = [
+        'created_by' => 'integer',
+        'updated_by' => 'integer',
+    ];
 }

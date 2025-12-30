@@ -67,6 +67,11 @@ class LeadStatusPolicy
         return $authUser->can('Reorder:LeadStatus');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, LeadStatus $leadStatus): bool
+    {
+        return $authUser->can('ViewOwnTerritory:LeadStatus');
+    }
+
     public function viewOwn(AuthUser $authUser, LeadStatus $leadStatus): bool
     {
         return $authUser->can('ViewOwn:LeadStatus');

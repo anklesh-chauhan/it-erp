@@ -67,6 +67,11 @@ class EmployeePolicy
         return $authUser->can('Reorder:Employee');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Employee $employee): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Employee');
+    }
+
     public function viewOwn(AuthUser $authUser, Employee $employee): bool
     {
         return $authUser->can('ViewOwn:Employee');

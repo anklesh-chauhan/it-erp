@@ -67,6 +67,11 @@ class RolePolicy
         return $authUser->can('Reorder:Role');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Role $role): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Role');
+    }
+
     public function viewOwn(AuthUser $authUser, Role $role): bool
     {
         return $authUser->can('ViewOwn:Role');

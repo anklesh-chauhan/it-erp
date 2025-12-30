@@ -40,7 +40,8 @@ return new class extends Migration
                 ->nullable();
             $table->string('check_out_longitude')
                 ->nullable();
-
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

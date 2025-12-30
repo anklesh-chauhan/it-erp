@@ -15,6 +15,8 @@ return new class extends Migration
         Schema::create('approval_settings', function (Blueprint $table) {
             $table->id();
             $table->json('enabled_modules')->nullable();
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
 

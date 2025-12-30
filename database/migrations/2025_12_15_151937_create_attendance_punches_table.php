@@ -32,6 +32,9 @@ return new class extends Migration
 
             // Indexes
             $table->index(['employee_id', 'punch_date']);
+
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

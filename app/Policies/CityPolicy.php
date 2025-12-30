@@ -67,6 +67,11 @@ class CityPolicy
         return $authUser->can('Reorder:City');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, City $city): bool
+    {
+        return $authUser->can('ViewOwnTerritory:City');
+    }
+
     public function viewOwn(AuthUser $authUser, City $city): bool
     {
         return $authUser->can('ViewOwn:City');

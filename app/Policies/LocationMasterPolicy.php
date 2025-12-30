@@ -67,6 +67,11 @@ class LocationMasterPolicy
         return $authUser->can('Reorder:LocationMaster');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, LocationMaster $locationMaster): bool
+    {
+        return $authUser->can('ViewOwnTerritory:LocationMaster');
+    }
+
     public function viewOwn(AuthUser $authUser, LocationMaster $locationMaster): bool
     {
         return $authUser->can('ViewOwn:LocationMaster');

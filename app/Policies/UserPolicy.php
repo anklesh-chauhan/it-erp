@@ -64,6 +64,11 @@ class UserPolicy
         return $authUser->can('Reorder:User');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewOwnTerritory:User');
+    }
+
     public function viewOwn(AuthUser $authUser): bool
     {
         return $authUser->can('ViewOwn:User');

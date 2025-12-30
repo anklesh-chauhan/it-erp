@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('patch_id')->constrained('patches')->onDelete('cascade');
             $table->morphs('patchable'); // Creates patchable_id and patchable_type
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

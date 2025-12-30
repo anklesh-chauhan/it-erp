@@ -67,6 +67,11 @@ class CityPinCodePolicy
         return $authUser->can('Reorder:CityPinCode');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, CityPinCode $cityPinCode): bool
+    {
+        return $authUser->can('ViewOwnTerritory:CityPinCode');
+    }
+
     public function viewOwn(AuthUser $authUser, CityPinCode $cityPinCode): bool
     {
         return $authUser->can('ViewOwn:CityPinCode');

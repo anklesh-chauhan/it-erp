@@ -67,6 +67,11 @@ class ApprovalSettingPolicy
         return $authUser->can('Reorder:ApprovalSetting');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, ApprovalSetting $approvalSetting): bool
+    {
+        return $authUser->can('ViewOwnTerritory:ApprovalSetting');
+    }
+
     public function viewOwn(AuthUser $authUser, ApprovalSetting $approvalSetting): bool
     {
         return $authUser->can('ViewOwn:ApprovalSetting');

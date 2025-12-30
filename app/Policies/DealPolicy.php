@@ -67,6 +67,11 @@ class DealPolicy
         return $authUser->can('Reorder:Deal');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Deal $deal): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Deal');
+    }
+
     public function viewOwn(AuthUser $authUser, Deal $deal): bool
     {
         return $authUser->can('ViewOwn:Deal');

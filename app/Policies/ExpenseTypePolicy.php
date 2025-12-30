@@ -67,6 +67,11 @@ class ExpenseTypePolicy
         return $authUser->can('Reorder:ExpenseType');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, ExpenseType $expenseType): bool
+    {
+        return $authUser->can('ViewOwnTerritory:ExpenseType');
+    }
+
     public function viewOwn(AuthUser $authUser, ExpenseType $expenseType): bool
     {
         return $authUser->can('ViewOwn:ExpenseType');

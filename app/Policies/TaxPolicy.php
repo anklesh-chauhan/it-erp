@@ -67,6 +67,11 @@ class TaxPolicy
         return $authUser->can('Reorder:Tax');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Tax $tax): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Tax');
+    }
+
     public function viewOwn(AuthUser $authUser, Tax $tax): bool
     {
         return $authUser->can('ViewOwn:Tax');

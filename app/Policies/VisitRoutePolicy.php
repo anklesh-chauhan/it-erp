@@ -67,6 +67,11 @@ class VisitRoutePolicy
         return $authUser->can('Reorder:VisitRoute');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, VisitRoute $visitRoute): bool
+    {
+        return $authUser->can('ViewOwnTerritory:VisitRoute');
+    }
+
     public function viewOwn(AuthUser $authUser, VisitRoute $visitRoute): bool
     {
         return $authUser->can('ViewOwn:VisitRoute');

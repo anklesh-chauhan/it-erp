@@ -67,6 +67,11 @@ class ImagePolicy
         return $authUser->can('Reorder:Image');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Image $image): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Image');
+    }
+
     public function viewOwn(AuthUser $authUser, Image $image): bool
     {
         return $authUser->can('ViewOwn:Image');

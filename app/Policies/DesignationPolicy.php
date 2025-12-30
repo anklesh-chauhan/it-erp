@@ -67,6 +67,11 @@ class DesignationPolicy
         return $authUser->can('Reorder:Designation');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Designation $designation): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Designation');
+    }
+
     public function viewOwn(AuthUser $authUser, Designation $designation): bool
     {
         return $authUser->can('ViewOwn:Designation');

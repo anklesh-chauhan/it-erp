@@ -67,6 +67,11 @@ class PaymentMethodPolicy
         return $authUser->can('Reorder:PaymentMethod');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, PaymentMethod $paymentMethod): bool
+    {
+        return $authUser->can('ViewOwnTerritory:PaymentMethod');
+    }
+
     public function viewOwn(AuthUser $authUser, PaymentMethod $paymentMethod): bool
     {
         return $authUser->can('ViewOwn:PaymentMethod');

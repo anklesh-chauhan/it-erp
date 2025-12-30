@@ -61,12 +61,6 @@ class EmploymentDetail extends BaseModel
         );
     }
 
-    // public function organizationalUnit()
-    // {
-    //     return $this->belongsTo(OrganizationalUnit::class, 'organizational_unit_id');
-    // }
-
-
     public function organizationalUnits()
     {
         return $this->belongsToMany(
@@ -90,5 +84,26 @@ class EmploymentDetail extends BaseModel
     public function reportingManager()
     {
         return $this->belongsTo(Employee::class, 'reporting_manager_id');
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function ($model) {
+
+            // Only validate when both are present
+            if (
+                $model->division_ou_id &&
+                $model->relationLoaded('organizationalUnits') &&
+                $model->organizationalUnits->isNotEmpty()
+            ) {
+                foreach ($model->organizationalUnits as $ou) {
+                    if ($ou->parent_id !== $model->division_ou_id) {
+                        throw new \InvalidArgumentException(
+                            'Selected Organizational Unit does not belong to the selected Division.'
+                        );
+                    }
+                }
+            }
+        });
     }
 }

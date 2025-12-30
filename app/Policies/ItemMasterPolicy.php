@@ -67,6 +67,11 @@ class ItemMasterPolicy
         return $authUser->can('Reorder:ItemMaster');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, ItemMaster $itemMaster): bool
+    {
+        return $authUser->can('ViewOwnTerritory:ItemMaster');
+    }
+
     public function viewOwn(AuthUser $authUser, ItemMaster $itemMaster): bool
     {
         return $authUser->can('ViewOwn:ItemMaster');

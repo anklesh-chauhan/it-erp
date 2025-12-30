@@ -11,10 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Enums\PositionStatus; // Import the new enum
 
 use App\Traits\HasApprovalWorkflow;
+use App\Traits\HasVisibilityScope;
 
 class Position extends BaseModel
 {
-    use HasFactory, HasApprovalWorkflow;
+    use HasFactory, HasApprovalWorkflow, HasVisibilityScope;
 
     /**
      * The table associated with the model.
@@ -69,11 +70,6 @@ class Position extends BaseModel
             OrganizationalUnit::class,
             'division_ou_id'
         );
-    }
-
-    public function organizationalUnit()
-    {
-        return $this->belongsTo(OrganizationalUnit::class, 'organizational_unit_id');
     }
 
     /**

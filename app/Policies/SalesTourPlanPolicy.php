@@ -67,6 +67,11 @@ class SalesTourPlanPolicy
         return $authUser->can('Reorder:SalesTourPlan');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, SalesTourPlan $salesTourPlan): bool
+    {
+        return $authUser->can('ViewOwnTerritory:SalesTourPlan');
+    }
+
     public function viewOwn(AuthUser $authUser, SalesTourPlan $salesTourPlan): bool
     {
         return $authUser->can('ViewOwn:SalesTourPlan');

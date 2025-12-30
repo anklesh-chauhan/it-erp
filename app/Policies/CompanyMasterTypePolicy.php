@@ -67,6 +67,11 @@ class CompanyMasterTypePolicy
         return $authUser->can('Reorder:CompanyMasterType');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, CompanyMasterType $companyMasterType): bool
+    {
+        return $authUser->can('ViewOwnTerritory:CompanyMasterType');
+    }
+
     public function viewOwn(AuthUser $authUser, CompanyMasterType $companyMasterType): bool
     {
         return $authUser->can('ViewOwn:CompanyMasterType');

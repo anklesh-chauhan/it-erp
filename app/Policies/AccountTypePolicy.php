@@ -67,6 +67,11 @@ class AccountTypePolicy
         return $authUser->can('Reorder:AccountType');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, AccountType $accountType): bool
+    {
+        return $authUser->can('ViewOwnTerritory:AccountType');
+    }
+
     public function viewOwn(AuthUser $authUser, AccountType $accountType): bool
     {
         return $authUser->can('ViewOwn:AccountType');

@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('quote_id')->constrained('quotes')->onDelete('cascade');
             $table->foreignId('sales_order_id')->constrained('sales_orders')->onDelete('cascade');
+            $table->blameable();
+            $table->blameableSoftDeletes();
             $table->timestamps();
         });
     }

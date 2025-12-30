@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ShiftMasters;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\ShiftMasters\Pages\CreateShiftMaster;
 use App\Filament\Resources\ShiftMasters\Pages\EditShiftMaster;
 use App\Filament\Resources\ShiftMasters\Pages\ListShiftMasters;
@@ -16,6 +18,7 @@ use Filament\Tables\Table;
 
 class ShiftMasterResource extends Resource
 {
+    use HasSafeGlobalSearch;
     protected static ?string $model = ShiftMaster::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

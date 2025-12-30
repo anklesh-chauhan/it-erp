@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::table('tenants', function (Blueprint $table) {
             $table->string('cloudflare_record_id')->nullable()->after('database');
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

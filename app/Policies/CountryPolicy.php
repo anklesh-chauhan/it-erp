@@ -67,6 +67,11 @@ class CountryPolicy
         return $authUser->can('Reorder:Country');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Country $country): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Country');
+    }
+
     public function viewOwn(AuthUser $authUser, Country $country): bool
     {
         return $authUser->can('ViewOwn:Country');

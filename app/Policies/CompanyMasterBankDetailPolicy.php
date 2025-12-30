@@ -67,6 +67,11 @@ class CompanyMasterBankDetailPolicy
         return $authUser->can('Reorder:CompanyMasterBankDetail');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, CompanyMasterBankDetail $companyMasterBankDetail): bool
+    {
+        return $authUser->can('ViewOwnTerritory:CompanyMasterBankDetail');
+    }
+
     public function viewOwn(AuthUser $authUser, CompanyMasterBankDetail $companyMasterBankDetail): bool
     {
         return $authUser->can('ViewOwn:CompanyMasterBankDetail');

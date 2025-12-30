@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamps();
             $table->blameable();
             $table->blameableSoftDeletes();
+            $table->index('parent_id');
         });
     }
 

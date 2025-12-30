@@ -67,6 +67,11 @@ class FollowUpMediaPolicy
         return $authUser->can('Reorder:FollowUpMedia');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, FollowUpMedia $followUpMedia): bool
+    {
+        return $authUser->can('ViewOwnTerritory:FollowUpMedia');
+    }
+
     public function viewOwn(AuthUser $authUser, FollowUpMedia $followUpMedia): bool
     {
         return $authUser->can('ViewOwn:FollowUpMedia');

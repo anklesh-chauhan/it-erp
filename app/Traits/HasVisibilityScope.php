@@ -3,9 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
-use App\Services\TerritoryService;
-use App\Services\OrganizationalUnitService;
-use Illuminate\Support\Facades\Auth;
+use App\Services\PositionService;
 
 trait HasVisibilityScope
 {
@@ -14,46 +12,57 @@ trait HasVisibilityScope
         $user = auth()->user();
 
         if (! $user) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        /* =====================================================
+         | 1. SUPER / FULL ACCESS
+         ===================================================== */
+        if (
+            $user->hasRole('super_admin') ||
+            $user->hasRole('administration_admin') ||
+            $user->can('AccessAllRecords')
+        ) {
             return $query;
         }
 
-        /* ========== ADMIN (FULL ACCESS) ========== */
-        if ($user->hasRole('super_admin') || $user->hasRole('administration_admin')) {
-            return $query;
-        }
+        /* =====================================================
+         | 2. VIEW OWN TERRITORY (PRIMARY FILTER)
+         ===================================================== */
+        if ($user->can("ViewOwnTerritory:{$model}")) {
 
-        // Access without ViewOwn
-        if ($user->can("ViewAny:{$model}") && ! $user->can("ViewOwn:{$model}")) {
-            return $query;
-        }
+            $territoryIds = PositionService::getTerritoryIdsForUser($user);
 
-        /* ========== OWN RECORDS ONLY ========== */
-        if ($user->can("ViewOwn:{$model}") && ! $user->can("ViewAny:{$model}")) {
-            return $query->where('created_by', $user->id);
-        }
-
-        /* ========== OU + TERRITORY SCOPE ========== */
-        if ($user->can("ViewAny:{$model}")) {
-            return $this->applyOuAndTerritoryScope($query, $user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    protected function applyOuAndTerritoryScope(Builder $query, $user): Builder
-    {
-        $ouIds        = OrganizationalUnitService::getUserOuIds($user);
-        $territoryIds = TerritoryService::getUserTerritoryIds($user);
-
-        return $query
-            // 🔹 OU scope via creator → employee → employmentDetail → organizationalUnits
-            ->whereHas('creator.employee.employmentDetail.organizationalUnits', function ($q) use ($ouIds) {
-                $q->whereIn('organizational_units.id', $ouIds);
-            })
-            // 🔹 Territory scope (if model has territory_id)
-            ->when(
-                $territoryIds && \Schema::hasColumn($query->getModel()->getTable(), 'territory_id'),
-                fn ($q) => $q->whereIn('territory_id', $territoryIds)
+            if (
+                empty($territoryIds) ||
+                ! \Schema::hasColumn($query->getModel()->getTable(), 'territory_id')
+            ) {
+                return $query->whereRaw('1 = 0');
+            }
+            $query = $query->whereIn(
+                $query->getModel()->getTable() . '.territory_id',
+                $territoryIds
             );
+
+            return $query->whereIn(
+                $query->getModel()->getTable() . '.territory_id',
+                $territoryIds
+            );
+        }
+
+        /* =====================================================
+         | 3. VIEW OWN RECORDS
+         ===================================================== */
+        if ($user->can("ViewOwn:{$model}")) {
+            return $query->where(
+                $query->getModel()->getTable() . '.created_by',
+                $user->id
+            );
+        }
+
+        /* =====================================================
+         | 4. DEFAULT: NO DATA
+         ===================================================== */
+        return $query->whereRaw('1 = 0');
     }
 }

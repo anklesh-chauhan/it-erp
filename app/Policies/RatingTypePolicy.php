@@ -67,6 +67,11 @@ class RatingTypePolicy
         return $authUser->can('Reorder:RatingType');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, RatingType $ratingType): bool
+    {
+        return $authUser->can('ViewOwnTerritory:RatingType');
+    }
+
     public function viewOwn(AuthUser $authUser, RatingType $ratingType): bool
     {
         return $authUser->can('ViewOwn:RatingType');

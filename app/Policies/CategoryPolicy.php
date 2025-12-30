@@ -67,6 +67,11 @@ class CategoryPolicy
         return $authUser->can('Reorder:Category');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Category $category): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Category');
+    }
+
     public function viewOwn(AuthUser $authUser, Category $category): bool
     {
         return $authUser->can('ViewOwn:Category');

@@ -67,6 +67,11 @@ class SalesDocumentPreferencePolicy
         return $authUser->can('Reorder:SalesDocumentPreference');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, SalesDocumentPreference $salesDocumentPreference): bool
+    {
+        return $authUser->can('ViewOwnTerritory:SalesDocumentPreference');
+    }
+
     public function viewOwn(AuthUser $authUser, SalesDocumentPreference $salesDocumentPreference): bool
     {
         return $authUser->can('ViewOwn:SalesDocumentPreference');

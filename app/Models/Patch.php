@@ -20,9 +20,6 @@ class Patch extends BaseModel
         'city_pin_code_id',
         'description',
         'color',
-        'created_by',
-        'updated_by',
-        'deleted_by',
     ];
 
     public function territory()
@@ -40,19 +37,4 @@ class Patch extends BaseModel
         return $this->belongsToMany(AccountMaster::class)
             ->withTimestamps();
     }
-
-
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            $model->created_by = Auth::user()->name ?? 'System';
-            $model->updated_by = Auth::user()->name ?? 'System';
-        });
-
-        static::updating(function ($model) {
-            $model->updated_by = Auth::user()->name ?? 'System';
-        });
-    }
-
-
 }

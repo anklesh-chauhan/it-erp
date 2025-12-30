@@ -67,6 +67,11 @@ class IndustryTypePolicy
         return $authUser->can('Reorder:IndustryType');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, IndustryType $industryType): bool
+    {
+        return $authUser->can('ViewOwnTerritory:IndustryType');
+    }
+
     public function viewOwn(AuthUser $authUser, IndustryType $industryType): bool
     {
         return $authUser->can('ViewOwn:IndustryType');

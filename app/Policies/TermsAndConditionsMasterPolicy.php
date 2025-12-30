@@ -67,6 +67,11 @@ class TermsAndConditionsMasterPolicy
         return $authUser->can('Reorder:TermsAndConditionsMaster');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, TermsAndConditionsMaster $termsAndConditionsMaster): bool
+    {
+        return $authUser->can('ViewOwnTerritory:TermsAndConditionsMaster');
+    }
+
     public function viewOwn(AuthUser $authUser, TermsAndConditionsMaster $termsAndConditionsMaster): bool
     {
         return $authUser->can('ViewOwn:TermsAndConditionsMaster');

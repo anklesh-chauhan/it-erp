@@ -67,6 +67,11 @@ class GstPanPolicy
         return $authUser->can('Reorder:GstPan');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, GstPan $gstPan): bool
+    {
+        return $authUser->can('ViewOwnTerritory:GstPan');
+    }
+
     public function viewOwn(AuthUser $authUser, GstPan $gstPan): bool
     {
         return $authUser->can('ViewOwn:GstPan');

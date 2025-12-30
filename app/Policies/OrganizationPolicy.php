@@ -67,6 +67,11 @@ class OrganizationPolicy
         return $authUser->can('Reorder:Organization');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Organization $organization): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Organization');
+    }
+
     public function viewOwn(AuthUser $authUser, Organization $organization): bool
     {
         return $authUser->can('ViewOwn:Organization');

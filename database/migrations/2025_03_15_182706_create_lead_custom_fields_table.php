@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('type');
             $table->string('name');
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

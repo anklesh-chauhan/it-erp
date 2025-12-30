@@ -67,6 +67,11 @@ class ApprovalPolicy
         return $authUser->can('Reorder:Approval');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Approval $approval): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Approval');
+    }
+
     public function viewOwn(AuthUser $authUser, Approval $approval): bool
     {
         return $authUser->can('ViewOwn:Approval');

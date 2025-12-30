@@ -67,6 +67,11 @@ class LeadSourcePolicy
         return $authUser->can('Reorder:LeadSource');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, LeadSource $leadSource): bool
+    {
+        return $authUser->can('ViewOwnTerritory:LeadSource');
+    }
+
     public function viewOwn(AuthUser $authUser, LeadSource $leadSource): bool
     {
         return $authUser->can('ViewOwn:LeadSource');

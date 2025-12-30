@@ -67,6 +67,11 @@ class SalesInvoicePolicy
         return $authUser->can('Reorder:SalesInvoice');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, SalesInvoice $salesInvoice): bool
+    {
+        return $authUser->can('ViewOwnTerritory:SalesInvoice');
+    }
+
     public function viewOwn(AuthUser $authUser, SalesInvoice $salesInvoice): bool
     {
         return $authUser->can('ViewOwn:SalesInvoice');

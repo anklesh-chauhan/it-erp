@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\DailyAttendances;
 
+use App\Traits\HasSafeGlobalSearch;
+
 use App\Filament\Resources\DailyAttendances\Pages\CreateDailyAttendance;
 use App\Filament\Resources\DailyAttendances\Pages\EditDailyAttendance;
 use App\Filament\Resources\DailyAttendances\Pages\ListDailyAttendances;
@@ -18,6 +20,7 @@ use Filament\Facades\Filament;
 
 class DailyAttendanceResource extends Resource
 {
+    use HasSafeGlobalSearch;
 
     protected static ?string $model = DailyAttendance::class;
 

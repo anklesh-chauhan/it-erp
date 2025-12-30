@@ -67,6 +67,11 @@ class CustomerPricePolicy
         return $authUser->can('Reorder:CustomerPrice');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, CustomerPrice $customerPrice): bool
+    {
+        return $authUser->can('ViewOwnTerritory:CustomerPrice');
+    }
+
     public function viewOwn(AuthUser $authUser, CustomerPrice $customerPrice): bool
     {
         return $authUser->can('ViewOwn:CustomerPrice');

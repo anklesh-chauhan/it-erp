@@ -67,6 +67,11 @@ class FollowUpStatusPolicy
         return $authUser->can('Reorder:FollowUpStatus');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, FollowUpStatus $followUpStatus): bool
+    {
+        return $authUser->can('ViewOwnTerritory:FollowUpStatus');
+    }
+
     public function viewOwn(AuthUser $authUser, FollowUpStatus $followUpStatus): bool
     {
         return $authUser->can('ViewOwn:FollowUpStatus');

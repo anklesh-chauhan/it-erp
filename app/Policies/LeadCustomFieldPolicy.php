@@ -67,6 +67,11 @@ class LeadCustomFieldPolicy
         return $authUser->can('Reorder:LeadCustomField');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, LeadCustomField $leadCustomField): bool
+    {
+        return $authUser->can('ViewOwnTerritory:LeadCustomField');
+    }
+
     public function viewOwn(AuthUser $authUser, LeadCustomField $leadCustomField): bool
     {
         return $authUser->can('ViewOwn:LeadCustomField');

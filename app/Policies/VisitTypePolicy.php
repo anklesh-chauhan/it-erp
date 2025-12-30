@@ -67,6 +67,11 @@ class VisitTypePolicy
         return $authUser->can('Reorder:VisitType');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, VisitType $visitType): bool
+    {
+        return $authUser->can('ViewOwnTerritory:VisitType');
+    }
+
     public function viewOwn(AuthUser $authUser, VisitType $visitType): bool
     {
         return $authUser->can('ViewOwn:VisitType');

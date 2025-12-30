@@ -67,6 +67,11 @@ class PackagingTypePolicy
         return $authUser->can('Reorder:PackagingType');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, PackagingType $packagingType): bool
+    {
+        return $authUser->can('ViewOwnTerritory:PackagingType');
+    }
+
     public function viewOwn(AuthUser $authUser, PackagingType $packagingType): bool
     {
         return $authUser->can('ViewOwn:PackagingType');

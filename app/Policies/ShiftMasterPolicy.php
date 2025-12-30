@@ -67,6 +67,11 @@ class ShiftMasterPolicy
         return $authUser->can('Reorder:ShiftMaster');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, ShiftMaster $shiftMaster): bool
+    {
+        return $authUser->can('ViewOwnTerritory:ShiftMaster');
+    }
+
     public function viewOwn(AuthUser $authUser, ShiftMaster $shiftMaster): bool
     {
         return $authUser->can('ViewOwn:ShiftMaster');

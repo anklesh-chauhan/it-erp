@@ -67,6 +67,11 @@ class SalesDcrPolicy
         return $authUser->can('Reorder:SalesDcr');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, SalesDcr $salesDcr): bool
+    {
+        return $authUser->can('ViewOwnTerritory:SalesDcr');
+    }
+
     public function viewOwn(AuthUser $authUser, SalesDcr $salesDcr): bool
     {
         return $authUser->can('ViewOwn:SalesDcr');

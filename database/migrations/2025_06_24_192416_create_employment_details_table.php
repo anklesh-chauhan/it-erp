@@ -43,6 +43,8 @@ return new class extends Migration
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();
+
+            $table->index('division_ou_id');
         });
     }
 

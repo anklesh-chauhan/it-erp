@@ -67,6 +67,11 @@ class DepartmentPolicy
         return $authUser->can('Reorder:Department');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, Department $department): bool
+    {
+        return $authUser->can('ViewOwnTerritory:Department');
+    }
+
     public function viewOwn(AuthUser $authUser, Department $department): bool
     {
         return $authUser->can('ViewOwn:Department');

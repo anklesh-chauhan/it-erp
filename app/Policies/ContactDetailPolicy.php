@@ -67,6 +67,11 @@ class ContactDetailPolicy
         return $authUser->can('Reorder:ContactDetail');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, ContactDetail $contactDetail): bool
+    {
+        return $authUser->can('ViewOwnTerritory:ContactDetail');
+    }
+
     public function viewOwn(AuthUser $authUser, ContactDetail $contactDetail): bool
     {
         return $authUser->can('ViewOwn:ContactDetail');

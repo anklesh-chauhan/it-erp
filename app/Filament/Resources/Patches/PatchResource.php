@@ -37,10 +37,11 @@ use App\Models\Territory;
 use Filament\Actions\ActionGroup;
 use Filament\Tables\Enums\RecordActionsPosition;
 use App\Filament\Actions\ApprovalAction;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Facades\Filament;
 
-class PatchResource extends Resource
+class PatchResource extends BaseResource
 {
     use HasSafeGlobalSearch;
 
@@ -50,9 +51,6 @@ class PatchResource extends Resource
     protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
     // Added a label for better readability in the navigation
     protected static ?string $navigationLabel = 'Patches';
-
-    // Optional: Add a slug for cleaner URLs if needed
-    // protected static ?string $slug = 'patches';
 
     public static function form(Schema $schema): Schema
     {
@@ -150,27 +148,16 @@ class PatchResource extends Resource
                     ->maxLength(65535)
                     ->rows(2),
 
-
-
-                        Hidden::make('created_by')
-                            ->default(Auth::user()->name ?? 'System') // Fallback if user is somehow not available
-                            ->disabled()
-                            ->dehydrated(false)
-                            ->label('Created By'),
-
-                        Hidden::make('updated_by')
-                            ->default(Auth::user()->name ?? 'System')
-                            ->disabled()
-                            ->dehydrated(false)
-                            ->label('Last Updated By'),
-
-
             ])->columns(2); // Set a default number of columns for the form
     }
 
     public static function table(Table $table): Table
     {
         $table = parent::table($table);
+//         dd([
+//     'permissions' => auth()->user()->getAllPermissions()->pluck('name'),
+//     'territories' => \App\Services\PositionService::getTerritoryIdsForUser(auth()->user()),
+// ]);
         return $table
             ->columns([
                 TextColumn::make('name')

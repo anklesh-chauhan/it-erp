@@ -67,6 +67,11 @@ class SalesDailyExpensePolicy
         return $authUser->can('Reorder:SalesDailyExpense');
     }
 
+    public function viewOwnTerritory(AuthUser $authUser, SalesDailyExpense $salesDailyExpense): bool
+    {
+        return $authUser->can('ViewOwnTerritory:SalesDailyExpense');
+    }
+
     public function viewOwn(AuthUser $authUser, SalesDailyExpense $salesDailyExpense): bool
     {
         return $authUser->can('ViewOwn:SalesDailyExpense');

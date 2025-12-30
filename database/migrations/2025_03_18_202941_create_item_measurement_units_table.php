@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('unit_of_measurement_id')->constrained('unit_of_measurements')->onDelete('cascade');
             $table->decimal('conversion_rate', 10, 2)->default(1);
             $table->timestamps();
+            $table->blameable();
+            $table->blameableSoftDeletes();
         });
     }
 

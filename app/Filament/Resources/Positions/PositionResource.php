@@ -106,6 +106,7 @@ class PositionResource extends Resource
                         ->relationship('location', 'name')
                         ->searchable()
                         ->nullable()
+                        ->preload()
                         ->placeholder('Select a location'),
 
                     Select::make('division_ou_id')
@@ -126,21 +127,29 @@ class PositionResource extends Resource
                             $set('organizational_unit_id', null);
                         }),
 
-                    Select::make('organizational_unit_id')
-                        ->label('Organizational Unit')
-                        ->options(function (callable $get) {
-                            $divisionId = $get('division_ou_id');
+                    Select::make('organizationalUnits')
+                        ->label('Organizational Units')
+                        ->multiple()
+                        ->relationship(
+                            name: 'organizationalUnits',
+                            titleAttribute: 'name',
+                            modifyQueryUsing: function ($query, callable $get) {
+                                $divisionId = $get('division_ou_id');
 
-                            if (! $divisionId) {
-                                return [];
+                                if (! $divisionId) {
+                                    $query->whereRaw('1 = 0');
+                                    return;
+                                }
+
+                                $query->where(function ($q) use ($divisionId) {
+                                    $q->where('organizational_units.id', $divisionId)
+                                    ->orWhere('organizational_units.parent_id', $divisionId);
+                                });
                             }
-
-                            return \App\Models\OrganizationalUnit::hierarchicalOptions($divisionId);
-                        })
-                        ->live()
+                        )
                         ->searchable()
                         ->preload()
-                        ->nullable(),
+                        ->reactive(),
                 ]),
 
             Section::make('Job Classification')
@@ -178,11 +187,11 @@ class PositionResource extends Resource
                     Select::make('employees')
                         ->relationship('employees', 'first_name')
                         ->getOptionLabelFromRecordUsing(fn (Employee $record) =>
-                            "{$record->first_name} {$record->last_name} ({$record->employee_code})"
+                            "{$record->employee_id} - {$record->first_name} {$record->last_name}"
                         )
                         ->multiple()
+                        ->searchable(['employees.employee_id', 'first_name', 'last_name'])
                         ->preload()
-                        ->searchable()
                         ->label('Select Employees'),
                 ]),
         ]);
@@ -252,15 +261,15 @@ class PositionResource extends Resource
                     ->bulleted()
                     ->toggleable(),
 
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(),
+                // TextColumn::make('created_at')
+                //     ->dateTime()
+                //     ->sortable()
+                //     ->toggleable(),
 
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(),
+                // TextColumn::make('updated_at')
+                //     ->dateTime()
+                //     ->sortable()
+                //     ->toggleable(),
             ])
             ->filters([
                 // Tables\Filters\SelectFilter::make('status')

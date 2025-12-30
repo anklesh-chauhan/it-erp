@@ -86,6 +86,12 @@ class LeadResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'reference_code';
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->applyVisibility(static::getModelLabel());
+    }
+
     public static function canViewAny(): bool
     {
         return true;
@@ -379,7 +385,7 @@ class LeadResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),
