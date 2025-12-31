@@ -22,12 +22,13 @@ use App\Filament\Resources\VisitTypeResource\RelationManagers;
 use App\Models\VisitType;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class VisitTypeResource extends Resource
+class VisitTypeResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = VisitType::class;

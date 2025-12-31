@@ -22,12 +22,13 @@ use App\Filament\Resources\DepartmentResource\RelationManagers;
 use App\Models\Department;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class DepartmentResource extends Resource
+class DepartmentResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = Department::class;

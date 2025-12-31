@@ -11,11 +11,12 @@ use App\Models\ApprovalRule;
 use App\Traits\HasSafeGlobalSearch;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class ApprovalRuleResource extends Resource
+class ApprovalRuleResource extends BaseResource
 {
     use HasSafeGlobalSearch;
 

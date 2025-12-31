@@ -33,6 +33,7 @@ use App\Filament\Resources\UsersRelationManagerResource\RelationManagers\UsersRe
 use App\Models\OrganizationalUnit;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,7 +41,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
 
-class OrganizationalUnitResource extends Resource
+class OrganizationalUnitResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = OrganizationalUnit::class;

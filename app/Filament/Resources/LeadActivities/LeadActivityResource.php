@@ -25,13 +25,14 @@ use App\Filament\Resources\LeadActivityResource\RelationManagers;
 use App\Models\LeadActivity;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class LeadActivityResource extends Resource
+class LeadActivityResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = LeadActivity::class;

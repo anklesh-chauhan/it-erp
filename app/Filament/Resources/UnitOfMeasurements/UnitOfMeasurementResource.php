@@ -22,12 +22,13 @@ use App\Filament\Resources\UnitOfMeasurementResource\RelationManagers;
 use App\Models\UnitOfMeasurement;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class UnitOfMeasurementResource extends Resource
+class UnitOfMeasurementResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = UnitOfMeasurement::class;

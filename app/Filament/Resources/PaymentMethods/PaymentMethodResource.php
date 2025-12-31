@@ -12,11 +12,12 @@ use App\Filament\Resources\PaymentMethods\Tables\PaymentMethodsTable;
 use App\Models\PaymentMethod;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class PaymentMethodResource extends Resource
+class PaymentMethodResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = PaymentMethod::class;

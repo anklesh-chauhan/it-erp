@@ -24,12 +24,13 @@ use App\Filament\Resources\TourPlanResource\RelationManagers;
 use App\Models\TourPlan;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class TourPlanResource extends Resource
+class TourPlanResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = TourPlan::class;

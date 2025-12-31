@@ -30,6 +30,7 @@ use App\Models\NumberSeries;
 use App\Models\LocationMaster;
 use App\Models\PackagingType;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -44,7 +45,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\Filter;
 
-class ItemMasterResource extends Resource
+class ItemMasterResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     use ItemMasterTrait;

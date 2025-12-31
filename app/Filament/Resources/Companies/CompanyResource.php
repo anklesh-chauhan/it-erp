@@ -27,12 +27,13 @@ use App\Models\Company;
 use App\Models\CityPinCode;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CompanyResource extends Resource
+class CompanyResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = Company::class;

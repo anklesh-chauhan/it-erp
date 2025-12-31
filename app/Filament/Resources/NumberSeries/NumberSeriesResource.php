@@ -27,13 +27,14 @@ use App\Filament\Resources\NumberSeriesResource\RelationManagers;
 use App\Models\NumberSeries;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Helpers\ModelHelper;
 
-class NumberSeriesResource extends Resource
+class NumberSeriesResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = NumberSeries::class;

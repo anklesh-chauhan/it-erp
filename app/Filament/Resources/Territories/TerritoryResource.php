@@ -30,12 +30,13 @@ use App\Filament\Resources\TerritoryResource\RelationManagers;
 use App\Models\Territory;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class TerritoryResource extends Resource
+class TerritoryResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = Territory::class;

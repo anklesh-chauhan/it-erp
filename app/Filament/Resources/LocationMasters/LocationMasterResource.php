@@ -26,6 +26,7 @@ use App\Models\NumberSeries;
 use App\Models\TypeMaster;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,7 +41,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Schemas\Components\Utilities\Get;
 
-class LocationMasterResource extends Resource
+class LocationMasterResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = LocationMaster::class;

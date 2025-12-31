@@ -12,11 +12,12 @@ use App\Filament\Resources\ShiftMasters\Tables\ShiftMastersTable;
 use App\Models\ShiftMaster;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class ShiftMasterResource extends Resource
+class ShiftMasterResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = ShiftMaster::class;

@@ -12,11 +12,12 @@ use App\Filament\Resources\CustomerPrices\Tables\CustomerPricesTable;
 use App\Models\CustomerPrice;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class CustomerPriceResource extends Resource
+class CustomerPriceResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = CustomerPrice::class;

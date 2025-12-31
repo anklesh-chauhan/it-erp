@@ -22,12 +22,13 @@ use App\Filament\Resources\RatingTypeResource\RelationManagers;
 use App\Models\RatingType;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class RatingTypeResource extends Resource
+class RatingTypeResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = RatingType::class;

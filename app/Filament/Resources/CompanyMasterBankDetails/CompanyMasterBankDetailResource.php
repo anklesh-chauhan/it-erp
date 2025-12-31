@@ -23,12 +23,13 @@ use App\Filament\Resources\CompanyMasterBankDetailResource\RelationManagers;
 use App\Models\CompanyMasterBankDetail;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CompanyMasterBankDetailResource extends Resource
+class CompanyMasterBankDetailResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = CompanyMasterBankDetail::class;

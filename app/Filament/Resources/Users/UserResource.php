@@ -23,13 +23,14 @@ use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Spatie\Multitenancy\Models\Tenant;
 
-class UserResource extends Resource
+class UserResource extends BaseResource
 {
     use HasSafeGlobalSearch;
 

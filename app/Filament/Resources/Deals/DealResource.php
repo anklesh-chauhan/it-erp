@@ -27,6 +27,7 @@ use App\Models\Deal;
 use App\Models\TypeMaster;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -44,7 +45,7 @@ use Filament\GlobalSearch\Actions\Action as GlobalSearchAction;
 
 
 
-class DealResource extends Resource
+class DealResource extends BaseResource
 {
     use HasCustomerInteractionFields;
     use HasSafeGlobalSearch;

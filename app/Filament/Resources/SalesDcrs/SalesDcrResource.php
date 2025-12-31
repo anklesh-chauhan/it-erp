@@ -23,12 +23,13 @@ use App\Filament\Resources\SalesDcrResource\RelationManagers;
 use App\Models\SalesDcr;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class SalesDcrResource extends Resource
+class SalesDcrResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = SalesDcr::class;

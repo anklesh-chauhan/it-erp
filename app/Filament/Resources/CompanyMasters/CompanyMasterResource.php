@@ -34,6 +34,7 @@ use App\Models\NumberSeries;
 use App\Models\TypeMaster;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Notifications\Notification;
@@ -49,7 +50,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Filament\Facades\Filament;
 
-class CompanyMasterResource extends Resource
+class CompanyMasterResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = CompanyMaster::class;

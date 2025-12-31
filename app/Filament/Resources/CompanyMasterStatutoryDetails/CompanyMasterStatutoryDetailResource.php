@@ -24,12 +24,13 @@ use App\Filament\Resources\CompanyMasterStatutoryDetailResource\RelationManagers
 use App\Models\CompanyMasterStatutoryDetail;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CompanyMasterStatutoryDetailResource extends Resource
+class CompanyMasterStatutoryDetailResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = CompanyMasterStatutoryDetail::class;

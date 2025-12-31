@@ -29,6 +29,7 @@ use App\Filament\Resources\AccountMasterResource\Pages;
 use App\Models\AccountMaster;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Traits\CreateAccountMasterTrait;
@@ -37,7 +38,7 @@ use App\Filament\Resources\AccountMasterCreditDetailResource\RelationManagers\Cr
 use App\Filament\Resources\AccountMasterGSTDetailResource\RelationManagers\GSTDetailRelationManager;
 use App\Filament\Resources\AccountMasterStatutoryDetailResource\RelationManagers\StatutoryDetailRelationManager;
 
-class AccountMasterResource extends Resource
+class AccountMasterResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     use CreateAccountMasterTrait;

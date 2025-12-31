@@ -12,11 +12,12 @@ use App\Filament\Resources\TermsAndConditionsMasters\Tables\TermsAndConditionsMa
 use App\Models\TermsAndConditionsMaster;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class TermsAndConditionsMasterResource extends Resource
+class TermsAndConditionsMasterResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = TermsAndConditionsMaster::class;

@@ -39,6 +39,7 @@ use App\Models\Employee;
 use App\Models\OrganizationalUnit;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -48,7 +49,7 @@ use Filament\Forms\Components\Repeater; // Import Tab
 use App\Filament\Resources\AccountMasterBankDetailResource\RelationManagers\BankDetailRelationManager;
 use Filament\Resources\RelationManagers\RelationManager;
 
-class EmployeeResource extends Resource
+class EmployeeResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = Employee::class;
