@@ -31,11 +31,12 @@ use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Helpers\ModelHelper;
 
-class CategoryResource extends Resource
+class CategoryResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = Category::class;

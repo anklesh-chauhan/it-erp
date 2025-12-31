@@ -14,13 +14,14 @@ use App\Filament\Resources\Approvals\Tables\ApprovalsTable;
 use App\Models\Approval;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 
-class ApprovalResource extends Resource
+class ApprovalResource extends BaseResource
 {
     use HasSafeGlobalSearch;
 

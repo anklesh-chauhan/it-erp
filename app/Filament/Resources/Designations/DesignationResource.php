@@ -22,12 +22,13 @@ use App\Filament\Resources\DesignationResource\RelationManagers;
 use App\Models\Designation;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class DesignationResource extends Resource
+class DesignationResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = Designation::class;

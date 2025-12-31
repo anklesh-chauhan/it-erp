@@ -12,13 +12,14 @@ use App\Filament\Resources\EmployeeAttendances\Tables\EmployeeAttendancesTable;
 use App\Models\EmployeeAttendance;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 use App\Traits\HasSafeGlobalSearch;
 
-class EmployeeAttendanceResource extends Resource
+class EmployeeAttendanceResource extends BaseResource
 {
     use HasSafeGlobalSearch;
 

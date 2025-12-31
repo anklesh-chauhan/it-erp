@@ -30,11 +30,12 @@ use App\Models\Company;
 use Filament\Actions\Concerns\HasForm;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 
-class ContactDetailResource extends Resource
+class ContactDetailResource extends BaseResource
 {
     use HasSafeGlobalSearch;
 

@@ -22,12 +22,13 @@ use App\Filament\Resources\LeadSourceResource\RelationManagers;
 use App\Models\LeadSource;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class LeadSourceResource extends Resource
+class LeadSourceResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = LeadSource::class;

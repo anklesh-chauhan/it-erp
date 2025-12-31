@@ -28,6 +28,7 @@ use App\Models\SalesInvoice;
 use App\Models\NumberSeries;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,7 +39,7 @@ use Illuminate\Support\Str;
 use Filament\Tables\Enums\RecordActionsPosition;
 use App\Helpers\SalesDocumentHelper;
 
-class SalesOrderResource extends Resource
+class SalesOrderResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     use SalesDocumentResourceTrait;

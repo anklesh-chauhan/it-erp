@@ -22,13 +22,14 @@ use App\Filament\Resources\TenantResource\RelationManagers;
 use App\Models\Tenant;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Spatie\Multitenancy\Models\Tenant as BaseTenant;
 
-class TenantResource extends Resource
+class TenantResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = Tenant::class;

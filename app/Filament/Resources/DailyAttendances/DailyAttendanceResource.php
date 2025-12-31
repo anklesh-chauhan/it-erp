@@ -12,13 +12,14 @@ use App\Filament\Resources\DailyAttendances\Tables\DailyAttendancesTable;
 use App\Models\DailyAttendance;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Facades\Filament;
 
-class DailyAttendanceResource extends Resource
+class DailyAttendanceResource extends BaseResource
 {
     use HasSafeGlobalSearch;
 

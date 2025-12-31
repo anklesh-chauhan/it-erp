@@ -22,12 +22,13 @@ use App\Filament\Resources\TransportModeResource\RelationManagers;
 use App\Models\TransportMode;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class TransportModeResource extends Resource
+class TransportModeResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = TransportMode::class;

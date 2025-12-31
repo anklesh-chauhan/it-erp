@@ -40,13 +40,14 @@ use App\Filament\Resources\EmpDepartmentResource\RelationManagers;
 use App\Models\EmpDepartment;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
-class EmpDepartmentResource extends Resource
+class EmpDepartmentResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = EmpDepartment::class;

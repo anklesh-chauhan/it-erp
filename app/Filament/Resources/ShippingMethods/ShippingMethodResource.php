@@ -12,11 +12,12 @@ use App\Filament\Resources\ShippingMethods\Tables\ShippingMethodsTable;
 use App\Models\ShippingMethod;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class ShippingMethodResource extends Resource
+class ShippingMethodResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = ShippingMethod::class;

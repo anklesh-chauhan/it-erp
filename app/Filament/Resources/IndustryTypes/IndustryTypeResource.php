@@ -22,12 +22,13 @@ use App\Filament\Resources\IndustryTypeResource\RelationManagers;
 use App\Models\IndustryType;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class IndustryTypeResource extends Resource
+class IndustryTypeResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = IndustryType::class;

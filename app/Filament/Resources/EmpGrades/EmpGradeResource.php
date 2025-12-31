@@ -28,12 +28,13 @@ use App\Models\EmpGrade;
 use App\Models\EmpDeparment; // Make sure to import the Department model
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class EmpGradeResource extends Resource
+class EmpGradeResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = EmpGrade::class;

@@ -12,11 +12,12 @@ use App\Filament\Resources\SalesTourPlans\Tables\SalesTourPlansTable;
 use App\Models\SalesTourPlan;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class SalesTourPlanResource extends Resource
+class SalesTourPlanResource extends BaseResource
 {
     use HasSafeGlobalSearch;
 

@@ -28,12 +28,13 @@ use App\Models\EmpJobTitle;
 use App\Models\EmpDeparment; // Make sure to import the Department model
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class EmpJobTitleResource extends Resource
+class EmpJobTitleResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = EmpJobTitle::class;

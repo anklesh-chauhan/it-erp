@@ -22,12 +22,13 @@ use App\Filament\Resources\GstPanResource\RelationManagers;
 use App\Models\GstPan;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class GstPanResource extends Resource
+class GstPanResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = GstPan::class;

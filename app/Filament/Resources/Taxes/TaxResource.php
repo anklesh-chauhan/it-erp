@@ -18,6 +18,7 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\TaxComponent;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Forms\Components\Repeater;
 // use Filament\Resources\Table; // Remove this incorrect import
 use Filament\Tables\Table;
@@ -30,7 +31,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Tables\Columns\BadgeColumn;
 use App\Filament\Resources\TaxResource\Pages;
 
-class TaxResource extends Resource
+class TaxResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = Tax::class;

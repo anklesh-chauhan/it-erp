@@ -12,11 +12,12 @@ use App\Filament\Resources\ApprovalSettings\Tables\ApprovalSettingsTable;
 use App\Models\ApprovalSetting;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class ApprovalSettingResource extends Resource
+class ApprovalSettingResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = ApprovalSetting::class;

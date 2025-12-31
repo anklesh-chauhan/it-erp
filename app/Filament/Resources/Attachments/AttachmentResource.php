@@ -23,12 +23,13 @@ use App\Filament\Resources\AttachmentResource\RelationManagers;
 use App\Models\Attachment;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class AttachmentResource extends Resource
+class AttachmentResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = Attachment::class;

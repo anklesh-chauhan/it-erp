@@ -12,11 +12,12 @@ use App\Filament\Resources\PaymentTerms\Tables\PaymentTermsTable;
 use App\Models\PaymentTerm;
 use BackedEnum;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class PaymentTermResource extends Resource
+class PaymentTermResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = PaymentTerm::class;

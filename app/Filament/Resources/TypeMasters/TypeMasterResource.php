@@ -23,6 +23,7 @@ use App\Filament\Resources\TypeMasterResource\RelationManagers;
 use App\Models\TypeMaster;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,7 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Helpers\ModelHelper;
 use Filament\Schemas\Components\Utilities\Get;
 
-class TypeMasterResource extends Resource
+class TypeMasterResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     protected static ?string $model = TypeMaster::class;

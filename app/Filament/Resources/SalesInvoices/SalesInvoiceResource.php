@@ -25,6 +25,7 @@ use App\Filament\Resources\SalesInvoiceResource\RelationManagers;
 use App\Models\SalesInvoice;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -37,7 +38,7 @@ use App\Helpers\SalesDocumentHelper;
 use Filament\Actions\Action;
 
 
-class SalesInvoiceResource extends Resource
+class SalesInvoiceResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     use SalesDocumentResourceTrait;

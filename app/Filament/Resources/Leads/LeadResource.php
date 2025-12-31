@@ -43,6 +43,7 @@ use App\Models\NumberSeries;
 use App\Models\ItemMaster;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -67,7 +68,7 @@ use App\Traits\HasCustomerInteractionFields;
 
 
 
-class LeadResource extends Resource
+class LeadResource extends BaseResource
 {
     use HasCustomerInteractionFields;
     use AddressDetailsTrait;
