@@ -72,6 +72,11 @@ class VisitRouteTourPlanPolicy
         return $authUser->can('ViewOwnTerritory:VisitRouteTourPlan');
     }
 
+    public function viewOwnOU(AuthUser $authUser, VisitRouteTourPlan $visitRouteTourPlan): bool
+    {
+        return $authUser->can('ViewOwnOU:VisitRouteTourPlan');
+    }
+
     public function viewOwn(AuthUser $authUser, VisitRouteTourPlan $visitRouteTourPlan): bool
     {
         return $authUser->can('ViewOwn:VisitRouteTourPlan');

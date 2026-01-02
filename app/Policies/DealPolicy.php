@@ -72,6 +72,11 @@ class DealPolicy
         return $authUser->can('ViewOwnTerritory:Deal');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Deal $deal): bool
+    {
+        return $authUser->can('ViewOwnOU:Deal');
+    }
+
     public function viewOwn(AuthUser $authUser, Deal $deal): bool
     {
         return $authUser->can('ViewOwn:Deal');

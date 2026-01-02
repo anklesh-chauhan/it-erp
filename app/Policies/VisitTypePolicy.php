@@ -72,6 +72,11 @@ class VisitTypePolicy
         return $authUser->can('ViewOwnTerritory:VisitType');
     }
 
+    public function viewOwnOU(AuthUser $authUser, VisitType $visitType): bool
+    {
+        return $authUser->can('ViewOwnOU:VisitType');
+    }
+
     public function viewOwn(AuthUser $authUser, VisitType $visitType): bool
     {
         return $authUser->can('ViewOwn:VisitType');

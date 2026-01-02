@@ -72,6 +72,11 @@ class TypeMasterPolicy
         return $authUser->can('ViewOwnTerritory:TypeMaster');
     }
 
+    public function viewOwnOU(AuthUser $authUser, TypeMaster $typeMaster): bool
+    {
+        return $authUser->can('ViewOwnOU:TypeMaster');
+    }
+
     public function viewOwn(AuthUser $authUser, TypeMaster $typeMaster): bool
     {
         return $authUser->can('ViewOwn:TypeMaster');

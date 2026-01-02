@@ -72,6 +72,11 @@ class AccountTypePolicy
         return $authUser->can('ViewOwnTerritory:AccountType');
     }
 
+    public function viewOwnOU(AuthUser $authUser, AccountType $accountType): bool
+    {
+        return $authUser->can('ViewOwnOU:AccountType');
+    }
+
     public function viewOwn(AuthUser $authUser, AccountType $accountType): bool
     {
         return $authUser->can('ViewOwn:AccountType');

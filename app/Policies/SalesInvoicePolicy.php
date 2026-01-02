@@ -72,6 +72,11 @@ class SalesInvoicePolicy
         return $authUser->can('ViewOwnTerritory:SalesInvoice');
     }
 
+    public function viewOwnOU(AuthUser $authUser, SalesInvoice $salesInvoice): bool
+    {
+        return $authUser->can('ViewOwnOU:SalesInvoice');
+    }
+
     public function viewOwn(AuthUser $authUser, SalesInvoice $salesInvoice): bool
     {
         return $authUser->can('ViewOwn:SalesInvoice');

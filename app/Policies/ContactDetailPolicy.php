@@ -72,6 +72,11 @@ class ContactDetailPolicy
         return $authUser->can('ViewOwnTerritory:ContactDetail');
     }
 
+    public function viewOwnOU(AuthUser $authUser, ContactDetail $contactDetail): bool
+    {
+        return $authUser->can('ViewOwnOU:ContactDetail');
+    }
+
     public function viewOwn(AuthUser $authUser, ContactDetail $contactDetail): bool
     {
         return $authUser->can('ViewOwn:ContactDetail');

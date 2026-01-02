@@ -20,6 +20,7 @@ use Filament\Forms\Components\Hidden;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\Carbon;
 use Filament\Notifications\Notification;
+use App\Services\PositionService;
 use Illuminate\Validation\ValidationException;
 
 class SalesTourPlanForm
@@ -40,7 +41,18 @@ class SalesTourPlanForm
 
         // If there are valid existing dates, add +1 day from the last one
         if ($validDates->isNotEmpty()) {
-            return $validDates->last()->addDay()->format('Y-m-d');
+            $next = $validDates->last()->copy()->addDay();
+
+            $month = $get('../../month');
+
+            // 🚫 Stop auto increment outside month
+            if ($month && $next->format('Y-m') !== $month) {
+                return Carbon::createFromFormat('Y-m', $month)
+                    ->startOfMonth()
+                    ->format('Y-m-d');
+            }
+
+            return $next->format('Y-m-d');
         }
 
         // Otherwise, use the selected month (from parent select)
@@ -55,6 +67,34 @@ class SalesTourPlanForm
         return now()->startOfMonth()->format('Y-m-d');
     }
 
+    private static function generateMonthDays(string $month): array
+    {
+        if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
+            return [];
+        }
+
+        $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $end   = $start->copy()->endOfMonth();
+
+        $days = [];
+
+        while ($start->lte($end)) {
+            $days[] = [
+                'date'         => $start->format('Y-m-d'),
+                'territory_id' => null,
+                'patch_ids'    => [],
+                'purpose'      => null,
+                'joint_with'   => [],
+                'remarks'      => null,
+            ];
+
+            $start->addDay();
+        }
+
+        return $days;
+    }
+
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -64,10 +104,30 @@ class SalesTourPlanForm
                         ->label('Sales Employee')
                         ->relationship('user', 'name')
                         ->default(fn() => Auth::id())
-                        ->required(),
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, callable $set) {
+
+                            if (! $state) {
+                                return;
+                            }
+
+                            $user = \App\Models\User::find($state);
+
+                            if (! $user) {
+                                return;
+                            }
+
+                            $territoryIds = PositionService::getTerritoryIdsForUser($user);
+
+                            if (! empty($territoryIds)) {
+                                // Apply to ALL repeater rows
+                                $set('details.*.territory_id', $territoryIds[0]);
+                            }
+                        }),
 
                     Select::make('month')
-                        ->label('Month')
+                        ->label('Select Month')
                         ->options(function (callable $get) {
                             $userId = $get('user_id') ?? Auth::id();
 
@@ -94,32 +154,23 @@ class SalesTourPlanForm
 
                             return $months;
                         })
-                        ->default(function (callable $get) {
-                            $userId = $get('user_id') ?? Auth::id();
-
-                            // Get months already created
-                            $existingMonths = SalesTourPlan::where('user_id', $userId)
-                                ->pluck('month')
-                                ->toArray();
-
-                            // Identify the first free month starting from NOW
-                            $start = now()->startOfMonth();
-
-                            for ($i = 0; $i < 12; $i++) {
-                                $monthKey = $start->copy()->addMonths($i)->format('Y-m');
-
-                                if (!in_array($monthKey, $existingMonths)) {
-                                    return $monthKey;  // <-- FIRST AVAILABLE MONTH
-                                }
-                            }
-
-                            return now()->format('Y-m'); // fallback
-                        })
+                        // Defoult none selected
+                        ->default(null)
                         ->required()
                         ->reactive() // 👈 this makes downstream components re-evaluate
                         ->afterStateUpdated(function ($state, callable $set) {
-                            // Reset repeater when month changes (optional but clean)
-                            $set('details', []);
+                            if (! $state) {
+                                return;
+                            }
+
+                            // 🚀 AUTO-GENERATE ALL DAYS
+                            $set('details', self::generateMonthDays($state));
+
+                            Notification::make()
+                                ->title('Tour plan generated')
+                                ->body('All days of the selected month have been added.')
+                                ->success()
+                                ->send();
                         })
                         ->searchable(),
 
@@ -135,18 +186,20 @@ class SalesTourPlanForm
                         ->disabled(),
                 ])->columns(3)->columnSpanFull(),
 
+                // show details only if month is selected
                 Section::make('Tour Plan Details')
+                    ->visible(fn(Get $get) => !empty($get('month')))
                     ->schema([
                     // Repeater for Sales Tour Plan Details
                     Repeater::make('details')
                         ->relationship('details')
                         ->label('Daily Plan')
-                        ->minItems(1)
                         ->required()
                         ->compact()
+                        ->addable(false)
                         ->table([
                             TableColumn::make('Date'),
-                            TableColumn::make('Territory '),
+                            TableColumn::make('Territory'),
                             TableColumn::make('Patches'),
                             TableColumn::make('Purpose'),
                             TableColumn::make('Joint With'),
@@ -211,11 +264,50 @@ class SalesTourPlanForm
 
                             Select::make('territory_id')
                                 ->label('Territory')
-                                ->relationship('territory', 'name')
+                                ->options(function () {
+                                    $user = auth()->user();
+
+                                    // Single source of truth
+                                    $territoryIds = PositionService::getTerritoryIdsForUser($user);
+
+                                    // Super admin / full access → no filtering
+                                    if (empty($territoryIds)) {
+                                        return \App\Models\Territory::pluck('name', 'id');
+                                    }
+
+                                    return \App\Models\Territory::whereIn('id', $territoryIds)
+                                        ->pluck('name', 'id');
+                                })
+                                ->visible(function (Get $get) {
+
+                                    $userId = $get('../../user_id') ?? auth()->id();
+                                    $user   = $userId ? \App\Models\User::find($userId) : null;
+
+                                    if (! $user) {
+                                        return false;
+                                    }
+
+                                    $territoryIds = PositionService::getTerritoryIdsForUser($user);
+
+                                    // Show only if multiple territories OR super admin
+                                    return empty($territoryIds) || count($territoryIds) > 1;
+                                })
                                 ->searchable()
                                 ->preload()
-                                ->reactive(),
+                                ->reactive()
+                                ->afterStateHydrated(function (callable $set, $state) {
 
+                                    // Do not override existing value
+                                    if ($state) {
+                                        return;
+                                    }
+
+                                    $territoryIds = PositionService::getTerritoryIdsForUser(auth()->user());
+
+                                    if (! empty($territoryIds)) {
+                                        $set('territory_id', $territoryIds[0]);
+                                    }
+                                }),
                             Select::make('patch_ids')
                                 ->label('Patches')
                                 ->multiple()

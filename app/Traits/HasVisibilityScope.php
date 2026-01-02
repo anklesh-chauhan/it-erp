@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use App\Services\PositionService;
+use App\Services\OrganizationalUnitService;
 
 trait HasVisibilityScope
 {
@@ -47,6 +48,23 @@ trait HasVisibilityScope
             return $query->whereIn(
                 $query->getModel()->getTable() . '.territory_id',
                 $territoryIds
+            );
+        }
+
+        /* =====================================================
+         | VIEW OWN OU (STRUCTURAL)
+         ===================================================== */
+        if ($user->can("ViewOwnOU:{$model}")) {
+
+            $ouIds = OrganizationalUnitService::getUserOuIds($user);
+
+            if (empty($ouIds)) {
+                return $query->whereRaw('1 = 0');
+            }
+
+            return $query->whereHas(
+                'creator.employee.employmentDetail.organizationalUnits',
+                fn ($q) => $q->whereIn('organizational_units.id', $ouIds)
             );
         }
 

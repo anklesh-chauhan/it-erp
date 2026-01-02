@@ -72,6 +72,11 @@ class SalesDocumentPreferencePolicy
         return $authUser->can('ViewOwnTerritory:SalesDocumentPreference');
     }
 
+    public function viewOwnOU(AuthUser $authUser, SalesDocumentPreference $salesDocumentPreference): bool
+    {
+        return $authUser->can('ViewOwnOU:SalesDocumentPreference');
+    }
+
     public function viewOwn(AuthUser $authUser, SalesDocumentPreference $salesDocumentPreference): bool
     {
         return $authUser->can('ViewOwn:SalesDocumentPreference');

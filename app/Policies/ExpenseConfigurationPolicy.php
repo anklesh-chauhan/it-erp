@@ -72,6 +72,11 @@ class ExpenseConfigurationPolicy
         return $authUser->can('ViewOwnTerritory:ExpenseConfiguration');
     }
 
+    public function viewOwnOU(AuthUser $authUser, ExpenseConfiguration $expenseConfiguration): bool
+    {
+        return $authUser->can('ViewOwnOU:ExpenseConfiguration');
+    }
+
     public function viewOwn(AuthUser $authUser, ExpenseConfiguration $expenseConfiguration): bool
     {
         return $authUser->can('ViewOwn:ExpenseConfiguration');

@@ -17,13 +17,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Disable foreign key checks to avoid constraint issues
+        // // Disable foreign key checks to avoid constraint issues
         // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         // // Truncate all tables you want to reset
-        // DB::table('city_pin_codes')->truncate();
-        // DB::table('cities')->truncate();
-        // DB::table('states')->truncate();
+        // DB::table('model_has_roles')->truncate();
 
         // // Enable foreign key checks again
         // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
@@ -81,6 +79,8 @@ class DatabaseSeeder extends Seeder
             LocationMasterSeeder::class,
             ItemCategorySeeder::class,
             ItemMasterSeeder::class,
+            SalesUsersSeeder::class,
+            DepartmentRoleSeeder::class,
         ]);
     }
 }

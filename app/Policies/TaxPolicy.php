@@ -72,6 +72,11 @@ class TaxPolicy
         return $authUser->can('ViewOwnTerritory:Tax');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Tax $tax): bool
+    {
+        return $authUser->can('ViewOwnOU:Tax');
+    }
+
     public function viewOwn(AuthUser $authUser, Tax $tax): bool
     {
         return $authUser->can('ViewOwn:Tax');

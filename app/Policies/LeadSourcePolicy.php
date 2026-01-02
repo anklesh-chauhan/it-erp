@@ -72,6 +72,11 @@ class LeadSourcePolicy
         return $authUser->can('ViewOwnTerritory:LeadSource');
     }
 
+    public function viewOwnOU(AuthUser $authUser, LeadSource $leadSource): bool
+    {
+        return $authUser->can('ViewOwnOU:LeadSource');
+    }
+
     public function viewOwn(AuthUser $authUser, LeadSource $leadSource): bool
     {
         return $authUser->can('ViewOwn:LeadSource');

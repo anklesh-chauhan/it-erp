@@ -72,6 +72,11 @@ class SalesDailyExpensePolicy
         return $authUser->can('ViewOwnTerritory:SalesDailyExpense');
     }
 
+    public function viewOwnOU(AuthUser $authUser, SalesDailyExpense $salesDailyExpense): bool
+    {
+        return $authUser->can('ViewOwnOU:SalesDailyExpense');
+    }
+
     public function viewOwn(AuthUser $authUser, SalesDailyExpense $salesDailyExpense): bool
     {
         return $authUser->can('ViewOwn:SalesDailyExpense');

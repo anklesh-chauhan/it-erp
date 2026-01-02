@@ -72,6 +72,11 @@ class LeadPolicy
         return $authUser->can('ViewOwnTerritory:Lead');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Lead $lead): bool
+    {
+        return $authUser->can('ViewOwnOU:Lead');
+    }
+
     public function viewOwn(AuthUser $authUser, Lead $lead): bool
     {
         return $authUser->can('ViewOwn:Lead');

@@ -72,6 +72,11 @@ class QuotePolicy
         return $authUser->can('ViewOwnTerritory:Quote');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Quote $quote): bool
+    {
+        return $authUser->can('ViewOwnOU:Quote');
+    }
+
     public function viewOwn(AuthUser $authUser, Quote $quote): bool
     {
         return $authUser->can('ViewOwn:Quote');

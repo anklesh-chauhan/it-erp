@@ -72,6 +72,11 @@ class ChartOfAccountPolicy
         return $authUser->can('ViewOwnTerritory:ChartOfAccount');
     }
 
+    public function viewOwnOU(AuthUser $authUser, ChartOfAccount $chartOfAccount): bool
+    {
+        return $authUser->can('ViewOwnOU:ChartOfAccount');
+    }
+
     public function viewOwn(AuthUser $authUser, ChartOfAccount $chartOfAccount): bool
     {
         return $authUser->can('ViewOwn:ChartOfAccount');

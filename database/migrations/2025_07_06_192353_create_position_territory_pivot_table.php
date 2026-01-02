@@ -18,6 +18,8 @@ return new class extends Migration
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();
+
+            $table->unique(['position_id', 'territory_id'], 'position_territory_unique');
         });
     }
 

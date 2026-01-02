@@ -72,6 +72,11 @@ class EmployeeAttendancePolicy
         return $authUser->can('ViewOwnTerritory:EmployeeAttendance');
     }
 
+    public function viewOwnOU(AuthUser $authUser, EmployeeAttendance $employeeAttendance): bool
+    {
+        return $authUser->can('ViewOwnOU:EmployeeAttendance');
+    }
+
     public function viewOwn(AuthUser $authUser, EmployeeAttendance $employeeAttendance): bool
     {
         return $authUser->can('ViewOwn:EmployeeAttendance');

@@ -74,8 +74,8 @@ class PatchesRelationManager extends RelationManager
                 TextColumn::make('code')->sortable(),
                 TextColumn::make('cityPinCode.pin_code')->label('Pin Code'),
                 TextColumn::make('color')->badge()->color(fn ($state) => $state ?? 'gray'),
-                TextColumn::make('created_by')->label('Created By'),
-                TextColumn::make('updated_by')->label('Updated By'),
+                TextColumn::make('creator.name')->label('Created By'),
+                TextColumn::make('updater.name')->label('Updated By'),
                 TextColumn::make('created_at')->dateTime()->since()->label('Created'),
             ])
             ->filters([
@@ -85,7 +85,7 @@ class PatchesRelationManager extends RelationManager
                 //
             ])
             ->recordActions([
-                // EditAction::make(),
+                EditAction::make(),
             ])
             ->toolbarActions([
                 //

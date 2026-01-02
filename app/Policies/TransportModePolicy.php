@@ -72,6 +72,11 @@ class TransportModePolicy
         return $authUser->can('ViewOwnTerritory:TransportMode');
     }
 
+    public function viewOwnOU(AuthUser $authUser, TransportMode $transportMode): bool
+    {
+        return $authUser->can('ViewOwnOU:TransportMode');
+    }
+
     public function viewOwn(AuthUser $authUser, TransportMode $transportMode): bool
     {
         return $authUser->can('ViewOwn:TransportMode');

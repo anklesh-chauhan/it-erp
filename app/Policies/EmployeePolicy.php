@@ -72,6 +72,11 @@ class EmployeePolicy
         return $authUser->can('ViewOwnTerritory:Employee');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Employee $employee): bool
+    {
+        return $authUser->can('ViewOwnOU:Employee');
+    }
+
     public function viewOwn(AuthUser $authUser, Employee $employee): bool
     {
         return $authUser->can('ViewOwn:Employee');

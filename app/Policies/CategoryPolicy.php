@@ -72,6 +72,11 @@ class CategoryPolicy
         return $authUser->can('ViewOwnTerritory:Category');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Category $category): bool
+    {
+        return $authUser->can('ViewOwnOU:Category');
+    }
+
     public function viewOwn(AuthUser $authUser, Category $category): bool
     {
         return $authUser->can('ViewOwn:Category');

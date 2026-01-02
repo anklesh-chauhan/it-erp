@@ -72,6 +72,11 @@ class FollowUpPriorityPolicy
         return $authUser->can('ViewOwnTerritory:FollowUpPriority');
     }
 
+    public function viewOwnOU(AuthUser $authUser, FollowUpPriority $followUpPriority): bool
+    {
+        return $authUser->can('ViewOwnOU:FollowUpPriority');
+    }
+
     public function viewOwn(AuthUser $authUser, FollowUpPriority $followUpPriority): bool
     {
         return $authUser->can('ViewOwn:FollowUpPriority');

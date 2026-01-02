@@ -72,6 +72,11 @@ class PaymentMethodPolicy
         return $authUser->can('ViewOwnTerritory:PaymentMethod');
     }
 
+    public function viewOwnOU(AuthUser $authUser, PaymentMethod $paymentMethod): bool
+    {
+        return $authUser->can('ViewOwnOU:PaymentMethod');
+    }
+
     public function viewOwn(AuthUser $authUser, PaymentMethod $paymentMethod): bool
     {
         return $authUser->can('ViewOwn:PaymentMethod');

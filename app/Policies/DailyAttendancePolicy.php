@@ -72,6 +72,11 @@ class DailyAttendancePolicy
         return $authUser->can('ViewOwnTerritory:DailyAttendance');
     }
 
+    public function viewOwnOU(AuthUser $authUser, DailyAttendance $dailyAttendance): bool
+    {
+        return $authUser->can('ViewOwnOU:DailyAttendance');
+    }
+
     public function viewOwn(AuthUser $authUser, DailyAttendance $dailyAttendance): bool
     {
         return $authUser->can('ViewOwn:DailyAttendance');

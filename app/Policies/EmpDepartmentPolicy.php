@@ -72,6 +72,11 @@ class EmpDepartmentPolicy
         return $authUser->can('ViewOwnTerritory:EmpDepartment');
     }
 
+    public function viewOwnOU(AuthUser $authUser, EmpDepartment $empDepartment): bool
+    {
+        return $authUser->can('ViewOwnOU:EmpDepartment');
+    }
+
     public function viewOwn(AuthUser $authUser, EmpDepartment $empDepartment): bool
     {
         return $authUser->can('ViewOwn:EmpDepartment');

@@ -72,6 +72,11 @@ class VisitPurposePolicy
         return $authUser->can('ViewOwnTerritory:VisitPurpose');
     }
 
+    public function viewOwnOU(AuthUser $authUser, VisitPurpose $visitPurpose): bool
+    {
+        return $authUser->can('ViewOwnOU:VisitPurpose');
+    }
+
     public function viewOwn(AuthUser $authUser, VisitPurpose $visitPurpose): bool
     {
         return $authUser->can('ViewOwn:VisitPurpose');

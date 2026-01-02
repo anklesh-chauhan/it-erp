@@ -72,6 +72,11 @@ class NumberSeriesPolicy
         return $authUser->can('ViewOwnTerritory:NumberSeries');
     }
 
+    public function viewOwnOU(AuthUser $authUser, NumberSeries $numberSeries): bool
+    {
+        return $authUser->can('ViewOwnOU:NumberSeries');
+    }
+
     public function viewOwn(AuthUser $authUser, NumberSeries $numberSeries): bool
     {
         return $authUser->can('ViewOwn:NumberSeries');

@@ -72,6 +72,11 @@ class LedgerPolicy
         return $authUser->can('ViewOwnTerritory:Ledger');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Ledger $ledger): bool
+    {
+        return $authUser->can('ViewOwnOU:Ledger');
+    }
+
     public function viewOwn(AuthUser $authUser, Ledger $ledger): bool
     {
         return $authUser->can('ViewOwn:Ledger');

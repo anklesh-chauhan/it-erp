@@ -72,6 +72,11 @@ class OrganizationPolicy
         return $authUser->can('ViewOwnTerritory:Organization');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Organization $organization): bool
+    {
+        return $authUser->can('ViewOwnOU:Organization');
+    }
+
     public function viewOwn(AuthUser $authUser, Organization $organization): bool
     {
         return $authUser->can('ViewOwn:Organization');

@@ -72,6 +72,11 @@ class CompanyMasterBankDetailPolicy
         return $authUser->can('ViewOwnTerritory:CompanyMasterBankDetail');
     }
 
+    public function viewOwnOU(AuthUser $authUser, CompanyMasterBankDetail $companyMasterBankDetail): bool
+    {
+        return $authUser->can('ViewOwnOU:CompanyMasterBankDetail');
+    }
+
     public function viewOwn(AuthUser $authUser, CompanyMasterBankDetail $companyMasterBankDetail): bool
     {
         return $authUser->can('ViewOwn:CompanyMasterBankDetail');

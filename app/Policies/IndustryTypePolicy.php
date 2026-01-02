@@ -72,6 +72,11 @@ class IndustryTypePolicy
         return $authUser->can('ViewOwnTerritory:IndustryType');
     }
 
+    public function viewOwnOU(AuthUser $authUser, IndustryType $industryType): bool
+    {
+        return $authUser->can('ViewOwnOU:IndustryType');
+    }
+
     public function viewOwn(AuthUser $authUser, IndustryType $industryType): bool
     {
         return $authUser->can('ViewOwn:IndustryType');

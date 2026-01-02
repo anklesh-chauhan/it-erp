@@ -72,6 +72,11 @@ class FollowUpPolicy
         return $authUser->can('ViewOwnTerritory:FollowUp');
     }
 
+    public function viewOwnOU(AuthUser $authUser, FollowUp $followUp): bool
+    {
+        return $authUser->can('ViewOwnOU:FollowUp');
+    }
+
     public function viewOwn(AuthUser $authUser, FollowUp $followUp): bool
     {
         return $authUser->can('ViewOwn:FollowUp');

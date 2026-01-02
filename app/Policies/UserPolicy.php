@@ -69,6 +69,11 @@ class UserPolicy
         return $authUser->can('ViewOwnTerritory:User');
     }
 
+    public function viewOwnOU(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewOwnOU:User');
+    }
+
     public function viewOwn(AuthUser $authUser): bool
     {
         return $authUser->can('ViewOwn:User');

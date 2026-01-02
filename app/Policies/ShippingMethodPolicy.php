@@ -72,6 +72,11 @@ class ShippingMethodPolicy
         return $authUser->can('ViewOwnTerritory:ShippingMethod');
     }
 
+    public function viewOwnOU(AuthUser $authUser, ShippingMethod $shippingMethod): bool
+    {
+        return $authUser->can('ViewOwnOU:ShippingMethod');
+    }
+
     public function viewOwn(AuthUser $authUser, ShippingMethod $shippingMethod): bool
     {
         return $authUser->can('ViewOwn:ShippingMethod');

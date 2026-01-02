@@ -72,6 +72,11 @@ class ApprovalRulePolicy
         return $authUser->can('ViewOwnTerritory:ApprovalRule');
     }
 
+    public function viewOwnOU(AuthUser $authUser, ApprovalRule $approvalRule): bool
+    {
+        return $authUser->can('ViewOwnOU:ApprovalRule');
+    }
+
     public function viewOwn(AuthUser $authUser, ApprovalRule $approvalRule): bool
     {
         return $authUser->can('ViewOwn:ApprovalRule');

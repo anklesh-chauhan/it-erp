@@ -72,6 +72,11 @@ class PositionPolicy
         return $authUser->can('ViewOwnTerritory:Position');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Position $position): bool
+    {
+        return $authUser->can('ViewOwnOU:Position');
+    }
+
     public function viewOwn(AuthUser $authUser, Position $position): bool
     {
         return $authUser->can('ViewOwn:Position');

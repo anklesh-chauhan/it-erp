@@ -72,6 +72,11 @@ class PackagingTypePolicy
         return $authUser->can('ViewOwnTerritory:PackagingType');
     }
 
+    public function viewOwnOU(AuthUser $authUser, PackagingType $packagingType): bool
+    {
+        return $authUser->can('ViewOwnOU:PackagingType');
+    }
+
     public function viewOwn(AuthUser $authUser, PackagingType $packagingType): bool
     {
         return $authUser->can('ViewOwn:PackagingType');

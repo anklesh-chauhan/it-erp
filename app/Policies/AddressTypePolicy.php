@@ -72,6 +72,11 @@ class AddressTypePolicy
         return $authUser->can('ViewOwnTerritory:AddressType');
     }
 
+    public function viewOwnOU(AuthUser $authUser, AddressType $addressType): bool
+    {
+        return $authUser->can('ViewOwnOU:AddressType');
+    }
+
     public function viewOwn(AuthUser $authUser, AddressType $addressType): bool
     {
         return $authUser->can('ViewOwn:AddressType');

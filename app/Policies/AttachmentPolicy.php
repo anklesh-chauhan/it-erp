@@ -72,6 +72,11 @@ class AttachmentPolicy
         return $authUser->can('ViewOwnTerritory:Attachment');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Attachment $attachment): bool
+    {
+        return $authUser->can('ViewOwnOU:Attachment');
+    }
+
     public function viewOwn(AuthUser $authUser, Attachment $attachment): bool
     {
         return $authUser->can('ViewOwn:Attachment');

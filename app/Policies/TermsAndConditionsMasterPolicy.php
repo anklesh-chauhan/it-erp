@@ -72,6 +72,11 @@ class TermsAndConditionsMasterPolicy
         return $authUser->can('ViewOwnTerritory:TermsAndConditionsMaster');
     }
 
+    public function viewOwnOU(AuthUser $authUser, TermsAndConditionsMaster $termsAndConditionsMaster): bool
+    {
+        return $authUser->can('ViewOwnOU:TermsAndConditionsMaster');
+    }
+
     public function viewOwn(AuthUser $authUser, TermsAndConditionsMaster $termsAndConditionsMaster): bool
     {
         return $authUser->can('ViewOwn:TermsAndConditionsMaster');

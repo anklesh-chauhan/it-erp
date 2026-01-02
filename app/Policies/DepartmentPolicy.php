@@ -72,6 +72,11 @@ class DepartmentPolicy
         return $authUser->can('ViewOwnTerritory:Department');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Department $department): bool
+    {
+        return $authUser->can('ViewOwnOU:Department');
+    }
+
     public function viewOwn(AuthUser $authUser, Department $department): bool
     {
         return $authUser->can('ViewOwn:Department');

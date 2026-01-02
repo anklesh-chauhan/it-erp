@@ -72,6 +72,11 @@ class RegionPolicy
         return $authUser->can('ViewOwnTerritory:Region');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Region $region): bool
+    {
+        return $authUser->can('ViewOwnOU:Region');
+    }
+
     public function viewOwn(AuthUser $authUser, Region $region): bool
     {
         return $authUser->can('ViewOwn:Region');

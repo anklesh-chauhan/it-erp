@@ -72,6 +72,11 @@ class LocationMasterPolicy
         return $authUser->can('ViewOwnTerritory:LocationMaster');
     }
 
+    public function viewOwnOU(AuthUser $authUser, LocationMaster $locationMaster): bool
+    {
+        return $authUser->can('ViewOwnOU:LocationMaster');
+    }
+
     public function viewOwn(AuthUser $authUser, LocationMaster $locationMaster): bool
     {
         return $authUser->can('ViewOwn:LocationMaster');

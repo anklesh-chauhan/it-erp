@@ -40,6 +40,7 @@ use App\Filament\Actions\ApprovalAction;
 use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Facades\Filament;
+use App\Services\PositionService;
 
 class PatchResource extends BaseResource
 {
@@ -77,31 +78,45 @@ class PatchResource extends BaseResource
 
                             $user = Auth::user();
 
-                            // SAFETY CHECKS
-                            if (
-                                ! $user?->employee?->employmentDetail
-                            ) {
-                                // No employment detail → no territory
+                            if (! $user?->employee) {
+                                // No employee → no territory
                                 $query->whereRaw('1 = 0');
                                 return;
                             }
 
-                            // ✅ Get ALL division OU IDs
-                            $divisionOuIds = $user->employee
-                                ->employmentDetail
+                            /* =====================================================
+                            | 1️⃣ POSITION-BASED TERRITORIES (PRIMARY)
+                            ===================================================== */
+                            $positionTerritoryIds = PositionService::getTerritoryIdsForUser($user);
+
+                            if (! empty($positionTerritoryIds)) {
+                                // 🔥 PRIMARY RULE
+                                $query->whereIn('territories.id', $positionTerritoryIds);
+                                return;
+                            }
+
+                            /* =====================================================
+                            | 2️⃣ OU-BASED TERRITORIES (FALLBACK)
+                            ===================================================== */
+                            $employmentDetail = $user->employee->employmentDetail;
+
+                            if (! $employmentDetail) {
+                                $query->whereRaw('1 = 0');
+                                return;
+                            }
+
+                            $ouIds = $employmentDetail
                                 ->organizationalUnits()
                                 ->pluck('organizational_units.id')
                                 ->toArray();
 
-                            if (empty($divisionOuIds)) {
-                                // No divisions → no territory
+                            if (empty($ouIds)) {
                                 $query->whereRaw('1 = 0');
                                 return;
                             }
 
-                            // ✅ Filter territories by linked divisions
-                            $query->whereHas('divisions', function ($q) use ($divisionOuIds) {
-                                $q->whereIn('organizational_units.id', $divisionOuIds);
+                            $query->whereHas('divisions', function ($q) use ($ouIds) {
+                                $q->whereIn('organizational_units.id', $ouIds);
                             });
                         }
                     )

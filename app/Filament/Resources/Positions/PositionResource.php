@@ -78,29 +78,15 @@ class PositionResource extends BaseResource
                         ->nullable()
                         ->placeholder('Select a reporting position'),
 
-                    Toggle::make('is_multi_territory')
-                        ->label('Is Multi Territory')
-                        ->helperText('Enable to select multiple territories. ⚠️ Once multi-territory is enabled, it cannot be reversed.')
-                        ->reactive()
-                        ->disabled(fn (?Position $record, Get $get) => $record?->is_multi_territory ?? false),
-
                     Select::make('territories')
-                        ->relationship('territories', 'name')
-                        ->multiple() // Keep it multiple for the many-to-many relationship
-                        ->searchable()
+                        ->relationship(
+                            name: 'territories',
+                            titleAttribute: 'name'
+                        )
+                        ->multiple()
                         ->preload()
-                        ->label(fn (Get $get) => $get('is_multi_territory') ? 'Territories (Select Multiple)' : 'Territory (Select One Only)')
-
-                        // Add validation to limit selection to 1 when NOT multi-territory
-                        ->rules([
-                            fn (Get $get) => function (string $attribute, $value, \Closure $fail) use ($get) {
-                                if (! $get('is_multi_territory') && count($value) > 1) {
-                                    $fail("Only one territory can be selected when 'Is Multi Territory' is disabled.");
-                                }
-                            },
-                        ])
-                        // The component is always visible, but its label changes and it is constrained
-                        ->helperText(fn (Get $get) => ! $get('is_multi_territory') ? 'Select a single territory.' : null),
+                        ->searchable()
+                        ->label('Territories'),
 
                     Select::make('location_id')
                         ->label('Location')
@@ -204,10 +190,6 @@ class PositionResource extends BaseResource
             ->columns([
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('code')->searchable()->sortable(),
-                // Tables\Columns\TextColumn::make('status')
-                //     ->badge()
-                //     ->color(fn (string $state): string => PositionStatus::from($state)->getColor())
-                //     ->sortable(),
 
                 TextColumn::make('level')
                     ->searchable()
@@ -219,13 +201,10 @@ class PositionResource extends BaseResource
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('territories')
+                TextColumn::make('territories.name')
                     ->label('Territories')
-                    ->formatStateUsing(fn ($record) =>
-                        $record->territories->pluck('name')->implode(', ')
-                    )
-                    ->wrap()
-                    ->toggleable(),
+                    ->listWithLineBreaks()
+                    ->searchable(),
 
                 TextColumn::make('location.name')
                     ->label('Location')
@@ -261,22 +240,8 @@ class PositionResource extends BaseResource
                     ->listWithLineBreaks()
                     ->bulleted()
                     ->toggleable(),
-
-                // TextColumn::make('created_at')
-                //     ->dateTime()
-                //     ->sortable()
-                //     ->toggleable(),
-
-                // TextColumn::make('updated_at')
-                //     ->dateTime()
-                //     ->sortable()
-                //     ->toggleable(),
             ])
             ->filters([
-                // Tables\Filters\SelectFilter::make('status')
-                //     ->options(PositionStatus::class)
-                //     ->label('Status'),
-
                 SelectFilter::make('territories')
                     ->relationship('territories', 'name')
                     ->multiple()

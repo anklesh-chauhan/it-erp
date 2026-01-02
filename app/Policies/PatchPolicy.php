@@ -11,7 +11,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class PatchPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:Patch');
@@ -70,6 +70,11 @@ class PatchPolicy
     public function viewOwnTerritory(AuthUser $authUser, Patch $patch): bool
     {
         return $authUser->can('ViewOwnTerritory:Patch');
+    }
+
+    public function viewOwnOU(AuthUser $authUser, Patch $patch): bool
+    {
+        return $authUser->can('ViewOwnOU:Patch');
     }
 
     public function viewOwn(AuthUser $authUser, Patch $patch): bool

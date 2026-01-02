@@ -72,6 +72,11 @@ class EmpJobTitlePolicy
         return $authUser->can('ViewOwnTerritory:EmpJobTitle');
     }
 
+    public function viewOwnOU(AuthUser $authUser, EmpJobTitle $empJobTitle): bool
+    {
+        return $authUser->can('ViewOwnOU:EmpJobTitle');
+    }
+
     public function viewOwn(AuthUser $authUser, EmpJobTitle $empJobTitle): bool
     {
         return $authUser->can('ViewOwn:EmpJobTitle');

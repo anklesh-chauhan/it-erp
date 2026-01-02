@@ -72,6 +72,11 @@ class ItemBrandPolicy
         return $authUser->can('ViewOwnTerritory:ItemBrand');
     }
 
+    public function viewOwnOU(AuthUser $authUser, ItemBrand $itemBrand): bool
+    {
+        return $authUser->can('ViewOwnOU:ItemBrand');
+    }
+
     public function viewOwn(AuthUser $authUser, ItemBrand $itemBrand): bool
     {
         return $authUser->can('ViewOwn:ItemBrand');

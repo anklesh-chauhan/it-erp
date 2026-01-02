@@ -72,6 +72,11 @@ class GstPanPolicy
         return $authUser->can('ViewOwnTerritory:GstPan');
     }
 
+    public function viewOwnOU(AuthUser $authUser, GstPan $gstPan): bool
+    {
+        return $authUser->can('ViewOwnOU:GstPan');
+    }
+
     public function viewOwn(AuthUser $authUser, GstPan $gstPan): bool
     {
         return $authUser->can('ViewOwn:GstPan');

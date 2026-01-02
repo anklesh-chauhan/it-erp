@@ -72,6 +72,11 @@ class SalesOrderPolicy
         return $authUser->can('ViewOwnTerritory:SalesOrder');
     }
 
+    public function viewOwnOU(AuthUser $authUser, SalesOrder $salesOrder): bool
+    {
+        return $authUser->can('ViewOwnOU:SalesOrder');
+    }
+
     public function viewOwn(AuthUser $authUser, SalesOrder $salesOrder): bool
     {
         return $authUser->can('ViewOwn:SalesOrder');

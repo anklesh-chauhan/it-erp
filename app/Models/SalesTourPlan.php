@@ -21,8 +21,6 @@ class SalesTourPlan extends BaseModel
         'manager_remarks',
         'approved_by',
         'approved_at',
-        'created_by',
-        'updated_by',
     ];
 
     protected $casts = [

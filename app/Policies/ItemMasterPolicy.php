@@ -72,6 +72,11 @@ class ItemMasterPolicy
         return $authUser->can('ViewOwnTerritory:ItemMaster');
     }
 
+    public function viewOwnOU(AuthUser $authUser, ItemMaster $itemMaster): bool
+    {
+        return $authUser->can('ViewOwnOU:ItemMaster');
+    }
+
     public function viewOwn(AuthUser $authUser, ItemMaster $itemMaster): bool
     {
         return $authUser->can('ViewOwn:ItemMaster');

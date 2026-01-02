@@ -69,6 +69,11 @@ class TenantUserPolicy
         return $authUser->can('ViewOwnTerritory:TenantUser');
     }
 
+    public function viewOwnOU(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewOwnOU:TenantUser');
+    }
+
     public function viewOwn(AuthUser $authUser): bool
     {
         return $authUser->can('ViewOwn:TenantUser');

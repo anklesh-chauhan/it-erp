@@ -123,7 +123,7 @@ return [
         'generate' => true,
         'methods' => [
             'viewAny', 'view', 'create', 'update', 'delete', 'restore',
-            'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder', 'viewOwnTerritory', 'viewOwn',
+            'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder', 'viewOwnTerritory', 'viewOwnOU', 'viewOwn',
         ],
         'single_parameter_methods' => [
             'viewAny',

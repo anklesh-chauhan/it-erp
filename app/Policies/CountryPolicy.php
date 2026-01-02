@@ -72,6 +72,11 @@ class CountryPolicy
         return $authUser->can('ViewOwnTerritory:Country');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Country $country): bool
+    {
+        return $authUser->can('ViewOwnOU:Country');
+    }
+
     public function viewOwn(AuthUser $authUser, Country $country): bool
     {
         return $authUser->can('ViewOwn:Country');

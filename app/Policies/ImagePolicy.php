@@ -72,6 +72,11 @@ class ImagePolicy
         return $authUser->can('ViewOwnTerritory:Image');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Image $image): bool
+    {
+        return $authUser->can('ViewOwnOU:Image');
+    }
+
     public function viewOwn(AuthUser $authUser, Image $image): bool
     {
         return $authUser->can('ViewOwn:Image');

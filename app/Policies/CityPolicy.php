@@ -72,6 +72,11 @@ class CityPolicy
         return $authUser->can('ViewOwnTerritory:City');
     }
 
+    public function viewOwnOU(AuthUser $authUser, City $city): bool
+    {
+        return $authUser->can('ViewOwnOU:City');
+    }
+
     public function viewOwn(AuthUser $authUser, City $city): bool
     {
         return $authUser->can('ViewOwn:City');

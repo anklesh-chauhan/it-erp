@@ -21,6 +21,7 @@ class OrganizationalUnitService
         return OrganizationalUnit::whereIn('id', $primaryOuIds)
             ->orWhereIn('parent_id', $primaryOuIds)
             ->pluck('id')
+            ->unique()
             ->toArray();
     }
 }

@@ -72,6 +72,11 @@ class AccountMasterPolicy
         return $authUser->can('ViewOwnTerritory:AccountMaster');
     }
 
+    public function viewOwnOU(AuthUser $authUser, AccountMaster $accountMaster): bool
+    {
+        return $authUser->can('ViewOwnOU:AccountMaster');
+    }
+
     public function viewOwn(AuthUser $authUser, AccountMaster $accountMaster): bool
     {
         return $authUser->can('ViewOwn:AccountMaster');

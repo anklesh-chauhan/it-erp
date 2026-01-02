@@ -72,6 +72,11 @@ class EmpGradePolicy
         return $authUser->can('ViewOwnTerritory:EmpGrade');
     }
 
+    public function viewOwnOU(AuthUser $authUser, EmpGrade $empGrade): bool
+    {
+        return $authUser->can('ViewOwnOU:EmpGrade');
+    }
+
     public function viewOwn(AuthUser $authUser, EmpGrade $empGrade): bool
     {
         return $authUser->can('ViewOwn:EmpGrade');

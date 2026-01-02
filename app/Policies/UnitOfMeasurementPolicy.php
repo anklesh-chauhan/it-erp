@@ -72,6 +72,11 @@ class UnitOfMeasurementPolicy
         return $authUser->can('ViewOwnTerritory:UnitOfMeasurement');
     }
 
+    public function viewOwnOU(AuthUser $authUser, UnitOfMeasurement $unitOfMeasurement): bool
+    {
+        return $authUser->can('ViewOwnOU:UnitOfMeasurement');
+    }
+
     public function viewOwn(AuthUser $authUser, UnitOfMeasurement $unitOfMeasurement): bool
     {
         return $authUser->can('ViewOwn:UnitOfMeasurement');

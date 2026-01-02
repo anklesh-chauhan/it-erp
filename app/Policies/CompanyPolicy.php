@@ -72,6 +72,11 @@ class CompanyPolicy
         return $authUser->can('ViewOwnTerritory:Company');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Company $company): bool
+    {
+        return $authUser->can('ViewOwnOU:Company');
+    }
+
     public function viewOwn(AuthUser $authUser, Company $company): bool
     {
         return $authUser->can('ViewOwn:Company');

@@ -72,6 +72,11 @@ class RolePolicy
         return $authUser->can('ViewOwnTerritory:Role');
     }
 
+    public function viewOwnOU(AuthUser $authUser, Role $role): bool
+    {
+        return $authUser->can('ViewOwnOU:Role');
+    }
+
     public function viewOwn(AuthUser $authUser, Role $role): bool
     {
         return $authUser->can('ViewOwn:Role');

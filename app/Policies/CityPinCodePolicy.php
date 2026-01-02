@@ -72,6 +72,11 @@ class CityPinCodePolicy
         return $authUser->can('ViewOwnTerritory:CityPinCode');
     }
 
+    public function viewOwnOU(AuthUser $authUser, CityPinCode $cityPinCode): bool
+    {
+        return $authUser->can('ViewOwnOU:CityPinCode');
+    }
+
     public function viewOwn(AuthUser $authUser, CityPinCode $cityPinCode): bool
     {
         return $authUser->can('ViewOwn:CityPinCode');

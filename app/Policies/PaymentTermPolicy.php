@@ -72,6 +72,11 @@ class PaymentTermPolicy
         return $authUser->can('ViewOwnTerritory:PaymentTerm');
     }
 
+    public function viewOwnOU(AuthUser $authUser, PaymentTerm $paymentTerm): bool
+    {
+        return $authUser->can('ViewOwnOU:PaymentTerm');
+    }
+
     public function viewOwn(AuthUser $authUser, PaymentTerm $paymentTerm): bool
     {
         return $authUser->can('ViewOwn:PaymentTerm');

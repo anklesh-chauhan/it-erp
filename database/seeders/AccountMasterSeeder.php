@@ -15,9 +15,8 @@ class AccountMasterSeeder extends Seeder
 
     public function run(): void
     {
-        $this->seedAccounts(10);              // mixed
-        $this->seedAccounts(10, 'customer');  // customers
-        $this->seedAccounts(10, 'vendor');       // vendors
+        $this->seedAccounts(5);              // mixed
+        $this->seedAccounts(5, 'customer');  // customers
     }
 
     protected function seedAccounts(int $total, ?string $state = null): void

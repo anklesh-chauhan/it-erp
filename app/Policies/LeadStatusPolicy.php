@@ -72,6 +72,11 @@ class LeadStatusPolicy
         return $authUser->can('ViewOwnTerritory:LeadStatus');
     }
 
+    public function viewOwnOU(AuthUser $authUser, LeadStatus $leadStatus): bool
+    {
+        return $authUser->can('ViewOwnOU:LeadStatus');
+    }
+
     public function viewOwn(AuthUser $authUser, LeadStatus $leadStatus): bool
     {
         return $authUser->can('ViewOwn:LeadStatus');
