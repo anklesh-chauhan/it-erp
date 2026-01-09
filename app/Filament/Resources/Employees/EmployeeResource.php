@@ -48,6 +48,10 @@ use Illuminate\Support\Facades\Auth; // Import Tabs
 use Filament\Forms\Components\Repeater; // Import Tab
 use App\Filament\Resources\AccountMasterBankDetailResource\RelationManagers\BankDetailRelationManager;
 use Filament\Resources\RelationManagers\RelationManager;
+use App\Models\User;
+use Illuminate\Support\Str;
+use App\Notifications\UserAccountCreated;
+use Filament\Actions\Action;
 
 class EmployeeResource extends BaseResource
 {
@@ -83,6 +87,34 @@ class EmployeeResource extends BaseResource
                                             ->required()
                                             ->unique(ignoreRecord: true)
                                             ->maxLength(20),
+                                        FileUpload::make('profile_picture')
+                                            ->hiddenLabel()
+                                            ->image()
+                                            ->avatar()
+                                            ->columnSpan(3)
+                                            ->placeholder('Upload Profile Picture')
+                                            ->imagePreviewHeight('200')
+                                            ->loadingIndicatorPosition('left')
+                                            ->panelAspectRatio('2:1')
+                                            ->panelLayout('integrated')
+                                            ->removeUploadedFileButtonPosition('right')
+                                            ->uploadButtonPosition('left')
+                                            ->uploadProgressIndicatorPosition('left')
+
+                                            // Editor
+                                            ->imageEditor()
+                                            ->imageCropAspectRatio('1:1')
+
+                                            // Resize (WhatsApp style)
+                                            ->imageResizeMode('cover')
+                                            ->imageResizeTargetWidth(512)
+                                            ->imageResizeTargetHeight(512)
+
+                                            // Storage rules
+                                            ->maxSize(1024) // KB
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->nullable(),
+
                                         TextInput::make('first_name')
                                             ->required()
                                             ->maxLength(50),
@@ -116,6 +148,7 @@ class EmployeeResource extends BaseResource
                                                 'O+' => 'O+', 'O-' => 'O-',
                                             ])
                                             ->nullable(),
+
                                         Select::make('country_id')
                                             ->relationship('country', 'name')
                                             ->searchable()
@@ -123,6 +156,7 @@ class EmployeeResource extends BaseResource
                                             ->label('Nationality')
                                             ->nullable(),
                                     ]),
+
                                 Section::make('Contact Information')
                                     // Changed from columns(2) to columns(3) for a denser layout
                                     ->columns(4)
@@ -131,6 +165,7 @@ class EmployeeResource extends BaseResource
                                             ->email()
                                             ->required()
                                             ->unique(ignoreRecord: true)
+                                            ->helperText('This email will be used for login credentials.')
                                             ->maxLength(100),
                                         TextInput::make('mobile_number')
                                             ->tel()
@@ -142,17 +177,16 @@ class EmployeeResource extends BaseResource
                                             ->maxLength(15)
                                             ->nullable(),
 
-                                        Select::make('login_id')
-                                            ->relationship('user', 'email')
-                                            ->searchable()
-                                            ->preload()
-                                            ->label('User Login ID')
-                                            ->nullable(),
+                                        TextInput::make('personal_email')
+                                            ->email()
+                                            ->unique(ignoreRecord: true)
+                                            ->maxLength(100),
 
                                         Textarea::make('contact_details')
                                             ->columnSpanFull() // This field correctly spans full width
                                             ->nullable(),
                                     ]),
+
                                 Section::make('Emergency Contact')
                                     // Keeping columns(2) as there are only 2 fields
                                     ->columns(2)
@@ -165,14 +199,38 @@ class EmployeeResource extends BaseResource
                                             ->maxLength(15)
                                             ->nullable(),
                                     ]),
+
+                                Select::make('login_id')
+                                    ->label('Login User')
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable()
+
+                                    ->options(function ($record) {
+
+                                        $query = User::query()
+                                            ->whereDoesntHave('employee'); // 🔑 only users without employee
+
+                                        // ✅ When editing, allow currently linked user to remain visible
+                                        if ($record?->login_id) {
+                                            $query->orWhere('id', $record->login_id);
+                                        }
+
+                                        return $query
+                                            ->orderBy('email')
+                                            ->pluck('email', 'id')
+                                            ->toArray();
+                                    })
+
+                                    ->helperText(
+                                        'Login is auto-created if left empty. Only login IDs not linked to any employee are shown.'
+                                    ),
+
                                 Section::make('Additional Details')
                                     // Changed from columns(2) to columns(3) for a denser layout
                                     ->columns(3)
                                     ->schema([
-                                        FileUpload::make('profile_picture')
-                                            ->image()
-                                            ->directory('employee-profiles')
-                                            ->nullable(),
+
                                         Toggle::make('is_active')
                                             ->default(true),
                                     ]),
@@ -197,24 +255,21 @@ class EmployeeResource extends BaseResource
                                     ->columns(3)
                                     ->relationship('employmentDetail') // Binds to the employmentDetail relationship
                                     ->schema([
-                                        Select::make('reporting_manager_id')
-                                            ->label('Reporting Manager')
-                                            ->options(fn () => Employee::all()->pluck('full_name', 'id')->toArray())
-                                            ->preload()
-                                            ->searchable()
-                                            ->nullable(),
+
                                         Select::make('department_id')
                                             ->label('Department')
                                             ->relationship('department', 'department_name')
                                             ->preload()
                                             ->searchable()
                                             ->nullable(),
+
                                         Select::make('job_title_id')
                                             ->label('Job Title')
                                             ->relationship('jobTitle', 'title')
                                             ->preload()
                                             ->searchable()
                                             ->requiredIf('employee_id', true),
+
                                         Select::make('grade_id')
                                             ->label('Grade')
                                             ->relationship('grade', 'grade_name')
@@ -270,26 +325,43 @@ class EmployeeResource extends BaseResource
                                             ->preload()
                                             ->reactive(),
 
+                                        Select::make('reporting_manager_id')
+                                            ->label('Reporting Manager')
+                                            ->relationship('reportingManager', 'id') // or name
+                                            ->getOptionLabelFromRecordUsing(
+                                                fn (\App\Models\Employee $record) => $record->full_name
+                                            )
+                                            ->disabled()          // 🔒 read-only
+                                            ->dehydrated(false)   // ❌ do not save from form
+                                            ->helperText(
+                                                'This is automatically derived from the employee’s position hierarchy.'
+                                            ),
+
                                         DatePicker::make('hire_date')
                                             ->label('Hire Date')
                                             ->native(false)
                                             ->requiredIf('employee_id', true),
+
                                         Select::make('employment_type')
                                             ->label('Employment Type')
                                             ->options(['Permanent' => 'Permanent','Contract' => 'Contract', 'Part-Time' => 'Part-Time', 'Intern' => 'Intern', 'Temporary' => 'Temporary', 'Consultant' => 'Consultant'])
                                             ->nullable(),
+
                                         Select::make('employment_status')
                                             ->label('Employment Status')
                                             ->options(['Active' => 'Active', 'Inactive' => 'Inactive', 'Terminated' => 'Terminated', 'Retired' => 'Retired', 'On Leave' => 'On Leave'])
                                             ->nullable(),
+
                                         DatePicker::make('resign_offer_date')
                                             ->label('Resign Offer Date')
                                             ->native(false)
                                             ->nullable(),
+
                                         DatePicker::make('last_working_date')
                                             ->label('Last Working Date')
                                             ->native(false)
                                             ->nullable(),
+
                                         DatePicker::make('probation_date')
                                             ->label('Probation Date')
                                             ->native(false)

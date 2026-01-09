@@ -17,8 +17,7 @@ class EmploymentDetail extends BaseModel
         'employee_id', 'ticket_no', 'department_id', 'job_title_id', 'grade_id',
         'division_ou_id', 'organizational_unit_id', 'hire_date', 'employment_type',
         'employment_status', 'resign_offer_date', 'last_working_date', 'probation_date',
-        'confirm_date', 'fnf_retiring_date', 'last_increment_date', 'work_location_id',
-        'reporting_manager_id', 'remarks', 'created_by', 'updated_by'
+        'confirm_date', 'fnf_retiring_date', 'last_increment_date', 'work_location_id', 'remarks'
     ];
 
     protected $casts = [
@@ -31,6 +30,10 @@ class EmploymentDetail extends BaseModel
         'last_increment_date' => 'date',
         'employment_type' => 'string',
         'employment_status' => 'string',
+    ];
+
+    protected $guarded = [
+        'reporting_manager_id',
     ];
 
     public function employee()
@@ -90,7 +93,9 @@ class EmploymentDetail extends BaseModel
     {
         static::saving(function ($model) {
 
-            // Only validate when both are present
+            /* ===============================
+            | Validate Division / OU (existing)
+            =============================== */
             if (
                 $model->division_ou_id &&
                 $model->relationLoaded('organizationalUnits') &&
@@ -104,6 +109,40 @@ class EmploymentDetail extends BaseModel
                     }
                 }
             }
+
+            /* ===============================
+            | AUTO-DERIVE REPORTING MANAGER
+            =============================== */
+
+            // Resolve employee
+            $employee = $model->employee;
+
+            if (! $employee) {
+                $model->reporting_manager_id = null;
+                return;
+            }
+
+            // Get employee positions (supports multi-position)
+            $positions = $employee->positions()->with('reportsTo.employees')->get();
+
+            // Pick the FIRST valid reporting manager found
+            foreach ($positions as $position) {
+                $managerPosition = $position->reportsTo;
+
+                if (! $managerPosition) {
+                    continue;
+                }
+
+                $managerEmployee = $managerPosition->employees()->first();
+
+                if ($managerEmployee) {
+                    $model->reporting_manager_id = $managerEmployee->id;
+                    return;
+                }
+            }
+
+            // No reporting position found
+            $model->reporting_manager_id = null;
         });
     }
 }

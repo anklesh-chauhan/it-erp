@@ -88,8 +88,8 @@ trait SalesDocumentResourceTrait
 
         // ⚠️ CHANGE: Get discount mode from form state if available, otherwise from record or preference
         // Define the callable to get the discount mode value
-        $discountModeCallable = fn(callable $get) => $get('discount_mode') 
-            ?? optional($record)->discount_mode 
+        $discountModeCallable = fn(callable $get) => $get('discount_mode')
+            ?? optional($record)->discount_mode
             ?? (SalesDocumentPreference::first()?->discount_level ?? 'none');
 
         // Now, define the visibility booleans using the callable's result
@@ -111,7 +111,7 @@ trait SalesDocumentResourceTrait
                         ->label('Date')
                         ->default(now()->toDateString())
                         ->required(),
-                    
+
                     Select::make('sales_person_id')
                         ->label('Sales Person')
                         ->options(function () {
@@ -122,7 +122,7 @@ trait SalesDocumentResourceTrait
                         ->placeholder('Select a sales person...')
                         ->required()
                         ->default(Auth::id()),
-                    
+
                     Select::make('quote_ids')
                         ->label('Related Quotes')
                         ->multiple()
@@ -155,9 +155,9 @@ trait SalesDocumentResourceTrait
 
 
                     Hidden::make('discount_mode')
-                        ->default(fn () => 
-                            optional($record)->discount_mode 
-                            ?? SalesDocumentPreference::first()?->discount_level 
+                        ->default(fn () =>
+                            optional($record)->discount_mode
+                            ?? SalesDocumentPreference::first()?->discount_level
                             ?? 'none'
                         ),
 
@@ -203,10 +203,10 @@ trait SalesDocumentResourceTrait
                             TableColumn::make('HSN/SAC'),
                             TableColumn::make('Unit Price       ')->width('100px'),
                             TableColumn::make('Line Gross Amt')->width('100px'),
-                            
+
                             // 🚀 Correctly execute the callable here with the $get from the closure
                             $showLineItemDiscount($get)
-                                ? TableColumn::make('Disc %        ')->width('100px') 
+                                ? TableColumn::make('Disc %        ')->width('100px')
                                 : null,
 
                             TableColumn::make('Tax Rate %              ')->width('100px'),
@@ -224,7 +224,7 @@ trait SalesDocumentResourceTrait
                             ->searchable()
                             ->native(false)
                             ->required()
-                            ->live() 
+                            ->live()
                             ->options(function () {
                                 return \App\Models\ItemMaster::with('parent')
                                     ->orderByRaw('COALESCE(parent_id, id), parent_id, item_name')
@@ -286,51 +286,51 @@ trait SalesDocumentResourceTrait
                                     ->visible(fn ($get) => !empty($get('item_master_id'))); // Show only if item_master_id is set
                             })
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
-    if (!$state) {
-        $set('description', '');
-        $set('hsn_sac', '');
-        $set('unit_price', 0);
-        $set('tax_rate', 0);
-        $set('discount', 0);
-        return;
-    }
+                                if (!$state) {
+                                    $set('description', '');
+                                    $set('hsn_sac', '');
+                                    $set('unit_price', 0);
+                                    $set('tax_rate', 0);
+                                    $set('discount', 0);
+                                    return;
+                                }
 
-    $item = \App\Models\ItemMaster::with('taxes')->find($state);
-    $accountMasterId = $get('../../account_master_id');
-    
-    if (!$item) {
-        $set('description', '');
-        $set('hsn_sac', '');
-        $set('unit_price', 0);
-        $set('tax_rate', 0);
-        $set('discount', 0);
-        return;
-    }
+                                $item = \App\Models\ItemMaster::with('taxes')->find($state);
+                                $accountMasterId = $get('../../account_master_id');
 
-    // ✅ Base item details
-    $set('description', $item->description ?? '');
-    $set('hsn_sac', $item->hsn_code ?? '');
+                                if (!$item) {
+                                    $set('description', '');
+                                    $set('hsn_sac', '');
+                                    $set('unit_price', 0);
+                                    $set('tax_rate', 0);
+                                    $set('discount', 0);
+                                    return;
+                                }
 
-    // ✅ Default values (fallback from ItemMaster)
-    $defaultPrice = $item->selling_price ?? 0;
-    $defaultDiscount = $item->discount ?? 0;
+                                // ✅ Base item details
+                                $set('description', $item->description ?? '');
+                                $set('hsn_sac', $item->hsn_code ?? '');
 
-    // ✅ Calculate total tax rate from related taxes
-    $totalTaxRate = $item->taxes->sum('total_rate');
-    $set('tax_rate', number_format($totalTaxRate, 2, '.', ''));
+                                // ✅ Default values (fallback from ItemMaster)
+                                $defaultPrice = $item->selling_price ?? 0;
+                                $defaultDiscount = $item->discount ?? 0;
 
-    // ✅ Try to fetch account-specific price
-    $accountPrice = null;
-    if ($accountMasterId) {
-        $accountPrice = \App\Models\CustomerPrice::where('customer_id', $accountMasterId)
-            ->where('item_master_id', $item->id)
-            ->first();
-    }
+                                // ✅ Calculate total tax rate from related taxes
+                                $totalTaxRate = $item->taxes->sum('total_rate');
+                                $set('tax_rate', number_format($totalTaxRate, 2, '.', ''));
 
-    // ✅ Use account-specific price if available, else fallback to item defaults
-    $set('unit_price', $accountPrice->price ?? $defaultPrice);
-    $set('discount', $accountPrice->discount ?? $defaultDiscount);
-}),
+                                // ✅ Try to fetch account-specific price
+                                $accountPrice = null;
+                                if ($accountMasterId) {
+                                    $accountPrice = \App\Models\CustomerPrice::where('customer_id', $accountMasterId)
+                                        ->where('item_master_id', $item->id)
+                                        ->first();
+                                }
+
+                                // ✅ Use account-specific price if available, else fallback to item defaults
+                                $set('unit_price', $accountPrice->price ?? $defaultPrice);
+                                $set('discount', $accountPrice->discount ?? $defaultDiscount);
+                            }),
 
                             Textarea::make('description')
                                 ->label(false)
@@ -369,7 +369,7 @@ trait SalesDocumentResourceTrait
                                     self::updateItemAmount($set, $get);
                                     self::updateTotals($set, $get);
                                 }),
-                            
+
                             TextInput::make('price')
                                 ->label(false)
                                 ->numeric()
@@ -462,7 +462,7 @@ trait SalesDocumentResourceTrait
                                     $value = (float) ($state ?? 0);
                                     // Always format to 2 decimal places
                                     return number_format($value, 2, '.', '');
-                                }), 
+                                }),
                         ])->filter()->all() // removes null entries safely
                     )
                     ->afterStateHydrated(function (callable $set, callable $get) {
@@ -528,7 +528,7 @@ trait SalesDocumentResourceTrait
                                                 ->readOnly()
                                                 ->extraInputAttributes(['class' => 'text-right'])
                                                 ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
-                                    
+
                                             TextInput::make('subtotal')
                                                 ->label('Subtotal')
                                                 ->readOnly()
@@ -586,7 +586,7 @@ trait SalesDocumentResourceTrait
                                         ->readOnly()
                                         ->extraInputAttributes(['class' => 'text-right'])
                                         ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
-                                    
+
                                     TextInput::make('subtotal')
                                         ->label('Subtotal After Discounts')
                                         ->inlineLabel()
@@ -662,7 +662,7 @@ trait SalesDocumentResourceTrait
                                         ->readOnly()
                                         ->extraInputAttributes(['class' => 'text-right'])
                                         ->formatStateUsing(fn ($state) => is_numeric($state) ? number_format((float) $state, 2, '.', '') : $state),
-                                    
+
                                 ]),
                         ])->columnSpanFull(),
 
@@ -733,7 +733,7 @@ trait SalesDocumentResourceTrait
                         ->relationship('lead', 'reference_code')
                         ->preload()
                         ->searchable(),
-                    
+
                 ])->columnSpanFull(),
 
             Grid::make(4)
@@ -746,7 +746,7 @@ trait SalesDocumentResourceTrait
                         ->maxLength(3)
                         ->default('INR'),
                 ])->columnSpanFull(),
-            
+
             RichEditor::make('terms_and_conditions')
                 ->label('Terms and Conditions')
                 ->toolbarButtons([
@@ -759,7 +759,7 @@ trait SalesDocumentResourceTrait
                 ->default(function (?Model $record) {
                     // Determine document type
                     $documentType = strtolower((new \ReflectionClass(static::resolveModelClass()))->getShortName());
-                   
+
                     // Fetch default terms from master table
                     $defaultTerms = \App\Models\TermsAndConditionsMaster::where('document_type', $documentType)
                         ->where('is_default', true)
@@ -783,7 +783,7 @@ trait SalesDocumentResourceTrait
                         [], // match by model_id/model_type
                         ['content' => $state]
                     );
-                }), 
+                }),
 
                 Textarea::make('description')
                     ->label('Internal Notes')
@@ -930,7 +930,7 @@ trait SalesDocumentResourceTrait
             $discountTypeRaw = $record && $record->discount_type ? $record->discount_type : ($get('discount_type') ?? 'percentage');
             $discountValue = $record && is_numeric($record->discount_value) ? floatval($record->discount_value) : floatval($get('discount_value') ?? 0);
             $discountType = strtolower(trim($discountTypeRaw));
-            
+
             // Calculate transaction discount
             if ($discountType === 'percentage' || $discountType === '%') {
                 $transactionDiscountAmount = $discountedSubtotal * ($discountValue / 100);
@@ -987,13 +987,13 @@ trait SalesDocumentResourceTrait
         // --- Set values in form state ---
         $set('gross_total', number_format($originalSubtotal, 2, '.', ''));
         $set('subtotal', number_format($discountedSubtotal, 2, '.', ''));
-        
+
         // 🚀 NEW: Set the total line item discount and the total of all discounts
         $set('total_line_item_discount', number_format($totalLineItemDiscount, 2, '.', ''));
         $set('transaction_discount', number_format($transactionDiscountAmount, 2, '.', ''));
         $totalDiscount = $totalLineItemDiscount + $transactionDiscountAmount;
         $set('total_discount_amount', number_format($totalDiscount, 2, '.', ''));
-        
+
         $set('cgst', number_format($cgstTotal, 2, '.', ''));
         $set('sgst', number_format($sgstTotal, 2, '.', ''));
         $set('igst', number_format($igstTotal, 2, '.', ''));
@@ -1058,7 +1058,7 @@ trait SalesDocumentResourceTrait
         $discountTypeRaw = data_get($this->form->getState(), 'discount_type', 'percentage');
         $discountType = strtolower(trim($discountTypeRaw));
         $discountValue = floatval(data_get($this->form->getState(), 'discount_value', 0));
-        
+
         $baseForTransactionDiscount = ($discountLevel === 'both') ? $lineItemDiscountedTotal : $grossTotal;
 
         if ($discountType === 'percentage' || $discountType === '%') {

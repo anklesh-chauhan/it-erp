@@ -18,7 +18,6 @@ return new class extends Migration
             $table->date('date');
             $table->foreignId('territory_id')->nullable()->constrained()->nullOnDelete();
             $table->json('patch_ids')->nullable();
-            $table->string('purpose')->nullable();
             $table->text('remarks')->nullable();
             $table->json('joint_with')->nullable();
             $table->blameable();

@@ -12,6 +12,6 @@ class VisitType extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['code', 'name', 'description', 'is_active', 'sort_order'];
 
 }

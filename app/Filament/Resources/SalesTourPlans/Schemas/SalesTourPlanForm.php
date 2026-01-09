@@ -7,6 +7,8 @@ use Filament\Forms\Components\DatePicker;
 use App\Models\Patch;
 use App\Models\User;
 use App\Models\SalesTourPlan;
+use App\Models\VisitType;
+use App\Models\VisitPurpose;
 use Dompdf\FrameDecorator\Table;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
@@ -21,7 +23,8 @@ use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\Carbon;
 use Filament\Notifications\Notification;
 use App\Services\PositionService;
-use Illuminate\Validation\ValidationException;
+use App\Enums\TourPurpose;
+use App\Services\JointUserService;
 
 class SalesTourPlanForm
 {
@@ -67,10 +70,21 @@ class SalesTourPlanForm
         return now()->startOfMonth()->format('Y-m-d');
     }
 
-    private static function generateMonthDays(string $month): array
+    private static function generateMonthDays(string $month, ?User $user): array
     {
         if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
             return [];
+        }
+
+        $territoryId = null;
+
+        if ($user) {
+            $territoryIds = PositionService::getTerritoryIdsForUser($user);
+
+            // Auto assign ONLY if exactly one territory
+            if (count($territoryIds) === 1) {
+                $territoryId = $territoryIds[0];
+            }
         }
 
         $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
@@ -81,7 +95,7 @@ class SalesTourPlanForm
         while ($start->lte($end)) {
             $days[] = [
                 'date'         => $start->format('Y-m-d'),
-                'territory_id' => null,
+                'territory_id' => $territoryId, // ✅ FIX
                 'patch_ids'    => [],
                 'purpose'      => null,
                 'joint_with'   => [],
@@ -95,6 +109,7 @@ class SalesTourPlanForm
     }
 
 
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -103,6 +118,11 @@ class SalesTourPlanForm
                     Select::make('user_id')
                         ->label('Sales Employee')
                         ->relationship('user', 'name')
+                        ->getOptionLabelFromRecordUsing(function (User $user) {
+                            return $user->employee
+                                ?->full_name
+                                ?? $user->email; // fallback safety
+                        })
                         ->default(fn() => Auth::id())
                         ->required()
                         ->reactive()
@@ -158,13 +178,16 @@ class SalesTourPlanForm
                         ->default(null)
                         ->required()
                         ->reactive() // 👈 this makes downstream components re-evaluate
-                        ->afterStateUpdated(function ($state, callable $set) {
+                        ->afterStateUpdated(function ($state, callable $set, Get $get) {
+
                             if (! $state) {
                                 return;
                             }
 
-                            // 🚀 AUTO-GENERATE ALL DAYS
-                            $set('details', self::generateMonthDays($state));
+                            $userId = $get('user_id') ?? auth()->id();
+                            $user   = $userId ? User::find($userId) : null;
+
+                            $set('details', self::generateMonthDays($state, $user));
 
                             Notification::make()
                                 ->title('Tour plan generated')
@@ -173,7 +196,6 @@ class SalesTourPlanForm
                                 ->send();
                         })
                         ->searchable(),
-
 
                     Select::make('status')
                         ->options([
@@ -201,6 +223,7 @@ class SalesTourPlanForm
                             TableColumn::make('Date'),
                             TableColumn::make('Territory'),
                             TableColumn::make('Patches'),
+                            TableColumn::make('Visit Type'),
                             TableColumn::make('Purpose'),
                             TableColumn::make('Joint With'),
                             TableColumn::make('Remarks'),
@@ -278,20 +301,6 @@ class SalesTourPlanForm
                                     return \App\Models\Territory::whereIn('id', $territoryIds)
                                         ->pluck('name', 'id');
                                 })
-                                ->visible(function (Get $get) {
-
-                                    $userId = $get('../../user_id') ?? auth()->id();
-                                    $user   = $userId ? \App\Models\User::find($userId) : null;
-
-                                    if (! $user) {
-                                        return false;
-                                    }
-
-                                    $territoryIds = PositionService::getTerritoryIdsForUser($user);
-
-                                    // Show only if multiple territories OR super admin
-                                    return empty($territoryIds) || count($territoryIds) > 1;
-                                })
                                 ->searchable()
                                 ->preload()
                                 ->reactive()
@@ -319,13 +328,49 @@ class SalesTourPlanForm
                                 ->searchable()
                                 ->preload(),
 
-                            TextInput::make('purpose')
-                                ->label('Purpose of Visit'),
+                            Select::make('visit_type_id')
+                                ->label('Visit Type')
+                                ->reactive()
+                                ->searchable()
+                                ->options(
+                                    VisitType::withoutGlobalScopes()
+                                        ->where('is_active', true)
+                                        ->orderBy('sort_order')
+                                        ->pluck('name', 'id')
+                                )
+                                ->afterStateUpdated(fn ($state, callable $set) =>
+                                    $set('visit_purpose_ids', [])
+                                ),
+
+                            Select::make('visit_purpose_ids')
+                                ->label('Purposes')
+                                ->multiple()
+                                ->reactive() // ✅ REQUIRED
+                                ->options(fn (Get $get) =>
+                                    VisitPurpose::withoutGlobalScopes() // safety
+                                        ->where('visit_type_id', $get('visit_type_id'))
+                                        ->where('is_active', true)
+                                        ->orderBy('sort_order')
+                                        ->pluck('name', 'id')
+                                )
+                                ->searchable()
+                                ->dehydrated(true),
 
                             Select::make('joint_with')
                                 ->label('Joint With')
                                 ->multiple()
-                                ->options(User::pluck('name', 'id')->toArray())
+                                ->options(fn () =>
+                                    JointUserService::getJointUsersForUser(auth()->user())
+                                        ->with('employee') // eager load for performance
+                                        ->get()
+                                        ->mapWithKeys(fn (User $user) => [
+                                            $user->id =>
+                                                $user->employee
+                                                    ? "{$user->employee->full_name} ({$user->email})"
+                                                    : $user->email, // fallback
+                                        ])
+                                        ->toArray()
+                                )
                                 ->searchable()
                                 ->preload(),
 
@@ -347,7 +392,8 @@ class SalesTourPlanForm
                                     'date' => $d->date?->format('Y-m-d'),
                                     'territory_id' => $d->territory_id,
                                     'patch_ids' => $d->patch_ids,
-                                    'purpose' => $d->purpose,
+                                    'visit_type_id' => $d->visit_type_id,
+                                    'visit_purpose_ids' => $d->visit_purpose_ids,
                                     'joint_with' => $d->joint_with,
                                     'remarks' => $d->remarks,
                                 ])
@@ -386,6 +432,7 @@ class SalesTourPlanForm
                         ->mutateRelationshipDataBeforeSaveUsing(function (array $data, Get $get): array {
                             $data['patch_ids'] = is_array($data['patch_ids'] ?? null) ? $data['patch_ids'] : [];
                             $data['joint_with'] = is_array($data['joint_with'] ?? null) ? $data['joint_with'] : [];
+                            $data['visit_purpose_ids'] = $data['visit_purpose_ids'] ?? [];
                             return $data;
                         })
 

@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use App\Traits\HasApprovalWorkflow;
+use App\Enums\TourPurpose;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 
 class SalesTourPlan extends BaseModel
 {
@@ -25,6 +28,7 @@ class SalesTourPlan extends BaseModel
 
     protected $casts = [
         'approved_at' => 'datetime',
+        'month' => 'date:Y-m',
     ];
 
     /*
@@ -102,4 +106,14 @@ class SalesTourPlan extends BaseModel
     {
         return $this->status === 'submitted';
     }
+
+    public function scopeApplyTerritoryVisibility(
+        Builder $query,
+        array $territoryIds
+    ): Builder {
+        return $query->whereHas('details', function ($q) use ($territoryIds) {
+            $q->whereIn('territory_id', $territoryIds);
+        });
+    }
+
 }

@@ -164,6 +164,7 @@ trait CreateAccountMasterTrait
                             ->maxLength(255),
                         Select::make('parent_id')
                             ->relationship('parent', 'name')
+                            ->label('Parent Account / Dealer / Stockist / Distributor')
                             ->searchable()
                             ->preload(),
                         Select::make('rating_type_id')

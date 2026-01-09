@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
             UnitOfMeasurementSeeder::class,
             ItemBrandSeeder::class,
             TransportModeSeeder::class,
-            VisitTypeSeeder::class,
+            VisitTypeAndPurposeSeeder::class,
             PackingTypeSeeder::class,
             DealStageSeeder::class,
             TypeMasterSeeder::class,

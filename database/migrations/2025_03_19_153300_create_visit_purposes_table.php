@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('visit_types', function (Blueprint $table) {
+        Schema::create('visit_purposes', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique()->nullable();
             $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0);
+            $table->foreignId('visit_type_id')->constrained('visit_types')->onDelete('cascade')->nullable();
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('visit_types');
+        Schema::dropIfExists('visit_purposes');
     }
 };

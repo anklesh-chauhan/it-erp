@@ -23,10 +23,10 @@ use App\Models\VisitPurpose;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use App\Filament\Resources\BaseResource;
+use Filament\Forms\Components\Select;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Columns\IconColumn;
 
 class VisitPurposeResource extends BaseResource
 {
@@ -43,9 +43,21 @@ class VisitPurposeResource extends BaseResource
     {
         return $schema
             ->components([
+                Select::make('visit_type_id')
+                    ->relationship('visitType', 'name'),
+                TextInput::make('code')
+                    ->required()
+                    ->maxLength(255),
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                TextInput::make('description')
+                    ->maxLength(65535),
+                TextInput::make('sort_order')
+                    ->numeric(),
+                IconColumn::make('is_active')
+                    ->default(true)
+                    ->boolean(),
             ]);
     }
 
@@ -73,7 +85,7 @@ class VisitPurposeResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

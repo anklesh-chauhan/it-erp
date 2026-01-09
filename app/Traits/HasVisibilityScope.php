@@ -34,21 +34,32 @@ trait HasVisibilityScope
 
             $territoryIds = PositionService::getTerritoryIdsForUser($user);
 
-            if (
-                empty($territoryIds) ||
-                ! \Schema::hasColumn($query->getModel()->getTable(), 'territory_id')
-            ) {
+            if (empty($territoryIds)) {
                 return $query->whereRaw('1 = 0');
             }
-            $query = $query->whereIn(
-                $query->getModel()->getTable() . '.territory_id',
-                $territoryIds
-            );
 
-            return $query->whereIn(
-                $query->getModel()->getTable() . '.territory_id',
-                $territoryIds
-            );
+            // Model-specific territory scope
+            if (method_exists($query->getModel(), 'scopeApplyTerritoryVisibility')) {
+
+                return $query->applyTerritoryVisibility($territoryIds);
+            }
+
+            // $query = $query->whereIn(
+            //     $query->getModel()->getTable() . '.territory_id',
+            //     $territoryIds
+            // );
+
+            if (\Schema::hasColumn($query->getModel()->getTable(), 'territory_id')) {
+                return $query->whereIn(
+                    $query->getModel()->getTable() . '.territory_id',
+                    $territoryIds
+                );
+            }
+
+            // return $query->whereIn(
+            //     $query->getModel()->getTable() . '.territory_id',
+            //     $territoryIds
+            // );
         }
 
         /* =====================================================
@@ -68,14 +79,26 @@ trait HasVisibilityScope
             );
         }
 
-        /* =====================================================
-         | 3. VIEW OWN RECORDS
-         ===================================================== */
+       /* =====================================================
+        | 3. VIEW OWN RECORDS
+        ===================================================== */
         if ($user->can("ViewOwn:{$model}")) {
-            return $query->where(
-                $query->getModel()->getTable() . '.created_by',
-                $user->id
-            );
+
+
+
+            $table = $query->getModel()->getTable();
+
+            // SalesTourPlan & similar owner-based models
+            if (\Schema::hasColumn($table, 'user_id')) {
+                return $query->where($table . '.user_id', $user->id);
+            }
+
+            // Standard created_by ownership
+            if (\Schema::hasColumn($table, 'created_by')) {
+                return $query->where($table . '.created_by', $user->id);
+            }
+
+            return $query->whereRaw('1 = 0');
         }
 
         /* =====================================================

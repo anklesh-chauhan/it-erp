@@ -7,6 +7,9 @@ use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use App\Notifications\UserAccountCreated;
 
 use App\Traits\HasApprovalWorkflow;
 
@@ -133,6 +136,54 @@ class Employee extends BaseModel
             })
             ->orderByDesc('effective_from')
             ->first()?->shift;
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function (Employee $employee) {
+
+            // ✅ Already has login
+            if ($employee->login_id) {
+                return;
+            }
+
+            // ✅ Email is mandatory
+            if (! $employee->email) {
+                return;
+            }
+
+            DB::transaction(function () use ($employee) {
+
+                // 🔁 Check if user already exists
+                $user = User::where('email', $employee->email)->first();
+
+                $password = null;
+
+                if (! $user) {
+                    $password = Str::random(10);
+
+                    $user = User::create([
+                        'name'     => trim($employee->first_name . ' ' . $employee->last_name),
+                        'email'    => $employee->email,
+                        'password' => bcrypt($password),
+                    ]);
+
+                    // Optional: assign default role
+                    // $user->assignRole('employee');
+                }
+
+                // 🔗 Link user to employee
+                $employee->login_id = $user->id;
+
+                // ❗ Prevent infinite loop
+                $employee->saveQuietly();
+
+                // 📧 Send credentials ONLY if user was newly created
+                if ($password) {
+                    $user->notify(new UserAccountCreated($password));
+                }
+            });
+        });
     }
 
 }

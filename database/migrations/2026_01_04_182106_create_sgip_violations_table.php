@@ -11,9 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('visit_purposes', function (Blueprint $table) {
+        Schema::create('sgip_violations', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->foreignId('sgip_distribution_id')->constrained();
+            $table->foreignId('sgip_limit_id')->constrained();
+
+            $table->enum('violation_type', [
+                'quantity',
+                'value'
+            ]);
+
+            $table->decimal('allowed_value', 12, 2);
+            $table->decimal('actual_value', 12, 2);
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();
@@ -25,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('visit_purposes');
+        Schema::dropIfExists('sgip_violations');
     }
 };

@@ -121,10 +121,10 @@ class TourPlanResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
-DeleteBulkAction::make(),
+                        DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Spatie\Multitenancy\Models\Tenant;
 
-class UserResource extends BaseResource
+class UserResource extends Resource
 {
     use HasSafeGlobalSearch;
 

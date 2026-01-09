@@ -9,6 +9,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Actions\Action;
+use Illuminate\Database\Eloquent\Builder;
 
 class SalesTourPlansTable
 {
@@ -16,8 +17,32 @@ class SalesTourPlansTable
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')->label('Sales Employee')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('month')->label('Month')->sortable(),
+                Tables\Columns\TextColumn::make('sales_employee')
+                    ->label('Sales Employee')
+                    ->getStateUsing(fn ($record) =>
+                        $record->user?->employee?->full_name
+                            ?? $record->user?->email
+                    )
+                    ->sortable(
+                        query: function (Builder $query, string $direction): Builder {
+                            return $query
+                                ->leftJoin('users', 'users.id', '=', 'sales_tour_plans.user_id')
+                                ->leftJoin('employees', 'employees.login_id', '=', 'users.id')
+                                ->orderBy('employees.first_name', $direction)
+                                ->select('sales_tour_plans.*');
+                        }
+                    )
+                    ->searchable(
+                        query: function (Builder $query, string $search): Builder {
+                            return $query->whereHas('user.employee', function ($q) use ($search) {
+                                $q->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                            });
+                        }
+                    ),
+
+                Tables\Columns\TextColumn::make('month')->label('Month')->sortable()->date('F Y'),
                 Tables\Columns\TextColumn::make('status')
                     ->colors([
                         'secondary' => 'draft',
