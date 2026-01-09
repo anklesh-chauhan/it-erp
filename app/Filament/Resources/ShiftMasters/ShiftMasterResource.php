@@ -26,6 +26,8 @@ class ShiftMasterResource extends BaseResource
 
     protected static ?string $recordTitleAttribute = 'ShiftMaster';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+
     public static function form(Schema $schema): Schema
     {
         return ShiftMasterForm::configure($schema);

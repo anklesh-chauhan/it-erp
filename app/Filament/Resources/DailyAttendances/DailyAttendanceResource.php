@@ -29,6 +29,8 @@ class DailyAttendanceResource extends BaseResource
 
     protected static ?string $recordTitleAttribute = 'DailyAttendance';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();

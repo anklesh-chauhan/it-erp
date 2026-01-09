@@ -41,7 +41,7 @@ class EmpJobTitleResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag'; // Changed icon to something more suitable for job titles
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR & Organization'; // Keep in the same group as Employee
+    protected static string | \UnitEnum | null $navigationGroup = 'HR'; // Keep in the same group as Employee
 
     protected static ?string $navigationLabel = 'Job Titles';
 
@@ -112,7 +112,7 @@ class EmpJobTitleResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

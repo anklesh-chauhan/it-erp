@@ -54,7 +54,7 @@ class EmpDepartmentResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR & Organization';
+    protected static string | \UnitEnum | null $navigationGroup = 'HR';
 
     protected static ?string $navigationLabel = 'Departments';
 
@@ -148,7 +148,7 @@ class EmpDepartmentResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

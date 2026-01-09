@@ -24,6 +24,8 @@ class SgipDistributionResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'SgipDistribution';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+
     public static function form(Schema $schema): Schema
     {
         return SgipDistributionForm::configure($schema);

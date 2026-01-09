@@ -60,7 +60,7 @@ class EmployeeResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR & Organization';
+    protected static string | \UnitEnum | null $navigationGroup = 'HR';
 
     protected static ?string $navigationLabel = 'Employees';
 

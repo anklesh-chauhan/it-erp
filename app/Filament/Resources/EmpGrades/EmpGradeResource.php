@@ -41,7 +41,7 @@ class EmpGradeResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar'; // Icon for grades
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR & Organization';
+    protected static string | \UnitEnum | null $navigationGroup = 'HR';
 
     protected static ?string $navigationLabel = 'Grades';
 
@@ -112,7 +112,7 @@ class EmpGradeResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

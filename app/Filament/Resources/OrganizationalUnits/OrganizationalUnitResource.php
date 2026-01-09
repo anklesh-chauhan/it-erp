@@ -50,7 +50,7 @@ class OrganizationalUnitResource extends BaseResource
 
     protected static ?string $navigationLabel = 'Org Units';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR & Organization';
+    protected static string | \UnitEnum | null $navigationGroup = 'HR';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -167,7 +167,7 @@ class OrganizationalUnitResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make()

@@ -29,6 +29,10 @@ class EmployeeAttendanceResource extends BaseResource
 
     protected static ?string $recordTitleAttribute = 'EmployeeAttendance';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+
+    protected static ?string $navigationLabel = 'Attendances';
+
     public static function form(Schema $schema): Schema
     {
         return EmployeeAttendanceForm::configure($schema);
