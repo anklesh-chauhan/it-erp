@@ -27,9 +27,9 @@ class ApprovalInfolist
                     ->label('Model ID')
                     ->content(fn ($record) => $record->model_id),
 
-                TextEntry::make('status')
+                TextEntry::make('approval_status')
                     ->label('Status')
-                    ->content(fn ($record) => ucfirst($record->status)),
+                    ->content(fn ($record) => ucfirst($record->approval_status)),
 
                 TextEntry::make('remarks')
                     ->label('Remarks')

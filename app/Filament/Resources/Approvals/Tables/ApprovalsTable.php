@@ -33,7 +33,7 @@ class ApprovalsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('status', 'asc')
+            ->defaultSort('approval_status', 'asc')
             ->columns([
                 TextColumn::make('approvable_type')
                     ->label('Module')
@@ -48,8 +48,8 @@ class ApprovalsTable
                     ->sortable()
                     ->searchable(),
 
-                TextColumn::make('status')
-                    ->label('Status')
+                TextColumn::make('approval_status')
+                    ->label('Approval Status')
                     ->sortable()
                     ->searchable()
                     ->formatStateUsing(fn ($state) => ucfirst($state))
@@ -66,7 +66,7 @@ class ApprovalsTable
                     ->listWithLineBreaks()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('steps.status')
+                Tables\Columns\TextColumn::make('steps.approval_status')
                     ->label('Approver Status')
                     ->listWithLineBreaks()
                     ->badge()
@@ -93,10 +93,11 @@ class ApprovalsTable
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
-                SelectFilter::make('status')
+                SelectFilter::make('approval_status')
                     ->options([
-                    'pending' => 'Pending',
+                    'draft' => 'Draft',
                     'approved' => 'Approved',
                     'rejected' => 'Rejected',
                     ]),
@@ -116,11 +117,11 @@ class ApprovalsTable
                         ->visible(fn ($record) =>
                             $record->steps()
                                 ->where('approver_id', Auth::id())
-                                ->where('status', 'pending')
+                                ->where('approval_status', 'draft')
                                 ->exists()
                         )
                         ->action(function ($record, array $data, LivewireComponent $livewire) {
-                            app(\App\Services\ApprovalService::class)
+                            app(\App\Services\Approval\ApprovalService::class)
                                 ->approveStepByUser($record, Auth::id(), $data['comments'] ?? null);
 
                             $livewire->dispatch('refresh-sidebar');
@@ -140,11 +141,11 @@ class ApprovalsTable
                         ->visible(fn ($record) =>
                             $record->steps()
                                 ->where('approver_id', Auth::id())
-                                ->where('status', 'pending')
+                                ->where('approval_status', 'draft')
                                 ->exists()
                         )
                         ->action(function ($record, array $data, LivewireComponent $livewire) {
-                            app(\App\Services\ApprovalService::class)
+                            app(\App\Services\Approval\ApprovalService::class)
                                 ->rejectStepByUser($record, Auth::id(), $data['comments'] ?? null);
 
                             $livewire->dispatch('refresh-sidebar');
@@ -166,14 +167,14 @@ class ApprovalsTable
                         ->requiresConfirmation()
                         ->action(function (\Illuminate\Database\Eloquent\Collection $records, LivewireComponent $livewire) {
 
-                            $service = app(\App\Services\ApprovalService::class);
+                            $service = app(\App\Services\Approval\ApprovalService::class);
                             $userId = Auth::id();
 
                             foreach ($records as $record) {
                                 /** @var \App\Models\Approval $record */
                                 $step = $record->steps()
                                     ->where('approver_id', $userId)
-                                    ->where('status', 'pending')
+                                    ->where('approval_status', 'draft')
                                     ->first();
 
                                 if ($step) {
@@ -196,14 +197,14 @@ class ApprovalsTable
                         ->icon('heroicon-o-x-circle')
                         ->action(function (Collection $records, LivewireComponent $livewire) {
 
-                            $service = app(\App\Services\ApprovalService::class);
+                            $service = app(\App\Services\Approval\ApprovalService::class);
                             $userId = Auth::id();
 
                             foreach ($records as $record) {
                                 /** @var \App\Models\Approval $record */
                                 $step = $record->steps()
                                     ->where('approver_id', $userId)
-                                    ->where('status', 'pending')
+                                    ->where('approval_status', 'draft')
                                     ->first();
 
                                 if ($step) {

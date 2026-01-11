@@ -43,6 +43,7 @@ return new class extends Migration
             $table->date('rejected_at')->nullable();
             $table->date('canceled_at')->nullable(); // e.g., '2025-12-31'
             $table->date('sent_at')->nullable(); // e.g., '2025-12-31'
+            $table->string('approval_status')->default('draft'); // e.g., 'approved', 'pending', 'rejected'
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();

@@ -81,6 +81,9 @@ class DatabaseSeeder extends Seeder
             ItemMasterSeeder::class,
             SalesUsersSeeder::class,
             DepartmentRoleSeeder::class,
+            LeaveRuleCategorySeeder::class,
+            LeaveRuleSeeder::class,
+            LeaveDemoDataSeeder::class,
         ]);
     }
 }

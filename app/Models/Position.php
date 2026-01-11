@@ -43,6 +43,7 @@ class Position extends BaseModel
         'status',
         'location_id',
         'level',
+        'approval_status',
     ];
 
     /**

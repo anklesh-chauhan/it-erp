@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('approval_id')->constrained('approvals')->onDelete('cascade');
             $table->foreignId('approver_id')->constrained('users');
             $table->unsignedInteger('level');
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->string('approval_status')->default('draft');
             $table->text('comments')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->blameable();

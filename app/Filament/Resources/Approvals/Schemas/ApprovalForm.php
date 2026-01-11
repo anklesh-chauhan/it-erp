@@ -27,9 +27,9 @@ class ApprovalForm
                     ->label('Requested By')
                     ->disabled(),
 
-                Select::make('status')
+                Select::make('approval_status')
                     ->options([
-                        'pending' => 'Pending',
+                        'draft' => 'Draft',
                         'approved' => 'Approved',
                         'rejected' => 'Rejected',
                     ])

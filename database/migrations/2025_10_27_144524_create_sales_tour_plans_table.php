@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('month'); // Format: YYYY-MM
-            $table->enum('status', ['draft', 'submitted', 'approved', 'rejected'])->default('draft');
+            $table->string('approval_status')->default('draft');
             $table->text('manager_remarks')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('approved_at')->nullable();

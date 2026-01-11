@@ -38,6 +38,9 @@ return new class extends Migration
             $table->enum('status', ['active', 'inactive', 'vacant'])->default('active');
             $table->foreignId('location_id')->nullable()->constrained('location_masters')->onDelete('set null');
             $table->string('level')->nullable();
+
+            $table->string('approval_status')->default('pending');
+
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();

@@ -45,6 +45,7 @@ return new class extends Migration
             $table->date('sent_at')->nullable(); // e.g., '2025-12-31'
             $table->date('delivery_date')->nullable(); // e.g., '2025-12-31'
             $table->dateTime('order_confirmation_at')->nullable(); // e.g., '2025-12-31'
+            $table->string('approval_status')->default('draft');
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();

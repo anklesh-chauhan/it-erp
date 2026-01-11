@@ -45,6 +45,7 @@ return new class extends Migration
             $table->date('due_date')->nullable(); // e.g., '2025-12-31'
             $table->enum('payment_status', ['Paid', 'Unpaid', 'Partially Paid'])->nullable();
             $table->datetime('paid_at')->nullable(); // e.g., '2025-12-31'
+            $table->string('approval_status')->default('draft');
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();

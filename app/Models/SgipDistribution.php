@@ -19,7 +19,7 @@ class SgipDistribution extends BaseModel
         'sales_tour_plan_id',
         'visit_date',
         'total_value',
-        'status',
+        'approval_status',
     ];
 
     protected $casts = [

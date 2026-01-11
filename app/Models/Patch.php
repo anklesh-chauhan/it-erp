@@ -21,6 +21,7 @@ class Patch extends BaseModel
         'city_pin_code_id',
         'description',
         'color',
+        'approval_status',
     ];
 
     public function territory()

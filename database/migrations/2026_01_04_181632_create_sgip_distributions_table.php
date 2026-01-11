@@ -27,8 +27,8 @@ return new class extends Migration
 
             $table->decimal('total_value', 12, 2)->default(0);
 
-            $table->enum('status', ['draft', 'submitted', 'approved', 'rejected'])
-                ->default('draft');
+            $table->string('approval_status')->default('draft');
+
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();

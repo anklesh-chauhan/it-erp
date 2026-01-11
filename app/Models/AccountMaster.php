@@ -41,6 +41,7 @@ class AccountMaster extends BaseModel
         'parent_id',
         'rating_type_id',
         'account_ownership_id',
+        'approval_status',
     ];
 
     public function approvals(): MorphMany

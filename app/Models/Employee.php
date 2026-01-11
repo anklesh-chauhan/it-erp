@@ -24,7 +24,7 @@ class Employee extends BaseModel
         'date_of_birth', 'gender', 'country_id', 'marital_status', 'phone_number',
         'emergency_contact_name', 'emergency_contact_number', 'age', 'contact_details',
         'profile_picture', 'blood_group', 'is_active', 'login_id', 'created_by_user_id',
-        'updated_by_user_id', 'deleted_by_user_id', 'is_deleted', 'shift_master_id',
+        'updated_by_user_id', 'deleted_by_user_id', 'is_deleted', 'shift_master_id', 'approval_status',
     ];
 
     protected $casts = [

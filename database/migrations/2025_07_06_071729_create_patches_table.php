@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('city_pin_code_id')->nullable()->constrained('city_pin_codes')->nullOnDelete();
             $table->text('description')->nullable();
             $table->string('color')->nullable(); // For UI representation, e.g., hex color code
+            $table->string('approval_status')->default('pending');
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();

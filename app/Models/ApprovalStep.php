@@ -14,7 +14,7 @@ class ApprovalStep extends BaseModel
 
     protected $table = 'approval_steps';
 
-    protected $fillable = ['approval_id','approver_id','level','status','comments','approved_at'];
+    protected $fillable = ['approval_id','approver_id','level','approval_status','comments','approved_at'];
 
     public function approval(): BelongsTo
     {

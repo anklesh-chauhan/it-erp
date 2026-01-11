@@ -20,7 +20,7 @@ class SalesTourPlan extends BaseModel
     protected $fillable = [
         'user_id',
         'month',
-        'status',
+        'approval_status',
         'manager_remarks',
         'approved_by',
         'approved_at',

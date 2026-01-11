@@ -18,7 +18,7 @@ class Approval extends BaseModel
 
     protected $table = 'approvals';
 
-    protected $fillable = ['approvable_type','approvable_id','requested_by','status','completed_at'];
+    protected $fillable = ['approvable_type','approvable_id','requested_by','approval_status','completed_at'];
 
     public function approvable(): MorphTo
     {
@@ -37,22 +37,22 @@ class Approval extends BaseModel
 
     public function currentStep()
     {
-        return $this->steps()->where('status', 'pending')->orderBy('level')->first();
+        return $this->steps()->where('approval_status', 'draft')->orderBy('level')->first();
     }
 
     public function isFullyApproved(): bool
     {
-        return $this->steps()->where('status', '!=', 'approved')->count() === 0;
+        return $this->steps()->where('approval_status', '!=', 'approved')->count() === 0;
     }
 
-    public function scopePendingForUser(Builder $query): Builder
+    public function scopeDraftForUser(Builder $query): Builder
     {
         $userId = Auth::id();
 
-        return $query->where('status', 'pending')
+        return $query->where('approval_status', 'draft')
                      ->whereHas('steps', function (Builder $stepQuery) use ($userId) {
-                         // Find a step that is pending and assigned to the current user
-                         $stepQuery->where('status', 'pending')
+                         // Find a step that is draft and assigned to the current user
+                         $stepQuery->where('approval_status', 'draft')
                                    ->where('approver_id', $userId)
                                    ->orderBy('level')
                                    ->limit(1); // Optimize the subquery
@@ -61,6 +61,6 @@ class Approval extends BaseModel
 
     public static function scopeSortByStatusPriority(Builder $query, string $direction): Builder
     {
-        return $query->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected') $direction");
+        return $query->orderByRaw("FIELD(approval_status, 'draft', 'approved', 'rejected') $direction");
     }
 }

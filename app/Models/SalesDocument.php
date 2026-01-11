@@ -43,6 +43,7 @@ class SalesDocument extends BaseModel
         'packing_forwarding',
         'insurance_charges',
         'other_charges',
+        'approval_status',
         'created_by',
         'updated_by',
         'deleted_by',

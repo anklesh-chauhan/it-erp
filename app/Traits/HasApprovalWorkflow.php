@@ -3,7 +3,7 @@
 namespace App\Traits;
 
 use App\Models\ApprovalRule;
-use App\Services\ApprovalService;
+use App\Services\Approval\ApprovalService;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 trait HasApprovalWorkflow
@@ -105,9 +105,9 @@ trait HasApprovalWorkflow
 
         if ($this->approval) {
 
-            $notAllowedStatuses = ['pending', 'approved', 'in_review'];
+            $notAllowedStatuses = ['draft', 'approved', 'in_review'];
 
-            if (in_array($this->approval->status, $notAllowedStatuses)) {
+            if (in_array($this->approval->approval_status, $notAllowedStatuses)) {
                 return false;
             }
         }
@@ -125,11 +125,11 @@ trait HasApprovalWorkflow
 
     public function getApprovalStatus(): ?string
     {
-        return $this->approval?->status;
+        return $this->approval?->approval_status;
     }
 
     public function isApprovalComplete(): bool
     {
-        return $this->approval !== null && $this->approval->status !== 'pending';
+        return $this->approval !== null && $this->approval->approval_status !== 'draft';
     }
 }

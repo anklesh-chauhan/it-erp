@@ -33,7 +33,7 @@ class ApprovalResource extends BaseResource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::pendingForUser()->count();
+        return static::getModel()::draftForUser()->count();
     }
 
 

@@ -22,6 +22,7 @@ class Territory extends BaseModel
         'description',
         'type_master_id',
         'status',
+        'approval_status',
     ];
 
     protected $casts = [

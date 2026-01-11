@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Approval;
 
 use App\Models\Approval;
 use App\Models\ApprovalRule;
@@ -52,7 +52,7 @@ class ApprovalService
 
             $approval = $model->approval()->create([
                 'requested_by' => Auth::id(),
-                'status' => 'pending',
+                'approval_status' => 'draft',
             ]);
 
             foreach ($rules as $rule) {
@@ -70,11 +70,14 @@ class ApprovalService
     /**
      * Approve a step for the given approval and user.
      */
-    public function approveStepByUser(Approval $approval, int $userId, ?string $comments = null): bool
-    {
+    public function approveStepByUser(
+        Approval $approval,
+        int $userId,
+        ?string $comments = null
+    ): bool {
         $step = $approval->steps()
             ->where('approver_id', $userId)
-            ->where('status', 'pending')
+            ->whereIn('approval_status', ['draft', 'pending'])
             ->orderBy('level')
             ->first();
 
@@ -83,18 +86,24 @@ class ApprovalService
         }
 
         $step->update([
-            'status' => 'approved',
+            'approval_status' => 'approved',
             'comments' => $comments,
             'approved_at' => now(),
         ]);
 
-        // update approval status if all approved
+        // ✅ Refresh relationship state
+        $approval->refresh();
+
         if ($approval->isFullyApproved()) {
-            $approval->update(['status' => 'approved', 'completed_at' => now()]);
+            $approval->update([
+                'approval_status' => 'approved',
+                'completed_at' => now(),
+            ]);
         }
 
         return true;
     }
+
 
     /**
      * Reject a step by user: mark step rejected & approval rejected.
@@ -103,7 +112,7 @@ class ApprovalService
     {
         $step = $approval->steps()
             ->where('approver_id', $userId)
-            ->where('status', 'pending')
+            ->where('approval_status', 'draft')
             ->orderBy('level')
             ->first();
 
@@ -112,12 +121,12 @@ class ApprovalService
         }
 
         $step->update([
-            'status' => 'rejected',
+            'approval_status' => 'rejected',
             'comments' => $comments,
             'approved_at' => now(),
         ]);
 
-        $approval->update(['status' => 'rejected']);
+        $approval->update(['approval_status' => 'rejected']);
         return true;
     }
 }

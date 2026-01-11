@@ -16,4 +16,23 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/sales-documents/{type}/{id}/download', [SalesDocumentPdfController::class, 'download'])
         ->name('sales-documents.download');
+
+    Route::get('/leave/email/approve', function () {
+    abort_unless(request()->hasValidSignature(), 403);
+
+    app(\App\Services\Attendance\LeaveWorkflowService::class)
+        ->approveFromEmail(request('step'));
+
+    return 'Leave approved successfully.';
+    })->name('leave.email.approve');
+
+    Route::get('/leave/email/reject', function () {
+        abort_unless(request()->hasValidSignature(), 403);
+
+        app(\App\Services\Attendance\LeaveWorkflowService::class)
+            ->rejectFromEmail(request('step'));
+
+        return 'Leave rejected successfully.';
+    })->name('leave.email.reject');
+
 });

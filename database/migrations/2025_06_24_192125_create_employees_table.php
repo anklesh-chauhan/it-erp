@@ -34,6 +34,7 @@ return new class extends Migration
             $table->enum('blood_group', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignId('login_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->string('approval_status')->default('draft');
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();
