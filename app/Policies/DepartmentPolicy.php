@@ -82,4 +82,9 @@ class DepartmentPolicy
         return $authUser->can('ViewOwn:Department');
     }
 
+    public function overrideApproval(AuthUser $authUser, Department $department): bool
+    {
+        return $authUser->can('OverrideApproval:Department');
+    }
+
 }

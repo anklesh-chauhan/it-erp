@@ -82,4 +82,9 @@ class PositionPolicy
         return $authUser->can('ViewOwn:Position');
     }
 
+    public function overrideApproval(AuthUser $authUser, Position $position): bool
+    {
+        return $authUser->can('OverrideApproval:Position');
+    }
+
 }

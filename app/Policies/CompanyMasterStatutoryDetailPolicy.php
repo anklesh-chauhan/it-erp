@@ -82,4 +82,9 @@ class CompanyMasterStatutoryDetailPolicy
         return $authUser->can('ViewOwn:CompanyMasterStatutoryDetail');
     }
 
+    public function overrideApproval(AuthUser $authUser, CompanyMasterStatutoryDetail $companyMasterStatutoryDetail): bool
+    {
+        return $authUser->can('OverrideApproval:CompanyMasterStatutoryDetail');
+    }
+
 }

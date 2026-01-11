@@ -82,4 +82,9 @@ class TourPlanPolicy
         return $authUser->can('ViewOwn:TourPlan');
     }
 
+    public function overrideApproval(AuthUser $authUser, TourPlan $tourPlan): bool
+    {
+        return $authUser->can('OverrideApproval:TourPlan');
+    }
+
 }

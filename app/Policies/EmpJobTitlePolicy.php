@@ -82,4 +82,9 @@ class EmpJobTitlePolicy
         return $authUser->can('ViewOwn:EmpJobTitle');
     }
 
+    public function overrideApproval(AuthUser $authUser, EmpJobTitle $empJobTitle): bool
+    {
+        return $authUser->can('OverrideApproval:EmpJobTitle');
+    }
+
 }

@@ -82,4 +82,9 @@ class SalesInvoicePolicy
         return $authUser->can('ViewOwn:SalesInvoice');
     }
 
+    public function overrideApproval(AuthUser $authUser, SalesInvoice $salesInvoice): bool
+    {
+        return $authUser->can('OverrideApproval:SalesInvoice');
+    }
+
 }

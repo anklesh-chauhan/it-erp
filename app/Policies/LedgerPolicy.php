@@ -82,4 +82,9 @@ class LedgerPolicy
         return $authUser->can('ViewOwn:Ledger');
     }
 
+    public function overrideApproval(AuthUser $authUser, Ledger $ledger): bool
+    {
+        return $authUser->can('OverrideApproval:Ledger');
+    }
+
 }

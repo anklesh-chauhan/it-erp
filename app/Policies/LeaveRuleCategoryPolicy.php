@@ -82,4 +82,9 @@ class LeaveRuleCategoryPolicy
         return $authUser->can('ViewOwn:LeaveRuleCategory');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeaveRuleCategory $leaveRuleCategory): bool
+    {
+        return $authUser->can('OverrideApproval:LeaveRuleCategory');
+    }
+
 }

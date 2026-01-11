@@ -82,4 +82,9 @@ class UnitOfMeasurementPolicy
         return $authUser->can('ViewOwn:UnitOfMeasurement');
     }
 
+    public function overrideApproval(AuthUser $authUser, UnitOfMeasurement $unitOfMeasurement): bool
+    {
+        return $authUser->can('OverrideApproval:UnitOfMeasurement');
+    }
+
 }

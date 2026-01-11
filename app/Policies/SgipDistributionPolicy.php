@@ -82,4 +82,9 @@ class SgipDistributionPolicy
         return $authUser->can('ViewOwn:SgipDistribution');
     }
 
+    public function overrideApproval(AuthUser $authUser, SgipDistribution $sgipDistribution): bool
+    {
+        return $authUser->can('OverrideApproval:SgipDistribution');
+    }
+
 }

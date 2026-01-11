@@ -82,4 +82,9 @@ class TransportModePolicy
         return $authUser->can('ViewOwn:TransportMode');
     }
 
+    public function overrideApproval(AuthUser $authUser, TransportMode $transportMode): bool
+    {
+        return $authUser->can('OverrideApproval:TransportMode');
+    }
+
 }

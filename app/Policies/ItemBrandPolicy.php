@@ -82,4 +82,9 @@ class ItemBrandPolicy
         return $authUser->can('ViewOwn:ItemBrand');
     }
 
+    public function overrideApproval(AuthUser $authUser, ItemBrand $itemBrand): bool
+    {
+        return $authUser->can('OverrideApproval:ItemBrand');
+    }
+
 }

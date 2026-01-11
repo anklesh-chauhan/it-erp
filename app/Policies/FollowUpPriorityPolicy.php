@@ -82,4 +82,9 @@ class FollowUpPriorityPolicy
         return $authUser->can('ViewOwn:FollowUpPriority');
     }
 
+    public function overrideApproval(AuthUser $authUser, FollowUpPriority $followUpPriority): bool
+    {
+        return $authUser->can('OverrideApproval:FollowUpPriority');
+    }
+
 }

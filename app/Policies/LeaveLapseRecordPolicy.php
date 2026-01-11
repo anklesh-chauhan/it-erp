@@ -82,4 +82,9 @@ class LeaveLapseRecordPolicy
         return $authUser->can('ViewOwn:LeaveLapseRecord');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeaveLapseRecord $leaveLapseRecord): bool
+    {
+        return $authUser->can('OverrideApproval:LeaveLapseRecord');
+    }
+
 }

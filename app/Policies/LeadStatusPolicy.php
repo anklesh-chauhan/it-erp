@@ -82,4 +82,9 @@ class LeadStatusPolicy
         return $authUser->can('ViewOwn:LeadStatus');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeadStatus $leadStatus): bool
+    {
+        return $authUser->can('OverrideApproval:LeadStatus');
+    }
+
 }

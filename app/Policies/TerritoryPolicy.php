@@ -82,4 +82,9 @@ class TerritoryPolicy
         return $authUser->can('ViewOwn:Territory');
     }
 
+    public function overrideApproval(AuthUser $authUser, Territory $territory): bool
+    {
+        return $authUser->can('OverrideApproval:Territory');
+    }
+
 }

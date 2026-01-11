@@ -82,4 +82,9 @@ class CityPolicy
         return $authUser->can('ViewOwn:City');
     }
 
+    public function overrideApproval(AuthUser $authUser, City $city): bool
+    {
+        return $authUser->can('OverrideApproval:City');
+    }
+
 }

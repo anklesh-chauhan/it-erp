@@ -82,4 +82,9 @@ class CityPinCodePolicy
         return $authUser->can('ViewOwn:CityPinCode');
     }
 
+    public function overrideApproval(AuthUser $authUser, CityPinCode $cityPinCode): bool
+    {
+        return $authUser->can('OverrideApproval:CityPinCode');
+    }
+
 }

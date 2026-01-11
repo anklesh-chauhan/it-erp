@@ -82,4 +82,9 @@ class CompanyMasterPolicy
         return $authUser->can('ViewOwn:CompanyMaster');
     }
 
+    public function overrideApproval(AuthUser $authUser, CompanyMaster $companyMaster): bool
+    {
+        return $authUser->can('OverrideApproval:CompanyMaster');
+    }
+
 }

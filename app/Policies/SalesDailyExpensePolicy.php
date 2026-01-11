@@ -82,4 +82,9 @@ class SalesDailyExpensePolicy
         return $authUser->can('ViewOwn:SalesDailyExpense');
     }
 
+    public function overrideApproval(AuthUser $authUser, SalesDailyExpense $salesDailyExpense): bool
+    {
+        return $authUser->can('OverrideApproval:SalesDailyExpense');
+    }
+
 }

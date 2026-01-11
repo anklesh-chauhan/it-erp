@@ -82,4 +82,9 @@ class ExpenseConfigurationPolicy
         return $authUser->can('ViewOwn:ExpenseConfiguration');
     }
 
+    public function overrideApproval(AuthUser $authUser, ExpenseConfiguration $expenseConfiguration): bool
+    {
+        return $authUser->can('OverrideApproval:ExpenseConfiguration');
+    }
+
 }

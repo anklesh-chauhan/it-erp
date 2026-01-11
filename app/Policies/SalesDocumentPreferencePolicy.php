@@ -82,4 +82,9 @@ class SalesDocumentPreferencePolicy
         return $authUser->can('ViewOwn:SalesDocumentPreference');
     }
 
+    public function overrideApproval(AuthUser $authUser, SalesDocumentPreference $salesDocumentPreference): bool
+    {
+        return $authUser->can('OverrideApproval:SalesDocumentPreference');
+    }
+
 }

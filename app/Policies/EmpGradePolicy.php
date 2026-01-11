@@ -82,4 +82,9 @@ class EmpGradePolicy
         return $authUser->can('ViewOwn:EmpGrade');
     }
 
+    public function overrideApproval(AuthUser $authUser, EmpGrade $empGrade): bool
+    {
+        return $authUser->can('OverrideApproval:EmpGrade');
+    }
+
 }

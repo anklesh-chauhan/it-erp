@@ -82,4 +82,9 @@ class TypeMasterPolicy
         return $authUser->can('ViewOwn:TypeMaster');
     }
 
+    public function overrideApproval(AuthUser $authUser, TypeMaster $typeMaster): bool
+    {
+        return $authUser->can('OverrideApproval:TypeMaster');
+    }
+
 }

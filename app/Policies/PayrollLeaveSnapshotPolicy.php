@@ -82,4 +82,9 @@ class PayrollLeaveSnapshotPolicy
         return $authUser->can('ViewOwn:PayrollLeaveSnapshot');
     }
 
+    public function overrideApproval(AuthUser $authUser, PayrollLeaveSnapshot $payrollLeaveSnapshot): bool
+    {
+        return $authUser->can('OverrideApproval:PayrollLeaveSnapshot');
+    }
+
 }

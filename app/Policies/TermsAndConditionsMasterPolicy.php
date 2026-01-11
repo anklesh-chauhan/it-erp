@@ -82,4 +82,9 @@ class TermsAndConditionsMasterPolicy
         return $authUser->can('ViewOwn:TermsAndConditionsMaster');
     }
 
+    public function overrideApproval(AuthUser $authUser, TermsAndConditionsMaster $termsAndConditionsMaster): bool
+    {
+        return $authUser->can('OverrideApproval:TermsAndConditionsMaster');
+    }
+
 }

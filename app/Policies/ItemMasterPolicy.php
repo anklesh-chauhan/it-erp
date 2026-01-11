@@ -82,4 +82,9 @@ class ItemMasterPolicy
         return $authUser->can('ViewOwn:ItemMaster');
     }
 
+    public function overrideApproval(AuthUser $authUser, ItemMaster $itemMaster): bool
+    {
+        return $authUser->can('OverrideApproval:ItemMaster');
+    }
+
 }

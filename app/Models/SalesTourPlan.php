@@ -78,12 +78,12 @@ class SalesTourPlan extends BaseModel
 
     public function scopeApproved($query)
     {
-        return $query->where('status', 'approved');
+        return $query->where('approval_status', 'approved');
     }
 
     public function scopePending($query)
     {
-        return $query->where('status', 'submitted');
+        return $query->where('approval_status', 'submitted');
     }
 
     /*
@@ -94,17 +94,17 @@ class SalesTourPlan extends BaseModel
 
     public function isEditable(): bool
     {
-        return in_array($this->status, ['draft', 'rejected']);
+        return in_array($this->approval_status, ['draft', 'rejected']);
     }
 
     public function isApproved(): bool
     {
-        return $this->status === 'approved';
+        return $this->approval_status === 'approved';
     }
 
     public function isSubmitted(): bool
     {
-        return $this->status === 'submitted';
+        return $this->approval_status === 'submitted';
     }
 
     public function scopeApplyTerritoryVisibility(

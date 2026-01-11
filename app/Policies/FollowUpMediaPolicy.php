@@ -82,4 +82,9 @@ class FollowUpMediaPolicy
         return $authUser->can('ViewOwn:FollowUpMedia');
     }
 
+    public function overrideApproval(AuthUser $authUser, FollowUpMedia $followUpMedia): bool
+    {
+        return $authUser->can('OverrideApproval:FollowUpMedia');
+    }
+
 }

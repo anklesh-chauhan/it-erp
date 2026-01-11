@@ -82,4 +82,9 @@ class LeaveApplicationPolicy
         return $authUser->can('ViewOwn:LeaveApplication');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeaveApplication $leaveApplication): bool
+    {
+        return $authUser->can('OverrideApproval:LeaveApplication');
+    }
+
 }

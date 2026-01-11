@@ -82,4 +82,9 @@ class QuotePolicy
         return $authUser->can('ViewOwn:Quote');
     }
 
+    public function overrideApproval(AuthUser $authUser, Quote $quote): bool
+    {
+        return $authUser->can('OverrideApproval:Quote');
+    }
+
 }

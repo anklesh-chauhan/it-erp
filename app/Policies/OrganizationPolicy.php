@@ -82,4 +82,9 @@ class OrganizationPolicy
         return $authUser->can('ViewOwn:Organization');
     }
 
+    public function overrideApproval(AuthUser $authUser, Organization $organization): bool
+    {
+        return $authUser->can('OverrideApproval:Organization');
+    }
+
 }

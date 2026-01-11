@@ -82,4 +82,9 @@ class PackagingTypePolicy
         return $authUser->can('ViewOwn:PackagingType');
     }
 
+    public function overrideApproval(AuthUser $authUser, PackagingType $packagingType): bool
+    {
+        return $authUser->can('OverrideApproval:PackagingType');
+    }
+
 }

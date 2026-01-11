@@ -82,4 +82,9 @@ class EmployeePolicy
         return $authUser->can('ViewOwn:Employee');
     }
 
+    public function overrideApproval(AuthUser $authUser, Employee $employee): bool
+    {
+        return $authUser->can('OverrideApproval:Employee');
+    }
+
 }

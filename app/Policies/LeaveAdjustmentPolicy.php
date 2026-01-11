@@ -82,4 +82,9 @@ class LeaveAdjustmentPolicy
         return $authUser->can('ViewOwn:LeaveAdjustment');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeaveAdjustment $leaveAdjustment): bool
+    {
+        return $authUser->can('OverrideApproval:LeaveAdjustment');
+    }
+
 }

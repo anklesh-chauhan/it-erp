@@ -82,4 +82,9 @@ class DealPolicy
         return $authUser->can('ViewOwn:Deal');
     }
 
+    public function overrideApproval(AuthUser $authUser, Deal $deal): bool
+    {
+        return $authUser->can('OverrideApproval:Deal');
+    }
+
 }

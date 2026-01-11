@@ -82,4 +82,9 @@ class TaxPolicy
         return $authUser->can('ViewOwn:Tax');
     }
 
+    public function overrideApproval(AuthUser $authUser, Tax $tax): bool
+    {
+        return $authUser->can('OverrideApproval:Tax');
+    }
+
 }

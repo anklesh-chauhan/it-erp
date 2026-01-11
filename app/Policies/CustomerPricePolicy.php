@@ -82,4 +82,9 @@ class CustomerPricePolicy
         return $authUser->can('ViewOwn:CustomerPrice');
     }
 
+    public function overrideApproval(AuthUser $authUser, CustomerPrice $customerPrice): bool
+    {
+        return $authUser->can('OverrideApproval:CustomerPrice');
+    }
+
 }

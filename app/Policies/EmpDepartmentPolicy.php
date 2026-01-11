@@ -82,4 +82,9 @@ class EmpDepartmentPolicy
         return $authUser->can('ViewOwn:EmpDepartment');
     }
 
+    public function overrideApproval(AuthUser $authUser, EmpDepartment $empDepartment): bool
+    {
+        return $authUser->can('OverrideApproval:EmpDepartment');
+    }
+
 }

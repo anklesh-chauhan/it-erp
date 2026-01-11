@@ -82,4 +82,9 @@ class SalesOrderPolicy
         return $authUser->can('ViewOwn:SalesOrder');
     }
 
+    public function overrideApproval(AuthUser $authUser, SalesOrder $salesOrder): bool
+    {
+        return $authUser->can('OverrideApproval:SalesOrder');
+    }
+
 }

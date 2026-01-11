@@ -82,4 +82,9 @@ class CountryPolicy
         return $authUser->can('ViewOwn:Country');
     }
 
+    public function overrideApproval(AuthUser $authUser, Country $country): bool
+    {
+        return $authUser->can('OverrideApproval:Country');
+    }
+
 }

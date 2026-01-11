@@ -82,4 +82,9 @@ class PaymentMethodPolicy
         return $authUser->can('ViewOwn:PaymentMethod');
     }
 
+    public function overrideApproval(AuthUser $authUser, PaymentMethod $paymentMethod): bool
+    {
+        return $authUser->can('OverrideApproval:PaymentMethod');
+    }
+
 }

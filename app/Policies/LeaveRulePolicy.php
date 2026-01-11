@@ -82,4 +82,9 @@ class LeaveRulePolicy
         return $authUser->can('ViewOwn:LeaveRule');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeaveRule $leaveRule): bool
+    {
+        return $authUser->can('OverrideApproval:LeaveRule');
+    }
+
 }

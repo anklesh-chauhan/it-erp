@@ -82,4 +82,9 @@ class AddressTypePolicy
         return $authUser->can('ViewOwn:AddressType');
     }
 
+    public function overrideApproval(AuthUser $authUser, AddressType $addressType): bool
+    {
+        return $authUser->can('OverrideApproval:AddressType');
+    }
+
 }

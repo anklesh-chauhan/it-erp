@@ -82,4 +82,9 @@ class GstPanPolicy
         return $authUser->can('ViewOwn:GstPan');
     }
 
+    public function overrideApproval(AuthUser $authUser, GstPan $gstPan): bool
+    {
+        return $authUser->can('OverrideApproval:GstPan');
+    }
+
 }

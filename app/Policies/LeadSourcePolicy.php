@@ -82,4 +82,9 @@ class LeadSourcePolicy
         return $authUser->can('ViewOwn:LeadSource');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeadSource $leadSource): bool
+    {
+        return $authUser->can('OverrideApproval:LeadSource');
+    }
+
 }

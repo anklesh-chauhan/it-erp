@@ -82,4 +82,9 @@ class LeadCustomFieldPolicy
         return $authUser->can('ViewOwn:LeadCustomField');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeadCustomField $leadCustomField): bool
+    {
+        return $authUser->can('OverrideApproval:LeadCustomField');
+    }
+
 }

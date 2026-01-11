@@ -82,4 +82,9 @@ class OrganizationalUnitPolicy
         return $authUser->can('ViewOwn:OrganizationalUnit');
     }
 
+    public function overrideApproval(AuthUser $authUser, OrganizationalUnit $organizationalUnit): bool
+    {
+        return $authUser->can('OverrideApproval:OrganizationalUnit');
+    }
+
 }

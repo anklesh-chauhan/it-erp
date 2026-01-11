@@ -82,4 +82,9 @@ class TenantPolicy
         return $authUser->can('ViewOwn:Tenant');
     }
 
+    public function overrideApproval(AuthUser $authUser, Tenant $tenant): bool
+    {
+        return $authUser->can('OverrideApproval:Tenant');
+    }
+
 }

@@ -82,4 +82,9 @@ class ShippingMethodPolicy
         return $authUser->can('ViewOwn:ShippingMethod');
     }
 
+    public function overrideApproval(AuthUser $authUser, ShippingMethod $shippingMethod): bool
+    {
+        return $authUser->can('OverrideApproval:ShippingMethod');
+    }
+
 }

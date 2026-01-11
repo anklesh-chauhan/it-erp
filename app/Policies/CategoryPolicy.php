@@ -82,4 +82,9 @@ class CategoryPolicy
         return $authUser->can('ViewOwn:Category');
     }
 
+    public function overrideApproval(AuthUser $authUser, Category $category): bool
+    {
+        return $authUser->can('OverrideApproval:Category');
+    }
+
 }

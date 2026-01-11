@@ -6,6 +6,7 @@ use App\Traits\HasSafeGlobalSearch;
 
 use Filament\Resources\Resource;
 use App\Filament\Resources\Concerns\HasSendForApprovalAction;
+use App\Filament\Resources\Concerns\HasApprovalLockUI;
 use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,6 +16,7 @@ abstract class BaseResource extends Resource
 {
     use HasSafeGlobalSearch;
     use HasSendForApprovalAction;
+    use HasApprovalLockUI;
 
     protected static function permissionKey(): string
     {

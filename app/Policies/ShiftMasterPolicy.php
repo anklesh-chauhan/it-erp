@@ -82,4 +82,9 @@ class ShiftMasterPolicy
         return $authUser->can('ViewOwn:ShiftMaster');
     }
 
+    public function overrideApproval(AuthUser $authUser, ShiftMaster $shiftMaster): bool
+    {
+        return $authUser->can('OverrideApproval:ShiftMaster');
+    }
+
 }

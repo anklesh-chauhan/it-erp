@@ -82,4 +82,9 @@ class NumberSeriesPolicy
         return $authUser->can('ViewOwn:NumberSeries');
     }
 
+    public function overrideApproval(AuthUser $authUser, NumberSeries $numberSeries): bool
+    {
+        return $authUser->can('OverrideApproval:NumberSeries');
+    }
+
 }

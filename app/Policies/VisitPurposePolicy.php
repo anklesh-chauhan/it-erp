@@ -82,4 +82,9 @@ class VisitPurposePolicy
         return $authUser->can('ViewOwn:VisitPurpose');
     }
 
+    public function overrideApproval(AuthUser $authUser, VisitPurpose $visitPurpose): bool
+    {
+        return $authUser->can('OverrideApproval:VisitPurpose');
+    }
+
 }

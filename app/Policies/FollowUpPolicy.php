@@ -82,4 +82,9 @@ class FollowUpPolicy
         return $authUser->can('ViewOwn:FollowUp');
     }
 
+    public function overrideApproval(AuthUser $authUser, FollowUp $followUp): bool
+    {
+        return $authUser->can('OverrideApproval:FollowUp');
+    }
+
 }

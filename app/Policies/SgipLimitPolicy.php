@@ -82,4 +82,9 @@ class SgipLimitPolicy
         return $authUser->can('ViewOwn:SgipLimit');
     }
 
+    public function overrideApproval(AuthUser $authUser, SgipLimit $sgipLimit): bool
+    {
+        return $authUser->can('OverrideApproval:SgipLimit');
+    }
+
 }

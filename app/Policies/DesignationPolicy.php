@@ -82,4 +82,9 @@ class DesignationPolicy
         return $authUser->can('ViewOwn:Designation');
     }
 
+    public function overrideApproval(AuthUser $authUser, Designation $designation): bool
+    {
+        return $authUser->can('OverrideApproval:Designation');
+    }
+
 }

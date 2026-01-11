@@ -82,4 +82,9 @@ class DailyAttendancePolicy
         return $authUser->can('ViewOwn:DailyAttendance');
     }
 
+    public function overrideApproval(AuthUser $authUser, DailyAttendance $dailyAttendance): bool
+    {
+        return $authUser->can('OverrideApproval:DailyAttendance');
+    }
+
 }

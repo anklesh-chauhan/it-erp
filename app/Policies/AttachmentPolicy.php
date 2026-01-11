@@ -82,4 +82,9 @@ class AttachmentPolicy
         return $authUser->can('ViewOwn:Attachment');
     }
 
+    public function overrideApproval(AuthUser $authUser, Attachment $attachment): bool
+    {
+        return $authUser->can('OverrideApproval:Attachment');
+    }
+
 }

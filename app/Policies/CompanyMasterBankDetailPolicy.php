@@ -82,4 +82,9 @@ class CompanyMasterBankDetailPolicy
         return $authUser->can('ViewOwn:CompanyMasterBankDetail');
     }
 
+    public function overrideApproval(AuthUser $authUser, CompanyMasterBankDetail $companyMasterBankDetail): bool
+    {
+        return $authUser->can('OverrideApproval:CompanyMasterBankDetail');
+    }
+
 }

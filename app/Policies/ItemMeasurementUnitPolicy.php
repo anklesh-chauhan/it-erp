@@ -82,4 +82,9 @@ class ItemMeasurementUnitPolicy
         return $authUser->can('ViewOwn:ItemMeasurementUnit');
     }
 
+    public function overrideApproval(AuthUser $authUser, ItemMeasurementUnit $itemMeasurementUnit): bool
+    {
+        return $authUser->can('OverrideApproval:ItemMeasurementUnit');
+    }
+
 }

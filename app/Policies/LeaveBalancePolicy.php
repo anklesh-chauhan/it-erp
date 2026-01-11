@@ -82,4 +82,9 @@ class LeaveBalancePolicy
         return $authUser->can('ViewOwn:LeaveBalance');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeaveBalance $leaveBalance): bool
+    {
+        return $authUser->can('OverrideApproval:LeaveBalance');
+    }
+
 }

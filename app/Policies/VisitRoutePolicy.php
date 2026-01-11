@@ -82,4 +82,9 @@ class VisitRoutePolicy
         return $authUser->can('ViewOwn:VisitRoute');
     }
 
+    public function overrideApproval(AuthUser $authUser, VisitRoute $visitRoute): bool
+    {
+        return $authUser->can('OverrideApproval:VisitRoute');
+    }
+
 }

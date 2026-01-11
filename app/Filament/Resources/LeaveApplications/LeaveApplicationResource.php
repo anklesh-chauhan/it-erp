@@ -9,14 +9,15 @@ use App\Filament\Resources\LeaveApplications\Schemas\LeaveApplicationForm;
 use App\Filament\Resources\LeaveApplications\Tables\LeaveApplicationsTable;
 use App\Models\LeaveApplication;
 use BackedEnum;
-use Filament\Resources\Resource;
+use Faker\Provider\Base;
+use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class LeaveApplicationResource extends Resource
+class LeaveApplicationResource extends BaseResource
 {
     protected static ?string $model = LeaveApplication::class;
 

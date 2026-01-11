@@ -82,4 +82,9 @@ class LocationMasterPolicy
         return $authUser->can('ViewOwn:LocationMaster');
     }
 
+    public function overrideApproval(AuthUser $authUser, LocationMaster $locationMaster): bool
+    {
+        return $authUser->can('OverrideApproval:LocationMaster');
+    }
+
 }

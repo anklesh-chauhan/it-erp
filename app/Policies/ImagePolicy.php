@@ -82,4 +82,9 @@ class ImagePolicy
         return $authUser->can('ViewOwn:Image');
     }
 
+    public function overrideApproval(AuthUser $authUser, Image $image): bool
+    {
+        return $authUser->can('OverrideApproval:Image');
+    }
+
 }

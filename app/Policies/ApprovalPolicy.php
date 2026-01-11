@@ -82,4 +82,9 @@ class ApprovalPolicy
         return $authUser->can('ViewOwn:Approval');
     }
 
+    public function overrideApproval(AuthUser $authUser, Approval $approval): bool
+    {
+        return $authUser->can('OverrideApproval:Approval');
+    }
+
 }

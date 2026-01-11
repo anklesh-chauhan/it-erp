@@ -82,4 +82,9 @@ class LeaveEncashmentPolicy
         return $authUser->can('ViewOwn:LeaveEncashment');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeaveEncashment $leaveEncashment): bool
+    {
+        return $authUser->can('OverrideApproval:LeaveEncashment');
+    }
+
 }

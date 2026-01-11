@@ -82,4 +82,9 @@ class AccountTypePolicy
         return $authUser->can('ViewOwn:AccountType');
     }
 
+    public function overrideApproval(AuthUser $authUser, AccountType $accountType): bool
+    {
+        return $authUser->can('OverrideApproval:AccountType');
+    }
+
 }

@@ -82,4 +82,9 @@ class StatePolicy
         return $authUser->can('ViewOwn:State');
     }
 
+    public function overrideApproval(AuthUser $authUser, State $state): bool
+    {
+        return $authUser->can('OverrideApproval:State');
+    }
+
 }

@@ -82,4 +82,9 @@ class VisitTypePolicy
         return $authUser->can('ViewOwn:VisitType');
     }
 
+    public function overrideApproval(AuthUser $authUser, VisitType $visitType): bool
+    {
+        return $authUser->can('OverrideApproval:VisitType');
+    }
+
 }

@@ -82,4 +82,9 @@ class SalesDcrPolicy
         return $authUser->can('ViewOwn:SalesDcr');
     }
 
+    public function overrideApproval(AuthUser $authUser, SalesDcr $salesDcr): bool
+    {
+        return $authUser->can('OverrideApproval:SalesDcr');
+    }
+
 }

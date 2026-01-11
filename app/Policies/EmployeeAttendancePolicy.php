@@ -82,4 +82,9 @@ class EmployeeAttendancePolicy
         return $authUser->can('ViewOwn:EmployeeAttendance');
     }
 
+    public function overrideApproval(AuthUser $authUser, EmployeeAttendance $employeeAttendance): bool
+    {
+        return $authUser->can('OverrideApproval:EmployeeAttendance');
+    }
+
 }

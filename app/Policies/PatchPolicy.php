@@ -82,4 +82,9 @@ class PatchPolicy
         return $authUser->can('ViewOwn:Patch');
     }
 
+    public function overrideApproval(AuthUser $authUser, Patch $patch): bool
+    {
+        return $authUser->can('OverrideApproval:Patch');
+    }
+
 }

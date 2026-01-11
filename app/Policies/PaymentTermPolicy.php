@@ -82,4 +82,9 @@ class PaymentTermPolicy
         return $authUser->can('ViewOwn:PaymentTerm');
     }
 
+    public function overrideApproval(AuthUser $authUser, PaymentTerm $paymentTerm): bool
+    {
+        return $authUser->can('OverrideApproval:PaymentTerm');
+    }
+
 }

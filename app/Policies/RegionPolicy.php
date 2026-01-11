@@ -82,4 +82,9 @@ class RegionPolicy
         return $authUser->can('ViewOwn:Region');
     }
 
+    public function overrideApproval(AuthUser $authUser, Region $region): bool
+    {
+        return $authUser->can('OverrideApproval:Region');
+    }
+
 }

@@ -82,4 +82,9 @@ class LeaveTypePolicy
         return $authUser->can('ViewOwn:LeaveType');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeaveType $leaveType): bool
+    {
+        return $authUser->can('OverrideApproval:LeaveType');
+    }
+
 }

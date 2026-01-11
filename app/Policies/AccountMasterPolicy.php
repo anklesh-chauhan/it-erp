@@ -82,4 +82,9 @@ class AccountMasterPolicy
         return $authUser->can('ViewOwn:AccountMaster');
     }
 
+    public function overrideApproval(AuthUser $authUser, AccountMaster $accountMaster): bool
+    {
+        return $authUser->can('OverrideApproval:AccountMaster');
+    }
+
 }

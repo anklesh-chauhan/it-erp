@@ -82,4 +82,9 @@ class LeaveInstancePolicy
         return $authUser->can('ViewOwn:LeaveInstance');
     }
 
+    public function overrideApproval(AuthUser $authUser, LeaveInstance $leaveInstance): bool
+    {
+        return $authUser->can('OverrideApproval:LeaveInstance');
+    }
+
 }

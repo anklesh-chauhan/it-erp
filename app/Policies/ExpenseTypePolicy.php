@@ -82,4 +82,9 @@ class ExpenseTypePolicy
         return $authUser->can('ViewOwn:ExpenseType');
     }
 
+    public function overrideApproval(AuthUser $authUser, ExpenseType $expenseType): bool
+    {
+        return $authUser->can('OverrideApproval:ExpenseType');
+    }
+
 }

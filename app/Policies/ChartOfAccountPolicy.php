@@ -82,4 +82,9 @@ class ChartOfAccountPolicy
         return $authUser->can('ViewOwn:ChartOfAccount');
     }
 
+    public function overrideApproval(AuthUser $authUser, ChartOfAccount $chartOfAccount): bool
+    {
+        return $authUser->can('OverrideApproval:ChartOfAccount');
+    }
+
 }

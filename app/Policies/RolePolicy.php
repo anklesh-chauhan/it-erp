@@ -82,4 +82,9 @@ class RolePolicy
         return $authUser->can('ViewOwn:Role');
     }
 
+    public function overrideApproval(AuthUser $authUser, Role $role): bool
+    {
+        return $authUser->can('OverrideApproval:Role');
+    }
+
 }

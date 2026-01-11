@@ -82,4 +82,9 @@ class ContactDetailPolicy
         return $authUser->can('ViewOwn:ContactDetail');
     }
 
+    public function overrideApproval(AuthUser $authUser, ContactDetail $contactDetail): bool
+    {
+        return $authUser->can('OverrideApproval:ContactDetail');
+    }
+
 }

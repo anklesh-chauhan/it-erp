@@ -82,4 +82,9 @@ class IndustryTypePolicy
         return $authUser->can('ViewOwn:IndustryType');
     }
 
+    public function overrideApproval(AuthUser $authUser, IndustryType $industryType): bool
+    {
+        return $authUser->can('OverrideApproval:IndustryType');
+    }
+
 }

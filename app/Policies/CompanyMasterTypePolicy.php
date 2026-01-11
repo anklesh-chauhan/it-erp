@@ -82,4 +82,9 @@ class CompanyMasterTypePolicy
         return $authUser->can('ViewOwn:CompanyMasterType');
     }
 
+    public function overrideApproval(AuthUser $authUser, CompanyMasterType $companyMasterType): bool
+    {
+        return $authUser->can('OverrideApproval:CompanyMasterType');
+    }
+
 }

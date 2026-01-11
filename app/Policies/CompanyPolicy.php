@@ -82,4 +82,9 @@ class CompanyPolicy
         return $authUser->can('ViewOwn:Company');
     }
 
+    public function overrideApproval(AuthUser $authUser, Company $company): bool
+    {
+        return $authUser->can('OverrideApproval:Company');
+    }
+
 }

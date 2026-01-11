@@ -82,4 +82,9 @@ class RatingTypePolicy
         return $authUser->can('ViewOwn:RatingType');
     }
 
+    public function overrideApproval(AuthUser $authUser, RatingType $ratingType): bool
+    {
+        return $authUser->can('OverrideApproval:RatingType');
+    }
+
 }
