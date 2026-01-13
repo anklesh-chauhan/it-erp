@@ -124,6 +124,11 @@ class Employee extends BaseModel
         return $this->hasMany(EmployeeShift::class);
     }
 
+    public function weekOffs()
+    {
+        return $this->hasMany(\App\Models\WeekOff::class);
+    }
+
     public function currentShiftForDate($date = null)
     {
         $date ??= today();

@@ -19,11 +19,11 @@ class LeaveRulesTable
     {
         return $table
             ->columns([
-                TextColumn::make('rule_key')->searchable(),
-                TextColumn::make('category.name')->label('Category'),
-                TextColumn::make('leaveType.name')->label('Leave Type'),
+                TextColumn::make('rule_key')->searchable()->sortable(),
+                TextColumn::make('category.name')->label('Category')->searchable()->sortable(),
+                TextColumn::make('leaveType.name')->label('Leave Type')->searchable()->sortable(),
                 TextColumn::make('priority')->sortable(),
-                IconColumn::make('is_active')->boolean(),
+                IconColumn::make('is_active')->boolean()->sortable(),
             ])
             ->defaultSort('priority')
             ->filters([

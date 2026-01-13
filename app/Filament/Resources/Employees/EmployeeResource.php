@@ -903,6 +903,7 @@ class EmployeeResource extends BaseResource
     {
         return [
             RelationManagers\ShiftAssignmentsRelationManager::class,
+            RelationManagers\WeekOffsRelationManager::class,
             BankDetailRelationManager::class,
         ];
     }

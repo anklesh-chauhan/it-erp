@@ -29,15 +29,84 @@ class LeaveRuleEvaluatorService
             ->get();
 
         foreach ($rules as $rule) {
-            if ($this->conditionsMatch($rule->condition_json)) {
-                $this->applyAction(
-                    $rule->category->key,
-                    $rule->action_json
-                );
+
+            if (! $this->conditionsMatch($rule->condition_json)) {
+                continue;
             }
+
+            /**
+             * 🔒 ENTERPRISE VALIDATION HOOK
+             * Holiday / Weekoff / Duplicate leave check
+             */
+            if (
+                $rule->category->key === 'validation'
+                && ($rule->action_json['check_holiday'] ?? false)
+            ) {
+                if ($error = $this->validateDateAvailability($context)) {
+                    $this->result['denied'] = true;
+                    $this->result['errors'][] = $error;
+
+                    // ⛔ Stop evaluating further rules
+                    return $this->result;
+                }
+            }
+
+            // Normal rule processing
+            $this->applyAction(
+                $rule->category->key,
+                $rule->action_json
+            );
         }
 
         return $this->result;
+    }
+
+    protected function validateDateAvailability(array $context): ?string
+    {
+        $employeeId = $context['employee_id'];
+        $from = \Carbon\Carbon::parse($context['from_date']);
+        $to = \Carbon\Carbon::parse($context['to_date']);
+
+        foreach ($from->daysUntil($to) as $date) {
+
+            // 1️⃣ Holiday check
+            if (\App\Models\Holiday::whereDate('date', $date)->exists()) {
+                return "Leave not allowed on holiday: {$date->toDateString()}";
+            }
+
+            // 2️⃣ Weekly off check
+            if ($this->isWeeklyOff($employeeId, $date)) {
+                return "Leave not allowed on weekly off: {$date->toDateString()}";
+            }
+
+            // 3️⃣ Existing leave check
+            if ($this->leaveAlreadyExists($employeeId, $date)) {
+                return "Leave already applied for: {$date->toDateString()}";
+            }
+        }
+
+        return null;
+    }
+
+    protected function leaveAlreadyExists(int $employeeId, \Carbon\Carbon $date): bool
+    {
+        return \App\Models\LeaveInstance::where('employee_id', $employeeId)
+            ->whereDate('date', $date)
+            ->whereIn('approval_status', ['applied', 'approved'])
+            ->exists();
+    }
+
+    protected function isWeeklyOff(int $employeeId, \Carbon\Carbon $date): bool
+    {
+        $day = $date->dayOfWeek; // 0 (Sun) → 6 (Sat)
+
+        return \App\Models\WeekOff::where('is_active', true)
+            ->where('day_of_week', $day)
+            ->where(function ($q) use ($employeeId) {
+                $q->whereNull('employee_id')
+                ->orWhere('employee_id', $employeeId);
+            })
+            ->exists();
     }
 
     protected function conditionsMatch(array $conditions): bool

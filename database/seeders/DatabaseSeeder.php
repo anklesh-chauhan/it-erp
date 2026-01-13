@@ -84,6 +84,7 @@ class DatabaseSeeder extends Seeder
             LeaveRuleCategorySeeder::class,
             LeaveRuleSeeder::class,
             LeaveDemoDataSeeder::class,
+            HolidaySeeder::class,
         ]);
     }
 }

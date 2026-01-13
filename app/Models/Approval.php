@@ -59,6 +59,29 @@ class Approval extends BaseModel
                      });
     }
 
+    public function getDocumentNumber(): ?string
+    {
+        $approvable = $this->approvable;
+
+        if (! $approvable) {
+            return null;
+        }
+
+        // Preferred: method-based contract
+        if (method_exists($approvable, 'getDocumentNumber')) {
+            return $approvable->getDocumentNumber();
+        }
+
+        // Fallback: common field names
+        foreach (['document_number', 'doc_no', 'number', 'code'] as $field) {
+            if (isset($approvable->{$field}) && filled($approvable->{$field})) {
+                return $approvable->{$field};
+            }
+        }
+
+        return null;
+    }
+
     public static function scopeSortByStatusPriority(Builder $query, string $direction): Builder
     {
         return $query->orderByRaw("FIELD(approval_status, 'draft', 'approved', 'rejected') $direction");

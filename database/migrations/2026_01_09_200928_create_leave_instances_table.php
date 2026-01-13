@@ -36,7 +36,7 @@ return new class extends Migration
             $table->blameableSoftDeletes();
             $table->timestamps();
 
-            $table->index(['employee_id', 'leave_type_id', 'date']);
+            $table->unique(['employee_id', 'date']);
         });
     }
 

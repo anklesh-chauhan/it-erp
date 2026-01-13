@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\HasBlameable;
 use App\Traits\HasSoftDeleteBlameable;
 use App\Traits\HasVisibilityScope;
+use App\Traits\LocksAfterApproval;
 
 abstract class BaseModel extends Model
 {
@@ -14,6 +15,7 @@ abstract class BaseModel extends Model
     use HasBlameable;
     use HasSoftDeleteBlameable;
     use HasVisibilityScope;
+    use LocksAfterApproval;
 
     protected $casts = [
         'created_by' => 'integer',

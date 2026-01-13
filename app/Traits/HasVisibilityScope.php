@@ -17,8 +17,8 @@ trait HasVisibilityScope
         }
 
         /* =====================================================
-         | 1. SUPER / FULL ACCESS
-         ===================================================== */
+        | 1. SUPER / FULL ACCESS
+        ===================================================== */
         if (
             $user->hasRole('super_admin') ||
             $user->hasRole('administration_admin') ||
@@ -27,83 +27,56 @@ trait HasVisibilityScope
             return $query;
         }
 
-        /* =====================================================
-         | 2. VIEW OWN TERRITORY (PRIMARY FILTER)
-         ===================================================== */
-        if ($user->can("ViewOwnTerritory:{$model}")) {
+        $table = $query->getModel()->getTable();
 
-            $territoryIds = PositionService::getTerritoryIdsForUser($user);
+        $query->where(function (Builder $q) use ($user, $model, $table) {
 
-            if (empty($territoryIds)) {
-                return $query->whereRaw('1 = 0');
-            }
-
-            // Model-specific territory scope
-            if (method_exists($query->getModel(), 'scopeApplyTerritoryVisibility')) {
-
-                return $query->applyTerritoryVisibility($territoryIds);
-            }
-
-            // $query = $query->whereIn(
-            //     $query->getModel()->getTable() . '.territory_id',
-            //     $territoryIds
-            // );
-
-            if (\Schema::hasColumn($query->getModel()->getTable(), 'territory_id')) {
-                return $query->whereIn(
-                    $query->getModel()->getTable() . '.territory_id',
-                    $territoryIds
-                );
-            }
-
-            // return $query->whereIn(
-            //     $query->getModel()->getTable() . '.territory_id',
-            //     $territoryIds
-            // );
-        }
-
-        /* =====================================================
-         | VIEW OWN OU (STRUCTURAL)
-         ===================================================== */
-        if ($user->can("ViewOwnOU:{$model}")) {
-
-            $ouIds = OrganizationalUnitService::getUserOuIds($user);
-
-            if (empty($ouIds)) {
-                return $query->whereRaw('1 = 0');
-            }
-
-            return $query->whereHas(
-                'creator.employee.employmentDetail.organizationalUnits',
-                fn ($q) => $q->whereIn('organizational_units.id', $ouIds)
-            );
-        }
-
-       /* =====================================================
-        | 3. VIEW OWN RECORDS
-        ===================================================== */
-        if ($user->can("ViewOwn:{$model}")) {
-
-
-
-            $table = $query->getModel()->getTable();
-
-            // SalesTourPlan & similar owner-based models
-            if (\Schema::hasColumn($table, 'user_id')) {
-                return $query->where($table . '.user_id', $user->id);
-            }
-
-            // Standard created_by ownership
+            /* =====================================================
+            | A. ALWAYS SHOW OWN RECORDS
+            ===================================================== */
             if (\Schema::hasColumn($table, 'created_by')) {
-                return $query->where($table . '.created_by', $user->id);
+                $q->orWhere($table . '.created_by', $user->id);
             }
 
-            return $query->whereRaw('1 = 0');
-        }
+            if (\Schema::hasColumn($table, 'user_id')) {
+                $q->orWhere($table . '.user_id', $user->id);
+            }
 
-        /* =====================================================
-         | 4. DEFAULT: NO DATA
-         ===================================================== */
-        return $query->whereRaw('1 = 0');
+            /* =====================================================
+            | B. VIEW OWN TERRITORY
+            ===================================================== */
+            if ($user->can("ViewOwnTerritory:{$model}")) {
+
+                $territoryIds = PositionService::getTerritoryIdsForUser($user);
+
+                if (! empty($territoryIds)) {
+
+                    if (method_exists($q->getModel(), 'scopeApplyTerritoryVisibility')) {
+                        $q->orWhere(function ($tq) use ($territoryIds) {
+                            $tq->applyTerritoryVisibility($territoryIds);
+                        });
+                    } elseif (\Schema::hasColumn($table, 'territory_id')) {
+                        $q->orWhereIn($table . '.territory_id', $territoryIds);
+                    }
+                }
+            }
+
+            /* =====================================================
+            | C. VIEW OWN OU
+            ===================================================== */
+            if ($user->can("ViewOwnOU:{$model}")) {
+
+                $ouIds = OrganizationalUnitService::getUserOuIds($user);
+
+                if (! empty($ouIds)) {
+                    $q->orWhereHas(
+                        'creator.employee.employmentDetail.organizationalUnits',
+                        fn ($ou) => $ou->whereIn('organizational_units.id', $ouIds)
+                    );
+                }
+            }
+        });
+
+        return $query;
     }
 }

@@ -11,29 +11,38 @@ class ApprovalInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('approval_rule_id')
-                    ->label('Approval Rule ID')
-                    ->content(fn ($record) => $record->approval_rule_id),
+                TextEntry::make('approvable_type')
+                    ->label('Module')
+                    ->formatStateUsing(fn ($state) => class_basename($state)),
 
-                TextEntry::make('approver_id')
-                    ->label('Approver ID')
-                    ->content(fn ($record) => $record->approver_id),
+                TextEntry::make('approvable_id')
+                    ->label('Document No')
+                    ->formatStateUsing(
+                        fn ($state, $record) =>
+                            $record->getDocumentNumber() ?? $state
+                    ),
 
-                TextEntry::make('model_type')
-                    ->label('Model Type')
-                    ->content(fn ($record) => $record->model_type),
-
-                TextEntry::make('model_id')
-                    ->label('Model ID')
-                    ->content(fn ($record) => $record->model_id),
+                TextEntry::make('requester.name')
+                    ->label('Requested By'),
 
                 TextEntry::make('approval_status')
                     ->label('Status')
-                    ->content(fn ($record) => ucfirst($record->approval_status)),
+                    ->badge()
+                    ->color(fn (string $state) => match ($state) {
+                        'draft'    => 'warning',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                        default    => 'gray',
+                    }),
 
-                TextEntry::make('remarks')
-                    ->label('Remarks')
-                    ->content(fn ($record) => $record->remarks),
+                TextEntry::make('created_at')
+                    ->label('Requested At')
+                    ->dateTime(),
+
+                TextEntry::make('completed_at')
+                    ->label('Completed At')
+                    ->dateTime()
+                    ->placeholder('—'),
             ]);
     }
 }

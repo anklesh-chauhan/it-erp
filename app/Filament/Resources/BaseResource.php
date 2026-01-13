@@ -30,4 +30,38 @@ abstract class BaseResource extends Resource
             ->applyVisibility(static::permissionKey());
 
     }
+
+    public static function canEdit(Model $record): bool
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        // 🔒 Approved record → only HR override can edit
+        if ($record->approval_status === 'approved') {
+            return $user->can('OverrideApproval:LeaveApplication');
+        }
+
+        // ⛔ Not approved → normal update permission
+        return $user->can('Update:LeaveApplication');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        // 🔒 Approved record → only HR override can delete
+        if ($record->approval_status === 'approved') {
+            return $user->can('OverrideApproval:LeaveApplication');
+        }
+
+        // ⛔ Not approved → normal delete permission
+        return $user->can('Delete:LeaveApplication');
+    }
 }

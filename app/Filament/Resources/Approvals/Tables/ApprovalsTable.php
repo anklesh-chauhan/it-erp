@@ -41,7 +41,11 @@ class ApprovalsTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('approvable_id')->label('Record ID'),
+                TextColumn::make('approvable_id')
+                    ->label('Record ID')
+                    ->formatStateUsing(fn ($state, $record) =>
+                        $record->getDocumentNumber() ?? $state
+                    ),
 
                 TextColumn::make('requester.name')
                     ->label('Requested By')

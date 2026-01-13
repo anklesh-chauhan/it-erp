@@ -7,6 +7,7 @@ use Filament\Resources\Pages\CreateRecord;
 use App\Orchestrators\LeaveApplicationOrchestrator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Filament\Notifications\Notification;
 
 class CreateLeaveApplication extends CreateRecord
 {
@@ -28,6 +29,18 @@ class CreateLeaveApplication extends CreateRecord
                 'substitute_user_id' => $data['substitute_user_id'] ?? null,
             ]);
         } catch (ValidationException $e) {
+
+            Notification::make()
+                ->title('Leave application failed')
+                ->body(
+                    implode(
+                        "\n",
+                        $e->errors()['leave'] ?? ['Invalid leave request']
+                    )
+                )
+                ->danger()
+                ->send();
+
             throw $e;
         }
     }

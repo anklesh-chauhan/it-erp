@@ -20,20 +20,14 @@ class LeaveNotificationService
         array $ruleResult = []
     ): void {
 
-        $rules = LeaveRule::query()
-            ->where('is_active', true)
-            ->whereHas('category', fn ($q) =>
-                $q->where('key', 'notification')
-            )
-            ->get();
+        // ⛔ No notification rules matched
+        if (empty($ruleResult['notifications'])) {
+            return;
+        }
 
-        foreach ($rules as $rule) {
-            if (! $this->eventMatches($rule->condition_json, $event)) {
-                continue;
-            }
-
+        foreach ($ruleResult['notifications'] as $notification) {
             $this->executeNotification(
-                $rule->action_json,
+                $notification,
                 $event,
                 $leave,
                 $ruleResult
@@ -41,12 +35,12 @@ class LeaveNotificationService
         }
     }
 
-        protected function eventMatches(array $conditions, string $event): bool
+    protected function eventMatches(array $conditions, string $event): bool
     {
         return ($conditions['event'] ?? null) === $event;
     }
 
-        protected function executeNotification(
+    protected function executeNotification(
         array $action,
         string $event,
         LeaveApplication $leave,
@@ -64,7 +58,7 @@ class LeaveNotificationService
         }
     }
 
-        protected function sendEmail(array $action, LeaveApplication $leave): void
+    protected function sendEmail(array $action, LeaveApplication $leave): void
     {
         $recipients = match ($action['recipient'] ?? null) {
             'employee' => [$leave->employee],
@@ -124,7 +118,7 @@ class LeaveNotificationService
     }
 
 
-        protected function sendSms(array $action, LeaveApplication $leave): void
+    protected function sendSms(array $action, LeaveApplication $leave): void
     {
         // Plug any SMS gateway here
         Log::info('SMS sent', [

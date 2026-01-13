@@ -72,6 +72,10 @@ class LeaveApplicationOrchestrator
             // 6️⃣ Start workflow (this sends notifications internally)
             app(LeaveWorkflowService::class)->start($application);
 
+            // 7️⃣ Dispatch notifications USING evaluated rules
+            app(LeaveNotificationService::class)
+                ->dispatch('LEAVE_APPLIED', $application, $ruleResult);
+
             return $application;
         });
     }

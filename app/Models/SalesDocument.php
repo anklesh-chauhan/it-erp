@@ -116,6 +116,11 @@ class SalesDocument extends BaseModel
         return $this->morphMany(TaxDetail::class, 'taxable');
     }
 
+    public function getDocumentNumber(): ?string
+    {
+        return $this->document_number;
+    }
+
 
     public function calculateTotals()
     {

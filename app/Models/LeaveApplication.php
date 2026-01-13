@@ -4,11 +4,10 @@ namespace App\Models;
 
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Traits\LocksAfterApproval;
 
 class LeaveApplication extends BaseModel
 {
-    use HasFactory, LocksAfterApproval;
+    use HasFactory;
 
     protected $fillable = [
         'employee_id',
