@@ -8,6 +8,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Textarea;
 use App\Models\LeaveType;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Placeholder;
 
@@ -63,14 +64,18 @@ class LeaveApplicationForm
                 Placeholder::make('leave_balance')
                     ->label('Available Balance')
                     ->content(function ($get) {
-                        if (! $get('leave_type_id')) {
+
+                        $employeeId = $get('employee_id') ?? Auth::user()?->employee?->id;
+
+                        if (! $employeeId || ! $get('leave_type_id')) {
                             return '—';
                         }
 
                         return app(\App\Services\Attendance\LeaveBalanceCalculator::class)
                             ->calculate(
-                                employeeId: Auth::id(),
-                                leaveTypeId: $get('leave_type_id')
+                                employeeId: $employeeId,
+                                leaveTypeId: $get('leave_type_id'),
+                                asOnDate: now()
                             )['closing'] ?? '—';
                     }),
             ]);

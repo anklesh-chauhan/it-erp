@@ -5,8 +5,6 @@ namespace App\Filament\Resources\Approvals\Pages;
 use App\Filament\Resources\Approvals\ApprovalResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
 
 class ListApprovals extends ListRecords
 {
@@ -18,5 +16,4 @@ class ListApprovals extends ListRecords
             CreateAction::make(),
         ];
     }
-
 }

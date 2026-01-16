@@ -63,14 +63,19 @@ class LeaveApplicationOrchestrator
                 'is_half_day' => $data['is_half_day'] ?? false,
                 'half_day_type' => $data['half_day_type'] ?? null,
                 'reason' => $data['reason'] ?? null,
-                'approval_status' => 'applied',
+                'status' => 'applied',
+                'approval_status' => 'draft',
+
             ]);
 
             // 5️⃣ Generate leave instances
             $this->generateInstances($application, $ruleResult);
 
             // 6️⃣ Start workflow (this sends notifications internally)
-            app(LeaveWorkflowService::class)->start($application);
+            app(LeaveWorkflowService::class)->start(
+                $application,
+                $ruleResult
+            );
 
             // 7️⃣ Dispatch notifications USING evaluated rules
             app(LeaveNotificationService::class)
@@ -119,8 +124,10 @@ class LeaveApplicationOrchestrator
              */
             $application->update(['approval_status' => 'pending_cancel']);
 
-            app(LeaveWorkflowService::class)
-                ->start($application); // reuse approval rules
+            app(LeaveWorkflowService::class)->start(
+                $application,
+                $ruleResult
+            );
 
             app(LeaveNotificationService::class)
                 ->dispatch('LEAVE_CANCEL_REQUESTED', $application);

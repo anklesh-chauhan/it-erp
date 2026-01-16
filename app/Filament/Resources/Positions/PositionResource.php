@@ -71,6 +71,10 @@ class PositionResource extends BaseResource
             Section::make('Reporting & Organizational Structure')
                 ->columns(2)
                 ->schema([
+                    Select::make('job_role_id')
+                        ->relationship('jobRole', 'name')
+                        ->required(),
+
                     Select::make('reports_to_position_id')
                         ->label('Reports To Position')
                         ->relationship('reportsTo', 'name')

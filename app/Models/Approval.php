@@ -18,7 +18,14 @@ class Approval extends BaseModel
 
     protected $table = 'approvals';
 
-    protected $fillable = ['approvable_type','approvable_id','requested_by','approval_status','completed_at'];
+    protected $fillable = [
+        'approvable_type',
+        'approvable_id',
+        'approval_flow_id',
+        'requested_by',
+        'approval_status',
+        'completed_at'
+        ];
 
     public function approvable(): MorphTo
     {
@@ -30,19 +37,29 @@ class Approval extends BaseModel
         return $this->belongsTo(\App\Models\User::class, 'requested_by');
     }
 
+    public function requestedBy()
+    {
+        return $this->belongsTo(User::class, 'requested_by');
+    }
+
     public function steps(): HasMany
     {
-        return $this->hasMany(ApprovalStep::class);
+        return $this->hasMany(ApprovalStep::class)->orderBy('step_order');
+    }
+
+    public function flow()
+    {
+        return $this->belongsTo(ApprovalFlow::class);
     }
 
     public function currentStep()
     {
-        return $this->steps()->where('approval_status', 'draft')->orderBy('level')->first();
+        return $this->steps()->where('status', 'draft')->orderBy('level')->first();
     }
 
     public function isFullyApproved(): bool
     {
-        return $this->steps()->where('approval_status', '!=', 'approved')->count() === 0;
+        return $this->steps()->where('status', '!=', 'approved')->count() === 0;
     }
 
     public function scopeDraftForUser(Builder $query): Builder

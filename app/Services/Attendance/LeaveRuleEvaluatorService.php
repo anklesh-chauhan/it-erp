@@ -3,24 +3,25 @@
 namespace App\Services\Attendance;
 
 use App\Models\LeaveRule;
+use LogicException;
 
 class LeaveRuleEvaluatorService
 {
-    protected array $context;
-    protected array $result;
+    protected array $context = [];
+    protected array $result = [];
 
     public function evaluate(array $context): array
     {
         $this->context = $context;
 
         $this->result = [
-            'denied' => false,
-            'errors' => [],
-            'workflow' => [],
-            'computation' => [],
+            'denied'        => false,
+            'errors'        => [],
+            'workflow'      => [],
+            'computation'   => [],
             'notifications' => [],
-            'visibility' => [],
-            'payroll' => [],
+            'visibility'    => [],
+            'payroll'       => [],
         ];
 
         $rules = LeaveRule::query()
@@ -30,13 +31,21 @@ class LeaveRuleEvaluatorService
 
         foreach ($rules as $rule) {
 
-            if (! $this->conditionsMatch($rule->condition_json)) {
+            // 1️⃣ Rule key must match current event (if provided)
+            if (
+                isset($this->context['event'])
+                && $rule->rule_key !== $this->context['event']
+            ) {
+                continue;
+            }
+
+            // 2️⃣ Condition match
+            if (! $this->conditionsMatch($rule->condition_json ?? [])) {
                 continue;
             }
 
             /**
              * 🔒 ENTERPRISE VALIDATION HOOK
-             * Holiday / Weekoff / Duplicate leave check
              */
             if (
                 $rule->category->key === 'validation'
@@ -45,69 +54,24 @@ class LeaveRuleEvaluatorService
                 if ($error = $this->validateDateAvailability($context)) {
                     $this->result['denied'] = true;
                     $this->result['errors'][] = $error;
-
-                    // ⛔ Stop evaluating further rules
                     return $this->result;
                 }
             }
 
-            // Normal rule processing
+            // 3️⃣ Apply category action
             $this->applyAction(
-                $rule->category->key,
-                $rule->action_json
+                category: $rule->category->key,
+                ruleKey: $rule->rule_key,
+                actions: $rule->action_json ?? []
             );
         }
 
         return $this->result;
     }
 
-    protected function validateDateAvailability(array $context): ?string
-    {
-        $employeeId = $context['employee_id'];
-        $from = \Carbon\Carbon::parse($context['from_date']);
-        $to = \Carbon\Carbon::parse($context['to_date']);
-
-        foreach ($from->daysUntil($to) as $date) {
-
-            // 1️⃣ Holiday check
-            if (\App\Models\Holiday::whereDate('date', $date)->exists()) {
-                return "Leave not allowed on holiday: {$date->toDateString()}";
-            }
-
-            // 2️⃣ Weekly off check
-            if ($this->isWeeklyOff($employeeId, $date)) {
-                return "Leave not allowed on weekly off: {$date->toDateString()}";
-            }
-
-            // 3️⃣ Existing leave check
-            if ($this->leaveAlreadyExists($employeeId, $date)) {
-                return "Leave already applied for: {$date->toDateString()}";
-            }
-        }
-
-        return null;
-    }
-
-    protected function leaveAlreadyExists(int $employeeId, \Carbon\Carbon $date): bool
-    {
-        return \App\Models\LeaveInstance::where('employee_id', $employeeId)
-            ->whereDate('date', $date)
-            ->whereIn('approval_status', ['applied', 'approved'])
-            ->exists();
-    }
-
-    protected function isWeeklyOff(int $employeeId, \Carbon\Carbon $date): bool
-    {
-        $day = $date->dayOfWeek; // 0 (Sun) → 6 (Sat)
-
-        return \App\Models\WeekOff::where('is_active', true)
-            ->where('day_of_week', $day)
-            ->where(function ($q) use ($employeeId) {
-                $q->whereNull('employee_id')
-                ->orWhere('employee_id', $employeeId);
-            })
-            ->exists();
-    }
+    /* =====================================================
+     | Condition Evaluation
+     ===================================================== */
 
     protected function conditionsMatch(array $conditions): bool
     {
@@ -119,15 +83,15 @@ class LeaveRuleEvaluatorService
 
             $actual = $this->context[$key];
 
-            // Array condition (IN)
+            // IN condition
             if (is_array($expected)) {
-                if (! in_array($actual, $expected)) {
+                if (! in_array($actual, $expected, true)) {
                     return false;
                 }
                 continue;
             }
 
-            // Date-based checks
+            // Date semantic checks
             if ($expected === 'future' && now()->parse($actual)->isPast()) {
                 return false;
             }
@@ -144,24 +108,34 @@ class LeaveRuleEvaluatorService
         return true;
     }
 
-    protected function applyAction(string $category, array $actions): void
-    {
+    /* =====================================================
+     | Action Dispatch
+     ===================================================== */
+
+    protected function applyAction(
+        string $category,
+        string $ruleKey,
+        array $actions
+    ): void {
         match ($category) {
             'validation'   => $this->applyValidation($actions),
             'workflow'     => $this->applyWorkflow($actions),
             'computation'  => $this->applyComputation($actions),
-            'notification' => $this->applyNotification($actions),
+            'notification' => $this->applyNotification($ruleKey, $actions),
             'visibility'   => $this->applyVisibility($actions),
             'payroll'      => $this->applyPayroll($actions),
             default        => null,
         };
     }
 
+    /* =====================================================
+     | Category Handlers
+     ===================================================== */
+
     protected function applyValidation(array $actions): void
     {
         if (($actions['deny'] ?? false) === true) {
             $this->result['denied'] = true;
-
             $this->result['errors'][] =
                 $actions['message'] ?? 'Leave rule violation';
         }
@@ -181,11 +155,21 @@ class LeaveRuleEvaluatorService
         }
     }
 
-    protected function applyNotification(array $actions): void
-    {
-        foreach ($actions as $key => $value) {
-            $this->result['notifications'][$key] = $value;
-        }
+    /**
+     * ✅ FINAL, CORRECT NOTIFICATION HANDLER
+     */
+    protected function applyNotification(
+        string $ruleKey,
+        array $actions
+    ): void {
+
+        $this->result['notifications'][] = [
+            'event'              => $ruleKey,
+            'send_email'         => (bool) ($actions['send_email'] ?? false),
+            'send_sms'           => (bool) ($actions['send_sms'] ?? false),
+            'recipient'          => $actions['recipient'] ?? null,
+            'email_action_links' => (bool) ($actions['email_action_links'] ?? false),
+        ];
     }
 
     protected function applyVisibility(array $actions): void
@@ -202,5 +186,50 @@ class LeaveRuleEvaluatorService
         }
     }
 
+    /* =====================================================
+     | Validation Helpers (unchanged)
+     ===================================================== */
 
+    protected function validateDateAvailability(array $context): ?string
+    {
+        $employeeId = $context['employee_id'];
+        $from = \Carbon\Carbon::parse($context['from_date']);
+        $to = \Carbon\Carbon::parse($context['to_date']);
+
+        foreach ($from->daysUntil($to) as $date) {
+
+            if (\App\Models\Holiday::whereDate('date', $date)->exists()) {
+                return "Leave not allowed on holiday: {$date->toDateString()}";
+            }
+
+            if ($this->isWeeklyOff($employeeId, $date)) {
+                return "Leave not allowed on weekly off: {$date->toDateString()}";
+            }
+
+            if ($this->leaveAlreadyExists($employeeId, $date)) {
+                return "Leave already applied for: {$date->toDateString()}";
+            }
+        }
+
+        return null;
+    }
+
+    protected function leaveAlreadyExists(int $employeeId, \Carbon\Carbon $date): bool
+    {
+        return \App\Models\LeaveInstance::where('employee_id', $employeeId)
+            ->whereDate('date', $date)
+            ->whereIn('approval_status', ['applied', 'approved'])
+            ->exists();
+    }
+
+    protected function isWeeklyOff(int $employeeId, \Carbon\Carbon $date): bool
+    {
+        return \App\Models\WeekOff::where('is_active', true)
+            ->where('day_of_week', $date->dayOfWeek)
+            ->where(fn ($q) =>
+                $q->whereNull('employee_id')
+                  ->orWhere('employee_id', $employeeId)
+            )
+            ->exists();
+    }
 }

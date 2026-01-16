@@ -51,6 +51,7 @@ class LeaveBalanceCalculator
             ],
             [
                 'opening_balance' => 0,
+                'year_start_date' => now()->startOfYear(),
             ]
         );
 
@@ -75,6 +76,7 @@ class LeaveBalanceCalculator
             ->sum('days');
 
         $lapsed = LeaveLapseRecord::forEmployee($employeeId, $leaveTypeId)
+            ->after($balance->year_start_date)
             ->sum('days');
 
         $closing =

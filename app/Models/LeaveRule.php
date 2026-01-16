@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use LogicException;
 
 class LeaveRule extends BaseModel
 {
@@ -41,5 +42,26 @@ class LeaveRule extends BaseModel
     public function attendanceStatus()
     {
         return $this->belongsTo(EmployeeAttendanceStatus::class, 'employee_attendance_status_id');
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (LeaveRule $rule) {
+
+            // Only validate active rules
+            if (! $rule->is_active) {
+                return;
+            }
+
+            // Notification rules MUST define an event
+            if (
+                $rule->category?->key === 'notification'
+                && empty($rule->action_json['event'])
+            ) {
+                throw new LogicException(
+                    'Notification rule must define an event'
+                );
+            }
+        });
     }
 }

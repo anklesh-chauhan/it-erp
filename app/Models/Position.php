@@ -32,6 +32,7 @@ class Position extends BaseModel
     protected $fillable = [
         'name',
         'code',
+        'job_role_id',
         'division_ou_id',
         'organizational_unit_id',
         'department_id',
@@ -54,6 +55,11 @@ class Position extends BaseModel
     protected $casts = [
         'status' => PositionStatus::class, // Cast to the new PositionStatus enum
     ];
+
+    public function jobRole()
+    {
+        return $this->belongsTo(JobRole::class);
+    }
 
     /**
      * Get the territory associated with the position.

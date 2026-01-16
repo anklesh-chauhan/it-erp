@@ -9,34 +9,42 @@ use App\Services\Approval\ApprovalService;
 class LeaveWorkflowService
 {
     /**
-     * Start workflow for leave application
+     * Start approval workflow for leave application.
+     *
+     * @param array $ruleResult Result from LeaveRuleEvaluatorService
      */
-    public function start(LeaveApplication $leave): void
-    {
-        DB::transaction(function () use ($leave) {
+    public function start(
+        LeaveApplication $leave,
+        array $ruleResult
+    ): void {
+        DB::transaction(function () use ($leave, $ruleResult) {
 
-            // Mark leave as draft
+            // Domain state only (NOT approval logic)
             $leave->update([
                 'approval_status' => 'draft',
-                'applied_at' => now(),
+                'applied_at'      => now(),
             ]);
 
-            // Start approval workflow
-            app(ApprovalService::class)->startFromRules(
-                model: $leave,
+            // Start generic approval workflow
+            app(ApprovalService::class)->start(
+                approvable: $leave,
                 module: 'LeaveApplication',
                 territoryId: $leave->employee->territory_id ?? null,
                 amount: null
             );
 
-            // Notify managers (rule based)
+            // ✅ Notifications MUST be rule-driven
             app(LeaveNotificationService::class)
-                ->dispatch('LEAVE_APPLIED', $leave);
+                ->dispatch(
+                    event: 'LEAVE_APPLIED',
+                    leave: $leave,
+                    ruleResult: $ruleResult
+                );
         });
     }
 
     /**
-     * Approve via email (signed URL)
+     * Approve via email (signed URL).
      */
     public function approveFromEmail(int $approvalStepId): void
     {
@@ -44,25 +52,17 @@ class LeaveWorkflowService
 
             $step = \App\Models\ApprovalStep::findOrFail($approvalStepId);
             $approval = $step->approval;
-            $leave = $approval->approvable;
 
             app(ApprovalService::class)
-                ->approveStepByUser($approval, $step->approver_id);
+                ->approve($approval, $step->assigned_user_id);
 
-            $approval->refresh();
-
-            if ($approval->approval_status === 'approved') {
-                $leave->update(['approval_status' => 'approved']);
-                $leave->instances()->update(['approval_status' => 'approved']);
-
-                app(LeaveNotificationService::class)
-                    ->dispatch('LEAVE_APPROVED', $leave);
-            }
+            // ❌ No notifications here
+            // Approval handlers + orchestrators decide notifications
         });
     }
 
     /**
-     * Reject via email (signed URL)
+     * Reject via email (signed URL).
      */
     public function rejectFromEmail(int $approvalStepId): void
     {
@@ -70,16 +70,11 @@ class LeaveWorkflowService
 
             $step = \App\Models\ApprovalStep::findOrFail($approvalStepId);
             $approval = $step->approval;
-            $leave = $approval->approvable;
 
             app(ApprovalService::class)
-                ->rejectStepByUser($approval, $step->approver_id);
+                ->reject($approval, $step->assigned_user_id);
 
-            $leave->update(['approval_status' => 'rejected']);
-            $leave->instances()->update(['approval_status' => 'rejected']);
-
-            app(LeaveNotificationService::class)
-                ->dispatch('LEAVE_REJECTED', $leave);
+            // ❌ No notifications here
         });
     }
 }

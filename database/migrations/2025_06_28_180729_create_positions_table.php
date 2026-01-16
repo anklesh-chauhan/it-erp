@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('name')->index();
             $table->string('code')->unique();
 
+            $table->foreignId('job_role_id')
+                ->constrained('job_roles');
+
             $table->foreignId('division_ou_id')
                 ->nullable()
                 ->constrained('organizational_units')

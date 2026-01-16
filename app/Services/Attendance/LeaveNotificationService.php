@@ -20,12 +20,16 @@ class LeaveNotificationService
         array $ruleResult = []
     ): void {
 
-        // ⛔ No notification rules matched
-        if (empty($ruleResult['notifications'])) {
-            return;
-        }
+        $notifications = $ruleResult['notifications'] ?? [];
 
-        foreach ($ruleResult['notifications'] as $notification) {
+        foreach ($notifications as $notification) {
+
+            if (! is_array($notification)) {
+                throw new \LogicException(
+                    'Invalid notification rule: expected array, got ' . gettype($notification)
+                );
+            }
+
             $this->executeNotification(
                 $notification,
                 $event,

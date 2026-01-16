@@ -14,7 +14,15 @@ class ApprovalStep extends BaseModel
 
     protected $table = 'approval_steps';
 
-    protected $fillable = ['approval_id','approver_id','level','approval_status','comments','approved_at'];
+    protected $fillable = [
+        'approval_id',
+        'step_order',
+        'job_role_id',
+        'assigned_user_id',
+        'status',
+        'comments',
+        'approved_at',
+        ];
 
     public function approval(): BelongsTo
     {
@@ -26,4 +34,10 @@ class ApprovalStep extends BaseModel
     {
         return $this->belongsTo(\App\Models\User::class, 'approver_id');
     }
+
+    public function jobRole()
+    {
+        return $this->belongsTo(JobRole::class);
+    }
+
 }

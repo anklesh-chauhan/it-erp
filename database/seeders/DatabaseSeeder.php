@@ -75,16 +75,23 @@ class DatabaseSeeder extends Seeder
             AddressTypeSeeder::class,
             EmployeeAttendanceStatusSeeder::class,
             TerritorySeeder::class,
-            AccountMasterSeeder::class,
+            // AccountMasterSeeder::class,
             LocationMasterSeeder::class,
             ItemCategorySeeder::class,
             ItemMasterSeeder::class,
             SalesUsersSeeder::class,
             DepartmentRoleSeeder::class,
+
             LeaveRuleCategorySeeder::class,
             LeaveRuleSeeder::class,
             LeaveDemoDataSeeder::class,
+
             HolidaySeeder::class,
+
+            PositionSeeder::class,
+            PositionOrganizationalUnitPivotSeeder::class,
+            PositionTerritoryPivotSeeder::class,
+            EmployeePositionPivotSeeder::class,
         ]);
     }
 }

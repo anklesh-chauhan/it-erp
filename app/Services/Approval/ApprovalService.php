@@ -3,64 +3,103 @@
 namespace App\Services\Approval;
 
 use App\Models\Approval;
-use App\Models\ApprovalRule;
+use App\Models\ApprovalFlow;
+use App\Models\ApprovalFlowStep;
 use App\Models\ApprovalStep;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Exception;
+use Illuminate\Support\Facades\DB;
+use LogicException;
 
 class ApprovalService
 {
+    // IMPORTANT:
+    // Approval steps are skipped if approver role level
+    // is less than or equal to applicant role level.
+    // This enforces seniority-based approvals (SAP/Salesforce pattern).
+
     /**
-     * Start approval for an approvable model using rules.
+     * Start approval for any approvable model.
      *
-     * @param Model $model The model instance (e.g. Quote)
-     * @param string $module module name matching approval_rules.module (e.g. 'quotation')
-     * @param int|null $territoryId optional territory id
-     * @param float|null $amount optional amount to match thresholds
-     * @return Approval
-     * @throws Exception
+     * @throws LogicException
      */
-    public function startFromRules(Model $model, string $module, ?int $territoryId = null, ?float $amount = null): Approval
-    {
-        $amount = $amount ?? ($model->total ?? 0);
+    public function start(
+        Model $approvable,
+        string $module,
+        ?int $territoryId = null,
+        ?float $amount = null
+    ): Approval {
+        $amount ??= $this->resolveAmount($approvable);
 
-        $rules = ApprovalRule::query()
-            ->where('module', $module)
-            ->where('active', true)
-            ->where(function ($q) use ($territoryId) {
-                $q->whereNull('territory_id')
-                ->orWhere('territory_id', $territoryId);
-            })
-            ->where(function ($q) use ($amount) {
-                $q->whereNull('min_amount')
-                ->orWhere('min_amount', '<=', $amount);
-            })
-            ->where(function ($q) use ($amount) {
-                $q->whereNull('max_amount')
-                ->orWhere('max_amount', '>=', $amount);
-            })
-            ->orderBy('level')
-            ->get();
+        $flow = $this->resolveApprovalFlow($module, $territoryId, $amount);
 
-        if ($rules->isEmpty()) {
-            throw new Exception("No approval rules found for module {$module} territory {$territoryId} amount {$amount}");
-        }
+        return DB::transaction(function () use ($approvable, $flow, $territoryId) {
 
-        return DB::transaction(function () use ($model, $rules) {
+            /** -------------------------------------------------
+             * Resolve applicant job role level
+             * ------------------------------------------------- */
+            $applicantUser = Auth::user();
 
-            $approval = $model->approval()->create([
-                'requested_by' => Auth::id(),
-                'approval_status' => 'draft',
+            $applicantRoleLevel = $applicantUser?->employee?->positions()
+                ->with('jobRole')
+                ->get()
+                ->pluck('jobRole.level')
+                ->min(); // lowest = most junior position
+
+            // If applicant has no role, assume top-level
+            $applicantRoleLevel ??= PHP_INT_MAX;
+
+            /** -------------------------------------------------
+             * Create approval record
+             * ------------------------------------------------- */
+            $approval = $approvable->approval()->create([
+                'approval_flow_id' => $flow->id,
+                'requested_by'     => Auth::id(),
+                'approval_status'  => 'pending',
             ]);
 
-            foreach ($rules as $rule) {
+            /** -------------------------------------------------
+            * Build approval steps
+            * ------------------------------------------------- */
+            foreach ($flow->steps as $flowStep) {
+
+                $stepRole = $flowStep->jobRole;
+
+                // 🔑 Skip same or junior roles
+                if ($stepRole->level <= $applicantRoleLevel) {
+                    continue;
+                }
+
+                $user = $this->resolveApprover(
+                    $flowStep->job_role_id,
+                    $territoryId
+                );
+
+                // If no approver found and can_skip = true → skip
+                if (! $user && $flowStep->can_skip) {
+                    continue;
+                }
+
                 ApprovalStep::create([
-                    'approval_id' => $approval->id,
-                    'approver_id' => $rule->approver_id,
-                    'level' => $rule->level,
+                    'approval_id'      => $approval->id,
+                    'step_order'       => $flowStep->step_order,
+                    'job_role_id'      => $flowStep->job_role_id,
+                    'assigned_user_id' => $user?->id,
+                    'status'           => 'pending',
                 ]);
+            }
+
+            /** -------------------------------------------------
+             * Auto-approve if no steps remain
+             * ------------------------------------------------- */
+            if ($approval->steps()->count() === 0) {
+                $approval->update([
+                    'approval_status' => 'approved',
+                    'completed_at'    => now(),
+                ]);
+
+                app(ApprovalDomainDispatcher::class)
+                    ->dispatch($approval);
             }
 
             return $approval;
@@ -68,65 +107,162 @@ class ApprovalService
     }
 
     /**
-     * Approve a step for the given approval and user.
+     * Approve a pending step by the logged-in user.
      */
-    public function approveStepByUser(
+    public function approve(
         Approval $approval,
         int $userId,
         ?string $comments = null
     ): bool {
-        $step = $approval->steps()
-            ->where('approver_id', $userId)
-            ->whereIn('approval_status', ['draft', 'pending'])
-            ->orderBy('level')
-            ->first();
+        return DB::transaction(function () use ($approval, $userId, $comments) {
 
-        if (! $step) {
-            return false;
-        }
+            $step = $approval->steps()
+                ->where('assigned_user_id', $userId)
+                ->where('status', 'pending')
+                ->orderBy('step_order')
+                ->first();
 
-        $step->update([
-            'approval_status' => 'approved',
-            'comments' => $comments,
-            'approved_at' => now(),
-        ]);
+            if (! $step) {
+                return false;
+            }
 
-        // ✅ Refresh relationship state
-        $approval->refresh();
-
-        if ($approval->isFullyApproved()) {
-            $approval->update([
-                'approval_status' => 'approved',
-                'completed_at' => now(),
+            $step->update([
+                'status'      => 'approved',
+                'comments'    => $comments,
+                'actioned_at' => now(),
             ]);
-        }
 
-        return true;
+            if ($approval->isFullyApproved()) {
+                $approval->update([
+                    'approval_status' => 'approved',
+                    'completed_at'    => now(),
+                ]);
+
+                app(ApprovalDomainDispatcher::class)
+                    ->dispatch($approval);
+            }
+
+            return true;
+        });
     }
 
+    /**
+     * Reject a pending approval step.
+     */
+    public function reject(
+        Approval $approval,
+        int $userId,
+        ?string $comments = null
+    ): bool {
+        return DB::transaction(function () use ($approval, $userId, $comments) {
+
+            $step = $approval->steps()
+                ->where('assigned_user_id', $userId)
+                ->where('status', 'pending')
+                ->first();
+
+            if (! $step) {
+                return false;
+            }
+
+            $step->update([
+                'status'      => 'rejected',
+                'comments'    => $comments,
+                'actioned_at' => now(),
+            ]);
+
+            $approval->update([
+                'approval_status' => 'rejected',
+                'completed_at'    => now(),
+            ]);
+
+            app(ApprovalDomainDispatcher::class)
+                ->dispatch($approval);
+
+            return true;
+        });
+    }
 
     /**
-     * Reject a step by user: mark step rejected & approval rejected.
+     * Cancel approval (optional use case).
      */
-    public function rejectStepByUser(Approval $approval, int $userId, ?string $comments = null): bool
+    public function cancel(Approval $approval): void
     {
-        $step = $approval->steps()
-            ->where('approver_id', $userId)
-            ->where('approval_status', 'draft')
-            ->orderBy('level')
+        DB::transaction(function () use ($approval) {
+            $approval->steps()->update([
+                'status' => 'skipped',
+            ]);
+
+            $approval->update([
+                'approval_status' => 'draft',
+                'completed_at'    => null,
+            ]);
+        });
+    }
+
+    /* =====================================================
+     | Internal Helpers
+     ===================================================== */
+
+    protected function resolveApprovalFlow(
+        string $module,
+        ?int $territoryId,
+        float $amount
+    ): ApprovalFlow {
+        $flow = ApprovalFlow ::query()
+            ->where('module', $module)
+            ->where('active', true)
+            ->where(fn ($q) =>
+                $q->whereNull('territory_id')
+                  ->orWhere('territory_id', $territoryId)
+            )
+            ->where(fn ($q) =>
+                $q->whereNull('min_amount')
+                  ->orWhere('min_amount', '<=', $amount)
+            )
+            ->where(fn ($q) =>
+                $q->whereNull('max_amount')
+                  ->orWhere('max_amount', '>=', $amount)
+            )
+            ->with('steps')
+            ->orderByDesc('territory_id') // territory-specific wins
             ->first();
 
-        if (! $step) {
-            return false;
+        if (! $flow) {
+            throw new LogicException(
+                "No approval flow found for module [{$module}]"
+            );
         }
 
-        $step->update([
-            'approval_status' => 'rejected',
-            'comments' => $comments,
-            'approved_at' => now(),
-        ]);
+        return $flow;
+    }
 
-        $approval->update(['approval_status' => 'rejected']);
-        return true;
+    protected function resolveApprover(
+        int $jobRoleId,
+        ?int $territoryId
+        ): ?\App\Models\User {
+            $query = \App\Models\User::query()
+                ->whereHas('employee.positions', fn ($q) =>
+                    $q->where('job_role_id', $jobRoleId)
+                );
+
+            // Apply territory filter ONLY if territory exists
+            if ($territoryId !== null) {
+                $query->whereHas('employee.positions.territories', fn ($t) =>
+                    $t->where('territories.id', $territoryId)
+                );
+            }
+
+            return $query->first();
+    }
+
+    protected function resolveAmount(Model $approvable): float
+    {
+        return match (true) {
+            isset($approvable->total)        => (float) $approvable->total,
+            isset($approvable->amount)       => (float) $approvable->amount,
+            isset($approvable->expected_value) => (float) $approvable->expected_value,
+            default                          => 0.0,
+        };
     }
 }

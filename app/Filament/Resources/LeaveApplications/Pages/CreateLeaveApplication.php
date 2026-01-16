@@ -17,7 +17,7 @@ class CreateLeaveApplication extends CreateRecord
     {
         try {
             return app(LeaveApplicationOrchestrator::class)->apply([
-                'employee_id' => Auth::id(),
+                'employee_id' => Auth::user()?->employee?->id,
                 'leave_type_code' => \App\Models\LeaveType::find($data['leave_type_id'])->code,
                 'from_date' => $data['from_date'],
                 'to_date' => $data['to_date'],

@@ -3,31 +3,62 @@
 namespace App\Services\Approval;
 
 use App\Models\Approval;
-use App\Domains\Leave\Handlers\LeaveApprovalHandler;
-use App\Domains\SalesDocument\Handlers\QuoteApprovalHandler;
+use Illuminate\Database\Eloquent\Model;
+use LogicException;
+use App\Domains\Approval\Contracts\ApprovalHandler;
 
 class ApprovalDomainDispatcher
 {
-    protected array $handlers = [
-        \App\Models\LeaveApplication::class => LeaveApprovalHandler::class,
-        \App\Models\Quote::class            => QuoteApprovalHandler::class,
-        // \App\Models\Invoice::class          => InvoiceApprovalHandler::class,
-    ];
+    protected array $handlerMap = [];
 
-    public function dispatch(Approval $approval, string $approval_status): void
+    public function __construct()
+    {
+        $this->discoverHandlers();
+    }
+
+    protected function discoverHandlers(): void
+    {
+        foreach ($this->resolveAllHandlers() as $handlerClass) {
+            if (! is_subclass_of($handlerClass, ApprovalHandler::class)) {
+                continue;
+            }
+
+            $supportedModel = $handlerClass::supports();
+
+            $this->handlerMap[$supportedModel] = $handlerClass;
+        }
+    }
+
+    protected function resolveAllHandlers(): array
+    {
+        return [
+            \App\Domains\Leave\Handlers\LeaveApprovalHandler::class,
+            \App\Domains\SalesDocument\Handlers\QuoteApprovalHandler::class,
+            // later: scan filesystem or config
+        ];
+    }
+
+    /**
+     * Dispatch approval outcome to domain handler.
+     *
+     * @throws LogicException
+     */
+    public function dispatch(Approval $approval): void
     {
         $approvable = $approval->approvable;
 
-        if (! $approvable) {
+        if (! $approvable instanceof Model) {
             return;
         }
 
-        $handlerClass = $this->handlers[get_class($approvable)] ?? null;
+        $handlerClass = $this->handlerMap[$approvable::class] ?? null;
 
         if (! $handlerClass) {
-            return; // silently ignore
+            throw new LogicException(
+                "No ApprovalHandler found for". $approvable::class
+            );
         }
 
-        app($handlerClass)->handle($approvable, $approval_status);
+        app($handlerClass)->handle($approvable, $approval);
     }
 }

@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Approvals\Pages;
 
-use App\Filament\Actions\ApprovalAction;
-
 use App\Filament\Resources\Approvals\ApprovalResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -16,7 +14,6 @@ class ViewApproval extends ViewRecord
     {
         return [
             EditAction::make(),
-                ApprovalAction::make(),
         ];
     }
 }

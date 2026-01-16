@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('approval_steps', function (Blueprint $table) {
+        Schema::create('approvals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('approval_id')->constrained('approvals')->onDelete('cascade');
-            $table->foreignId('approver_id')->constrained('users');
-            $table->unsignedInteger('level');
+            $table->morphs('approvable');
+            $table->foreignId('approval_flow_id')->constrained();
+            $table->foreignId('requested_by')->constrained('users');
             $table->string('approval_status')->default('draft');
-            $table->text('comments')->nullable();
-            $table->timestamp('approved_at')->nullable();
+            $table->timestamp('completed_at')->nullable();
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();
+
+            $table->index('approval_status');
+
         });
     }
 
@@ -30,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('approval_steps');
+        Schema::dropIfExists('approvals');
     }
 };

@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Approvals;
 
-use App\Traits\HasSafeGlobalSearch;
-
 use App\Filament\Resources\Approvals\Pages\CreateApproval;
 use App\Filament\Resources\Approvals\Pages\EditApproval;
 use App\Filament\Resources\Approvals\Pages\ListApprovals;
@@ -14,28 +12,19 @@ use App\Filament\Resources\Approvals\Tables\ApprovalsTable;
 use App\Models\Approval;
 use BackedEnum;
 use Filament\Resources\Resource;
-use App\Filament\Resources\BaseResource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ApprovalResource extends BaseResource
+class ApprovalResource extends Resource
 {
-    use HasSafeGlobalSearch;
-
     protected static ?string $model = Approval::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'ApprovalResource';
-
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::draftForUser()->count();
-    }
-
+    protected static ?string $recordTitleAttribute = 'Approval';
 
     public static function form(Schema $schema): Schema
     {
@@ -59,26 +48,21 @@ class ApprovalResource extends BaseResource
         ];
     }
 
-    public static function canCreate(): bool
-    {
-        return false; // disables create page & button
-    }
-
     public static function getPages(): array
     {
         return [
             'index' => ListApprovals::route('/'),
-            // 'create' => CreateApproval::route('/create'),
+            'create' => CreateApproval::route('/create'),
             'view' => ViewApproval::route('/{record}'),
             'edit' => EditApproval::route('/{record}/edit'),
         ];
     }
 
-    public static function getEloquentQuery(): Builder
+    public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->whereHas('steps', function ($q) {
-                $q->where('approver_id', Auth::id());
-            });
+        return parent::getRecordRouteBindingEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }
