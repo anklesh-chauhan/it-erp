@@ -35,10 +35,14 @@ return [
         ],
 
         'sales_user' => [
-            'LeadResource'           => 'C',
-            'QuoteResource'          => 'C',
-            'SalesOrderResource'     => 'C',
-            'SalesInvoiceResource'   => 'R',
+            'PatchResource'             => 'C',
+            'AccountMasterResource'     => 'C',
+            'SalesTourPlanResource'     => 'C',
+            'LeaveApplicationResource'  => 'C',
+            'LeadResource'              => 'C',
+            'QuoteResource'             => 'C',
+            'SalesOrderResource'        => 'C',
+            'SalesInvoiceResource'      => 'R',
         ],
 
         /* ================= HR ================= */

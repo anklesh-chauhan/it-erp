@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 use App\Services\Attendance\{
+    LeaveDateValidator,
     LeaveRuleEvaluatorService,
     LeaveBalanceCalculator,
     LeaveWorkflowService,
@@ -67,6 +68,13 @@ class LeaveApplicationOrchestrator
                 'approval_status' => 'draft',
 
             ]);
+
+            // Validate dates (duplicate / holiday / weekoff)
+            app(LeaveDateValidator::class)->validate(
+                employeeId: $application->employee_id,
+                from: Carbon::parse($application->from_date),
+                to: Carbon::parse($application->to_date)
+            );
 
             // 5️⃣ Generate leave instances
             $this->generateInstances($application, $ruleResult);

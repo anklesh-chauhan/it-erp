@@ -43,18 +43,18 @@ class LeaveDemoDataSeeder extends Seeder
                     'leave_type_id' => $leaveType->id,
                 ]);
 
-                // 🔹 Create Leave Application (PARENT)
-                $application = LeaveApplication::factory()->create([
-                    'employee_id' => $employee->id,
-                    'leave_type_id' => $leaveType->id,
-                ]);
+                // // 🔹 Create Leave Application (PARENT)
+                // $application = LeaveApplication::factory()->create([
+                //     'employee_id' => $employee->id,
+                //     'leave_type_id' => $leaveType->id,
+                // ]);
 
-                // 🔹 Create Leave Instances (CHILD)
-                LeaveInstance::factory()->count(3)->create([
-                    'leave_application_id' => $application->id,
-                    'employee_id' => $employee->id,
-                    'leave_type_id' => $leaveType->id,
-                ]);
+                // // 🔹 Create Leave Instances (CHILD)
+                // LeaveInstance::factory()->count(3)->create([
+                //     'leave_application_id' => $application->id,
+                //     'employee_id' => $employee->id,
+                //     'leave_type_id' => $leaveType->id,
+                // ]);
 
                 // 🔹 Adjustments
                 LeaveAdjustment::factory()->create([

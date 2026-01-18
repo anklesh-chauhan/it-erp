@@ -11,12 +11,12 @@ use App\Models\CityPinCode;
 
 class AccountMasterSeeder extends Seeder
 {
-    protected int $batchSize = 500;
+    protected int $batchSize = 5;
 
     public function run(): void
     {
-        $this->seedAccounts(5);              // mixed
-        $this->seedAccounts(5, 'customer');  // customers
+        $this->seedAccounts(2);              // mixed
+        $this->seedAccounts(10, 'customer');  // customers
     }
 
     protected function seedAccounts(int $total, ?string $state = null): void
@@ -25,7 +25,15 @@ class AccountMasterSeeder extends Seeder
 
         for ($i = 1; $i <= $batches; $i++) {
 
-            $factory = AccountMaster::factory()->count($this->batchSize);
+            // ✅ IMPORTANT FIX
+            $remaining = $total - (($i - 1) * $this->batchSize);
+            $count = min($this->batchSize, $remaining);
+
+            if ($count <= 0) {
+                break;
+            }
+
+            $factory = AccountMaster::factory()->count($count);
 
             if ($state) {
                 $factory = $factory->{$state}();

@@ -6,23 +6,33 @@ use Illuminate\Database\Eloquent\Model;
 
 trait HasApprovalLockUI
 {
+    protected static function approvalLockApplies(Model $record): bool
+    {
+        return
+            method_exists($record, 'approvalApplies')
+            && $record->approvalApplies()
+            && $record->getApprovalStatus() === 'approved';
+    }
+
     protected static function canEditApproved(Model $record): bool
     {
-        if ($record->approval_status !== 'approved') {
+        if (! static::approvalLockApplies($record)) {
             return true;
         }
 
-        return auth()->user()
-            ?->can('OverrideApproval:' . class_basename($record)) ?? false;
+        return auth()->user()?->can(
+            'OverrideApproval:' . static::permissionKey()
+        ) ?? false;
     }
 
     protected static function canDeleteApproved(Model $record): bool
     {
-        if ($record->approval_status !== 'approved') {
+        if (! static::approvalLockApplies($record)) {
             return true;
         }
 
-        return auth()->user()
-            ?->can('OverrideApproval:' . class_basename($record)) ?? false;
+        return auth()->user()?->can(
+            'OverrideApproval:' . static::permissionKey()
+        ) ?? false;
     }
 }

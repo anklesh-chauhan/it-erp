@@ -20,7 +20,6 @@ class TerritorySeeder extends Seeder
         $cities = [
             'Ahmedabad',
             'Mumbai',
-            'Delhi',
             'Bangalore',
         ];
 

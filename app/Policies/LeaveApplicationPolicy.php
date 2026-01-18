@@ -11,7 +11,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class LeaveApplicationPolicy
 {
     use HandlesAuthorization;
-    
+
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:LeaveApplication');
@@ -29,12 +29,14 @@ class LeaveApplicationPolicy
 
     public function update(AuthUser $authUser, LeaveApplication $leaveApplication): bool
     {
-        return $authUser->can('Update:LeaveApplication');
+        // return $authUser->can('Update:LeaveApplication');
+        return $leaveApplication->approval_status !== 'approved';
     }
 
     public function delete(AuthUser $authUser, LeaveApplication $leaveApplication): bool
     {
-        return $authUser->can('Delete:LeaveApplication');
+        // return $authUser->can('Delete:LeaveApplication');
+        return $leaveApplication->approval_status !== 'approved';
     }
 
     public function restore(AuthUser $authUser, LeaveApplication $leaveApplication): bool

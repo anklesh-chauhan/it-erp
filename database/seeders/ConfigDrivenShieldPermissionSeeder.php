@@ -71,12 +71,18 @@ class ConfigDrivenShieldPermissionSeeder extends Seeder
             'R' => [
                 "ViewAny:{$model}",
                 "View:{$model}",
+                "ViewOwnTerritory:{$model}",
+                "viewOwnOU:{$model}",
+                "viewOwn:{$model}",
             ],
             'C' => [
                 "ViewAny:{$model}",
                 "View:{$model}",
                 "Create:{$model}",
                 "Update:{$model}",
+                "ViewOwnTerritory:{$model}",
+                "viewOwnOU:{$model}",
+                "viewOwn:{$model}",
             ],
             'F' => [
                 "ViewAny:{$model}",
@@ -90,6 +96,9 @@ class ConfigDrivenShieldPermissionSeeder extends Seeder
                 "ForceDeleteAny:{$model}",
                 "Replicate:{$model}",
                 "Reorder:{$model}",
+                "ViewOwnTerritory:{$model}",
+                "viewOwnOU:{$model}",
+                "viewOwn:{$model}",
             ],
             default => [],
         };

@@ -2,134 +2,167 @@
 
 namespace App\Traits;
 
-use App\Models\ApprovalRule;
+use App\Models\Approval;
+use App\Models\ApprovalFlow;
 use App\Services\Approval\ApprovalService;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use LogicException;
 
 trait HasApprovalWorkflow
 {
+    /* =====================================================
+     | Relations
+     ===================================================== */
+
     /**
-     * Polymorphic relation
+     * Polymorphic approval relation
      */
     public function approval(): MorphOne
     {
-        return $this->morphOne(\App\Models\Approval::class, 'approvable');
+        return $this->morphOne(Approval::class, 'approvable');
     }
 
     /**
-     * Auto-detect module name (model name)
+     * Auto-detect module name (Model short name)
      */
-    protected function detectModuleName(): string
+    public static function approvalModule(): string
     {
         return class_basename(static::class);
     }
 
+    /* =====================================================
+     | Approval Flow Detection
+     ===================================================== */
+
     /**
-     * Start approval workflow
+     * Does ANY approval flow exist for this module?
+     * (cached, used for UI gating)
      */
-    public function startApprovalFromRules(
-        ?string $module = null,
-        ?int $territoryId = null,
-        ?float $amount = null
-    ) {
-        $module = $module ?? $this->detectModuleName();
-
-        if (! $this->canStartApproval($module)) {
-            throw new \Exception("Approval already in progress or no applicable rules.");
-        }
-
-        $territoryId = $territoryId ?? ($this->territory_id ?? null);
-        $amount      = $amount ?? ($this->total ?? ($this->amount ?? 0));
-
-        /** @var ApprovalService $service */
-        $service = app(ApprovalService::class);
-
-        return $service->startFromRules($this, $module, $territoryId, $amount);
+    public static function moduleHasApprovalFlow(): bool
+    {
+        return cache()->remember(
+            'approval:module:' . static::approvalModule(),
+            now()->addMinutes(10),
+            fn () => ApprovalFlow::query()
+                ->where('module', static::approvalModule())
+                ->where('active', true)
+                ->exists()
+        );
     }
 
     /**
-     * Check if any rules exist for this module
+     * Does THIS record qualify for any approval flow?
+     * (territory + amount aware)
      */
-    public static function moduleHasAnyRules(?string $module = null): bool
+    public function hasApplicableApprovalFlow(): bool
     {
-        $model = new static();
-        $module = $module ?? $model->detectModuleName();
-
-        return ApprovalRule::where('module', $module)->exists();
-    }
-
-    /**
-     * Check rule for specific record (territory + amount)
-     */
-    public function hasApplicableApprovalRule(?string $module = null): bool
-    {
-        $module = $module ?? $this->detectModuleName();
-
-        $territory = $this->territory_id ?? null;
-        $amount    = $this->total ?? ($this->amount ?? 0);
-
-        return ApprovalRule::query()
-            ->where('module', $module)
+        return ApprovalFlow::query()
+            ->where('module', static::approvalModule())
             ->where('active', true)
-            ->where(function ($q) use ($territory) {
+            ->where(fn ($q) =>
                 $q->whereNull('territory_id')
-                  ->orWhere('territory_id', $territory);
-            })
-            ->where(function ($q) use ($amount) {
+                  ->orWhere('territory_id', $this->resolveApprovalTerritoryId())
+            )
+            ->where(fn ($q) =>
                 $q->whereNull('min_amount')
-                  ->orWhere('min_amount', '<=', $amount);
-            })
-            ->where(function ($q) use ($amount) {
+                  ->orWhere('min_amount', '<=', $this->resolveApprovalAmount())
+            )
+            ->where(fn ($q) =>
                 $q->whereNull('max_amount')
-                  ->orWhere('max_amount', '>=', $amount);
-            })
+                  ->orWhere('max_amount', '>=', $this->resolveApprovalAmount())
+            )
             ->exists();
     }
 
     /**
-     * Main check for Filament actions
+     * FINAL check:
+     * Should approval workflow apply to this record?
      */
-    public function canSendForApproval(?string $module = null): bool
+    public function approvalApplies(): bool
     {
-        $module = $module ?? $this->detectModuleName();
+        return
+            static::moduleHasApprovalFlow()
+            && $this->hasApplicableApprovalFlow();
+    }
 
-        // No rules exist for this module?
-        if (! static::moduleHasAnyRules($module)) {
-            return false;
-        }
+    /* =====================================================
+     | Approval Lifecycle
+     ===================================================== */
 
-        // Record does not match territory / amount?
-        if (! $this->hasApplicableApprovalRule($module)) {
-            return false;
+    /**
+     * Start approval workflow
+     */
+    public function startApproval(
+        ?int $territoryId = null,
+        ?float $amount = null
+    ): Approval {
+        if (! $this->approvalApplies()) {
+            throw new LogicException(
+                'No applicable approval flow for this record.'
+            );
         }
 
         if ($this->approval) {
-
-            $notAllowedStatuses = ['draft', 'approved', 'in_review'];
-
-            if (in_array($this->approval->approval_status, $notAllowedStatuses)) {
-                return false;
-            }
+            throw new LogicException(
+                'Approval already started for this record.'
+            );
         }
 
-        return true;
+        return app(ApprovalService::class)->start(
+            approvable: $this,
+            module: static::approvalModule(),
+            territoryId: $territoryId ?? $this->resolveApprovalTerritoryId(),
+            amount: $amount ?? $this->resolveApprovalAmount()
+        );
     }
 
-    /**
-     * Wrapper
-     */
-    public function canStartApproval(?string $module = null): bool
-    {
-        return $this->canSendForApproval($module);
-    }
+    /* =====================================================
+     | Helpers (Used by Filament / Policies)
+     ===================================================== */
 
     public function getApprovalStatus(): ?string
     {
         return $this->approval?->approval_status;
     }
 
-    public function isApprovalComplete(): bool
+    public function isApprovalCompleted(): bool
     {
-        return $this->approval !== null && $this->approval->approval_status !== 'draft';
+        return
+            $this->approval !== null
+            && in_array($this->approval->approval_status, ['approved', 'rejected'], true);
+    }
+
+    public function isApprovalPending(): bool
+    {
+        return
+            $this->approval !== null
+            && $this->approval->approval_status === 'pending';
+    }
+
+    /* =====================================================
+     | Internal Resolution Hooks (EXTENSIBLE)
+     ===================================================== */
+
+    /**
+     * Resolve territory for approval matching
+     * Override this in model if needed
+     */
+    protected function resolveApprovalTerritoryId(): ?int
+    {
+        return $this->territory_id ?? null;
+    }
+
+    /**
+     * Resolve amount/value for approval matching
+     * Override this in model if needed
+     */
+    protected function resolveApprovalAmount(): float
+    {
+        return (float) (
+            $this->total
+            ?? $this->amount
+            ?? $this->expected_value
+            ?? 0
+        );
     }
 }
