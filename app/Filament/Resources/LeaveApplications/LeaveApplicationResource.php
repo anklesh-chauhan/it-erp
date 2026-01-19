@@ -12,6 +12,7 @@ use App\Models\LeaveApplication;
 use BackedEnum;
 use Faker\Provider\Base;
 use App\Filament\Resources\BaseResource;
+use App\Filament\Resources\LeaveApplications\RelationManagers\InstancesRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -43,7 +44,7 @@ class LeaveApplicationResource extends BaseResource
     public static function getRelations(): array
     {
         return [
-            //
+            InstancesRelationManager::class,
         ];
     }
 
