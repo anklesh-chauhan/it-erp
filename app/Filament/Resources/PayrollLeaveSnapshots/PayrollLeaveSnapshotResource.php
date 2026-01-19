@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PayrollLeaveSnapshots;
 
+use App\Filament\Clusters\HR\LeaveManagementCluster;
 use App\Filament\Resources\PayrollLeaveSnapshots\Pages\CreatePayrollLeaveSnapshot;
 use App\Filament\Resources\PayrollLeaveSnapshots\Pages\EditPayrollLeaveSnapshot;
 use App\Filament\Resources\PayrollLeaveSnapshots\Pages\ListPayrollLeaveSnapshots;
@@ -23,6 +24,12 @@ class PayrollLeaveSnapshotResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'PayrollLeaveSnapshot';
+
+    protected static ?string $cluster = LeaveManagementCluster::class;
+
+    protected static ?int $navigationSort = 20;
+
+    protected static ?string $navigationLabel = 'Payroll Leave Snapshots';
 
     public static function form(Schema $schema): Schema
     {

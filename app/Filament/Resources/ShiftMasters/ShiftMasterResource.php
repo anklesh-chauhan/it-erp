@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ShiftMasters;
 
+use App\Filament\Clusters\HR\ShiftAndCalanderCluster;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Resources\ShiftMasters\Pages\CreateShiftMaster;
@@ -26,7 +27,11 @@ class ShiftMasterResource extends BaseResource
 
     protected static ?string $recordTitleAttribute = 'ShiftMaster';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+    protected static ?string $cluster = ShiftAndCalanderCluster::class;
+
+    protected static ?string $navigationLabel = 'Shift Master';
+
+    protected static ?int $navigationSort = 30;
 
     public static function form(Schema $schema): Schema
     {

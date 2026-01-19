@@ -33,6 +33,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Clusters\HR\EmployeeManagementCluster;
 
 class EmpGradeResource extends BaseResource
 {
@@ -41,11 +42,11 @@ class EmpGradeResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar'; // Icon for grades
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+    protected static ?string $cluster = EmployeeManagementCluster::class;
 
     protected static ?string $navigationLabel = 'Grades';
 
-    protected static ?int $navigationSort = 4; // Adjust sort order as needed
+    protected static ?int $navigationSort = 30;
 
     public static function form(Schema $schema): Schema
     {

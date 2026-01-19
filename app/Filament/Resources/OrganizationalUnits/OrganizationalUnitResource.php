@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
+use App\Filament\Clusters\HR\OrganizationStructureCluster;
 
 class OrganizationalUnitResource extends BaseResource
 {
@@ -50,7 +51,9 @@ class OrganizationalUnitResource extends BaseResource
 
     protected static ?string $navigationLabel = 'Org Units';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+    protected static ?string $cluster = OrganizationStructureCluster::class;
+
+    protected static ?int $navigationSort = 30;
 
     protected static ?string $recordTitleAttribute = 'name';
 

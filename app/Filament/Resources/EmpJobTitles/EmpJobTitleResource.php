@@ -33,6 +33,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Clusters\HR\EmployeeManagementCluster;
 
 class EmpJobTitleResource extends BaseResource
 {
@@ -41,11 +42,11 @@ class EmpJobTitleResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag'; // Changed icon to something more suitable for job titles
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR'; // Keep in the same group as Employee
+    protected static ?string $cluster = EmployeeManagementCluster::class;
 
     protected static ?string $navigationLabel = 'Job Titles';
 
-    protected static ?int $navigationSort = 3; // Adjust sort order as needed, e.g., after Departments
+    protected static ?int $navigationSort = 30; // Adjust sort order as needed, e.g., after Departments
 
     public static function form(Schema $schema): Schema
     {

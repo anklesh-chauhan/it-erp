@@ -15,6 +15,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Clusters\HR\EmployeeManagementCluster;
 
 class JobRoleResource extends Resource
 {
@@ -23,6 +24,12 @@ class JobRoleResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'JobRole';
+
+    protected static ?string $cluster = EmployeeManagementCluster::class;
+
+    protected static ?string $navigationLabel = 'Job Roles';
+
+    protected static ?int $navigationSort = 20;
 
     public static function form(Schema $schema): Schema
     {

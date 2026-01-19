@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmployeeAttendances;
 
+use App\Filament\Clusters\HR\AttendanceCluster;
 use App\Filament\Resources\EmployeeAttendances\Pages\CreateEmployeeAttendance;
 use App\Filament\Resources\EmployeeAttendances\Pages\EditEmployeeAttendance;
 use App\Filament\Resources\EmployeeAttendances\Pages\ListEmployeeAttendances;
@@ -13,6 +14,7 @@ use App\Models\EmployeeAttendance;
 use BackedEnum;
 use Filament\Resources\Resource;
 use App\Filament\Resources\BaseResource;
+use App\Services\Attendance\AttendanceCalculationService;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -29,7 +31,9 @@ class EmployeeAttendanceResource extends BaseResource
 
     protected static ?string $recordTitleAttribute = 'EmployeeAttendance';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+    protected static ?string $cluster = AttendanceCluster::class;
+
+    protected static ?int $navigationSort = 30;
 
     protected static ?string $navigationLabel = 'Attendances';
 

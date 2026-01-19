@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LeaveAdjustments;
 
+use App\Filament\Clusters\HR\LeaveManagementCluster;
 use App\Filament\Resources\LeaveAdjustments\Pages\CreateLeaveAdjustment;
 use App\Filament\Resources\LeaveAdjustments\Pages\EditLeaveAdjustment;
 use App\Filament\Resources\LeaveAdjustments\Pages\ListLeaveAdjustments;
@@ -15,6 +16,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Clusters\LeaveSettings\LeaveSettingsCluster;
 
 class LeaveAdjustmentResource extends Resource
 {
@@ -23,6 +25,12 @@ class LeaveAdjustmentResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'LeaveAdjustment';
+
+    protected static ?string $cluster = LeaveManagementCluster::class;
+
+    protected static ?int $navigationSort = 20;
+
+    protected static ?string $navigationLabel = 'Adjustment';
 
     public static function form(Schema $schema): Schema
     {

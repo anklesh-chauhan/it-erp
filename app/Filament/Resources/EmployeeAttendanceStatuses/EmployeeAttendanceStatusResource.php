@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmployeeAttendanceStatuses;
 
+use App\Filament\Clusters\HR\AttendanceCluster;
 use App\Filament\Resources\EmployeeAttendanceStatuses\Pages\CreateEmployeeAttendanceStatus;
 use App\Filament\Resources\EmployeeAttendanceStatuses\Pages\EditEmployeeAttendanceStatus;
 use App\Filament\Resources\EmployeeAttendanceStatuses\Pages\ListEmployeeAttendanceStatuses;
@@ -24,11 +25,11 @@ class EmployeeAttendanceStatusResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'EmployeeAttendanceStatus';
+    protected static ?string $cluster = AttendanceCluster::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+    protected static ?string $navigationLabel = 'Attendance Status';
 
-    protected static ?string $navigationLabel = 'Attendance Statuses';
+    protected static ?int $navigationSort = 20;
 
     public static function form(Schema $schema): Schema
     {

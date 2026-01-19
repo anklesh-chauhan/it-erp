@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LeaveBalances;
 
+use App\Filament\Clusters\HR\LeaveManagementCluster;
 use App\Filament\Resources\LeaveBalances\Pages\CreateLeaveBalance;
 use App\Filament\Resources\LeaveBalances\Pages\EditLeaveBalance;
 use App\Filament\Resources\LeaveBalances\Pages\ListLeaveBalances;
@@ -22,7 +23,13 @@ class LeaveBalanceResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?string $cluster = LeaveManagementCluster::class;
+
+    protected static ?int $navigationSort = 20;
+
     protected static ?string $recordTitleAttribute = 'LeaveBalance';
+
+    protected static ?string $navigationLabel = 'Balances';
 
     public static function form(Schema $schema): Schema
     {

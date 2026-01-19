@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LeaveLapseRecords;
 
+use App\Filament\Clusters\HR\LeaveManagementCluster;
 use App\Filament\Resources\LeaveLapseRecords\Pages\CreateLeaveLapseRecord;
 use App\Filament\Resources\LeaveLapseRecords\Pages\EditLeaveLapseRecord;
 use App\Filament\Resources\LeaveLapseRecords\Pages\ListLeaveLapseRecords;
@@ -23,6 +24,12 @@ class LeaveLapseRecordResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'LeaveLapseRecord';
+
+    protected static ?string $cluster = LeaveManagementCluster::class;
+
+    protected static ?int $navigationSort = 20;
+
+    protected static ?string $navigationLabel = 'Laps Records';
 
     public static function form(Schema $schema): Schema
     {

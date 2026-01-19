@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LeaveInstances;
 
+use App\Filament\Clusters\HR\LeaveManagementCluster;
 use App\Filament\Resources\LeaveInstances\Pages\CreateLeaveInstance;
 use App\Filament\Resources\LeaveInstances\Pages\EditLeaveInstance;
 use App\Filament\Resources\LeaveInstances\Pages\ListLeaveInstances;
@@ -25,6 +26,12 @@ class LeaveInstanceResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'LeaveInstance';
+
+    protected static ?string $cluster = LeaveManagementCluster::class;
+
+    protected static ?int $navigationSort = 20;
+
+    protected static ?string $navigationLabel = 'Instances';
 
     public static function form(Schema $schema): Schema
     {

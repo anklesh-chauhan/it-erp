@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\DailyAttendances;
 
+use App\Filament\Clusters\HR\AttendanceCluster;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Resources\DailyAttendances\Pages\CreateDailyAttendance;
@@ -29,7 +30,9 @@ class DailyAttendanceResource extends BaseResource
 
     protected static ?string $recordTitleAttribute = 'DailyAttendance';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+    protected static ?string $cluster = AttendanceCluster::class;
+
+    protected static ?int $navigationSort = 20;
 
     public static function getEloquentQuery(): Builder
     {

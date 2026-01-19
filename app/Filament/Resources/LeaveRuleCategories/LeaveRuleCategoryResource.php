@@ -15,6 +15,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Clusters\HR\LeaveManagementCluster;
 
 class LeaveRuleCategoryResource extends Resource
 {
@@ -23,6 +24,12 @@ class LeaveRuleCategoryResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'LeaveRuleCategory';
+
+    protected static ?string $cluster = LeaveManagementCluster::class;
+
+    protected static ?int $navigationSort = 10;
+
+    protected static ?string $navigationLabel = 'Cetegories';
 
     public static function form(Schema $schema): Schema
     {

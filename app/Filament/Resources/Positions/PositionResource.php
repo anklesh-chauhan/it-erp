@@ -33,6 +33,8 @@ use App\Filament\Resources\BaseResource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Clusters\HR\EmployeeManagementCluster;
+use App\Filament\Clusters\HR\OrganizationStructureCluster;
 
 class PositionResource extends BaseResource
 {
@@ -40,7 +42,12 @@ class PositionResource extends BaseResource
     protected static ?string $model = Position::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-briefcase';
-    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+
+    protected static ?string $cluster = OrganizationStructureCluster::class;
+
+    protected static ?string $navigationLabel = 'Positions';
+
+    protected static ?int $navigationSort = 20;
 
     public static function form(Schema $schema): Schema
     {

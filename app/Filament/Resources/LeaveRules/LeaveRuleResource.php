@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LeaveRules;
 
+use App\Filament\Clusters\HR\LeaveManagementCluster;
 use App\Filament\Resources\LeaveRules\Pages\CreateLeaveRule;
 use App\Filament\Resources\LeaveRules\Pages\EditLeaveRule;
 use App\Filament\Resources\LeaveRules\Pages\ListLeaveRules;
@@ -25,6 +26,12 @@ class LeaveRuleResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'LeaveRule';
+
+    protected static ?string $cluster = LeaveManagementCluster::class;
+
+    protected static ?int $navigationSort = 10;
+
+    protected static ?string $navigationLabel = 'Rules';
 
     public static function form(Schema $schema): Schema
     {

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LeaveEncashments;
 
+use App\Filament\Clusters\HR\LeaveManagementCluster;
 use App\Filament\Resources\LeaveEncashments\Pages\CreateLeaveEncashment;
 use App\Filament\Resources\LeaveEncashments\Pages\EditLeaveEncashment;
 use App\Filament\Resources\LeaveEncashments\Pages\ListLeaveEncashments;
@@ -23,6 +24,12 @@ class LeaveEncashmentResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'LeaveEncashment';
+
+    protected static ?string $cluster = LeaveManagementCluster::class;
+
+    protected static ?int $navigationSort = 20;
+
+    protected static ?string $navigationLabel = 'Encashment';
 
     public static function form(Schema $schema): Schema
     {

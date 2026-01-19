@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LeaveTypes;
 
+use App\Filament\Clusters\HR\LeaveManagementCluster;
 use App\Filament\Resources\LeaveTypes\Pages\CreateLeaveType;
 use App\Filament\Resources\LeaveTypes\Pages\EditLeaveType;
 use App\Filament\Resources\LeaveTypes\Pages\ListLeaveTypes;
@@ -23,6 +24,12 @@ class LeaveTypeResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'LeaveType';
+
+    protected static ?string $cluster = LeaveManagementCluster::class;
+
+    protected static ?int $navigationSort = 20;
+
+    protected static ?string $navigationLabel = 'Types';
 
     public static function form(Schema $schema): Schema
     {

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Holidays;
 
+use App\Filament\Clusters\HR\ShiftAndCalanderCluster;
 use App\Filament\Resources\Holidays\Pages\CreateHoliday;
 use App\Filament\Resources\Holidays\Pages\EditHoliday;
 use App\Filament\Resources\Holidays\Pages\ListHolidays;
@@ -17,6 +18,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Clusters\HRSettings\HRSettingsCluster;
 
 class HolidayResource extends Resource
 {
@@ -25,6 +27,12 @@ class HolidayResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'Holiday';
+
+    protected static ?string $cluster = ShiftAndCalanderCluster::class;
+
+    protected static ?string $navigationLabel = 'Holiday List';
+
+    protected static ?int $navigationSort = 30;
 
     public static function form(Schema $schema): Schema
     {

@@ -46,6 +46,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use App\Filament\Clusters\HR\EmployeeManagementCluster;
 
 class EmpDepartmentResource extends BaseResource
 {
@@ -54,11 +55,11 @@ class EmpDepartmentResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'HR';
+    protected static ?string $cluster = EmployeeManagementCluster::class;
 
     protected static ?string $navigationLabel = 'Departments';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 20;
 
     public static function form(Schema $schema): Schema
     {
