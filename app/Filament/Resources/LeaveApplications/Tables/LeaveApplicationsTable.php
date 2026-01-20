@@ -10,6 +10,8 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Support\Facades\Auth;
+use Filament\Facades\Filament;
 
 class LeaveApplicationsTable
 {
@@ -17,6 +19,9 @@ class LeaveApplicationsTable
     {
         return $table
             ->columns([
+                TextColumn::make('employee.employee.fullName')
+                    ->label('Employee'),
+
                 TextColumn::make('leaveType.name')->label('Leave'),
 
                 TextColumn::make('from_date')->date(),

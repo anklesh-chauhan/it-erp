@@ -25,11 +25,7 @@ class PayrollLeaveSnapshotResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'PayrollLeaveSnapshot';
 
-    protected static ?string $cluster = LeaveManagementCluster::class;
-
-    protected static ?int $navigationSort = 20;
-
-    protected static ?string $navigationLabel = 'Payroll Leave Snapshots';
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {

@@ -25,6 +25,8 @@ class LeaveLapseRecordResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'LeaveLapseRecord';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $cluster = LeaveManagementCluster::class;
 
     protected static ?int $navigationSort = 20;
