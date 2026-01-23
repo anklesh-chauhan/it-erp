@@ -63,6 +63,7 @@ class DatabaseSeeder extends Seeder
             EmpDepartmentSeeder::class,
             EmpGradeSeeder::class,
             EmpJobTitleSeeder::class,
+            RegionSeeder::class,
             AccountTypeSeeder::class,
             ChartOfAccountSeeder::class,
             OrganizationSeeder::class,

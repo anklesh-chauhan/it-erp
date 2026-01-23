@@ -23,6 +23,7 @@ use App\Models\VisitPurpose;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use App\Filament\Resources\BaseResource;
+use Dom\Text;
 use Filament\Forms\Components\Select;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -35,7 +36,7 @@ class VisitPurposeResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $cluster = SalesMarketingConfigurationCluster::class;
-    protected static ?int $navigationSort = 1001;
+    protected static ?int $navigationSort = 10;
     protected static ?string $navigationLabel = 'Visit Puroposes';
 
     public static function form(Schema $schema): Schema
@@ -65,6 +66,8 @@ class VisitPurposeResource extends BaseResource
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->searchable(),
+                TextColumn::make('visitType.name')
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()

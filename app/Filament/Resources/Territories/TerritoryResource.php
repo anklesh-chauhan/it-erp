@@ -48,7 +48,7 @@ class TerritoryResource extends BaseResource
     {
         return $schema->components([
             Section::make('Territory Details')
-                ->columns(3)
+                ->columns(4)
                 ->schema([
                     TextInput::make('name')
                         ->required()
@@ -79,6 +79,13 @@ class TerritoryResource extends BaseResource
                         ->searchable()
                         ->nullable()
                         ->label('Type Master'),
+
+                    Select::make('region_id')
+                        ->relationship('region', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->nullable()
+                        ->label('Region'),
 
                     Select::make('divisions')
                         ->label('Divisions Linkages')

@@ -27,7 +27,7 @@ class TermsAndConditionsMasterResource extends BaseResource
 
     protected static ?string $cluster = OperationalConfigCluster::class;
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 40;
 
     protected static ?string $navigationLabel = 'Terms & Cond.';
 

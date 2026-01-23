@@ -21,6 +21,7 @@ class Territory extends BaseModel
         'division_ou_id',
         'description',
         'type_master_id',
+        'region_id',
         'status',
         'approval_status',
     ];
@@ -46,6 +47,14 @@ class Territory extends BaseModel
             OrganizationalUnit::class,
             'division_ou_id'
         );
+    }
+
+    /**
+     * Get the region associated with the Territory.
+     */
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'region_id');
     }
 
 

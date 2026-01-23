@@ -100,7 +100,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->sidebarCollapsibleOnDesktop()
-            ->sidebarWidth('14rem')
+            ->sidebarWidth('15rem')
             ->authGuard('web');
     }
 

@@ -36,7 +36,7 @@ class RegionResource extends BaseResource
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $cluster = CustomerConfigurationCluster::class;
     protected static ?int $navigationSort = 1001;
-    protected static ?string $navigationLabel = 'Customer Region';
+    protected static ?string $navigationLabel = 'Regions';
 
     public static function form(Schema $schema): Schema
     {

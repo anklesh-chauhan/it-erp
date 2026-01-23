@@ -9,15 +9,15 @@ use Filament\Pages\Enums\SubNavigationPosition;
 
 class CustomerConfigurationCluster extends Cluster
 {
-    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+    // protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
 
-    protected static ?string $clusterBreadcrumb = 'Cust. Config';
+    protected static ?string $clusterBreadcrumb = 'Customer Config';
 
     protected static string |\UnitEnum| null $navigationGroup = 'Global Configuration';
 
-    protected static ?string $navigationLabel = 'Cust. Config';
+    protected static ?string $navigationLabel = 'Customer Config';
 
     protected static ?int $navigationSort = 10;
 }

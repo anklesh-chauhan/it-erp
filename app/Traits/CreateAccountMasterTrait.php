@@ -149,10 +149,7 @@ trait CreateAccountMasterTrait
                             ->relationship('industryType', 'name')
                             ->searchable()
                             ->preload(),
-                        Select::make('region_id')
-                            ->relationship('region', 'name')
-                            ->searchable()
-                            ->preload(),
+
                         Select::make('ref_dealer_contact')
                             ->label('Ref Contact')
                             ->relationship('dealerName', 'id') // Use 'id' here for relationship
