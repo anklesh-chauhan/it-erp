@@ -26,6 +26,8 @@ class ApprovalResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'Approval';
 
+    protected static ?string $navigationParentItem = 'My Approvals';
+
     public static function form(Schema $schema): Schema
     {
         return ApprovalForm::configure($schema);

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ApprovalFlows;
 
+use App\Filament\Clusters\GlobalConfiguration\OperationalConfigCluster;
 use App\Filament\Resources\ApprovalFlows\Pages\CreateApprovalFlow;
 use App\Filament\Resources\ApprovalFlows\Pages\EditApprovalFlow;
 use App\Filament\Resources\ApprovalFlows\Pages\ListApprovalFlows;
@@ -22,7 +23,11 @@ class ApprovalFlowResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?string $cluster = OperationalConfigCluster::class;
+
     protected static ?string $recordTitleAttribute = 'ApprovalFlow';
+
+    protected static ?int $navigationSort = 10;
 
     public static function form(Schema $schema): Schema
     {
