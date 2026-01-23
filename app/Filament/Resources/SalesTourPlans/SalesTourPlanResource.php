@@ -24,7 +24,7 @@ class SalesTourPlanResource extends BaseResource
     protected static ?string $model = SalesTourPlan::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-calendar-date-range';
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing & Field Sales';
     // Added a label for better readability in the navigation
     protected static ?string $navigationLabel = 'Sales Tour Plan';
 

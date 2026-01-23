@@ -57,7 +57,7 @@ class DealResource extends BaseResource
      */
     protected static ?string $statusModel = DealStage::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing & Field Sales';
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 20;
 
@@ -219,7 +219,7 @@ class DealResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

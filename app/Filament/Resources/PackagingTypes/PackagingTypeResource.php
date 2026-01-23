@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\ItemConfigurationCluster;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -36,8 +36,7 @@ class PackagingTypeResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
-    protected static ?string $navigationParentItem = 'Items';
+    protected static ?string $cluster = ItemConfigurationCluster::class;
     protected static ?int $navigationSort = 1003;
 
     public static function form(Schema $schema): Schema
@@ -76,7 +75,7 @@ class PackagingTypeResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

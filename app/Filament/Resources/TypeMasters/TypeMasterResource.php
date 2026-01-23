@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\OperationalConfigCluster;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
@@ -38,7 +38,7 @@ class TypeMasterResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
+    protected static ?string $cluster = OperationalConfigCluster::class;
     protected static ?int $navigationSort = 200;
 
     public static function form(Schema $schema): Schema

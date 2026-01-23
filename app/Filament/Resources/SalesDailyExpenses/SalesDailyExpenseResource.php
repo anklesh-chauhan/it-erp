@@ -36,7 +36,7 @@ class SalesDailyExpenseResource extends BaseResource
     protected static ?string $model = SalesDailyExpense::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing & Field Sales';
     protected static ?int $navigationSort = 40;
     protected static ?string $navigationLabel = 'Daily Expense';
 
@@ -135,7 +135,7 @@ class SalesDailyExpenseResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

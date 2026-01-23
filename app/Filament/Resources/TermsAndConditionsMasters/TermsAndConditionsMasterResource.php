@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TermsAndConditionsMasters;
 
+use App\Filament\Clusters\GlobalConfiguration\OperationalConfigCluster;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Resources\TermsAndConditionsMasters\Pages\CreateTermsAndConditionsMaster;
@@ -24,7 +25,11 @@ class TermsAndConditionsMasterResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
+    protected static ?string $cluster = OperationalConfigCluster::class;
+
+    protected static ?int $navigationSort = 20;
+
+    protected static ?string $navigationLabel = 'Terms & Cond.';
 
     public static function form(Schema $schema): Schema
     {

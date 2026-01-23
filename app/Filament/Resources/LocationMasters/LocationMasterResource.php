@@ -48,7 +48,7 @@ class LocationMasterResource extends BaseResource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
+    protected static string | \UnitEnum | null $navigationGroup = 'Contacts & Companies';
     protected static ?int $navigationSort = 200;
 
     public static function form(Schema $schema): Schema

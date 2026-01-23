@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\OperationalConfigCluster;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -35,7 +35,9 @@ class ImageResource extends BaseResource
     protected static ?string $model = Image::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
+
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?int $navigationSort = 1000;
     protected static ?string $navigationLabel = 'Images';
 
@@ -93,7 +95,7 @@ class ImageResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

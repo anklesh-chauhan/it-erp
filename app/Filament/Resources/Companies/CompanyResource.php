@@ -38,7 +38,7 @@ class CompanyResource extends BaseResource
     use HasSafeGlobalSearch;
     protected static ?string $model = Company::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \UnitEnum | null $navigationGroup = 'Contacts & Companies';
     protected static ?string $navigationParentItem = 'Contacts';
     protected static ?string $navigationLabel = 'Companies';
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -182,7 +182,7 @@ class CompanyResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\OperationalConfigCluster;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Grid;
@@ -40,8 +40,8 @@ class NumberSeriesResource extends BaseResource
     protected static ?string $model = NumberSeries::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
-    protected static ?int $navigationSort = 1000;
+    protected static ?string $cluster = OperationalConfigCluster::class;
+    protected static ?int $navigationSort = 1;
     protected static ?string $navigationLabel = 'Number Series';
 
     public static function form(Schema $schema): Schema
@@ -114,7 +114,7 @@ class NumberSeriesResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

@@ -77,7 +77,7 @@ class LeadResource extends BaseResource
     protected static ?string $model = Lead::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document';
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing & Field Sales';
     protected static ?int $navigationSort = 10;
 
     /**

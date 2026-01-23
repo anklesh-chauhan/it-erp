@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\AddressConfigurationCluster;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -34,8 +34,7 @@ class CityResource extends BaseResource
     use HasSafeGlobalSearch;
     protected static ?string $model = City::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
-    protected static ?string $navigationParentItem = 'Address Config';
+    protected static ?string $cluster = AddressConfigurationCluster::class;
     protected static ?string $navigationLabel = 'City Master';
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
     protected static ?int $navigationSort = 2;
@@ -72,7 +71,7 @@ class CityResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

@@ -26,7 +26,7 @@ class SgipLimitResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'SgipLimit';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing & Field Sales';
 
     public static function form(Schema $schema): Schema
     {

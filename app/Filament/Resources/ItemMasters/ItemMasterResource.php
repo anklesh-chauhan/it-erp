@@ -54,7 +54,7 @@ class ItemMasterResource extends BaseResource
     protected static ?string $model = ItemMaster::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
+    protected static string | \UnitEnum | null $navigationGroup = 'Items & Inventory';
     protected static ?int $navigationSort = 198;
     protected static ?string $navigationLabel = 'Item Master';
 
@@ -74,8 +74,8 @@ class ItemMasterResource extends BaseResource
             ])
             ->filters([
                 // Use the new filter here
-                self::getItemTypeFilter(), 
-                
+                self::getItemTypeFilter(),
+
                 // Your existing filter
                 Filter::make('expiry_date')->label('Expired Items')
                     ->query(fn ($query) => $query->whereDate('expiry_date', '<', now())),
@@ -86,7 +86,7 @@ class ItemMasterResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

@@ -42,7 +42,7 @@ class LedgerResource extends BaseResource
     protected static ?string $model = Ledger::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Accounting';
+    protected static string | \UnitEnum | null $navigationGroup = 'Accounting & Finance';
     protected static ?string $navigationLabel = 'Ledgers';
     protected static ?string $modelLabel = 'Ledger Entry';
     protected static ?string $pluralModelLabel = 'Ledger Entries';
@@ -210,7 +210,7 @@ class LedgerResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

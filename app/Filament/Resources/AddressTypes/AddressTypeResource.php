@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\AddressConfigurationCluster;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
@@ -33,10 +33,9 @@ class AddressTypeResource extends BaseResource
     use HasSafeGlobalSearch;
     protected static ?string $model = AddressType::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
+    protected static ?string $cluster = AddressConfigurationCluster::class;
     protected static ?string $navigationParentItem = 'Address Config';
     protected static ?int $navigationSort = 2;
-    protected static ?string $navigationLabel = 'Address Types';
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
 
     public static function form(Schema $schema): Schema
@@ -73,7 +72,7 @@ class AddressTypeResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

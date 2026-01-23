@@ -35,7 +35,7 @@ class SalesDcrResource extends BaseResource
     protected static ?string $model = SalesDcr::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing & Field Sales';
     protected static ?int $navigationSort = 30;
     protected static ?string $navigationLabel = 'Daily Call Report';
 
@@ -109,7 +109,7 @@ class SalesDcrResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

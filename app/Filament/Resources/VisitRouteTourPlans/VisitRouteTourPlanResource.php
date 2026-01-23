@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\SalesMarketingConfigurationCluster;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
@@ -34,8 +34,7 @@ class VisitRouteTourPlanResource extends BaseResource
     protected static ?string $model = VisitRouteTourPlan::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
-    protected static ?string $navigationParentItem = 'Sales & Marketing';
+    protected static ?string $cluster = SalesMarketingConfigurationCluster::class;
     protected static ?int $navigationSort = 1001;
     protected static ?string $navigationLabel = 'Visit Route & Tour Plan Mapping';
 
@@ -86,7 +85,7 @@ class VisitRouteTourPlanResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

@@ -46,7 +46,7 @@ class ChartOfAccountResource extends BaseResource
     protected static ?string $model = ChartOfAccount::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Accounting';
+    protected static string | \UnitEnum | null $navigationGroup = 'Accounting & Finance';
     protected static ?string $navigationLabel = 'Chart of Accounts';
     protected static ?string $modelLabel = 'Account';
     protected static ?string $pluralModelLabel = 'Chart of Accounts';
@@ -256,7 +256,7 @@ class ChartOfAccountResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

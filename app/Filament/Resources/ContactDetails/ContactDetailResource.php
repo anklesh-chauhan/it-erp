@@ -41,7 +41,7 @@ class ContactDetailResource extends BaseResource
 
     protected static ?string $model = ContactDetail::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \UnitEnum | null $navigationGroup = 'Contacts & Companies';
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user';
     protected static ?string $navigationLabel = 'Contacts';
     protected static ?int $navigationSort = 50;

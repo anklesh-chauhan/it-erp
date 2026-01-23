@@ -23,7 +23,7 @@ class PaymentTermResource extends BaseResource
     protected static ?string $model = PaymentTerm::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
+    protected static string | \UnitEnum | null $navigationGroup = 'Accounting & Finance';
 
     public static function form(Schema $schema): Schema
     {

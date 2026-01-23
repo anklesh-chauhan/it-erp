@@ -41,7 +41,7 @@ class TerritoryResource extends BaseResource
     use HasSafeGlobalSearch;
     protected static ?string $model = Territory::class;
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map';
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing & Field Sales';
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema

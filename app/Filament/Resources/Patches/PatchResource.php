@@ -49,7 +49,7 @@ class PatchResource extends BaseResource
     protected static ?string $model = Patch::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-wrench-screwdriver';
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string | \UnitEnum | null $navigationGroup = 'Marketing & Field Sales';
     // Added a label for better readability in the navigation
     protected static ?string $navigationLabel = 'Patches';
 

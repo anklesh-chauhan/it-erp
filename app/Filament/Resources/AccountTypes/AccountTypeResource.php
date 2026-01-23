@@ -43,7 +43,7 @@ class AccountTypeResource extends BaseResource
     protected static ?string $model = AccountType::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-banknotes';
-    protected static string | \UnitEnum | null $navigationGroup = 'Accounting';
+    protected static string | \UnitEnum | null $navigationGroup = 'Accounting & Finance';
     protected static ?string $navigationLabel = 'Account Types';
     protected static ?string $modelLabel = 'Account Type';
     protected static ?string $pluralModelLabel = 'Account Types';
@@ -134,7 +134,7 @@ class AccountTypeResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

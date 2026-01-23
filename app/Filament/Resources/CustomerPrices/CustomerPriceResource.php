@@ -24,9 +24,9 @@ class CustomerPriceResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
+    protected static string | \UnitEnum | null $navigationGroup = 'Sales';
     protected static ?int $navigationSort = 190;
-    protected static ?string $navigationLabel = 'Customer Prices';
+    protected static ?string $navigationLabel = 'Price & Discounts';
 
     protected static ?string $recordTitleAttribute = 'CustomerPrice';
 

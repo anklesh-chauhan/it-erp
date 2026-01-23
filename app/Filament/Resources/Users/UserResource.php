@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Users;
 use App\Filament\Actions\BulkApprovalAction;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\UserAndAccessCluster;
 use App\Traits\HasSafeGlobalSearch;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
@@ -36,7 +36,7 @@ class UserResource extends Resource
 
     protected static ?string $model = User::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
+    protected static ?string $cluster = UserAndAccessCluster::class;
     protected static ?string $navigationLabel = 'User Management';
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
 

@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\FollowpConfigurationCluster;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
@@ -34,10 +34,9 @@ class FollowUpResultResource extends BaseResource
     protected static ?string $model = FollowUpResult::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
-    protected static ?string $navigationParentItem = 'Follow Up Config';
+    protected static ?string $cluster = FollowpConfigurationCluster::class;
     protected static ?string $navigationLabel = 'Results';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 22;
 
     public static function form(Schema $schema): Schema
     {
@@ -73,7 +72,7 @@ class FollowUpResultResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

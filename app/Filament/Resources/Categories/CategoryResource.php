@@ -42,7 +42,7 @@ class CategoryResource extends BaseResource
     protected static ?string $model = Category::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-folder';
-    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
+    protected static string | \UnitEnum | null $navigationGroup = 'Items & Inventory';
     protected static ?int $navigationSort = 201;
     protected static ?string $navigationLabel = 'Category';
 
@@ -123,7 +123,7 @@ class CategoryResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

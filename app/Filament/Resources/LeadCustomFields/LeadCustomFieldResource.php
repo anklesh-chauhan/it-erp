@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\LeadConfigurationCluster;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
@@ -34,11 +34,10 @@ class LeadCustomFieldResource extends BaseResource
     use HasSafeGlobalSearch;
     protected static ?string $model = LeadCustomField::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
+    protected static ?string $cluster = LeadConfigurationCluster::class;
     protected static ?string $navigationLabel = 'Lead Custom Fields';
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
     protected static ?int $navigationSort = 4;
-    protected static ?string $navigationParentItem = 'Lead Config';
 
     public static function form(Schema $schema): Schema
     {
@@ -91,7 +90,7 @@ class LeadCustomFieldResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

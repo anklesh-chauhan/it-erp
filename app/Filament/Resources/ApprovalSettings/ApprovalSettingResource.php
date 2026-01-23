@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\ApprovalSettings;
 
+use App\Filament\Clusters\GlobalConfiguration\OperationalConfigCluster;
 use App\Traits\HasSafeGlobalSearch;
-
 use App\Filament\Resources\ApprovalSettings\Pages\CreateApprovalSetting;
 use App\Filament\Resources\ApprovalSettings\Pages\EditApprovalSetting;
 use App\Filament\Resources\ApprovalSettings\Pages\ListApprovalSettings;
@@ -24,9 +24,11 @@ class ApprovalSettingResource extends BaseResource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
+    protected static ?string $cluster = OperationalConfigCluster::class;
 
     protected static ?string $recordTitleAttribute = 'ApprovalSettingResource';
+
+    protected static ?int $navigationSort = 20;
 
     public static function form(Schema $schema): Schema
     {

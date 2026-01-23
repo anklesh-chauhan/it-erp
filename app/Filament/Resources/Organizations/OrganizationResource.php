@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\OrganizationAndCompanyCluster;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -52,10 +52,13 @@ class OrganizationResource extends BaseResource
     use HasSafeGlobalSearch;
     protected static ?string $model = Organization::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
-    protected static ?string $navigationLabel = 'Organization Profile';
-    protected static ?int $navigationSort = 1000;
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office-2'; // More relevant icon
+
+    protected static ?string $cluster = OrganizationAndCompanyCluster::class;
+
+    protected static ?string $navigationLabel = 'Organization Profile';
+
+    protected static ?int $navigationSort = 1000;
 
     public static function form(Schema $schema): Schema
     {
@@ -327,7 +330,7 @@ class OrganizationResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),
@@ -342,7 +345,7 @@ DeleteBulkAction::make(),
     {
         return [
             AddressesRelationManager::class,
-            BankDetailRelationManager::class,  
+            BankDetailRelationManager::class,
         ];
     }
 

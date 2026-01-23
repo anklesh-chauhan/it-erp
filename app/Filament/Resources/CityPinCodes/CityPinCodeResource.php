@@ -7,7 +7,7 @@ use App\Filament\Actions\BulkApprovalAction;
 use App\Traits\HasSafeGlobalSearch;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Clusters\GlobalConfiguration\AddressConfigurationCluster;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -36,9 +36,9 @@ class CityPinCodeResource extends BaseResource
     use HasSafeGlobalSearch;
     protected static ?string $model = CityPinCode::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
-    protected static ?int $navigationSort = 2;
-    protected static ?string $navigationLabel = 'Address Config';
+    protected static ?string $cluster = AddressConfigurationCluster::class;
+    protected static ?string $navigationLabel = 'Pin Codes';
+    protected static ?int $navigationSort = 1;
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
 
     public static function form(Schema $schema): Schema
@@ -84,7 +84,7 @@ class CityPinCodeResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
+
                         BulkApprovalAction::make(),
 
 DeleteBulkAction::make(),

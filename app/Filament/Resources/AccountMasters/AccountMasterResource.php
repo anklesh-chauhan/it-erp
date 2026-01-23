@@ -46,7 +46,7 @@ class AccountMasterResource extends BaseResource
     protected static ?string $model = AccountMaster::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Masters';
+    protected static string | \UnitEnum | null $navigationGroup = 'Contacts & Companies';
     protected static ?int $navigationSort = 190;
     protected static ?string $navigationLabel = 'Account Masters';
 
