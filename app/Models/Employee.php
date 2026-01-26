@@ -116,7 +116,8 @@ class Employee extends BaseModel
     public function positions(): BelongsToMany
     {
         return $this->belongsToMany(Position::class, 'employee_position_pivot', 'employee_id', 'position_id')
-                    ->withTimestamps();
+            ->withPivot('is_primary')
+            ->withTimestamps();
     }
 
     public function shiftAssignments()

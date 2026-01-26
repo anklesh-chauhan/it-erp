@@ -117,17 +117,35 @@ class SalesTourPlanForm
                 Group::make([
                     Select::make('user_id')
                         ->label('Sales Employee')
-                        ->relationship('user', 'name')
+                        ->relationship(
+                            name: 'user',
+                            titleAttribute: 'name',
+                            modifyQueryUsing: function ($query) {
+                                $authUser = auth()->user();
+
+                                if (! $authUser) {
+                                    return $query->whereRaw('1 = 0');
+                                }
+
+                                // Super admin can see all
+                                if ($authUser->hasRole('Super Admin')) {
+                                    return $query;
+                                }
+
+                                $visibleUserIds = \App\Services\PositionService::getVisibleUserIdsFor($authUser);
+
+                                return $query->whereIn('id', $visibleUserIds);
+                            }
+                        )
                         ->getOptionLabelFromRecordUsing(function (User $user) {
-                            return $user->employee
-                                ?->full_name
-                                ?? $user->email; // fallback safety
+                            return $user->employee?->full_name ?? $user->email;
                         })
-                        ->default(fn() => Auth::id())
+                        ->default(fn () => auth()->id())
                         ->required()
+                        ->searchable()
+                        ->preload()
                         ->reactive()
                         ->afterStateUpdated(function ($state, callable $set) {
-
                             if (! $state) {
                                 return;
                             }
@@ -138,13 +156,13 @@ class SalesTourPlanForm
                                 return;
                             }
 
-                            $territoryIds = PositionService::getTerritoryIdsForUser($user);
+                            $territoryIds = \App\Services\PositionService::getTerritoryIdsForUser($user);
 
                             if (! empty($territoryIds)) {
-                                // Apply to ALL repeater rows
                                 $set('details.*.territory_id', $territoryIds[0]);
                             }
                         }),
+
 
                     Select::make('month')
                         ->label('Select Month')

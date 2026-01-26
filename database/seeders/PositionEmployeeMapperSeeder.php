@@ -12,18 +12,11 @@ class PositionEmployeeMapperSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
-
-            /* ================= LOAD DATA ================= */
             $positions = Position::orderBy('level')->orderBy('id')->get();
             $employees = Employee::orderBy('id')->get();
 
-            if ($positions->isEmpty()) {
-                $this->command->error('No positions found. Run PositionSeeder first.');
-                return;
-            }
-
-            if ($employees->isEmpty()) {
-                $this->command->error('No employees found. Seed employees first.');
+            if ($positions->isEmpty() || $employees->isEmpty()) {
+                $this->command->error('Missing positions or employees.');
                 return;
             }
 
@@ -31,11 +24,9 @@ class PositionEmployeeMapperSeeder extends Seeder
             $employeeCount = $employees->count();
 
             foreach ($positions as $position) {
-
                 $required = $this->employeesRequired($position);
 
                 for ($i = 0; $i < $required; $i++) {
-
                     if ($employeeIndex >= $employeeCount) {
                         $this->command->warn('Not enough employees to map all positions.');
                         return;
@@ -43,14 +34,20 @@ class PositionEmployeeMapperSeeder extends Seeder
 
                     $employee = $employees[$employeeIndex++];
 
-                    // 🔗 Attach sequentially
+                    // 🔗 Attach with pivot data
+                    // We set is_primary to true because this seeder assigns
+                    // the main position for each employee.
                     $position->employees()->syncWithoutDetaching([
-                        $employee->id,
+                        $employee->id => [
+                            'is_primary' => true,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ],
                     ]);
                 }
             }
 
-            $this->command->info('Employees sequentially mapped to positions successfully.');
+            $this->command->info('Employees mapped with primary positions successfully.');
         });
     }
 

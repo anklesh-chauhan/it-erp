@@ -141,4 +141,23 @@ class Position extends BaseModel
         return $this->belongsToMany(Employee::class, 'employee_position_pivot', 'position_id', 'employee_id')
                     ->withTimestamps();
     }
+
+    public function ancestors(): \Illuminate\Support\Collection
+    {
+        $ancestors = collect();
+        $current = $this->reportsTo;
+
+        while ($current) {
+            $ancestors->push($current);
+            $current = $current->reportsTo;
+        }
+
+        return $ancestors;
+    }
+
+    public function getRecordTitle(): string
+    {
+        return $this->name;
+    }
+
 }

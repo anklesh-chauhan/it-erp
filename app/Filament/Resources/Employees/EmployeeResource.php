@@ -47,6 +47,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth; // Import Tabs
 use Filament\Forms\Components\Repeater; // Import Tab
 use App\Filament\Resources\AccountMasterBankDetailResource\RelationManagers\BankDetailRelationManager;
+use App\Filament\Resources\Employees\RelationManagers\PositionsRelationManager;
 use Filament\Resources\RelationManagers\RelationManager;
 use App\Models\User;
 use Illuminate\Support\Str;
@@ -395,17 +396,38 @@ class EmployeeResource extends BaseResource
                                             ->columnSpanFull()
                                             ->nullable(),
                                     ]),
-                                Section::make('Assigned Positions')
-                                    ->description('Select the positions this employee holds.')
-                                    ->schema([
-                                        Select::make('positions')
-                                            ->relationship('positions', 'name') // Use the many-to-many relationship
-                                            ->multiple()
-                                            ->preload()
-                                            ->searchable()
-                                            ->label('Select Positions')
-                                            ->columnSpanFull(),
-                                    ])->columns(1),
+                                Select::make('positions')
+                                    ->multiple()
+                                    ->relationship('positions', 'name')
+                                    ->saveRelationshipsUsing(function ($record, $state) {
+                                        // 1. Check if the employee already has a primary position in the database
+                                        $existingPrimaryId = $record->positions()
+                                            ->wherePivot('is_primary', true)
+                                            ->first()
+                                            ?->id;
+
+                                        $syncData = [];
+
+                                        foreach ($state as $index => $id) {
+                                            $isPrimary = false;
+
+                                            // 2. If this ID was already the primary, keep it primary
+                                            if ($existingPrimaryId && $id == $existingPrimaryId) {
+                                                $isPrimary = true;
+                                            }
+                                            // 3. If there is NO primary in DB yet, make the first one in the selection primary
+                                            elseif (!$existingPrimaryId && $index === 0) {
+                                                $isPrimary = true;
+                                            }
+
+                                            $syncData[$id] = ['is_primary' => $isPrimary];
+                                        }
+
+                                        // 4. Sync everything
+                                        $record->positions()->sync($syncData);
+                                    })
+                                    ->preload()
+                                    ->searchable()
                             ]),
 
                         // Uncommented and converted Professional Tax to a Tab
@@ -910,6 +932,7 @@ class EmployeeResource extends BaseResource
             RelationManagers\ShiftAssignmentsRelationManager::class,
             RelationManagers\WeekOffsRelationManager::class,
             BankDetailRelationManager::class,
+            PositionsRelationManager::class,
         ];
     }
 
