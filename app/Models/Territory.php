@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Builder;
 
 class Territory extends BaseModel
 {
@@ -29,6 +30,11 @@ class Territory extends BaseModel
     protected $casts = [
         'status' => 'string', // Ensures enum is cast as string
     ];
+
+    public function scopeApplyTerritoryVisibility(Builder $query, array $territoryIds): Builder
+    {
+        return $query->whereIn('territories.id', $territoryIds);
+    }
 
     /**
      * Get the parent territory.

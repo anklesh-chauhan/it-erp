@@ -57,4 +57,18 @@ class PositionService
 
         return $ids;
     }
+
+    public static function getPositionDepth(Position $position, Position $root): int
+    {
+        $depth = 0;
+        $current = $position;
+
+        while ($current && $current->id !== $root->id) {
+            $current = $current->reportsTo;
+            $depth++;
+        }
+
+        return $depth;
+    }
+
 }

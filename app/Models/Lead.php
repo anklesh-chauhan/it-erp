@@ -30,12 +30,23 @@ class Lead extends BaseModel
         'lead_source_id',
         'rating_type_id',
         'annual_revenue',
+        'territory_id',
         'description',
         'custom_fields',
         'status_id',
         'status_type',
         'account_master_id',
     ];
+
+    public function scopeApplyOwnVisibility(Builder $query, $user): Builder
+    {
+        return $query->where('employee_id', $user->employee->id);
+    }
+
+    public function scopeApplyTerritoryVisibility(Builder $query, array $territoryIds): Builder
+    {
+        return $query->whereIn('territory_id', $territoryIds);
+    }
 
     public function convertToDeal(bool $createCompanyMaster = false, bool $createAccountMaster = false)
     {
@@ -70,7 +81,7 @@ class Lead extends BaseModel
 
             try {
                 DB::beginTransaction();
-                
+
                 $typeMasterId = 2;
 
                 // Generate account code for AccountMaster
@@ -87,20 +98,20 @@ class Lead extends BaseModel
 
                 DB::commit();
 
-                
+
             } catch (Exception $e) {
                 DB::rollBack();
-                
+
                 throw new Exception('Failed to convert lead to customer.', 0, $e);
             }
 
-            
+
             Notification::make()
                 ->title('Account Master Created')
                 ->body("Account Master for {$this->company?->name} has been created.")
                 ->success()
                 ->send();
-           
+
         }
 
         // update the lead's status to "Converted"
@@ -113,6 +124,11 @@ class Lead extends BaseModel
         }
 
         return $deal;
+    }
+
+    public function territory()
+    {
+        return $this->belongsTo(Territory::class, 'territory_id');
     }
 
     public function status()
@@ -150,9 +166,9 @@ class Lead extends BaseModel
     //     return $this->belongsTo(Company::class);
     // }
 
-    public function address()
+    public function addresses()
     {
-        return $this->belongsTo(Address::class);
+        return $this->morphMany(Address::class, 'addressable');
     }
 
     public function leadSource()

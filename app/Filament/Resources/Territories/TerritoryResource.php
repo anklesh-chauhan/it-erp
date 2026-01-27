@@ -31,6 +31,7 @@ use App\Models\Territory;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use App\Filament\Resources\BaseResource;
+use App\Traits\HasVisibilityScope;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,7 +39,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class TerritoryResource extends BaseResource
 {
-    use HasSafeGlobalSearch;
+    use HasSafeGlobalSearch, HasVisibilityScope;
+
     protected static ?string $model = Territory::class;
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map';
     protected static string | \UnitEnum | null $navigationGroup = 'Marketing & Field Sales';

@@ -127,7 +127,6 @@ class SalesTourPlanForm
                                     return $query->whereRaw('1 = 0');
                                 }
 
-                                // Super admin can see all
                                 if ($authUser->hasRole('Super Admin')) {
                                     return $query;
                                 }
@@ -138,7 +137,34 @@ class SalesTourPlanForm
                             }
                         )
                         ->getOptionLabelFromRecordUsing(function (User $user) {
-                            return $user->employee?->full_name ?? $user->email;
+                            $employee = $user->employee;
+
+                            if (! $employee) {
+                                return $user->email;
+                            }
+
+                            $primaryPosition = $employee->positions()
+                                ->wherePivot('is_primary', true)
+                                ->first();
+
+                            $authEmployee = auth()->user()?->employee;
+                            $authPosition = $authEmployee?->positions()
+                                ->wherePivot('is_primary', true)
+                                ->first();
+
+                            if (! $primaryPosition || ! $authPosition) {
+                                return $employee->full_name;
+                            }
+
+                            $depth = \App\Services\PositionService::getPositionDepth(
+                                $primaryPosition,
+                                $authPosition
+                            );
+
+                            // Indentation (2 spaces per level)
+                            $indent = str_repeat('— ', max(0, $depth));
+
+                            return $indent . $employee->full_name;
                         })
                         ->default(fn () => auth()->id())
                         ->required()

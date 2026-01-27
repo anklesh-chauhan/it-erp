@@ -21,6 +21,8 @@ use Filament\Tables\Actions\AttachAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use App\Traits\CreateAddressFormTrait;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Address;
 
 class AddressesRelationManager extends RelationManager
 {
@@ -87,6 +89,19 @@ class AddressesRelationManager extends RelationManager
                                 ->title('Address linked to Company')
                                 ->success()
                                 ->send();
+                        }
+                        if (! $accountMaster || ! $record->pin_code) {
+                            return;
+                        }
+
+                        $territoryId = \App\Services\TerritoryService::fromPinCode(
+                            $record->pin_code
+                        );
+
+                        if ($territoryId && ! $accountMaster->territory_id) {
+                            $accountMaster->update([
+                                'territory_id' => $territoryId,
+                            ]);
                         }
                     }),
             ])

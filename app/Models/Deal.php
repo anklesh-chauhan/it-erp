@@ -20,6 +20,18 @@ class Deal extends BaseModel
         'type', 'amount', 'expected_revenue', 'expected_close_date', 'lead_source_id', 'description', 'status_id', 'status_type',
     ];
 
+    public function scopeApplyOwnVisibility(Builder $query, $user): Builder
+    {
+        return $query->where('sales_employee_id', $user->employee->id);
+    }
+
+    public function scopeApplyTerritoryVisibility(Builder $query, array $territoryIds): Builder
+    {
+        return $query->whereHas('lead', fn ($q) =>
+            $q->applyTerritoryVisibility($territoryIds)
+        );
+    }
+
     // Override the status relationship from the trait
     public function status()
     {

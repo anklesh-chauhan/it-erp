@@ -159,13 +159,22 @@ trait CreateAccountMasterTrait
                             ->suffix('%'),
                         TextInput::make('alias')
                             ->maxLength(255),
+
+                        Select::make('rating_type_id')
+                            ->relationship('ratingType', 'name')
+                            ->searchable()
+                            ->preload(),
+
+                        Select::make('territory_id')
+                            ->relationship('territory', 'name')
+                            ->searchable()
+                            ->disabled(fn () => ! auth()->user()?->hasRole('super_admin'))
+                            ->hint('Auto Suggested')
+                            ->preload(),
+
                         Select::make('parent_id')
                             ->relationship('parent', 'name')
                             ->label('Parent Account / Dealer / Stockist / Distributor')
-                            ->searchable()
-                            ->preload(),
-                        Select::make('rating_type_id')
-                            ->relationship('ratingType', 'name')
                             ->searchable()
                             ->preload(),
 

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+use App\Models\Territory;
 
 class TerritoryService
 {
@@ -13,5 +14,16 @@ class TerritoryService
             ?->pluck('id')
             ?->unique()
             ?->toArray() ?? [];
+    }
+
+    public static function fromPinCode(?string $pinCode): ?int
+    {
+        if (! $pinCode) {
+            return null;
+        }
+
+        return \App\Models\Territory::whereHas('cityPinCodes', function ($q) use ($pinCode) {
+            $q->where('pin_code', $pinCode);
+        })->value('id');
     }
 }

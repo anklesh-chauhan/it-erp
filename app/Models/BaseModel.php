@@ -8,6 +8,7 @@ use App\Traits\HasBlameable;
 use App\Traits\HasSoftDeleteBlameable;
 use App\Traits\HasVisibilityScope;
 use App\Traits\LocksAfterApproval;
+use Illuminate\Database\Eloquent\Builder;
 
 abstract class BaseModel extends Model
 {
@@ -21,4 +22,27 @@ abstract class BaseModel extends Model
         'created_by' => 'integer',
         'updated_by' => 'integer',
     ];
+
+    /* =====================================================
+     | VISIBILITY HOOKS (DEFAULT: deny)
+     | Models override what they support
+     ===================================================== */
+
+    public function scopeApplyOwnVisibility(Builder $query, $user): Builder
+    {
+        // Default: deny
+        return $query->whereRaw('1 = 0');
+    }
+
+    public function scopeApplyTerritoryVisibility(Builder $query, array $territoryIds): Builder
+    {
+        // Default: deny
+        return $query->whereRaw('1 = 0');
+    }
+
+    public function scopeApplyOuVisibility(Builder $query, array $ouIds): Builder
+    {
+        // Default: deny
+        return $query->whereRaw('1 = 0');
+    }
 }

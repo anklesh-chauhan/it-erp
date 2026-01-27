@@ -35,6 +35,7 @@ class AccountMaster extends BaseModel
         'description',
         'industry_type_id',
         'region_id',
+        'territory_id',
         'ref_dealer_contact',
         'commission',
         'alias',
@@ -43,6 +44,11 @@ class AccountMaster extends BaseModel
         'account_ownership_id',
         'approval_status',
     ];
+
+    public function territory()
+    {
+        return $this->belongsTo(Territory::class);
+    }
 
     public function approvals(): MorphMany
     {

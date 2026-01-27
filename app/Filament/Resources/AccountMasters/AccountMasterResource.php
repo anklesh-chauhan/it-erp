@@ -107,8 +107,8 @@ class AccountMasterResource extends BaseResource
     public static function getRelations(): array
     {
         return [
-            ContactDetailsRelationManager::class,
             AddressesRelationManager::class,
+            ContactDetailsRelationManager::class,
             BankDetailRelationManager::class,
             CreditDetailRelationManager::class,
             GSTDetailRelationManager::class,

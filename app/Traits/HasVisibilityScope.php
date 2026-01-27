@@ -42,6 +42,10 @@ trait HasVisibilityScope
                 $q->orWhere($table . '.user_id', $user->id);
             }
 
+            if (\Schema::hasColumn($table, 'login_id')) {
+                $q->orWhere($table . '.login_id', $user->id);
+            }
+
             /* =====================================================
             | B. VIEW OWN TERRITORY
             ===================================================== */
@@ -73,6 +77,18 @@ trait HasVisibilityScope
                         'creator.employee.employmentDetail.organizationalUnits',
                         fn ($ou) => $ou->whereIn('organizational_units.id', $ouIds)
                     );
+                }
+            }
+
+            /* =====================================================
+            | D. VIEW OWN (MODEL-DEFINED)
+            ===================================================== */
+            if ($user->can("ViewOwn:{$model}")) {
+
+                if (method_exists($q->getModel(), 'scopeApplyOwnVisibility')) {
+                    $q->orWhere(function ($oq) use ($user) {
+                        $oq->applyOwnVisibility($user);
+                    });
                 }
             }
         });

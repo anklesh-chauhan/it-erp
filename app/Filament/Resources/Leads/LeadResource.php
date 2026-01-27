@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Leads;
 use App\Filament\Actions\BulkApprovalAction;
 
 use App\Filament\Actions\ApprovalAction;
-
+use App\Filament\Resources\AccountMasters\RelationManagers\AddressesRelationManager;
 use App\Traits\AddressDetailsTrait;
 use App\Traits\HasSafeGlobalSearch;
 use App\Models\LeadStatus;
@@ -115,9 +115,6 @@ class LeadResource extends BaseResource
                 Section::make('Other Details')
                 ->collapsible()
                 ->schema([
-
-                    ...self::getAddressDetailsTraitField(),
-
                     Grid::make(4)
                         ->schema([
                             Select::make('lead_source_id')
@@ -386,18 +383,17 @@ class LeadResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-
-                        BulkApprovalAction::make(),
-
-DeleteBulkAction::make(),
-                ]),
-            ]);
+                BulkApprovalAction::make(),
+                DeleteBulkAction::make(),
+            ]),
+        ]);
     }
 
 
     public static function getRelations(): array
     {
         return [
+            AddressesRelationManager::class,
             LeadFollowUpRelationManager::class,
             ItemMastersRelationManager::class,
             LeadNotesRelationManager::class,
