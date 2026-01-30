@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('code')->unique()->nullable();
             $table->foreignId('parent_territory_id')->nullable()->constrained('territories')->onDelete('set null');
             // LINK TO DIVISION (ORGANIZATIONAL UNIT)
+            $table->foreignId('region_id')->nullable()->constrained('regions')->onDelete('set null');
             $table->foreignId('division_ou_id')
                 ->nullable()
                 ->constrained('organizational_units')

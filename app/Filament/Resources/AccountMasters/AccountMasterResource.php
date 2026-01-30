@@ -36,12 +36,16 @@ use App\Traits\CreateAccountMasterTrait;
 use App\Filament\Resources\AccountMasterBankDetailResource\RelationManagers\BankDetailRelationManager;
 use App\Filament\Resources\AccountMasterCreditDetailResource\RelationManagers\CreditDetailRelationManager;
 use App\Filament\Resources\AccountMasterGSTDetailResource\RelationManagers\GSTDetailRelationManager;
+use App\Filament\Resources\AccountMasters\Pages\AccountMasterInfolist;
 use App\Filament\Resources\AccountMasterStatutoryDetailResource\RelationManagers\StatutoryDetailRelationManager;
+use App\Traits\HasVisibilityScope;
+use Filament\Actions\ViewAction;
 
 class AccountMasterResource extends BaseResource
 {
     use HasSafeGlobalSearch;
     use CreateAccountMasterTrait;
+    use HasVisibilityScope;
 
     protected static ?string $model = AccountMaster::class;
 
@@ -56,6 +60,11 @@ class AccountMasterResource extends BaseResource
             ->schema([
                 ...self::getCreateAccountMasterTraitFields()
             ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return AccountMasterInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
@@ -90,6 +99,7 @@ class AccountMasterResource extends BaseResource
             ])
             ->recordActions([
                 EditAction::make(),
+                ViewAction::make(),
                 ApprovalAction::make(),
                 DeleteAction::make(),
                 RestoreAction::make(),
@@ -122,6 +132,7 @@ class AccountMasterResource extends BaseResource
             'index' => ListAccountMasters::route('/'),
             'create' => CreateAccountMaster::route('/create'),
             'edit' => EditAccountMaster::route('/{record}/edit'),
+            'view' => AccountMasterInfolist::route('/{record}'),
         ];
     }
 

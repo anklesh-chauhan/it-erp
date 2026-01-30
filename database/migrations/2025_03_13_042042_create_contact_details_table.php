@@ -22,13 +22,6 @@ return new class extends Migration
             $table->string('mobile_number')->nullable();
             $table->string('whatsapp_number')->nullable();
             $table->string('alternate_phone')->nullable();
-            $table->string('designation')->nullable();
-            $table->string('department')->nullable();
-            $table->string('address')->nullable();
-            $table->string('city')->nullable();
-            $table->string('state')->nullable();
-            $table->string('country')->nullable();
-            $table->string('postal_code')->nullable();
             $table->date('birthday')->nullable();
             $table->string('linkedin')->nullable();
             $table->string('facebook')->nullable();

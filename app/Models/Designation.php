@@ -11,6 +11,9 @@ class Designation extends BaseModel
 {
     use HasFactory, HasApprovalWorkflow;
 
+    protected $table = 'designations'; // example
+
+
     protected $fillable = ['name'];
 
     public function contactDetails()

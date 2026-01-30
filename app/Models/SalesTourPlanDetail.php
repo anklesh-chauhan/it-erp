@@ -74,6 +74,11 @@ class SalesTourPlanDetail extends BaseModel
     /**
      * Retrieve patches related to this tour plan detail.
      */
+    public function patches()
+    {
+        return $this->belongsTo(Patch::class, 'patch_ids');
+    }
+
     public function getPatchesAttribute()
     {
         return Patch::whereIn('id', $this->patch_ids ?? [])->get();

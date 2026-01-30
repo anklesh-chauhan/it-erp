@@ -44,7 +44,8 @@ class Patch extends BaseModel
     {
         static::saving(function (Patch $model) {
 
-            $user = auth()->user();
+            /** @var \App\Models\User|null $user */
+            $user = Auth::user();
 
             // CLI / Seeder / System safety
             if (! $user) {

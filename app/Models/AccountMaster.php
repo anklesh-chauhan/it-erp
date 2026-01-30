@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Builder;
 
 
 use App\Traits\HasApprovalWorkflow;
@@ -138,6 +139,14 @@ class AccountMaster extends BaseModel
         return $this->belongsToMany(ContactDetail::class, 'account_master_contact_details');
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with([
+                'contactDetails.designation', // 👈 REQUIRED
+            ]);
+    }
+
     public function addresses()
     {
         return $this->morphMany(Address::class, 'addressable');
@@ -151,6 +160,15 @@ class AccountMaster extends BaseModel
     public function typeable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function getParentTypeAttribute(): ?TypeMaster
+    {
+        if (! $this->typeMaster) {
+            return null;
+        }
+
+        return $this->typeMaster->parent ?: $this->typeMaster;
     }
 
     public function patches(): BelongsToMany

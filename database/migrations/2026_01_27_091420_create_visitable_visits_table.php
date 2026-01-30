@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('territories', function (Blueprint $table) {
-            $table->foreignId('region_id')->nullable()->constrained('regions')->onDelete('set null');
+        Schema::create('visitable_visits', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('visit_id')->constrained()->cascadeOnDelete();
+            $table->morphs('visitable');
+
+            $table->timestamps();
         });
     }
 
@@ -21,9 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('territories', function (Blueprint $table) {
-            $table->dropForeign(['region_id']);
-            $table->dropColumn('region_id');
-        });
+        Schema::dropIfExists('visitable_visits');
     }
 };
