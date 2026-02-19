@@ -41,7 +41,7 @@ trait SalesDocumentPreferenceTrait
                     ->title('Preferences updated successfully')
                     ->success()
                     ->send();
-                
+
                 $livewire->redirect(request()->header('Referer')); // Refresh the page
             })
             ->modalSubmitActionLabel('Save')
