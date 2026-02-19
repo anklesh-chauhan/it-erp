@@ -105,6 +105,7 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->viteTheme('resources/css/app.css')
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('15rem')
             ->authGuard('web');

@@ -361,16 +361,11 @@ class SalesTourPlanForm
                                         $set('territory_id', $territoryIds[0]);
                                     }
                                 }),
-                            Select::make('patch_ids')
-                                ->label('Patches')
+                            Select::make('patches') // Use relationship name (plural)
+                                ->relationship('patches', 'name')     // This handles all the saving/loading for you
                                 ->multiple()
-                                ->options(fn(Get $get) =>
-                                    Patch::query()
-                                        ->when($get('territory_id'), fn($q) => $q->where('territory_id', $get('territory_id')))
-                                        ->pluck('name', 'id')
-                                )
-                                ->searchable()
-                                ->preload(),
+                                ->preload()
+                                ->searchable(),
 
                             Select::make('visit_type_id')
                                 ->label('Visit Type')
@@ -430,12 +425,13 @@ class SalesTourPlanForm
 
                             $items = $record->details()
                                 ->orderBy('date')
+                                ->with('patches')
                                 ->get()
                                 ->map(fn($d) => [
                                     'id' => $d->id,
                                     'date' => $d->date?->format('Y-m-d'),
                                     'territory_id' => $d->territory_id,
-                                    'patch_ids' => $d->patch_ids,
+                                    'patches' => $d->patches->pluck('id')->toArray(),
                                     'visit_type_id' => $d->visit_type_id,
                                     'visit_purpose_ids' => $d->visit_purpose_ids,
                                     'joint_with' => $d->joint_with,
@@ -474,7 +470,7 @@ class SalesTourPlanForm
                         })
 
                         ->mutateRelationshipDataBeforeSaveUsing(function (array $data, Get $get): array {
-                            $data['patch_ids'] = is_array($data['patch_ids'] ?? null) ? $data['patch_ids'] : [];
+                            // $data['patch_ids'] = is_array($data['patch_ids'] ?? null) ? $data['patch_ids'] : [];
                             $data['joint_with'] = is_array($data['joint_with'] ?? null) ? $data['joint_with'] : [];
                             $data['visit_purpose_ids'] = $data['visit_purpose_ids'] ?? [];
                             return $data;

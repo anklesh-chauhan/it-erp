@@ -225,5 +225,68 @@
             });
         </script>
         {{-- End Geolocation Script --}}
+
+        {{-- Livewire Geolocation Listeners --}}
+        <script>
+            document.addEventListener('livewire:init', () => {
+                const handlePunch = (eventName, methodName) => {
+                    Livewire.on(eventName, (event) => {
+                        // Livewire 3 event data is usually wrapped in an array/object
+                        const data = Array.isArray(event) ? event[0] : event;
+                        const componentId = data.componentId;
+
+                        if (!navigator.geolocation) {
+                            alert("Geolocation is not supported by your browser.");
+                            return;
+                        }
+
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                Livewire.find(componentId).call(
+                                    methodName,
+                                    position.coords.latitude,
+                                    position.coords.longitude
+                                );
+                            },
+                            (error) => alert("Location access denied. Please enable GPS."),
+                            { enableHighAccuracy: true, timeout: 10000 }
+                        );
+                    });
+                };
+
+                handlePunch('trigger-punch-in', 'doPunchIn');
+                handlePunch('trigger-punch-out', 'doPunchOut');
+            });
+        </script>
+        {{-- End Livewire Geolocation Listeners --}}
+
+        {{-- Image Geolocation Capture Script --}}
+        <script>
+            document.addEventListener('capture-image-location', () => {
+                if (!navigator.geolocation) return;
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        Livewire.dispatch('set-image-location', {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                        });
+
+                        console.log(
+                            '🖼️ Image GPS:',
+                            position.coords.latitude,
+                            position.coords.longitude
+                        );
+                    },
+                    () => {},
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            });
+        </script>
+        {{-- End Image Geolocation Capture Script --}}
     </body>
 </html>

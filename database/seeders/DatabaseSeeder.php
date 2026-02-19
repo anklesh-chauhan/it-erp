@@ -52,8 +52,7 @@ class DatabaseSeeder extends Seeder
             FollowUpPrioritySeeder::class,
             UnitOfMeasurementSeeder::class,
             ItemBrandSeeder::class,
-            TransportModeSeeder::class,
-            VisitTypeAndPurposeSeeder::class,
+
             PackingTypeSeeder::class,
             DealStageSeeder::class,
             TypeMasterSeeder::class,
@@ -78,8 +77,10 @@ class DatabaseSeeder extends Seeder
             TerritorySeeder::class,
             AccountMasterSeeder::class,
             LocationMasterSeeder::class,
+
             ItemCategorySeeder::class,
             ItemMasterSeeder::class,
+
             SalesUsersSeeder::class,
             DepartmentRoleSeeder::class,
 
@@ -92,6 +93,14 @@ class DatabaseSeeder extends Seeder
 
             PositionSeeder::class,
             PositionEmployeeMapperSeeder::class,
+
+            TransportModeSeeder::class,
+            VisitTypeAndPurposeSeeder::class,
+            VisitOutcomeSeeder::class,
+            VisitFeedbackQuestionSeeder::class,
+            VisitPreferenceSeeder::class,
+
+            ImageTagSeeder::class,
         ]);
     }
 }

@@ -2,104 +2,36 @@
 
 namespace App\Filament\Resources\ExpenseConfigurations;
 
-use App\Filament\Actions\BulkApprovalAction;
-
-use App\Traits\HasSafeGlobalSearch;
-
-use App\Filament\Actions\ApprovalAction;
-
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\ExpenseConfigurations\Pages\ListExpenseConfigurations;
 use App\Filament\Resources\ExpenseConfigurations\Pages\CreateExpenseConfiguration;
 use App\Filament\Resources\ExpenseConfigurations\Pages\EditExpenseConfiguration;
-use App\Filament\Resources\ExpenseConfigurationResource\Pages;
-use App\Filament\Resources\ExpenseConfigurationResource\RelationManagers;
+use App\Filament\Resources\ExpenseConfigurations\Pages\ListExpenseConfigurations;
+use App\Filament\Resources\ExpenseConfigurations\Schemas\ExpenseConfigurationForm;
+use App\Filament\Resources\ExpenseConfigurations\Tables\ExpenseConfigurationsTable;
 use App\Models\ExpenseConfiguration;
-use Filament\Forms;
+use BackedEnum;
 use Filament\Resources\Resource;
-use App\Filament\Resources\BaseResource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ExpenseConfigurationResource extends BaseResource
+class ExpenseConfigurationResource extends Resource
 {
-    use HasSafeGlobalSearch;
     protected static ?string $model = ExpenseConfiguration::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Global Config';
-    protected static ?int $navigationSort = 1004;
-    protected static ?string $navigationLabel = 'Expense Config';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static ?string $recordTitleAttribute = 'ExpenseConfiguration';
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('category_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('expense_type_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('transport_mode_id')
-                    ->numeric(),
-                TextInput::make('rate_per_km')
-                    ->numeric(),
-                TextInput::make('fixed_expense')
-                    ->numeric(),
-            ]);
+        return ExpenseConfigurationForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                TextColumn::make('category_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('expense_type_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('transport_mode_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('rate_per_km')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('fixed_expense')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
-            ])
-            ->recordActions([
-                EditAction::make(),
-                ApprovalAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    
-                        BulkApprovalAction::make(),
-
-DeleteBulkAction::make(),
-                ]),
-            ]);
+        return ExpenseConfigurationsTable::configure($table);
     }
 
     public static function getRelations(): array
@@ -116,5 +48,13 @@ DeleteBulkAction::make(),
             'create' => CreateExpenseConfiguration::route('/create'),
             'edit' => EditExpenseConfiguration::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordRouteBindingEloquentQuery(): Builder
+    {
+        return parent::getRecordRouteBindingEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }

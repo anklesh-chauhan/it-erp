@@ -131,8 +131,8 @@ class SalesUsersSeeder extends Seeder
                 ['login_id' => $user->id],
                 [
                     'employee_id'=> $user->id,
-                    'first_name' => $faker->firstName,
-                    'last_name'  => $faker->lastName,
+                    'first_name' => "{$title}",
+                    'last_name'  => "{$i}",
                     'email'      => $user->email,
                     'mobile_number' => $faker->numerify('9#########'),
                     'is_active'  => true,

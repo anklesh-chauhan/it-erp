@@ -9,6 +9,7 @@ use App\Filament\Resources\Visits\Pages\ListVisits;
 use App\Filament\Resources\Visits\Schemas\VisitForm;
 use App\Filament\Resources\Visits\Tables\VisitsTable;
 use App\Models\Visit;
+use App\Models\VisitPreference;
 use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;

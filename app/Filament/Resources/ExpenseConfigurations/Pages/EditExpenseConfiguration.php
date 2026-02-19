@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\ExpenseConfigurations\Pages;
 
-use Filament\Actions\DeleteAction;
 use App\Filament\Resources\ExpenseConfigurations\ExpenseConfigurationResource;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditExpenseConfiguration extends EditRecord
@@ -15,6 +16,8 @@ class EditExpenseConfiguration extends EditRecord
     {
         return [
             DeleteAction::make(),
+            ForceDeleteAction::make(),
+            RestoreAction::make(),
         ];
     }
 }

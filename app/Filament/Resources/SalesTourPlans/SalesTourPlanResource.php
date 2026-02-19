@@ -13,6 +13,7 @@ use App\Models\SalesTourPlan;
 use BackedEnum;
 use Filament\Resources\Resource;
 use App\Filament\Resources\BaseResource;
+use App\Traits\HasApprovalWorkflow;
 use App\Traits\HasVisibilityScope;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class SalesTourPlanResource extends BaseResource
 {
-    use HasSafeGlobalSearch, HasVisibilityScope;
+    use HasSafeGlobalSearch, HasVisibilityScope, HasApprovalWorkflow;
 
     protected static ?string $model = SalesTourPlan::class;
 

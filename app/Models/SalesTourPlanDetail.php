@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 
 use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Log;
 
 class SalesTourPlanDetail extends BaseModel
@@ -19,7 +20,6 @@ class SalesTourPlanDetail extends BaseModel
         'sales_tour_plan_id',
         'date',
         'territory_id',
-        'patch_ids',
         'remarks',
         'joint_with',
         'visit_type_id',
@@ -74,14 +74,11 @@ class SalesTourPlanDetail extends BaseModel
     /**
      * Retrieve patches related to this tour plan detail.
      */
-    public function patches()
-    {
-        return $this->belongsTo(Patch::class, 'patch_ids');
-    }
 
-    public function getPatchesAttribute()
+    public function patches(): BelongsToMany
     {
-        return Patch::whereIn('id', $this->patch_ids ?? [])->get();
+        // Point to the pivot table we just created
+        return $this->belongsToMany(Patch::class, 'patch_sales_tour_plan_detail');
     }
 
     /**

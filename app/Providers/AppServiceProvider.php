@@ -13,7 +13,9 @@ use Filament\Tables\Table;
 use Filament\Support\Facades\FilamentView;
 use App\Database\Macros\BlueprintMacros;
 use App\Models\Approval;
+use App\Models\Media;
 use App\Observers\ApprovalObserver;
+use App\Observers\MediaObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,5 +36,6 @@ class AppServiceProvider extends ServiceProvider
     {
         BlueprintMacros::register();
         Approval::observe(ApprovalObserver::class);
+        Media::observe(MediaObserver::class);
     }
 }

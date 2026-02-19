@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('sales_tour_plan_id')->constrained()->cascadeOnDelete();
             $table->date('date');
             $table->foreignId('territory_id')->nullable()->constrained()->nullOnDelete();
-            $table->json('patch_ids')->nullable();
             $table->text('remarks')->nullable();
             $table->json('joint_with')->nullable();
             $table->blameable();

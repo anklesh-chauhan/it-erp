@@ -337,8 +337,8 @@ class EmployeeResource extends BaseResource
                                             ->getOptionLabelFromRecordUsing(
                                                 fn (\App\Models\Employee $record) => $record->full_name
                                             )
-                                            ->disabled()          // 🔒 read-only
-                                            ->dehydrated(false)   // ❌ do not save from form
+                                            ->disabled()
+                                            ->dehydrated(false)
                                             ->helperText(
                                                 'This is automatically derived from the employee’s position hierarchy.'
                                             ),

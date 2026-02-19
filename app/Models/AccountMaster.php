@@ -101,6 +101,22 @@ class AccountMaster extends BaseModel
         return $this->belongsTo(RatingType::class);
     }
 
+    public function visitables(): MorphMany
+    {
+        return $this->morphMany(VisitableVisit::class, 'visitable');
+    }
+
+    /**
+     * All visits related to this account
+     */
+    public function visits()
+    {
+        return Visit::whereHas('visitables', function ($query) {
+            $query->where('visitable_type', self::class)
+                ->where('visitable_id', $this->id);
+        });
+    }
+
     /**
      * Get the bank detail associated with the Account Master.
      */
@@ -108,11 +124,6 @@ class AccountMaster extends BaseModel
     {
         return $this->morphMany(BankDetail::class, 'bankable');
     }
-
-    // public function bankDetail()
-    // {
-    //     return $this->hasMany(AccountMasterBankDetail::class);
-    // }
 
     public function creditDetail()
     {

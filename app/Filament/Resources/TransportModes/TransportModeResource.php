@@ -23,7 +23,9 @@ use App\Models\TransportMode;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use App\Filament\Resources\BaseResource;
+use Filament\Forms\Components\Toggle;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -42,9 +44,9 @@ class TransportModeResource extends BaseResource
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
+                TextInput::make('name')->required(),
+                TextInput::make('code')->required()->unique(ignoreRecord: true),
+                Toggle::make('is_distance_based'),
             ]);
     }
 
@@ -52,16 +54,9 @@ class TransportModeResource extends BaseResource
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->searchable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('name'),
+                TextColumn::make('code'),
+                IconColumn::make('is_distance_based')->boolean(),
             ])
             ->filters([
                 //

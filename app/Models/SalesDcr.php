@@ -6,82 +6,37 @@ namespace App\Models;
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\ExpenseConfiguration;
-
 use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SalesDcr extends BaseModel
 {
     use HasFactory, SoftDeletes, HasApprovalWorkflow;
 
     protected $fillable = [
-        'date',
-        'user_id',
-        'jointwork_user_ids',
-        'visit_type_id',
-        'tour_plan_id',
-        'visit_route_ids',
-        'category_id',
-        'category_type',
-        'expense_total'
+        'dcr_date', 'user_id', 'sales_tour_plan_id', 'status',
+        'total_expense', 'submitted_at', 'approved_at', 'remarks'
     ];
 
     protected $casts = [
-        'jointwork_user_ids' => 'array',
-        'visit_route_ids' => 'array',
+        'dcr_date' => 'date',
+        'submitted_at' => 'timestamp',
+        'approved_at' => 'timestamp',
     ];
 
-    // Relationships
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function tourPlan()
+    public function visits(): HasMany
     {
-        return $this->belongsTo(TourPlan::class);
+        return $this->hasMany(SalesDcrVisit::class);
     }
 
-    public function expenseConfigurations()
+    public function expenses()
     {
-        return ExpenseConfiguration::where('category_id', $this->category_id)
-            ->where('mode_of_transport_id', $this->tourPlan->mode_of_transport ?? null)
-            ->get();
-    }
-
-    // Expense Calculation Logic
-    public function calculateExpense()
-    {
-        $totalExpense = 0;
-
-        // Calculate Transport Expense
-        $transportConfig = ExpenseConfiguration::where('expense_type_id', 'Transport')
-            ->where('mode_of_transport_id', $this->tourPlan->mode_of_transport ?? null)
-            ->first();
-
-        if ($transportConfig && $this->tourPlan) {
-            $totalExpense += $this->tourPlan->distance_travelled * $transportConfig->rate_per_km;
-        }
-
-        // Add Additional Fixed Expenses
-        $fixedExpenses = ExpenseConfiguration::whereNotNull('fixed_expense')->get();
-
-        foreach ($fixedExpenses as $expense) {
-            $totalExpense += $expense->fixed_expense;
-        }
-
-        $this->expense_total = $totalExpense;
-    }
-
-    // Auto-calculate on saving
-    protected static function booted()
-    {
-        static::creating(function ($salesDcr) {
-            $salesDcr->calculateExpense();
-        });
-
-        static::updating(function ($salesDcr) {
-            $salesDcr->calculateExpense();
-        });
+        return $this->hasMany(SalesDcrExpense::class);
     }
 }

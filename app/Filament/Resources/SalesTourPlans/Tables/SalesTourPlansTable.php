@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\SalesTourPlans\Tables;
 
 use App\Filament\Actions\ApprovalAction;
+use App\Filament\Actions\BulkApprovalAction;
+use App\Models\SalesTourPlan;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -58,11 +60,16 @@ class SalesTourPlansTable
             ])
             ->recordActions([
                 EditAction::make(),
-                ApprovalAction::make(),
+                Action::make('send_for_approval')
+                    // ->visible(fn ($record) => $record->status === 'draft')
+                    ->action(fn (SalesTourPlan $record) =>
+                        $record->update(['approval_status' => 'pending'])
+                    ),
 
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkApprovalAction::make(),
                     DeleteBulkAction::make(),
                 ]),
             ]);
