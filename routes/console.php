@@ -1,9 +1,12 @@
 <?php
 
+use App\Console\Commands\ScanModels;
 use Illuminate\Foundation\Console\ClosureCommand;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
-use App\Console\Commands\ScanModels;
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::command('visits:auto-checkout')->everyMinute();
 
 Artisan::command('inspire', function () {
     /** @var ClosureCommand $this */

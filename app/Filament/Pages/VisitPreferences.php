@@ -2,18 +2,18 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
-use Filament\Schemas\Schema;
-use Filament\Forms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Notifications\Notification;
 use App\Models\VisitPreference;
+use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
+use Filament\Pages\Page;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class VisitPreferences extends Page implements HasForms
 {
@@ -24,6 +24,7 @@ class VisitPreferences extends Page implements HasForms
     protected string $view = 'filament.pages.visit-preferences';
 
     protected static ?string $navigationLabel = 'Visit Preferences';
+
     protected static ?string $title = 'Visit Preferences';
 
     public ?array $data = [];
@@ -64,6 +65,13 @@ class VisitPreferences extends Page implements HasForms
                             ->label('Enforce Check-in before Check-out'),
                         Forms\Components\Toggle::make('allow_manual_time_edit')
                             ->label('Allow Manual Time Edit'),
+                        Forms\Components\Toggle::make('enable_auto_checkout')
+                            ->label('Auto Checkout')
+                            ->live(),
+                        Forms\Components\TimePicker::make('auto_checkout_time')
+                            ->inlineLabel('Auto Checkout Time')
+                            ->seconds(false)
+                            ->visible(fn ($get) => $get('enable_auto_checkout')),
                     ])
                     ->columns(2),
 
@@ -107,7 +115,7 @@ class VisitPreferences extends Page implements HasForms
                                     ->columnSpan(2)
                                     ->visible(fn ($get) => $get('enforce_minimum_duration')),
                             ])
-                            ->columns(3)
+                            ->columns(3),
                     ])
                     ->columnSpanFull(),
 
@@ -130,7 +138,7 @@ class VisitPreferences extends Page implements HasForms
                             ->columns(4)
                             ->addable(false)
                             ->deletable(false)
-                            ->reorderable(false)
+                            ->reorderable(false),
                     ])
                     ->collapsible(),
 
@@ -168,7 +176,6 @@ class VisitPreferences extends Page implements HasForms
             ->success()
             ->send();
     }
-
 
     protected function getHeaderActions(): array
     {
@@ -221,7 +228,7 @@ class VisitPreferences extends Page implements HasForms
         $this->form->fill($preference->fresh()->toArray());
 
         \Filament\Notifications\Notification::make()
-            ->title(ucfirst($industry) . ' preset applied')
+            ->title(ucfirst($industry).' preset applied')
             ->success()
             ->send();
     }
@@ -279,6 +286,8 @@ class VisitPreferences extends Page implements HasForms
                 'enable_check_out' => true,
                 'enforce_check_in_before_check_out' => true,
                 'allow_manual_time_edit' => false,
+                'enable_auto_checkout' => false,
+                'auto_checkout_time' => null,
 
                 'require_gps' => true,
                 'geo_fence_radius_meters' => 150,
@@ -308,6 +317,8 @@ class VisitPreferences extends Page implements HasForms
                 'enable_check_out' => true,
                 'enforce_check_in_before_check_out' => false,
                 'allow_manual_time_edit' => true,
+                'enable_auto_checkout' => false,
+                'auto_checkout_time' => null,
 
                 'require_gps' => true,
                 'geo_fence_radius_meters' => 300,
@@ -336,6 +347,8 @@ class VisitPreferences extends Page implements HasForms
                 'enable_check_out' => true,
                 'enforce_check_in_before_check_out' => false,
                 'allow_manual_time_edit' => true,
+                'enable_auto_checkout' => false,
+                'auto_checkout_time' => null,
 
                 'require_gps' => false,
 
@@ -386,6 +399,8 @@ class VisitPreferences extends Page implements HasForms
             'enable_check_out' => true,
             'enforce_check_in_before_check_out' => true,
             'allow_manual_time_edit' => false,
+            'enable_auto_checkout' => false,
+            'auto_checkout_time' => null,
 
             /* Compliance */
             'require_gps' => true,
@@ -413,5 +428,4 @@ class VisitPreferences extends Page implements HasForms
                 ->toArray(),
         ];
     }
-
 }

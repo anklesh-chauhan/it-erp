@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
-
 class VisitPreference extends BaseModel
 {
     protected $fillable = [
@@ -12,6 +10,8 @@ class VisitPreference extends BaseModel
         'enable_check_out',
         'enforce_check_in_before_check_out',
         'allow_manual_time_edit',
+        'enable_auto_checkout',
+        'auto_checkout_time',
 
         'require_check_in_image',
         'require_check_out_image',
@@ -33,6 +33,7 @@ class VisitPreference extends BaseModel
         'enable_check_out' => 'boolean',
         'enforce_check_in_before_check_out' => 'boolean',
         'allow_manual_time_edit' => 'boolean',
+        'enable_auto_checkout' => 'boolean',
 
         'require_check_in_image' => 'boolean',
         'require_check_out_image' => 'boolean',
@@ -78,5 +79,4 @@ class VisitPreference extends BaseModel
             }
         });
     }
-
 }
