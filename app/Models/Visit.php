@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -68,14 +67,38 @@ class Visit extends BaseModel
     |--------------------------------------------------------------------------
     */
     protected $casts = [
-        'visit_date'       => 'date',
-        'start_time'       => 'datetime',
-        'end_time'         => 'datetime',
-        'approved_at'      => 'datetime',
-        'rescheduled_for'  => 'date',
-        'is_joint_work'    => 'boolean',
+        'visit_date' => 'date',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+        'approved_at' => 'datetime',
+        'rescheduled_for' => 'date',
+        'is_joint_work' => 'boolean',
         'attachments' => 'array',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Booted
+    |--------------------------------------------------------------------------
+    */
+    public static function booted()
+    {
+        static::creating(function ($visit) {
+            if (! $visit->sales_dcr_id && $visit->visit_date !== null) {
+                $dcrService = app(\App\Services\Visit\DcrService::class);
+                $dcr = $dcrService->getOrCreateForDate($visit->visit_date);
+                $visit->sales_dcr_id = $dcr->id;
+            }
+        });
+
+        static::updating(function ($visit) {
+            if ($visit->isDirty('visit_date') && $visit->visit_date !== null) {
+                $dcrService = app(\App\Services\Visit\DcrService::class);
+                $newDcr = $dcrService->getOrCreateForDate($visit->visit_date);
+                $visit->sales_dcr_id = $newDcr->id;
+            }
+        });
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -271,5 +294,4 @@ class Visit extends BaseModel
             ->whereHas('tags', fn ($q) => $q->where('slug', 'general-visit'))
             ->exists();
     }
-
 }

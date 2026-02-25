@@ -23,31 +23,4 @@ class EditSalesDcr extends EditRecord
         ];
     }
 
-    protected function afterSave(): void
-{
-    $feedbackPayload = request()->input('feedback', []);
-    if (empty($feedbackPayload)) {
-        return;
-    }
-
-    foreach ($this->record->visits as $visit) {
-        $uuid = $visit->form_uuid;
-
-        if (! isset($feedbackPayload[$uuid])) {
-            continue;
-        }
-
-        foreach ($feedbackPayload[$uuid] as $questionId => $values) {
-            $visit->feedbacks()->updateOrCreate(
-                ['visit_feedback_question_id' => $questionId],
-                [
-                    'answer' => $values['answer'] ?? null,
-                    'remarks' => $values['remarks'] ?? null,
-                ]
-            );
-        }
-    }
-}
-
-
 }

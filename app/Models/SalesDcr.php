@@ -2,27 +2,49 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SalesDcr extends BaseModel
 {
-    use HasFactory, SoftDeletes, HasApprovalWorkflow;
+    use HasApprovalWorkflow, HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'dcr_date', 'user_id', 'sales_tour_plan_id', 'status',
-        'total_expense', 'submitted_at', 'approved_at', 'remarks'
+        'dcr_date',
+        'user_id',
+        'sales_tour_plan_id',
+        'approval_status',
+        'approved_by',
+        'approved_at',
+        'total_expense',
+        'submitted_at',
+        'approved_at',
+        'remarks',
+        'total_expense_approved',
+        'total_expense_rejected',
+        'rejected_at',
+        'rejected_by',
+        'rejected_remarks',
+        'approved_remarks',
+        'territory_id',
+        'route',
+        'sales_person_id',
+        'sales_manager_id',
+        'distance_covered',
+        'duration',
+        'visits_count',
+        'orders_count',
     ];
 
     protected $casts = [
         'dcr_date' => 'date',
         'submitted_at' => 'timestamp',
         'approved_at' => 'timestamp',
+        'rejected_at' => 'timestamp',
+        'route' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -30,13 +52,8 @@ class SalesDcr extends BaseModel
         return $this->belongsTo(User::class);
     }
 
-    public function visits(): HasMany
+    public function SalesDcrVisits(): HasMany
     {
-        return $this->hasMany(SalesDcrVisit::class);
-    }
-
-    public function expenses()
-    {
-        return $this->hasMany(SalesDcrExpense::class);
+        return $this->hasMany(Visit::class);
     }
 }

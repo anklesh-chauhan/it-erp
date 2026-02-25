@@ -47,7 +47,7 @@ class SalesDcrResource extends Resource
     {
         return [
             SalesDcrVisitsRelationManager::class,
-            SalesDcrExpensesRelationManager::class,
+            // SalesDcrExpensesRelationManager::class,
         ];
     }
 
@@ -56,7 +56,7 @@ class SalesDcrResource extends Resource
         return [
             'index' => ListSalesDcrs::route('/'),
             'create' => CreateSalesDcr::route('/create'),
-            'view' => ViewSalesDcr::route('/{record}'),
+            // 'view' => ViewSalesDcr::route('/{record}'),
             'edit' => EditSalesDcr::route('/{record}/edit'),
         ];
     }

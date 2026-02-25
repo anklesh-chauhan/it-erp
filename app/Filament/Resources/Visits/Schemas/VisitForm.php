@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\Visits\Schemas;
 
+use App\Models\Visit;
 use App\Models\VisitPreference;
 use App\Services\ImageWatermarkService;
-use Filament\Actions\Action;
-use Illuminate\Support\Str;
-use Filament\Schemas\Schema;
+use App\Services\Visit\DcrService;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -14,24 +13,28 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Components\Tabs;
 use Filament\Forms\Components\ViewField;
-use Filament\Schemas\Components\Actions;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Component;
-use Illuminate\Support\Facades\Auth;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 class VisitForm
 {
-
     public static function configure(Schema $schema): Schema
     {
         $prefs = VisitPreference::current();
 
         return $schema
             ->components([
+                Hidden::make('sales_dcr_id')
+                    ->default(function (?Visit $record): int {
+                        $date = $record?->visit_date?->format('Y-m-d') ?? now()->toDateString();
+
+                        return (new DcrService)->getOrCreateForDate($date)->id;
+                    }),
                 Tabs::make('VisitTabs')
                     ->tabs([
                         // --- TAB 1: VISIT DETAILS ---
@@ -45,7 +48,7 @@ class VisitForm
                                                     ->label('Check-in')
                                                     ->seconds(false)
                                                     ->visible(fn () => VisitPreference::current()->allow_manual_time_edit)
-                                                    ->disabled(fn ($record) =>! VisitPreference::current()->allow_manual_time_edit || $record->isCompleted()),
+                                                    ->disabled(fn ($record) => ! VisitPreference::current()->allow_manual_time_edit || $record->isCompleted()),
 
                                                 Forms\Components\TimePicker::make('end_time')
                                                     ->label('Check-out')
@@ -93,7 +96,7 @@ class VisitForm
                                 Toggle::make('is_joint_work')
                                     ->label('Is Joint Work?')
                                     ->reactive()
-                                    ->afterStateUpdated(fn (callable $set, $state) => !$state ? $set('jointUsers', []) : null),
+                                    ->afterStateUpdated(fn (callable $set, $state) => ! $state ? $set('jointUsers', []) : null),
                                 Forms\Components\Select::make('jointUsers')
                                     ->hiddenLabel()
                                     ->relationship('jointUsers', 'name')
@@ -173,84 +176,44 @@ class VisitForm
                         Tabs\Tab::make('Attachments')
                             ->schema([
 
-                            Repeater::make('media')
-                                ->hiddenLabel()
-                                ->relationship()
-                                ->schema([
-                                    FileUpload::make('path')
-                                        ->label('Visit Photo')
-                                        ->image()
-                                        ->directory('visits/photos')
-                                        ->disk('public')
-                                        ->maxSize(2048)
-                                        ->imageResizeTargetWidth(800)
-                                        ->imageResizeTargetHeight(800)
-                                        ->openable()
-                                        ->downloadable()
-                                        ->required()
-                                        ->live(), // only for UI refresh
+                                Repeater::make('media')
+                                    ->hiddenLabel()
+                                    ->relationship()
+                                    ->schema([
+                                        FileUpload::make('path')
+                                            ->label('Visit Photo')
+                                            ->image()
+                                            ->directory('visits/photos')
+                                            ->disk('public')
+                                            ->maxSize(2048)
+                                            ->imageResizeTargetWidth(800)
+                                            ->imageResizeTargetHeight(800)
+                                            ->openable()
+                                            ->downloadable()
+                                            ->required()
+                                            ->live(), // only for UI refresh
 
-                                    Select::make('tags')
-                                        ->relationship('tags', 'name')
-                                        ->multiple()
-                                        ->searchable()
-                                        ->preload(),
+                                        Select::make('tags')
+                                            ->relationship('tags', 'name')
+                                            ->multiple()
+                                            ->searchable()
+                                            ->preload(),
 
-                                    TextEntry::make('processing_status')
-                                        ->state(fn ($record) => $record?->processing_status ?? 'Pending')
-                                        ->visible(fn ($record) => filled($record)),
+                                        TextEntry::make('processing_status')
+                                            ->state(fn ($record) => $record?->processing_status ?? 'Pending')
+                                            ->visible(fn ($record) => filled($record)),
 
-                                    Hidden::make('original_name'),
-                                    Hidden::make('mime_type'),
-                                    Hidden::make('size'),
-                                    Hidden::make('latitude'),
-                                    Hidden::make('longitude'),
-                                ])
-                                ->columns(2),
+                                        Hidden::make('original_name'),
+                                        Hidden::make('mime_type'),
+                                        Hidden::make('size'),
+                                        Hidden::make('latitude'),
+                                        Hidden::make('longitude'),
+                                    ])
+                                    ->columns(2),
 
-                                // Forms\Components\Hidden::make('image_latitude'),
-                                // Forms\Components\Hidden::make('image_longitude'),
-
-                                // Forms\Components\FileUpload::make('attachments')
-                                    // ->label('Visit Photos')
-                                    // ->image()
-                                    // ->multiple()
-                                    // ->directory('visits/photos')
-                                    // ->disk('public')
-                                    // ->reorderable()
-                                    // ->appendFiles()
-                                    // ->maxSize(2048)
-                                    // ->openable()
-                                    // ->downloadable()
-                                    // ->imageResizeTargetWidth(800)
-                                    // ->imageResizeTargetHeight(800)
-
-                                    // // 🔹 1. Capture GPS on Upload
-                                    // ->afterStateUpdated(function ($state, Component $component, callable $get) {
-                                    //     if (blank($state)) return;
-
-                                    //     // Dispatch to JS for browser GPS
-                                    //     $component->getLivewire()->dispatch('capture-image-location');
-
-                                    //     // 🔹 2. Process Watermark for the most recent file
-                                    //     // We wrap this in a tiny delay or check to ensure file exists
-                                    //     $files = (array) $state;
-                                    //     $lastFile = end($files);
-
-                                    //     if ($lastFile) {
-                                    //         ImageWatermarkService::apply(
-                                    //             storage_path('app/public/' . $lastFile),
-                                    //             [
-                                    //                 'latitude'  => $get('image_latitude'),
-                                    //                 'longitude' => $get('image_longitude'),
-                                    //                 'timestamp' => now()->format('d M Y H:i'),
-                                    //             ]
-                                    //         );
-                                    //     }
-                                    // })
-                                    // ->live(), // Ensures coordinates are synced back to the server
-                            ]),
-                    ]),
+                               ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 }

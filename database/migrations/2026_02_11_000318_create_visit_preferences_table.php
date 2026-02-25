@@ -21,6 +21,8 @@ return new class extends Migration
             $table->boolean('enable_check_out')->default(true);
             $table->boolean('enforce_check_in_before_check_out')->default(true);
             $table->boolean('allow_manual_time_edit')->default(false);
+            $table->boolean('enable_auto_checkout')->default(false);
+            $table->time('auto_checkout_time')->nullable();
 
             /* ===============================
              | Proof & Compliance
