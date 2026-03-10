@@ -47,7 +47,7 @@ class SalesDcrResource extends Resource
     {
         return [
             SalesDcrVisitsRelationManager::class,
-            // SalesDcrExpensesRelationManager::class,
+            SalesDcrExpensesRelationManager::class,
         ];
     }
 

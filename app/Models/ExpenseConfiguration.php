@@ -14,7 +14,7 @@ class ExpenseConfiguration extends BaseModel
     use HasFactory, HasApprovalWorkflow;
 
     protected $fillable = [
-        'expense_type_id', 'transport_mode_id', 'role_id', 'territory_id',
+        'expense_type_id', 'transport_mode_id', 'job_role_id', 'position_id', 'territory_id',
         'city_id', 'calculation_type', 'rate', 'max_amount', 'min_amount',
         'requires_attachment', 'requires_approval', 'allow_manual_override',
         'effective_from', 'effective_to', 'is_active'
@@ -37,6 +37,26 @@ class ExpenseConfiguration extends BaseModel
     public function transportMode(): BelongsTo
     {
         return $this->belongsTo(TransportMode::class);
+    }
+
+    public function jobRole(): BelongsTo
+    {
+        return $this->belongsTo(JobRole::class);
+    }
+
+    public function position(): BelongsTo
+    {
+        return $this->belongsTo(Position::class);
+    }
+
+    public function territory(): BelongsTo
+    {
+        return $this->belongsTo(Territory::class);
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
     }
 
     public function conditions(): HasMany

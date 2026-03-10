@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SalesDcrs\RelationManagers;
 
+use App\AutoCalculateExpensesAction;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -14,16 +15,14 @@ use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms;
-use Filament\Tables;
 
 class SalesDcrExpensesRelationManager extends RelationManager
 {
@@ -37,7 +36,7 @@ class SalesDcrExpensesRelationManager extends RelationManager
                     ->relationship('expenseType', 'name')
                     ->required(),
 
-                Forms\Components\Select::make('mode_of_transport_id')
+                Forms\Components\Select::make('transport_mode_id')
                     ->relationship('transportMode', 'name')
                     ->nullable(),
 
@@ -49,7 +48,8 @@ class SalesDcrExpensesRelationManager extends RelationManager
 
                 Forms\Components\TextInput::make('amount')
                     ->numeric()
-                    ->required(),
+                    ->required()
+                    ->live(debounce: 500),
 
                 Forms\Components\Toggle::make('is_auto_calculated')
                     ->disabled(),
@@ -70,6 +70,13 @@ class SalesDcrExpensesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('transportMode.name')
                     ->label('Transport'),
 
+                Tables\Columns\TextColumn::make('quantity')
+                    ->label('Qty'),
+
+                Tables\Columns\TextColumn::make('rate')
+                    ->label('Rate')
+                    ->money('INR'),
+
                 Tables\Columns\TextColumn::make('amount')
                     ->money('INR'),
 
@@ -82,6 +89,7 @@ class SalesDcrExpensesRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make(),
                 AssociateAction::make(),
+                AutoCalculateExpensesAction::make(),
             ])
             ->recordActions([
                 EditAction::make(),

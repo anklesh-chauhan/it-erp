@@ -1,24 +1,20 @@
 <?php
 
-namespace App\Filament\Resources\SalesDcrs\Pages;
+namespace App\Filament\Resources\StandardFareCharts\Pages;
 
-use App\AutoCalculateExpensesAction;
-use App\Filament\Resources\SalesDcrs\SalesDcrResource;
+use App\Filament\Resources\StandardFareCharts\StandardFareChartResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
-use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditSalesDcr extends EditRecord
+class EditStandardFareChart extends EditRecord
 {
-    protected static string $resource = SalesDcrResource::class;
+    protected static string $resource = StandardFareChartResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            AutoCalculateExpensesAction::make(),
-            ViewAction::make(),
             DeleteAction::make(),
             ForceDeleteAction::make(),
             RestoreAction::make(),

@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\AccountMaster;
+use App\Models\NumberSeries;
 use App\Models\SalesTourPlanDetail;
 use App\Models\Visit;
 use App\Models\VisitFeedbackQuestion;
@@ -42,8 +43,7 @@ trait HasVisitManagement
             $detail = SalesTourPlanDetail::findOrFail($detailId);
 
             // Generate Document Number
-            $latestId = Visit::max('id') ?? 0;
-            $docNum = 'VIS-' . str_pad($latestId + 1, 6, '0', STR_PAD_LEFT);
+            $docNum = NumberSeries::getNextNumber(Visit::class);
 
             $visit = Visit::create([
                 'document_number'            => $docNum,
@@ -61,6 +61,9 @@ trait HasVisitManagement
                 'is_joint_work'             => ! empty($detail->joint_with),
             ]);
 
+            // Increemnt Number Series
+            NumberSeries::incrementNextNumber(Visit::class);
+
             // Attach Polymorphic Company
             $visit->visitables()->create([
                 'visitable_type' => AccountMaster::class,
@@ -77,6 +80,8 @@ trait HasVisitManagement
 
             // Initialize Feedback Questions
             $this->initializeVisitFeedbacks($visit);
+
+
 
             return $visit->fresh();
         });

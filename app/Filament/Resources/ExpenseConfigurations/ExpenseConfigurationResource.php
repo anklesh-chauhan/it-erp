@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ExpenseConfigurations;
 use App\Filament\Resources\ExpenseConfigurations\Pages\CreateExpenseConfiguration;
 use App\Filament\Resources\ExpenseConfigurations\Pages\EditExpenseConfiguration;
 use App\Filament\Resources\ExpenseConfigurations\Pages\ListExpenseConfigurations;
+use App\Filament\Resources\ExpenseConfigurations\RelationManagers\ConditionsRelationManager;
 use App\Filament\Resources\ExpenseConfigurations\Schemas\ExpenseConfigurationForm;
 use App\Filament\Resources\ExpenseConfigurations\Tables\ExpenseConfigurationsTable;
 use App\Models\ExpenseConfiguration;
@@ -37,7 +38,7 @@ class ExpenseConfigurationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ConditionsRelationManager::class,
         ];
     }
 

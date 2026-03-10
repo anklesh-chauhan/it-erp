@@ -29,6 +29,7 @@ class Visit extends BaseModel
 
         'sales_tour_plan_id',
         'sales_tour_plan_detail_id',
+        'sales_dcr_id',
 
         'visit_date',
         'start_time',
@@ -78,30 +79,6 @@ class Visit extends BaseModel
 
     /*
     |--------------------------------------------------------------------------
-    | Booted
-    |--------------------------------------------------------------------------
-    */
-    public static function booted()
-    {
-        static::creating(function ($visit) {
-            if (! $visit->sales_dcr_id && $visit->visit_date !== null) {
-                $dcrService = app(\App\Services\Visit\DcrService::class);
-                $dcr = $dcrService->getOrCreateForDate($visit->visit_date);
-                $visit->sales_dcr_id = $dcr->id;
-            }
-        });
-
-        static::updating(function ($visit) {
-            if ($visit->isDirty('visit_date') && $visit->visit_date !== null) {
-                $dcrService = app(\App\Services\Visit\DcrService::class);
-                $newDcr = $dcrService->getOrCreateForDate($visit->visit_date);
-                $visit->sales_dcr_id = $newDcr->id;
-            }
-        });
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | Relationships
     |--------------------------------------------------------------------------
     */
@@ -134,6 +111,11 @@ class Visit extends BaseModel
     public function salesTourPlanDetail(): BelongsTo
     {
         return $this->belongsTo(SalesTourPlanDetail::class);
+    }
+
+    public function salesDcr(): BelongsTo
+    {
+        return $this->belongsTo(SalesDcr::class);
     }
 
     public function approver(): BelongsTo
@@ -294,4 +276,17 @@ class Visit extends BaseModel
             ->whereHas('tags', fn ($q) => $q->where('slug', 'general-visit'))
             ->exists();
     }
+
+    // protected static function boot()
+    // {
+    //     parent::boot();
+
+    //     static::creating(function ($visit) {
+    //         $visit->document_number = NumberSeries::getNextNumber(Visit::class);
+    //     });
+
+    //     static::created(function ($visit) {
+    //         NumberSeries::incrementNextNumber(Visit::class);
+    //     });
+    // }
 }

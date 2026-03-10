@@ -52,8 +52,28 @@ class SalesDcr extends BaseModel
         return $this->belongsTo(User::class);
     }
 
-    public function SalesDcrVisits(): HasMany
+    public function visits(): HasMany
     {
         return $this->hasMany(Visit::class);
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(SalesDcrExpense::class);
+    }
+
+    public function updateVisitCount(): void
+    {
+        $this->visits_count = $this->visits()->count();
+        $this->saveQuietly();
+    }
+
+    public function recalculateTotalExpense(): void
+    {
+        $total = $this->expenses()->sum('amount');
+
+        $this->forceFill([
+            'total_expense' => $total,
+        ])->save();
     }
 }

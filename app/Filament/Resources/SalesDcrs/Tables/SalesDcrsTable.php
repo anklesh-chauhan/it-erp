@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SalesDcrs\Tables;
 
+use App\AutoCalculateExpensesAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -29,6 +30,7 @@ class SalesDcrsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                AutoCalculateExpensesAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

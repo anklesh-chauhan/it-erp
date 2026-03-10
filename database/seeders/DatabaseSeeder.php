@@ -94,6 +94,7 @@ class DatabaseSeeder extends Seeder
             PositionSeeder::class,
             PositionEmployeeMapperSeeder::class,
 
+            ExpenseTypeSeeder::class,
             TransportModeSeeder::class,
             VisitTypeAndPurposeSeeder::class,
             VisitOutcomeSeeder::class,

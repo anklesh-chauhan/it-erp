@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Visits\Schemas;
 
 use App\Models\Visit;
 use App\Models\VisitPreference;
-use App\Services\ImageWatermarkService;
 use App\Services\Visit\DcrService;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
@@ -172,7 +171,14 @@ class VisitForm
                                     ->visible(fn ($record) => filled($record?->primaryCompany())),
                             ]),
 
-                        // --- TAB 4: ATTACHMENTS ---
+                        // --- TAB 4: EXPENSES ---
+                        Tabs\Tab::make('Expenses')
+                            ->schema([
+                                ViewField::make('expenses_summary')
+                                    ->view('filament.visits.expenses-summary'),
+                            ]),
+
+                        // --- TAB 5: ATTACHMENTS ---
                         Tabs\Tab::make('Attachments')
                             ->schema([
 
@@ -211,7 +217,7 @@ class VisitForm
                                     ])
                                     ->columns(2),
 
-                               ]),
+                            ]),
                     ])
                     ->columnSpanFull(),
             ]);

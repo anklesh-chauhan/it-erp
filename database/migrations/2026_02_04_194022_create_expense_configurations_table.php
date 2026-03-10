@@ -24,7 +24,8 @@ return new class extends Migration
                 ->nullOnDelete();
 
             // Scope / applicability
-            $table->foreignId('role_id')->nullable();        // Sales Rep, Manager
+            $table->foreignId('job_role_id')->nullable();
+            $table->foreignId('position_id')->nullable();      // Sales Rep, Manager
             $table->foreignId('territory_id')->nullable();
             $table->foreignId('city_id')->nullable();
 
