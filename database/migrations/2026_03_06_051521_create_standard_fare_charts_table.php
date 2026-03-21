@@ -19,12 +19,12 @@ return new class extends Migration
             | Route Information
             |--------------------------------------------------------------------------
             */
-            $table->foreignId('from_city_id')
-                ->constrained('cities')
+            $table->foreignId('from_area_town_id')
+                ->constrained('city_pin_codes')
                 ->cascadeOnDelete();
 
-            $table->foreignId('to_city_id')
-                ->constrained('cities')
+            $table->foreignId('to_area_town_id')
+                ->constrained('city_pin_codes')
                 ->cascadeOnDelete();
 
             /*
@@ -54,6 +54,13 @@ return new class extends Migration
             $table->foreignId('territory_id')
                 ->nullable()
                 ->constrained()
+                ->nullOnDelete();
+
+            $table->string('route_name')->nullable();
+
+            $table->foreignId('type_master_id')
+                ->nullable()
+                ->constrained('type_masters')
                 ->nullOnDelete();
 
             /*

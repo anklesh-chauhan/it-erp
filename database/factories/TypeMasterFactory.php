@@ -64,6 +64,14 @@ class TypeMasterFactory extends Factory
         ]);
     }
 
+    public function standardFareChartRoot()
+    {
+        return $this->state(fn () => [
+            'typeable_type' => \App\Models\StandardFareChart::class,
+            'parent_id' => null,
+        ]);
+    }
+
     /* =====================================================
      | SUB TYPES
      ===================================================== */

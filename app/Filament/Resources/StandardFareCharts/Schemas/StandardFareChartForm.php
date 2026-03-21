@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\StandardFareCharts\Schemas;
 
+use App\Models\StandardFareChart;
+use App\Models\TypeMaster;
 use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Schemas\Components\Section;
-
+use Filament\Schemas\Components\Utilities\Get;
 
 class StandardFareChartForm
 {
@@ -15,14 +17,14 @@ class StandardFareChartForm
             ->components([
                 Section::make('Route Details')
                     ->schema([
-                        Forms\Components\Select::make('from_city_id')
-                            ->relationship('fromCity', 'name')
+                        Forms\Components\Select::make('from_area_town_id')
+                            ->relationship('fromAreaTown', 'area_town')
                             ->searchable()
                             ->preload()
                             ->required(),
 
-                        Forms\Components\Select::make('to_city_id')
-                            ->relationship('toCity', 'name')
+                        Forms\Components\Select::make('to_area_town_id')
+                            ->relationship('toAreaTown', 'area_town')
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -35,6 +37,15 @@ class StandardFareChartForm
                             ->relationship('territory', 'name')
                             ->searchable()
                             ->preload(),
+
+                        Forms\Components\Select::make('type_master_id')
+                            ->label('SFC Type')
+                            ->options(
+                                TypeMaster::whereNull('parent_id')
+                                    ->where('typeable_type', StandardFareChart::class)
+                                    ->pluck('name', 'id')
+                            ),
+
                     ])->columns(2),
 
                 Section::make('Pricing & Distance')

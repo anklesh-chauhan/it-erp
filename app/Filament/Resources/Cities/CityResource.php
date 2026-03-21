@@ -58,7 +58,7 @@ class CityResource extends BaseResource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('name')->searchable(),
                 TextColumn::make('state.name')->label('State'),
                 TextColumn::make('country.name')->label('Country'),
             ])

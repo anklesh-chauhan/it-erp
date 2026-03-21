@@ -13,23 +13,24 @@ class StandardFareChart extends BaseModel
     use HasFactory, SoftDeletes, HasApprovalWorkflow;
 
     protected $fillable = [
-        'from_city_id',
-        'to_city_id',
+        'from_area_town_id',
+        'to_area_town_id',
         'transport_mode_id',
         'distance_km',
         'fare_amount',
         'territory_id',
         'is_active',
+        'type_master_id',
     ];
 
-    public function fromCity(): BelongsTo
+    public function fromAreaTown(): BelongsTo
     {
-        return $this->belongsTo(City::class, 'from_city_id');
+        return $this->belongsTo(CityPinCode::class, 'from_area_town_id');
     }
 
-    public function toCity(): BelongsTo
+    public function toAreaTown(): BelongsTo
     {
-        return $this->belongsTo(City::class, 'to_city_id');
+        return $this->belongsTo(CityPinCode::class, 'to_area_town_id');
     }
 
     public function transportMode(): BelongsTo
@@ -40,5 +41,10 @@ class StandardFareChart extends BaseModel
     public function territory(): BelongsTo
     {
         return $this->belongsTo(Territory::class, 'territory_id');
+    }
+
+    public function typeMaster()
+    {
+        return $this->belongsTo(TypeMaster::class, 'type_master_id');
     }
 }

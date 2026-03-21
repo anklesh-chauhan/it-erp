@@ -17,11 +17,11 @@ class StandardFareChartsTable
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('fromCity.name')
+                Tables\Columns\TextColumn::make('fromAreaTown.area_town')
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('toCity.name')
+                Tables\Columns\TextColumn::make('toAreaTown.area_town')
                     ->sortable()
                     ->searchable(),
 
@@ -41,6 +41,10 @@ class StandardFareChartsTable
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),
 
+                Tables\Columns\TextColumn::make('typeMaster.name')
+                    ->badge()
+                    ->color('gray'),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -52,10 +56,6 @@ class StandardFareChartsTable
                     ->relationship('transportMode', 'name'),
                 Tables\Filters\SelectFilter::make('territory_id')
                     ->relationship('territory', 'name'),
-                Tables\Filters\SelectFilter::make('from_city_id')
-                    ->relationship('fromCity', 'name'),
-                Tables\Filters\SelectFilter::make('to_city_id')
-                    ->relationship('toCity', 'name'),
             ])
             ->recordActions([
                 EditAction::make(),

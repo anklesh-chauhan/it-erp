@@ -37,7 +37,7 @@ class CityPinCodeResource extends BaseResource
     protected static ?string $model = CityPinCode::class;
 
     protected static ?string $cluster = AddressConfigurationCluster::class;
-    protected static ?string $navigationLabel = 'Pin Codes';
+    protected static ?string $navigationLabel = 'Area Town';
     protected static ?int $navigationSort = 1;
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
 
@@ -69,8 +69,8 @@ class CityPinCodeResource extends BaseResource
     {
         return $table
             ->columns([
-                TextColumn::make('pin_code')->sortable()->searchable(),
                 TextColumn::make('area_town')->sortable()->searchable(),
+                TextColumn::make('pin_code')->sortable()->searchable(),
                 TextColumn::make('city.name')->label('City')->searchable(),
                 TextColumn::make('state.name')->label('State')->searchable(),
                 TextColumn::make('country.name')->label('Country'),
@@ -83,11 +83,9 @@ class CityPinCodeResource extends BaseResource
                 ApprovalAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-
-                        BulkApprovalAction::make(),
-
-DeleteBulkAction::make(),
+                    BulkActionGroup::make([
+                    BulkApprovalAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
