@@ -24,6 +24,7 @@ use App\Models\City;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use App\Filament\Resources\BaseResource;
+use App\Filament\Resources\Cities\RelationManagers\AreaTownRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -82,7 +83,7 @@ DeleteBulkAction::make(),
     public static function getRelations(): array
     {
         return [
-            //
+            AreaTownRelationManager::class,
         ];
     }
 

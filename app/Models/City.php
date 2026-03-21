@@ -28,4 +28,9 @@ class City extends BaseModel
     {
         return $this->hasOne(CityPinCode::class);
     }
+
+    public function areaTowns()
+    {
+        return $this->hasMany(CityPinCode::class, 'city_id');
+    }
 }
