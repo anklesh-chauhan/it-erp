@@ -2,10 +2,11 @@
 
 namespace App\Observers;
 
-use App\Models\Visit;
 use App\Models\SalesDcr;
-use App\Services\Visit\DcrService;
+use App\Models\Visit;
 use App\Services\Expense\ExpenseCalculationService;
+use App\Services\Travel\TravelSegmentService;
+use App\Services\Visit\DcrService;
 
 class VisitObserver
 {
@@ -83,11 +84,13 @@ class VisitObserver
             $visit->visit_status === 'completed' &&
             $visit->sales_dcr_id
         ) {
+            $travelSegmentService = app(TravelSegmentService::class);
             $service = app(ExpenseCalculationService::class);
 
             $dcr = $visit->salesDcr;
 
             if ($dcr !== null) {
+                $travelSegmentService->generateFromActualVisits($dcr);
                 $service->autoCalculateDcrExpenses($dcr);
             }
         }

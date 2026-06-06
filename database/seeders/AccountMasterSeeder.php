@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\AccountMaster;
 use App\Models\Address;
-use App\Models\ContactDetail;
 use App\Models\City;
 use App\Models\CityPinCode;
+use App\Models\ContactDetail;
+use Illuminate\Database\Seeder;
 
 class AccountMasterSeeder extends Seeder
 {
@@ -16,7 +16,7 @@ class AccountMasterSeeder extends Seeder
     public function run(): void
     {
         $this->seedAccounts(1);              // mixed
-        $this->seedAccounts(10, 'customer');  // customers
+        $this->seedAccounts(40, 'customer');  // customers
     }
 
     protected function seedAccounts(int $total, ?string $state = null): void
@@ -25,7 +25,6 @@ class AccountMasterSeeder extends Seeder
 
         for ($i = 1; $i <= $batches; $i++) {
 
-            // ✅ IMPORTANT FIX
             $remaining = $total - (($i - 1) * $this->batchSize);
             $count = min($this->batchSize, $remaining);
 
@@ -50,7 +49,7 @@ class AccountMasterSeeder extends Seeder
             gc_collect_cycles();
 
             $this->command?->info(
-                "Batch {$i}/{$batches}" . ($state ? " ({$state})" : '')
+                "Batch {$i}/{$batches}".($state ? " ({$state})" : '')
             );
         }
     }
@@ -60,7 +59,7 @@ class AccountMasterSeeder extends Seeder
      */
     protected function attachAddresses($accounts): void
     {
-        $allowedCities = ['Ahmedabad', 'Mumbai', 'Bangalore'];
+        $allowedCities = ['Ahmedabad', 'Mahesana', 'Bhavnagar', 'Vadodara'];
 
         $cities = City::whereIn('name', $allowedCities)
             ->with('state', 'country')
@@ -70,35 +69,39 @@ class AccountMasterSeeder extends Seeder
 
             $city = $cities->random();
 
-            $pinCode = CityPinCode::where('city_id', $city->id)
+            $pinCodeRecord = CityPinCode::where('city_id', $city->id)
                 ->inRandomOrder()
                 ->first();
 
-            if (! $pinCode) {
+            if (! $pinCodeRecord) {
                 continue;
             }
 
+            // 1. Create Billing Address (Set as Primary)
             Address::factory()
                 ->forAccount($account)
                 ->billing()
                 ->state([
-                    'city_id'    => $city->id,
-                    'state_id'   => $city->state_id,
+                    'city_id' => $city->id,
+                    'state_id' => $city->state_id,
                     'country_id' => $city->country_id,
-                    'pin_code'   => $pinCode->pin_code,
-                    'area_town' => $pinCode->area_town,
+                    'pin_code' => $pinCodeRecord->pin_code,
+                    'area_town_id' => $pinCodeRecord->id, // Linked to the pin code
+                    'is_primary' => true,               // Mark billing as primary
                 ])
                 ->create();
 
+            // 2. Create Shipping Address (Not Primary)
             Address::factory()
                 ->forAccount($account)
                 ->shipping()
                 ->state([
-                    'city_id'    => $city->id,
-                    'state_id'   => $city->state_id,
+                    'city_id' => $city->id,
+                    'state_id' => $city->state_id,
                     'country_id' => $city->country_id,
-                    'pin_code'   => $pinCode->pin_code,
-                    'area_town' => $pinCode->area_town,
+                    'pin_code' => $pinCodeRecord->pin_code,
+                    'area_town_id' => $pinCodeRecord->id, // Linked to the pin code
+                    'is_primary' => false,
                 ])
                 ->create();
         }
@@ -121,4 +124,3 @@ class AccountMasterSeeder extends Seeder
         }
     }
 }
-

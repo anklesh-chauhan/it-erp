@@ -30,6 +30,12 @@ return new class extends Migration
             // Prevent duplicate assignment
             $table->unique(['patch_id', 'account_master_id']);
 
+            // For reverse lookup (account → patches)
+            $table->index(
+                ['account_master_id'],
+                'account_patch_idx'
+            );
+
         });
     }
 

@@ -13,34 +13,19 @@ return new class extends Migration
     {
         Schema::create('expense_configurations', function (Blueprint $table) {
             $table->id();
-
+            $table->string('name')->nullable();
             $table->foreignId('expense_type_id')
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->foreignId('transport_mode_id')
-                ->nullable()
-                ->constrained()
-                ->nullOnDelete();
-
-            // Scope / applicability
-            $table->foreignId('job_role_id')->nullable();
-            $table->foreignId('position_id')->nullable();      // Sales Rep, Manager
-            $table->foreignId('territory_id')->nullable();
-            $table->foreignId('city_id')->nullable();
-
             // Calculation logic
-            $table->enum('calculation_type', [
-                'fixed',
-                'per_km',
-                'per_day',
-                'per_visit',
-                'manual'
-            ]);
+            $table->string('calculation_strategy'); // flat, per_km, slab, multiplier
 
             $table->decimal('rate', 10, 2)->nullable(); // ₹ per km / day / visit
             $table->decimal('max_amount', 10, 2)->nullable();
             $table->decimal('min_amount', 10, 2)->nullable();
+
+            $table->integer('priority')->default(0);
 
             // Controls
             $table->boolean('requires_attachment')->default(false);

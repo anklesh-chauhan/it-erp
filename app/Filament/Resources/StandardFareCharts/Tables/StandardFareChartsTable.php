@@ -7,8 +7,8 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class StandardFareChartsTable
@@ -17,43 +17,76 @@ class StandardFareChartsTable
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('fromAreaTown.area_town')
+                Tables\Columns\TextColumn::make('fromAreaTown.full_location')
+                    ->label('From')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(
+                        query: function ($query, string $search): void {
+                            $query->whereHas(
+                                'fromAreaTown',
+                                fn ($q) => $q->searchLocation($search)
+                            );
+                        }
+                    )
+                    ->wrap()
+                    ->tooltip(fn ($record) => $record->fromAreaTown?->full_location),
 
-                Tables\Columns\TextColumn::make('toAreaTown.area_town')
+                Tables\Columns\TextColumn::make('toAreaTown.full_location')
+                    ->label('To')
                     ->sortable()
-                    ->searchable(),
-
-                Tables\Columns\TextColumn::make('transportMode.name')
-                    ->badge()
-                    ->color('gray'),
+                    ->searchable(
+                        query: function ($query, string $search): void {
+                            $query->whereHas(
+                                'toAreaTown',
+                                fn ($q) => $q->searchLocation($search)
+                            );
+                        }
+                    )
+                    ->wrap()
+                    ->tooltip(fn ($record) => $record->toAreaTown?->full_location),
 
                 Tables\Columns\TextColumn::make('distance_km')
                     ->label('Distance')
                     ->suffix(' km')
-                    ->sortable(),
+                    ->sortable()
+                    ->alignRight(),
 
                 Tables\Columns\TextColumn::make('fare_amount')
-                    ->money('INR') // Matches your locale
-                    ->sortable(),
+                    ->label('Fare')
+                    ->money('INR')
+                    ->sortable()
+                    ->alignRight(),
 
                 Tables\Columns\IconColumn::make('is_active')
-                    ->boolean(),
+                    ->label('Active')
+                    ->boolean()
+                    ->alignCenter(),
 
                 Tables\Columns\TextColumn::make('typeMaster.name')
+                    ->label('SFC Type')
                     ->badge()
-                    ->color('gray'),
+                    ->color('success'),
+
+                Tables\Columns\TextColumn::make('territory.name')
+                    ->label('Territory')
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('patch.name')
+                    ->label('Patch')
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d M, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('transport_mode_id')
-                    ->relationship('transportMode', 'name'),
+
                 Tables\Filters\SelectFilter::make('territory_id')
                     ->relationship('territory', 'name'),
             ])

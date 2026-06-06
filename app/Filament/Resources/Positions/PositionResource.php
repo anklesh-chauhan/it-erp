@@ -2,46 +2,40 @@
 
 namespace App\Filament\Resources\Positions;
 
-use App\Traits\HasSafeGlobalSearch;
-
+use App\Enums\PositionStatus;
 use App\Filament\Actions\ApprovalAction;
-
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\Positions\Pages\ListPositions;
+use App\Filament\Clusters\HR\OrganizationStructureCluster;
+use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\Positions\Pages\CreatePosition;
 use App\Filament\Resources\Positions\Pages\EditPosition;
-use App\Enums\PositionStatus;
-use App\Filament\Resources\PositionResource\Pages;
-use App\Models\Position;
+use App\Filament\Resources\Positions\Pages\ListPositions;
 use App\Models\Employee;
 use App\Models\OrganizationalUnit;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use App\Filament\Resources\BaseResource;
-use Filament\Tables;
+use App\Models\Position;
+use App\Models\Territory;
+use App\Traits\HasSafeGlobalSearch;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Clusters\HR\EmployeeManagementCluster;
-use App\Filament\Clusters\HR\OrganizationStructureCluster;
 
 class PositionResource extends BaseResource
 {
     use HasSafeGlobalSearch;
+
     protected static ?string $model = Position::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-briefcase';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-briefcase';
 
     protected static ?string $cluster = OrganizationStructureCluster::class;
 
@@ -89,15 +83,41 @@ class PositionResource extends BaseResource
                         ->nullable()
                         ->placeholder('Select a reporting position'),
 
+                    // 1. Multiple Territories
                     Select::make('territories')
-                        ->relationship(
-                            name: 'territories',
-                            titleAttribute: 'name'
-                        )
+                        ->relationship(name: 'territories', titleAttribute: 'name')
                         ->multiple()
                         ->preload()
+                        ->live()                    // Important for reactivity
                         ->searchable()
-                        ->label('Territories'),
+                        ->label('Associated Territories')
+                        ->required(),
+
+                    // 2. HQ Territory (Only from selected territories)
+                    Select::make('hq_territory_id')
+                        ->label('HQ Territory')
+                        ->options(function (Get $get) {
+                            $selectedIds = $get('territories') ?? [];
+
+                            if (empty($selectedIds)) {
+                                return [];
+                            }
+
+                            return Territory::whereIn('id', $selectedIds)
+                                ->orderBy('name')
+                                ->pluck('name', 'id');
+                        })
+                        ->live(onBlur: true)           // More stable reactivity
+                        ->searchable()
+                        ->required()
+                        ->placeholder('Select HQ Territory...')
+                        ->disabled(fn (Get $get) => empty($get('territories')))
+                        ->afterStateUpdated(function (Set $set, $state, Get $get) {
+                            $selected = $get('territories') ?? [];
+                            if ($state && ! in_array($state, $selected)) {
+                                $set('hq_territory_id', null);   // Reset if HQ is no longer valid
+                            }
+                        }),
 
                     Select::make('location_id')
                         ->label('Location')
@@ -109,12 +129,10 @@ class PositionResource extends BaseResource
 
                     Select::make('division_ou_id')
                         ->label('Division')
-                        ->options(fn () =>
-                            \App\Models\OrganizationalUnit::query()
-                                ->whereHas('typeMaster', fn ($q) =>
-                                    $q->where('name', 'Division')
-                                )
-                                ->pluck('name', 'id')
+                        ->options(fn () => OrganizationalUnit::query()
+                            ->whereHas('typeMaster', fn ($q) => $q->where('name', 'Division')
+                            )
+                            ->pluck('name', 'id')
                         )
                         ->searchable()
                         ->preload()
@@ -136,12 +154,13 @@ class PositionResource extends BaseResource
 
                                 if (! $divisionId) {
                                     $query->whereRaw('1 = 0');
+
                                     return;
                                 }
 
                                 $query->where(function ($q) use ($divisionId) {
                                     $q->where('organizational_units.id', $divisionId)
-                                    ->orWhere('organizational_units.parent_id', $divisionId);
+                                        ->orWhere('organizational_units.parent_id', $divisionId);
                                 });
                             }
                         )
@@ -184,8 +203,7 @@ class PositionResource extends BaseResource
                 ->schema([
                     Select::make('employees')
                         ->relationship('employees', 'first_name')
-                        ->getOptionLabelFromRecordUsing(fn (Employee $record) =>
-                            "{$record->employee_id} - {$record->first_name} {$record->last_name}"
+                        ->getOptionLabelFromRecordUsing(fn (Employee $record) => "{$record->employee_id} - {$record->first_name} {$record->last_name}"
                         )
                         ->multiple()
                         ->searchable(['employees.employee_id', 'first_name', 'last_name'])

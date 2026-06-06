@@ -2,45 +2,34 @@
 
 namespace App\Filament\Resources\Patches;
 
-use App\Traits\HasSafeGlobalSearch;
-
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\Patches\Pages\ListPatches;
-use App\Filament\Resources\Patches\Pages\CreatePatch;
-use App\Filament\Resources\Patches\Pages\EditPatch;
-use App\Filament\Resources\PatchResource\Pages;
-use App\Models\AccountMaster;
-use App\Models\Patch;
-use App\Models\CityPinCode;
-use App\Models\ContactDetail; // Renamed for clarity in this context
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\ColorPicker;
-use Filament\Resources\Resource;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ColorColumn;
-use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Repeater\TableColumn;
-use Filament\Forms\Components\Hidden;
-use Filament\Actions\Action;
-use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Group;
-use App\Models\Territory;
-use Filament\Actions\ActionGroup;
-use Filament\Tables\Enums\RecordActionsPosition;
 use App\Filament\Actions\ApprovalAction;
 use App\Filament\Resources\BaseResource;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Facades\Filament;
+use App\Filament\Resources\Patches\Pages\CreatePatch;
+use App\Filament\Resources\Patches\Pages\EditPatch;
+use App\Filament\Resources\Patches\Pages\ListPatches;
+use App\Models\Patch;
+use App\Models\Territory;
 use App\Services\PositionService;
+use App\Traits\HasSafeGlobalSearch;
+use Filament\Actions\ActionGroup;
+// Renamed for clarity in this context
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\ColorColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\RecordActionsPosition;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class PatchResource extends BaseResource
 {
@@ -48,8 +37,10 @@ class PatchResource extends BaseResource
 
     protected static ?string $model = Patch::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-wrench-screwdriver';
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing & Field Sales';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-wrench-screwdriver';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Marketing & Field Sales';
+
     // Added a label for better readability in the navigation
     protected static ?string $navigationLabel = 'Patches';
 
@@ -81,6 +72,7 @@ class PatchResource extends BaseResource
                             if (! $user?->employee) {
                                 // No employee → no territory
                                 $query->whereRaw('1 = 0');
+
                                 return;
                             }
 
@@ -92,6 +84,7 @@ class PatchResource extends BaseResource
                             if (! empty($positionTerritoryIds)) {
                                 // 🔥 PRIMARY RULE
                                 $query->whereIn('territories.id', $positionTerritoryIds);
+
                                 return;
                             }
 
@@ -102,6 +95,7 @@ class PatchResource extends BaseResource
 
                             if (! $employmentDetail) {
                                 $query->whereRaw('1 = 0');
+
                                 return;
                             }
 
@@ -112,6 +106,7 @@ class PatchResource extends BaseResource
 
                             if (empty($ouIds)) {
                                 $query->whereRaw('1 = 0');
+
                                 return;
                             }
 
@@ -139,6 +134,7 @@ class PatchResource extends BaseResource
                             if (! $territoryId) {
                                 // No territory → no pin codes
                                 $query->whereRaw('1 = 0');
+
                                 return;
                             }
 
@@ -154,8 +150,8 @@ class PatchResource extends BaseResource
                     ->columnSpan(1),
 
                 ColorPicker::make('color')
-                            ->nullable()
-                            ->label('Patch Color'),
+                    ->nullable()
+                    ->label('Patch Color'),
 
                 Textarea::make('description')
                     ->label('Remarks')
@@ -169,10 +165,11 @@ class PatchResource extends BaseResource
     public static function table(Table $table): Table
     {
         $table = parent::table($table);
-//         dd([
-//     'permissions' => auth()->user()->getAllPermissions()->pluck('name'),
-//     'territories' => \App\Services\PositionService::getTerritoryIdsForUser(auth()->user()),
-// ]);
+
+        //         dd([
+        //     'permissions' => auth()->user()->getAllPermissions()->pluck('name'),
+        //     'territories' => \App\Services\PositionService::getTerritoryIdsForUser(auth()->user()),
+        // ]);
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -226,10 +223,7 @@ class PatchResource extends BaseResource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // You can add more filters here, e.g., for territory, creation date, etc.
-                // Tables\Filters\SelectFilter::make('territory_id')
-                //     ->relationship('territory', 'name')
-                //     ->label('Filter by Territory'),
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -271,5 +265,6 @@ class PatchResource extends BaseResource
      * Define the default ordering for the table.
      */
     protected static ?string $defaultSortColumn = 'name';
+
     protected static ?string $defaultSortDirection = 'asc';
 }

@@ -2,20 +2,18 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Enums\PositionStatus; // Import the new enum
-
+use App\Enums\PositionStatus;
 use App\Traits\HasApprovalWorkflow;
 use App\Traits\HasVisibilityScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // Import the new enum
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Position extends BaseModel
 {
-    use HasFactory, HasApprovalWorkflow, HasVisibilityScope;
+    use HasApprovalWorkflow, HasFactory, HasVisibilityScope;
 
     /**
      * The table associated with the model.
@@ -40,6 +38,7 @@ class Position extends BaseModel
         'job_grade_id',
         'reports_to_position_id',
         'is_multi_territory', // New field to indicate if the position can have multiple territories
+        'hq_territory_id',
         'description',
         'status',
         'location_id',
@@ -68,6 +67,12 @@ class Position extends BaseModel
     {
         return $this->belongsToMany(Territory::class, 'position_territory_pivot', 'position_id', 'territory_id');
     }
+
+    public function hqTerritory(): BelongsTo
+    {
+        return $this->belongsTo(Territory::class, 'hq_territory_id');
+    }
+
     /**
      * Get the division associated with the position.
      */
@@ -133,16 +138,16 @@ class Position extends BaseModel
     public function organizationalUnits(): BelongsToMany
     {
         return $this->belongsToMany(OrganizationalUnit::class, 'position_organizational_unit_pivot', 'position_id', 'organizational_unit_id')
-                    ->withTimestamps(); // Assuming your pivot table has timestamps based on the other pivot
+            ->withTimestamps(); // Assuming your pivot table has timestamps based on the other pivot
     }
 
     public function employees(): BelongsToMany
     {
         return $this->belongsToMany(Employee::class, 'employee_position_pivot', 'position_id', 'employee_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
-    public function ancestors(): \Illuminate\Support\Collection
+    public function ancestors(): Collection
     {
         $ancestors = collect();
         $current = $this->reportsTo;
@@ -159,5 +164,4 @@ class Position extends BaseModel
     {
         return $this->name;
     }
-
 }

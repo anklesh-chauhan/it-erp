@@ -2,22 +2,29 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ExpenseConfiguration extends BaseModel
 {
-    use HasFactory, HasApprovalWorkflow;
+    use HasApprovalWorkflow, HasFactory;
 
     protected $fillable = [
-        'expense_type_id', 'transport_mode_id', 'job_role_id', 'position_id', 'territory_id',
-        'city_id', 'calculation_type', 'rate', 'max_amount', 'min_amount',
-        'requires_attachment', 'requires_approval', 'allow_manual_override',
-        'effective_from', 'effective_to', 'is_active'
+        'name',
+        'expense_type_id',
+        'calculation_strategy',
+        'rate',
+        'max_amount',
+        'min_amount',
+        'priority',
+        'requires_attachment',
+        'requires_approval',
+        'allow_manual_override',
+        'effective_from',
+        'effective_to',
+        'is_active',
+
     ];
 
     protected $casts = [
@@ -28,6 +35,41 @@ class ExpenseConfiguration extends BaseModel
         'effective_from' => 'date',
         'effective_to' => 'date',
     ];
+
+    public function conditions()
+    {
+        return $this->hasMany(ExpenseConfigurationCondition::class);
+    }
+
+    public function slabs()
+    {
+        return $this->hasMany(ExpenseConfigurationSlab::class);
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(JobRole::class, 'expense_configuration_roles');
+    }
+
+    public function positions()
+    {
+        return $this->belongsToMany(Position::class, 'expense_configuration_positions');
+    }
+
+    public function territories()
+    {
+        return $this->belongsToMany(Territory::class, 'expense_configuration_territories');
+    }
+
+    public function transportModes()
+    {
+        return $this->belongsToMany(TransportMode::class, 'expense_configuration_transport_modes');
+    }
+
+    public function grades()
+    {
+        return $this->belongsToMany(EmpGrade::class, 'expense_configuration_grades');
+    }
 
     public function expenseType(): BelongsTo
     {
@@ -57,10 +99,5 @@ class ExpenseConfiguration extends BaseModel
     public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
-    }
-
-    public function conditions(): HasMany
-    {
-        return $this->hasMany(ExpenseConfigurationCondition::class);
     }
 }

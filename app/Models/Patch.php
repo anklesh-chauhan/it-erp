@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
+use App\Services\PositionService;
 use App\Traits\HasApprovalWorkflow;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Services\PositionService;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Patch extends BaseModel
 {
-    use SoftDeletes, HasApprovalWorkflow;
+    use HasApprovalWorkflow, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -37,6 +35,9 @@ class Patch extends BaseModel
     public function companies(): BelongsToMany
     {
         return $this->belongsToMany(AccountMaster::class)
+            ->using(AccountMasterPatch::class)
+            ->withPivot(['sequence_no', 'distance_km'])
+            ->orderByPivot('sequence_no')
             ->withTimestamps();
     }
 
@@ -44,7 +45,7 @@ class Patch extends BaseModel
     {
         static::saving(function (Patch $model) {
 
-            /** @var \App\Models\User|null $user */
+            /** @var User|null $user */
             $user = Auth::user();
 
             // CLI / Seeder / System safety

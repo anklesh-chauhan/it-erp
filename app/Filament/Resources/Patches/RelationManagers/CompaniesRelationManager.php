@@ -2,27 +2,21 @@
 
 namespace App\Filament\Resources\Patches\RelationManagers;
 
+use App\Models\AccountMaster;
+use App\Models\CityPinCode;
+use App\Models\Territory;
+use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
+use Filament\Tables\Columns\TextInputColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Forms\Components\Select;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Actions\Action;
-use Filament\Notifications\Notification;
-use App\Models\CityPinCode;
-use App\Models\AccountMaster;
-use Illuminate\Contracts\Support\Htmlable;
+use Filament\Tables\Table;
 
 class CompaniesRelationManager extends RelationManager
 {
@@ -47,7 +41,7 @@ class CompaniesRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('code')
+                TextColumn::make('account_code')
                     ->label('Customer Code')
                     ->searchable()
                     ->toggleable(),
@@ -55,14 +49,40 @@ class CompaniesRelationManager extends RelationManager
                 TextColumn::make('typeMaster.name')
                     ->label('Type')
                     ->badge()
-                    ->formatStateUsing(fn ($state, $record) =>
-                        $record->typeMaster?->parent?->name ?? $record->typeMaster?->name ?? 'Customer'
+                    ->formatStateUsing(fn ($state, $record) => $record->typeMaster?->parent?->name ?? $record->typeMaster?->name ?? 'Customer'
                     )
                     ->color('primary'),
 
-                TextColumn::make('addresses.pin_code')
+                TextInputColumn::make('sequence_no')
+                    ->label('Sequence No')
+                    ->rules(['nullable', 'integer', 'min:1'])
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->updateStateUsing(function ($record, $state) {
+                        $record->pivot->update([
+                            'sequence_no' => $state,
+                        ]);
+                    }),
+
+                TextColumn::make('distance_km')
+                    ->label('Distance (km)')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('addresses.areaTown.area_town')
+                    ->label('Primary Area/Town')
+                    ->getStateUsing(function ($record) {
+                        // Locate the primary address record
+                        $primaryAddress = $record->addresses->firstWhere('is_primary', true);
+
+                        // Return the area/town name or a dash if not found
+                        return $primaryAddress?->areaTown?->area_town ?? '-';
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                TextColumn::make('addresses.areaTown.pin_code')
                     ->label('Pin Code(s)')
-                    ->getStateUsing(fn ($record) => $record->addresses->pluck('pin_code')->unique()->implode(', '))
+                    ->getStateUsing(fn ($record) => $record->addresses->pluck('areaTown.pin_code')->unique()->implode(', '))
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -81,6 +101,7 @@ class CompaniesRelationManager extends RelationManager
 
                         if (! $patch->territory_id) {
                             Notification::make()->title('No territory selected')->danger()->send();
+
                             return;
                         }
 
@@ -90,13 +111,13 @@ class CompaniesRelationManager extends RelationManager
 
                         if ($pinCodes->isEmpty()) {
                             Notification::make()->title('No pin codes found')->warning()->send();
+
                             return;
                         }
 
                         $companyIds = AccountMaster::query()
                             ->whereHas('addresses', fn ($q) => $q->whereIn('pin_code', $pinCodes))
-                            ->whereHas('typeMaster', fn ($q) =>
-                                $q->where('name', 'Customer')
+                            ->whereHas('typeMaster', fn ($q) => $q->where('name', 'Customer')
                                 ->orWhereHas('parent', fn ($q) => $q->where('name', 'Customer'))
                             )
                             ->pluck('id');
@@ -104,7 +125,7 @@ class CompaniesRelationManager extends RelationManager
                         $patch->companies()->syncWithoutDetaching($companyIds);
 
                         Notification::make()
-                            ->title($companyIds->count() . ' companies added')
+                            ->title($companyIds->count().' companies added')
                             ->success()
                             ->send();
                     })
@@ -135,10 +156,10 @@ class CompaniesRelationManager extends RelationManager
                                 $pinCodes = collect();
 
                                 if ($patch->city_pin_code_id) {
-                                    $pinCodes = \App\Models\CityPinCode::where('id', $patch->city_pin_code_id)
+                                    $pinCodes = CityPinCode::where('id', $patch->city_pin_code_id)
                                         ->pluck('pin_code');
                                 } else {
-                                    $territory = \App\Models\Territory::with('cityPinCodes')
+                                    $territory = Territory::with('cityPinCodes')
                                         ->find($patch->territory_id);
 
                                     $pinCodes = $territory?->cityPinCodes?->pluck('pin_code') ?? collect();
@@ -148,24 +169,22 @@ class CompaniesRelationManager extends RelationManager
                                     return [];
                                 }
 
-                                return \App\Models\AccountMaster::query()
+                                return AccountMaster::query()
                                     ->whereHas('addresses', fn ($q) => $q->whereIn('pin_code', $pinCodes))
-                                    ->whereHas('typeMaster', fn ($q) =>
-                                        $q->where('name', 'Customer')
+                                    ->whereHas('typeMaster', fn ($q) => $q->where('name', 'Customer')
                                         ->orWhereHas('parent', fn ($q) => $q->where('name', 'Customer'))
                                     )
                                     ->pluck('name', 'id')
                                     ->toArray();
                             })
-                            ->getOptionLabelFromRecordUsing(fn (\App\Models\AccountMaster $record) =>
-                                ($record->typeMaster?->parent?->name ?? $record->typeMaster?->name ?? 'Customer')
-                                . ' – ' . $record->name
+                            ->getOptionLabelFromRecordUsing(fn (AccountMaster $record) => ($record->typeMaster?->parent?->name ?? $record->typeMaster?->name ?? 'Customer')
+                                .' – '.$record->name
                             ),
                     ])
                     ->preloadRecordSelect()
                     ->action(function (array $data, $livewire) {
                         $livewire->ownerRecord->companies()->attach($data['recordId']);
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Company attached successfully')
                             ->success()
                             ->send();
@@ -177,7 +196,7 @@ class CompaniesRelationManager extends RelationManager
                     ->icon('heroicon-o-trash')
                     ->action(function ($record, $livewire) {
                         $livewire->ownerRecord->companies()->detach($record);
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Company removed from patch')
                             ->success()
                             ->send();
@@ -188,7 +207,7 @@ class CompaniesRelationManager extends RelationManager
                     ->label('Remove Selected')
                     ->action(function ($records, $livewire) {
                         $livewire->ownerRecord->companies()->detach($records);
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Selected companies removed')
                             ->success()
                             ->send();

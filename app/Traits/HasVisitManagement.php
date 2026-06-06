@@ -7,7 +7,6 @@ use App\Models\NumberSeries;
 use App\Models\SalesTourPlanDetail;
 use App\Models\Visit;
 use App\Models\VisitFeedbackQuestion;
-use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -45,20 +44,28 @@ trait HasVisitManagement
             // Generate Document Number
             $docNum = NumberSeries::getNextNumber(Visit::class);
 
+            $territoryId = $detail->patches()
+                ->whereKey($patchId)
+                ->value('patches.territory_id');
+
+            if (! $territoryId) {
+                throw new \DomainException('Selected patch is not assigned to this tour plan detail.');
+            }
+
             $visit = Visit::create([
-                'document_number'            => $docNum,
-                'employee_id'               => Auth::id(),
-                'reporting_manager_id'      => Auth::user()->reporting_manager_id,
-                'sales_tour_plan_id'        => $detail->sales_tour_plan_id,
+                'document_number' => $docNum,
+                'employee_id' => Auth::id(),
+                'reporting_manager_id' => Auth::user()->reporting_manager_id,
+                'sales_tour_plan_id' => $detail->sales_tour_plan_id,
                 'sales_tour_plan_detail_id' => $detail->id,
-                'territory_id'              => $detail->territory_id,
-                'patch_id'                  => $patchId,
-                'visit_date'                => today(),
-                'visit_type'                => 'planned',
-                'visit_status'              => 'draft',
-                'approval_status'           => 'pending',
-                'remarks'                   => $detail->remarks,
-                'is_joint_work'             => ! empty($detail->joint_with),
+                'territory_id' => $territoryId,
+                'patch_id' => $patchId,
+                'visit_date' => today(),
+                'visit_type' => 'planned',
+                'visit_status' => 'draft',
+                'approval_status' => 'pending',
+                'remarks' => $detail->remarks,
+                'is_joint_work' => ! empty($detail->joint_with),
             ]);
 
             // Increemnt Number Series
@@ -67,7 +74,7 @@ trait HasVisitManagement
             // Attach Polymorphic Company
             $visit->visitables()->create([
                 'visitable_type' => AccountMaster::class,
-                'visitable_id'   => $companyId,
+                'visitable_id' => $companyId,
             ]);
 
             if (! empty($detail->joint_with)) {
@@ -80,8 +87,6 @@ trait HasVisitManagement
 
             // Initialize Feedback Questions
             $this->initializeVisitFeedbacks($visit);
-
-
 
             return $visit->fresh();
         });
@@ -134,8 +139,8 @@ trait HasVisitManagement
             $visit->feedbacks()
                 ->where('visit_feedback_question_id', $questionId)
                 ->update([
-                    'answer'     => $row['answer'] ?? null,
-                    'remarks'    => $row['remarks'] ?? null,
+                    'answer' => $row['answer'] ?? null,
+                    'remarks' => $row['remarks'] ?? null,
                     'updated_by' => Auth::id(),
                 ]);
         }

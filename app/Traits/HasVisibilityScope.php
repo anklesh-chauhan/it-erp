@@ -2,16 +2,18 @@
 
 namespace App\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
-use App\Services\PositionService;
+use App\Models\BaseModel;
 use App\Services\OrganizationalUnitService;
+use App\Services\PositionService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 trait HasVisibilityScope
 {
     public function scopeApplyVisibility(Builder $query, string $model): Builder
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (! $user) {
             return $query->whereRaw('1 = 0');
@@ -35,16 +37,16 @@ trait HasVisibilityScope
             /* =====================================================
             | A. ALWAYS SHOW OWN RECORDS
             ===================================================== */
-            if (\Schema::hasColumn($table, 'created_by')) {
-                $q->orWhere($table . '.created_by', $user->id);
+            if (Schema::hasColumn($table, 'created_by')) {
+                $q->orWhere($table.'.created_by', $user->id);
             }
 
-            if (\Schema::hasColumn($table, 'user_id')) {
-                $q->orWhere($table . '.user_id', $user->id);
+            if (Schema::hasColumn($table, 'user_id')) {
+                $q->orWhere($table.'.user_id', $user->id);
             }
 
-            if (\Schema::hasColumn($table, 'login_id')) {
-                $q->orWhere($table . '.login_id', $user->id);
+            if (Schema::hasColumn($table, 'login_id')) {
+                $q->orWhere($table.'.login_id', $user->id);
             }
 
             /* =====================================================
@@ -55,13 +57,25 @@ trait HasVisibilityScope
                 $territoryIds = PositionService::getTerritoryIdsForUser($user);
 
                 if (! empty($territoryIds)) {
+                    $modelInstance = $q->getModel();
+                    $usesCustomTerritoryScope = false;
 
-                    if (method_exists($q->getModel(), 'scopeApplyTerritoryVisibility')) {
-                        $q->orWhere(function ($tq) use ($territoryIds) {
+                    if (method_exists($modelInstance, 'scopeApplyTerritoryVisibility')) {
+                        $declaringClass = (new \ReflectionMethod($modelInstance, 'scopeApplyTerritoryVisibility'))
+                            ->getDeclaringClass()
+                            ->getName();
+
+                        $usesCustomTerritoryScope = $declaringClass !== BaseModel::class;
+                    }
+
+                    if ($usesCustomTerritoryScope) {
+                        $q->orWhere(function (Builder $tq) use ($territoryIds) {
                             $tq->applyTerritoryVisibility($territoryIds);
                         });
-                    } elseif (\Schema::hasColumn($table, 'territory_id')) {
-                        $q->orWhereIn($table . '.territory_id', $territoryIds);
+                    } elseif (Schema::hasColumn($table, 'territory_id')) {
+                        $q->orWhereIn($table.'.territory_id', $territoryIds);
+                    } elseif (Schema::hasColumn($table, 'id') && $table === 'territories') {
+                        $q->orWhereIn($table.'.id', $territoryIds);
                     }
                 }
             }

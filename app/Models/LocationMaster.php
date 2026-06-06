@@ -2,16 +2,14 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Builder;
-
 use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class LocationMaster extends BaseModel
 {
-    use HasFactory, HasApprovalWorkflow;
+    use HasApprovalWorkflow, HasFactory;
 
     protected $fillable = [
         'name',
@@ -23,17 +21,23 @@ class LocationMaster extends BaseModel
         'image',
         'typeable_id',
         'typeable_type',
-        'parent_id', // Added for sublocations
+        'parent_id',
     ];
+
+    public function territories(): BelongsToMany
+    {
+        return $this->belongsToMany(Territory::class, 'location_territory', 'location_master_id', 'territory_id')
+            ->withTimestamps();
+    }
 
     public function typeable()
     {
         return $this->morphTo();
     }
 
-    public function address()
+    public function addresses()
     {
-        return $this->morphOne(Address::class, 'addressable');
+        return $this->morphMany(Address::class, 'addressable');
     }
 
     public function contactDetail()
@@ -59,8 +63,8 @@ class LocationMaster extends BaseModel
     public function items()
     {
         return $this->belongsToMany(ItemMaster::class, 'item_location')
-                    ->withPivot('quantity') // Include quantity in the pivot table
-                    ->withTimestamps();
+            ->withPivot('quantity') // Include quantity in the pivot table
+            ->withTimestamps();
     }
 
     public function employmentDetails()
@@ -81,7 +85,7 @@ class LocationMaster extends BaseModel
         });
 
         static::saving(function ($model) {
-            if ($model->typeable_id && !$model->typeable_type) {
+            if ($model->typeable_id && ! $model->typeable_type) {
                 $model->typeable_type = TypeMaster::class;
             }
         });

@@ -2,13 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\AddressType;
-use App\Models\DealStage;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
-
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -52,7 +49,6 @@ class DatabaseSeeder extends Seeder
             FollowUpPrioritySeeder::class,
             UnitOfMeasurementSeeder::class,
             ItemBrandSeeder::class,
-
             PackingTypeSeeder::class,
             DealStageSeeder::class,
             TypeMasterSeeder::class,
@@ -77,31 +73,27 @@ class DatabaseSeeder extends Seeder
             TerritorySeeder::class,
             AccountMasterSeeder::class,
             LocationMasterSeeder::class,
-
             ItemCategorySeeder::class,
             ItemMasterSeeder::class,
-
             SalesUsersSeeder::class,
             DepartmentRoleSeeder::class,
-
             LeaveRuleCategorySeeder::class,
             LeaveRuleSeeder::class,
             LeaveDemoDataSeeder::class,
-
             HolidaySeeder::class,
             JobRoleSeeder::class,
-
             PositionSeeder::class,
             PositionEmployeeMapperSeeder::class,
-
             ExpenseTypeSeeder::class,
             TransportModeSeeder::class,
             VisitTypeAndPurposeSeeder::class,
             VisitOutcomeSeeder::class,
             VisitFeedbackQuestionSeeder::class,
             VisitPreferenceSeeder::class,
-
+            ExpensePolicySeeder::class,
             ImageTagSeeder::class,
+            PatchSeeder::class,
+            StandardFareChartSeeder::class,
         ]);
     }
 }
@@ -127,4 +119,3 @@ class ModelHasRolesSeeder extends Seeder
         DB::table('model_has_roles')->insert($roleAssignments);
     }
 }
-

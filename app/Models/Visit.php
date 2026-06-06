@@ -172,6 +172,11 @@ class Visit extends BaseModel
         return $this->morphMany(FollowUp::class, 'followupable');
     }
 
+    public function travelSegments(): HasMany
+    {
+        return $this->hasMany(TravelSegment::class);
+    }
+
     public function nextFollowUp()
     {
         return $this->followUps()

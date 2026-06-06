@@ -13,18 +13,18 @@ return new class extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('company_id');
+            $table->foreignId('company_id')->nullable();      // ✅ Make company optional
             $table->string('street');
-            $table->string('area_town')->nullable();
             $table->integer('pin_code'); // To relate with `city_pin_codes`
+            $table->foreignId('area_town_id')->nullable()->constrained('city_pin_codes')->onDelete('cascade');
             $table->foreignId('city_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('state_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('country_id')->nullable()->constrained()->onDelete('cascade');
+            $table->integer('sort')->nullable();
+            $table->boolean('is_primary')->default(false);
             $table->blameable();
             $table->blameableSoftDeletes();
             $table->timestamps();
-
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 

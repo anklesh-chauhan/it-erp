@@ -4,21 +4,22 @@ namespace App;
 
 use App\Models\ExpenseConfiguration;
 use App\Models\SalesDcr;
+use App\Services\Expense\BuildsExpenseContext;
 use Illuminate\Database\Eloquent\Collection;
 
 class ExpenseConfigurationMatcher
 {
-    /**
-     * @param  array<string, mixed>  $context
-     */
+    use BuildsExpenseContext;
+
     public function getApplicableConfigurations(
         SalesDcr $dcr,
         ?int $expenseTypeId = null,
         ?int $transportModeId = null,
         array $context = []
     ): Collection {
+
         $query = ExpenseConfiguration::query()
-            ->with('conditions')
+            ->with(['conditions', 'slabs'])
             ->where('is_active', true)
             ->whereDate('effective_from', '<=', $dcr->dcr_date)
             ->where(function ($q) use ($dcr) {
@@ -26,159 +27,83 @@ class ExpenseConfigurationMatcher
                     ->orWhereDate('effective_to', '>=', $dcr->dcr_date);
             });
 
-        if ($expenseTypeId !== null) {
+        if ($expenseTypeId) {
             $query->where('expense_type_id', $expenseTypeId);
         }
 
-        if ($transportModeId !== null) {
-            $query->where('transport_mode_id', $transportModeId);
-        }
-
-        if ($dcr->territory_id !== null) {
-            $query->where(function ($q) use ($dcr) {
-                $q->whereNull('territory_id')
-                    ->orWhere('territory_id', $dcr->territory_id);
+        if ($transportModeId) {
+            $query->whereHas('transportModes', function ($q) use ($transportModeId) {
+                $q->where('transport_mode_id', $transportModeId);
             });
         }
 
-        $configs = $query->get();
-
-        if ($configs->isEmpty()) {
-            return $configs;
-        }
-
-        $facts = $this->buildFacts($dcr, $context);
-
-        return $configs->filter(function (ExpenseConfiguration $config) use ($facts) {
-            if ($config->conditions->isEmpty()) {
-                return true;
-            }
-
-            foreach ($config->conditions as $condition) {
-                if (! $this->matchesCondition($condition->condition_key, $condition->operator, $condition->value, $facts)) {
-                    return false;
-                }
-            }
-
-            return true;
+        $query->where(function ($q) use ($dcr) {
+            $q->whereDoesntHave('territories')
+                ->orWhereHas('territories', fn ($q2) => $q2->where('territory_id', $dcr->territory_id)
+                );
         });
+
+        $configs = $query->orderByDesc('priority')->get();
+
+        $facts = $this->buildExpenseContext($dcr, $context);
+
+        return $configs->filter(fn ($config) => $this->matchConditions($config, $facts)
+        );
     }
 
-    /**
-     * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
-     */
-
-    protected function buildFacts(SalesDcr $dcr, array $context): array
+    protected function matchConditions($config, $facts): bool
     {
-        $dcr->loadMissing('user', 'visits');
+        foreach ($config->conditions as $condition) {
+            if (! $this->evaluate($condition, $facts)) {
+                return false;
+            }
+        }
 
-        $facts = [];
-
-        /*
-        |--------------------------------------------------------------------------
-        | Core Visit Aggregates
-        |--------------------------------------------------------------------------
-        */
-
-        $facts['visit_count'] = $dcr->visits_count
-            ?? $dcr->visits->count();
-
-        $facts['joint_work'] = $dcr->visits
-            ->where('is_joint_work', true)
-            ->isNotEmpty();
-
-        $facts['distance'] = $dcr->distance_covered ?? 0;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Role & User Facts
-        |--------------------------------------------------------------------------
-        */
-
-        $facts['role_id'] = $dcr->user?->role_id;
-        $facts['user_id'] = $dcr->user_id;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Territory / Location Facts
-        |--------------------------------------------------------------------------
-        */
-
-        $facts['territory_id'] = $dcr->territory_id;
-        $facts['city_id'] = $dcr->city_id ?? null;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Date-Based Facts
-        |--------------------------------------------------------------------------
-        */
-
-        $facts['day_of_week'] = $dcr->dcr_date?->format('l');
-        $facts['month'] = $dcr->dcr_date?->format('m');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Business Logic Facts
-        |--------------------------------------------------------------------------
-        */
-
-        $facts['outstation'] = $this->isOutstation($dcr);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Merge Extra Runtime Context
-        |--------------------------------------------------------------------------
-        */
-
-        return array_merge($facts, $context);
+        return true;
     }
 
-    protected function isOutstation(SalesDcr $dcr): bool
+    protected function evaluate($condition, $facts): bool
     {
-        if (! $dcr->user || ! $dcr->territory_id) {
+        if (! array_key_exists($condition->condition_key, $facts)) {
             return false;
         }
 
-        return $dcr->territory_id !== $dcr->user->territory_id;
-    }
+        $factValue = $facts[$condition->condition_key];
+        $conditionValue = $this->castConditionValue($condition->value, $factValue);
 
-    /**
-     * @param  array<string, mixed>  $facts
-     */
-    protected function matchesCondition(string $key, string $operator, string $value, array $facts): bool
-    {
-        if (! array_key_exists($key, $facts)) {
+        if ($factValue === null) {
             return false;
         }
 
-        $factValue = $facts[$key];
-
-        if (is_bool($factValue)) {
-            $expected = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
-            return $expected === null ? false : $factValue === $expected;
-        }
-
-        if (is_numeric($factValue) && is_numeric($value)) {
-            $factNumber = (float) $factValue;
-            $expectedNumber = (float) $value;
-
-            return match ($operator) {
-                '=', '==' => $factNumber === $expectedNumber,
-                '!=', '<>' => $factNumber !== $expectedNumber,
-                '>' => $factNumber > $expectedNumber,
-                '>=' => $factNumber >= $expectedNumber,
-                '<' => $factNumber < $expectedNumber,
-                '<=' => $factNumber <= $expectedNumber,
-                default => false,
-            };
-        }
-
-        return match ($operator) {
-            '=', '==' => (string) $factValue === $value,
-            '!=', '<>' => (string) $factValue !== $value,
+        return match ($condition->operator) {
+            '=' => $factValue == $conditionValue,
+            '!=' => $factValue != $conditionValue,
+            '>' => $factValue > $conditionValue,
+            '>=' => $factValue >= $conditionValue,
+            '<' => $factValue < $conditionValue,
+            '<=' => $factValue <= $conditionValue,
             default => false,
         };
+    }
+
+    protected function castConditionValue(mixed $raw, mixed $factValue): mixed
+    {
+        if (is_bool($factValue)) {
+            return filter_var($raw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+        }
+
+        if (is_int($factValue)) {
+            return (int) $raw;
+        }
+
+        if (is_float($factValue)) {
+            return (float) $raw;
+        }
+
+        if (is_numeric($factValue)) {
+            return (float) $raw;
+        }
+
+        return (string) $raw;
     }
 }

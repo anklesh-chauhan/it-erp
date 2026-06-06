@@ -2,19 +2,17 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
+use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-use App\Traits\HasApprovalWorkflow;
-use Illuminate\Database\Eloquent\Builder;
-
 class Territory extends BaseModel
 {
-    use SoftDeletes, HasApprovalWorkflow;
+    use HasApprovalWorkflow, SoftDeletes;
+
     protected $fillable = [
         'name',
         'code',
@@ -63,7 +61,6 @@ class Territory extends BaseModel
         return $this->belongsTo(Region::class, 'region_id');
     }
 
-
     /**
      * Get the child territories.
      */
@@ -74,7 +71,7 @@ class Territory extends BaseModel
 
     public function patches()
     {
-        return $this->hasMany(\App\Models\Patch::class, 'territory_id');
+        return $this->hasMany(Patch::class, 'territory_id');
     }
 
     /**
@@ -83,7 +80,7 @@ class Territory extends BaseModel
     public function divisions(): BelongsToMany
     {
         return $this->belongsToMany(OrganizationalUnit::class, 'territory_division_pivot', 'territory_id', 'division_ou_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -92,8 +89,8 @@ class Territory extends BaseModel
     public function cityPinCodes(): BelongsToMany
     {
         return $this->belongsToMany(CityPinCode::class, 'territory_city_pin_code_pivots', 'territory_id', 'city_pin_code_id')
-                    ->with('city')
-                    ->withTimestamps();
+            ->with('city')
+            ->withTimestamps();
     }
 
     /**
@@ -107,6 +104,12 @@ class Territory extends BaseModel
     public function positions()
     {
         return $this->belongsToMany(Position::class, 'position_territory_pivot', 'territory_id', 'position_id')
+            ->withTimestamps();
+    }
+
+    public function locations(): BelongsToMany
+    {
+        return $this->belongsToMany(LocationMaster::class, 'location_territory', 'territory_id', 'location_master_id')
             ->withTimestamps();
     }
 }

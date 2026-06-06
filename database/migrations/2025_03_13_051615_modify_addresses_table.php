@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('addresses', function (Blueprint $table) {
-            $table->foreignId('company_id')->nullable()->change();         // ✅ Make company optional
             $table->foreignId('contact_detail_id')->nullable()->constrained('contact_details')->onDelete('cascade'); // ✅ Add optional contact link
         });
     }

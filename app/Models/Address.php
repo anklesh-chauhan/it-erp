@@ -2,23 +2,23 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-
 use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Address extends BaseModel
 {
-    use HasFactory, HasApprovalWorkflow;
+    use HasApprovalWorkflow, HasFactory;
 
     protected $fillable = [
-        'company_id', 'contact_detail_id', 'address_type', 'street', 'area_town', 'pin_code',
-        'city_id', 'state_id', 'country_id', 'sort', 'addressable_id', 'addressable_type', 'type_master_id',
+        'company_id', 'contact_detail_id', 'address_type', 'street', 'area_town_id', 'pin_code',
+        'city_id', 'state_id', 'country_id', 'sort', 'is_primary', 'addressable_id', 'addressable_type', 'type_master_id',
     ];
+
+    public function areaTown()
+    {
+        return $this->belongsTo(CityPinCode::class);
+    }
 
     public function city()
     {
@@ -70,5 +70,4 @@ class Address extends BaseModel
         // Assuming the relationship is 1:1 or 1:0 for a registered GST address
         return $this->hasOne(AccountMasterGSTDetail::class);
     }
-
 }

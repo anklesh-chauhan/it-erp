@@ -2,10 +2,14 @@
 
 namespace App\Services\Approval;
 
+use App\Domains\Approval\Contracts\ApprovalHandler;
+use App\Domains\Leave\Handlers\LeaveApprovalHandler;
+use App\Domains\SalesDocument\Handlers\QuoteApprovalHandler;
+use App\Domains\Tour\Handlers\SalesTourPlanApprovalHandler;
+use App\Domains\Tour\Handlers\SalesTourPlanDetailApprovalHandler;
 use App\Models\Approval;
 use Illuminate\Database\Eloquent\Model;
 use LogicException;
-use App\Domains\Approval\Contracts\ApprovalHandler;
 
 class ApprovalDomainDispatcher
 {
@@ -32,8 +36,10 @@ class ApprovalDomainDispatcher
     protected function resolveAllHandlers(): array
     {
         return [
-            \App\Domains\Leave\Handlers\LeaveApprovalHandler::class,
-            \App\Domains\SalesDocument\Handlers\QuoteApprovalHandler::class,
+            LeaveApprovalHandler::class,
+            QuoteApprovalHandler::class,
+            SalesTourPlanApprovalHandler::class,
+            SalesTourPlanDetailApprovalHandler::class,
             // later: scan filesystem or config
         ];
     }
@@ -43,7 +49,7 @@ class ApprovalDomainDispatcher
      *
      * @throws LogicException
      */
-    public function dispatch(Approval $approval): void
+    public function dispatch(Approval $approval, ?string $approvalStatus = null): void
     {
         $approvable = $approval->approvable;
 
@@ -55,7 +61,7 @@ class ApprovalDomainDispatcher
 
         if (! $handlerClass) {
             throw new LogicException(
-                "No ApprovalHandler found for". $approvable::class
+                'No ApprovalHandler found for'.$approvable::class
             );
         }
 

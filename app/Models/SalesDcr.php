@@ -62,6 +62,11 @@ class SalesDcr extends BaseModel
         return $this->hasMany(SalesDcrExpense::class);
     }
 
+    public function travelSegments(): HasMany
+    {
+        return $this->hasMany(TravelSegment::class);
+    }
+
     public function updateVisitCount(): void
     {
         $this->visits_count = $this->visits()->count();

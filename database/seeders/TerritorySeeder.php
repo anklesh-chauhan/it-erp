@@ -2,13 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\City;
-use App\Models\Territory;
-use App\Helpers\TypeMasterHelper;
-use App\Models\CityPinCode;
 use App\Enums\TerritoryStatus;
+use App\Models\City;
+use App\Models\CityPinCode;
+use App\Models\Territory;
+use Illuminate\Database\Seeder;
 
 class TerritorySeeder extends Seeder
 {
@@ -19,8 +17,9 @@ class TerritorySeeder extends Seeder
     {
         $cities = [
             'Ahmedabad',
-            'Mumbai',
-            'Bangalore',
+            'Mahesana',
+            'Bhavnagar',
+            'Vadodara',
         ];
 
         foreach ($cities as $cityName) {
@@ -29,6 +28,7 @@ class TerritorySeeder extends Seeder
 
             if (! $city) {
                 $this->command->warn("City not found: {$cityName}");
+
                 continue;
             }
 
@@ -49,6 +49,7 @@ class TerritorySeeder extends Seeder
 
             if ($pinCodeIds->isEmpty()) {
                 $this->command->warn("No pincodes found for {$cityName}");
+
                 continue;
             }
 

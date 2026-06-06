@@ -6,22 +6,24 @@ use App\ExpenseConfigurationMatcher;
 use App\Models\ExpenseConfiguration;
 use App\Models\SalesDcr;
 use App\Models\SalesDcrExpense;
-use App\Models\Visit;
+use Illuminate\Support\Collection;
 
 class ExpenseCalculationService
 {
+    use BuildsExpenseContext;
+
     public function __construct(
         protected ExpenseConfigurationMatcher $matcher
     ) {}
 
-    /**
-     * Recalculate and persist all auto-calculated expenses for a DCR.
-     */
     public function autoCalculateDcrExpenses(SalesDcr $dcr): void
     {
-        $context = $this->buildContextFromDcr($dcr);
 
-        $configs = $this->matcher->getApplicableConfigurations($dcr, context: $context);
+        $context = $this->buildExpenseContext($dcr);
+
+        $configs = $this->matcher
+            ->getApplicableConfigurations($dcr, context: $context)
+            ->groupBy('expense_type_id');
 
         if ($configs->isEmpty()) {
             $dcr->recalculateTotalExpense();
@@ -31,77 +33,104 @@ class ExpenseCalculationService
 
         $dcr->expenses()->autoCalculated()->delete();
 
-        $expenses = $configs->map(function (ExpenseConfiguration $config) use ($dcr, $context) {
-            $calculated = $this->calculateExpense($config, $dcr, $context);
+        $expenses = collect();
 
-            if ($calculated['amount'] <= 0) {
-                return null;
+        foreach ($configs as $expenseTypeId => $groupConfigs) {
+
+            $amount = $this->executeRuleChain($groupConfigs, $context);
+
+            if ($amount <= 0) {
+                continue;
             }
 
-            return new SalesDcrExpense([
+            $expenses->push(new SalesDcrExpense([
                 'sales_dcr_id' => $dcr->id,
-                'expense_type_id' => $config->expense_type_id,
-                'transport_mode_id' => $config->transport_mode_id,
-                'quantity' => $calculated['quantity'],
-                'rate' => $calculated['rate'],
-                'amount' => $calculated['amount'],
+                'expense_type_id' => $expenseTypeId,
+                'quantity' => 1,
+                'rate' => $amount,
+                'amount' => $amount,
                 'is_auto_calculated' => true,
-                'meta' => $calculated['meta'],
-            ]);
-        })->filter();
+                'meta' => [
+                    'rule_count' => $groupConfigs->count(),
+                    'context' => $context,
+                ],
+            ]));
+        }
 
         if ($expenses->isNotEmpty()) {
-            $dcr->expenses()->saveMany($expenses->values()->all());
+            $dcr->expenses()->saveMany($expenses);
         }
 
         $dcr->recalculateTotalExpense();
     }
 
     /**
-     * Calculate a single expense for a DCR/configuration pair.
-     *
-     * @param  array<string, mixed>  $context
-     * @return array{amount: float, quantity: float, rate: float, meta: array<string, mixed>}
+     * 🔥 CORE ENGINE: Executes rules sequentially
      */
-    public function calculateExpense(ExpenseConfiguration $config, SalesDcr $dcr, array $context = []): array
+    protected function executeRuleChain(Collection $configs, array $facts): float
     {
-        $quantity = 0.0;
-        $rate = (float) ($config->rate ?? 0);
+        $amount = 0;
 
-        switch ($config->calculation_type) {
-            case 'fixed':
-                $quantity = 1.0;
+        // 🔥 Sort by priority (HIGH → LOW)
+        $configs = $configs->sortByDesc('priority');
 
-                break;
-            case 'per_km':
-                $distance = (float) ($context['distance'] ?? $dcr->distance_covered ?? 0);
-                $quantity = $distance;
+        foreach ($configs as $config) {
 
-                break;
-            case 'per_day':
-                $quantity = 1.0;
+            $result = match ($config->calculation_strategy) {
 
-                break;
-            case 'per_visit':
-                $visitCount = (float) ($context['visit_count'] ?? $dcr->visits_count ?? $dcr->SalesDcrVisits()->count());
-                $quantity = $visitCount;
+                'flat' => (float) $config->rate,
 
-                break;
-            case 'manual':
-            default:
-                return [
-                    'amount' => 0.0,
-                    'quantity' => 0.0,
-                    'rate' => $rate,
-                    'meta' => [
-                        'calculation_type' => $config->calculation_type,
-                        'config_id' => $config->id,
-                    ],
-                ];
+                'per_km' => $facts['distance'] * $config->rate,
+
+                'per_visit' => $facts['visit_count'] * $config->rate,
+
+                'slab' => $this->calculateSlab($config, $facts),
+
+                'multiplier' => $this->applyMultiplier($amount, $config),
+
+                default => 0,
+            };
+
+            $amount = $this->applyCaps($result, $config);
         }
 
-        $amount = $quantity * $rate;
+        return round($amount, 2);
+    }
 
+    /**
+     * 🔥 SLAB ENGINE
+     */
+    protected function calculateSlab(ExpenseConfiguration $config, array $facts): float
+    {
+        $value = $facts['distance'] ?? 0;
+
+        $slab = $config->slabs
+            ->sortBy(fn ($s) => $s->min_value ?? -INF)
+            ->first(fn ($s) => ($s->min_value === null || $value >= $s->min_value) &&
+                ($s->max_value === null || $value <= $s->max_value)
+            );
+
+        if (! $slab) {
+            return 0;
+        }
+
+        if ($slab->flat_amount !== null) {
+            return (float) $slab->flat_amount;
+        }
+
+        return $value * (float) $slab->rate;
+    }
+
+    /**
+     * 🔥 MULTIPLIER (uses previous amount)
+     */
+    protected function applyMultiplier(float $baseAmount, ExpenseConfiguration $config): float
+    {
+        return $baseAmount * (float) $config->rate;
+    }
+
+    protected function applyCaps(float $amount, ExpenseConfiguration $config): float
+    {
         if ($config->min_amount !== null) {
             $amount = max($amount, (float) $config->min_amount);
         }
@@ -110,50 +139,6 @@ class ExpenseCalculationService
             $amount = min($amount, (float) $config->max_amount);
         }
 
-        return [
-            'amount' => round($amount, 2),
-            'quantity' => round($quantity, 2),
-            'rate' => $rate,
-            'meta' => [
-                'calculation_type' => $config->calculation_type,
-                'config_id' => $config->id,
-                'context' => $context,
-            ],
-        ];
-    }
-
-    /**
-     * Calculate expense for a specific visit based on configuration.
-     *
-     * @param  array<string, mixed>  $context
-     * @return array{amount: float, quantity: float, rate: float, meta: array<string, mixed>}
-     */
-    public function calculateExpenseForVisit(Visit $visit, ExpenseConfiguration $config, array $context = []): array
-    {
-        $baseContext = array_merge($this->buildContextFromVisit($visit), $context);
-
-        return $this->calculateExpense($config, $visit->salesDcr, $baseContext);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    protected function buildContextFromDcr(SalesDcr $dcr): array
-    {
-        return [
-            'visit_count' => $dcr->visits_count ?? $dcr->visits()->count(),
-            'distance' => $dcr->distance_covered,
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    protected function buildContextFromVisit(Visit $visit): array
-    {
-        return [
-            'visit_count' => 1,
-            'distance' => $visit->salesDcr?->distance_covered,
-        ];
+        return $amount;
     }
 }

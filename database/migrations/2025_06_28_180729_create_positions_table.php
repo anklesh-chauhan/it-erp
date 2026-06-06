@@ -41,6 +41,10 @@ return new class extends Migration
             $table->enum('status', ['active', 'inactive', 'vacant'])->default('active');
             $table->foreignId('location_id')->nullable()->constrained('location_masters')->onDelete('set null');
             $table->string('level')->nullable();
+            $table->foreignId('hq_territory_id')
+                ->nullable()
+                ->constrained('territories')
+                ->onDelete('set null');
 
             $table->string('approval_status')->default('pending');
 

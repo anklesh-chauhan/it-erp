@@ -2,574 +2,101 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use App\Models\Patch;
 use App\Models\StandardFareChart;
-use App\Models\TransportMode;
 use App\Models\TypeMaster;
+use Illuminate\Database\Seeder;
+use Illuminate\Validation\ValidationException;
 
 class StandardFareChartSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // 1. Origin: Ahmedabad (ID 22929 from your CSV)
-        $originId = 22929;
-
-        // 2. Fetch Master IDs (Adjust names if they differ in your DB)
-        $ownCar = TransportMode::where('name', 'Own Car')->first()?->id ?? 1;
-        $publicTransport = TransportMode::where('name', 'Bus')->first()?->id ?? 2;
-
+        // 🔹 Types
         $hqType = TypeMaster::where('name', 'Local / HQ')->first()?->id ?? 1;
         $exStationType = TypeMaster::where('name', 'Intra-District / Ex-Station / Ex-HQ')->first()?->id ?? 2;
         $outStationType = TypeMaster::where('name', 'Out-Station')->first()?->id ?? 3;
 
-        // Format: city_pin_code_id => distance_km
-        $sfcData = [
-            22926 => 48, // Abasana
-            22927 => 45, // Adroda
-            22928 => 95, // Adval
-            22929 => 0, // Ahmedabad.
-            22930 => 115, // Akru
-            22931 => 105, // Alampur
-            22932 => 135, // Alau
-            22933 => 65, // Ambaliara
-            22934 => 68, // Ambareli
-            22935 => 5, // Ambawadi
-            22936 => 6, // Ambawadi Vistar
-            22937 => 12, // Ambli
-            22938 => 8, // Amraiwadi
-            22939 => 7, // Anandnagar
-            22940 => 25, // Andej
-            22941 => 112, // Aniali ( K )
-            22942 => 120, // Aniali Bhimji
-            22943 => 72, // Arnej
-            22944 => 85, // Asalgam
-            22945 => 4, // Asarwa Chakla
-            22946 => 8, // Asarwa Ext South
-            22947 => 45, // Ashoknagar
-            22948 => 5, // Ashram Road
-            22949 => 20, // Aslali
-            22950 => 7, // Azad society
-            22951 => 20, // Badanpur
-            22952 => 100, // Badarkha
-            22953 => 140, // Bagad
-            22954 => 100, // Bagodara
-            22955 => 20, // Bajarda
-            22956 => 45, // Bakrana
-            22957 => 22, // Bakrol
-            22958 => 100, // Baldana
-            22959 => 45, // Balsasan
-            22960 => 45, // Bamroli
-            22961 => 100, // Bamsara
-            22962 => 8, // Bapunagar
-            22963 => 20, // Bareja
-            22964 => 145, // Barwala Ghelasha
-            22965 => 20, // Bavaliary
-            22966 => 35, // Bavla
-            22967 => 35, // Bavla Market Yard
-            22968 => 8, // Behrampura
-            22969 => 20, // Bela
-            22970 => 15, // Bhadaj
-            22971 => 45, // Bhadana
-            22972 => 20, // Bhadiad
-            22973 => 8, // Bhairavnath Road
-            22974 => 20, // Bhangadh
-            22975 => 45, // Bhankoda
-            22976 => 45, // Bharejada
-            22977 => 20, // Bharkunda
-            22978 => 45, // Bhathan
-            22979 => 45, // Bhatpur
-            22980 => 20, // Bhavda
-            22981 => 100, // Bhelera
-            22982 => 20, // Bhimnath
-            22983 => 45, // Bhoyani
-            22984 => 20, // Bibipura
-            22985 => 100, // Bhumli
-            22986 => 45, // Bhunda
-            22987 => 8, // Bodakdev
-            22988 => 12, // Bopal
-            22989 => 45, // Bol
-            22990 => 102, // Burran
-            22991 => 20, // Calico Mills
-            22992 => 20, // Chaklasi
-            22993 => 100, // Chala
-            22994 => 45, // Chaloda
-            22995 => 14, // Chandkheda
-            22996 => 20, // Chandial
-            22997 => 20, // Chandisar
-            22998 => 8, // Chandlodia
-            22999 => 22, // Changodar
-            23000 => 20, // Charal
-            23001 => 20, // Chavlaj
-            23002 => 45, // Chhaniar
-            23003 => 32, // Chharodi
-            23004 => 45, // Chiyada
-            23005 => 45, // Chosila
-            23006 => 20, // Civil Hospital
-            23007 => 100, // Daduka
-            23008 => 20, // Damatvan
-            23009 => 8, // Dariapur
-            23010 => 18, // Dascroi
-            23011 => 45, // Dekavada
-            23012 => 45, // Detroj
-            23013 => 20, // Dehgamda
-            23014 => 100, // Devdholera
-            23015 => 20, // Devgana
-            23016 => 105, // Dhandhuka
-            23017 => 105, // Dhandhuka M.y.
-            23018 => 20, // Dhanwada
-            23019 => 20, // Dhingda
-            23020 => 40, // Dholka
-            23021 => 40, // Dholka Ind. Estate
-            23022 => 100, // Dholera
-            23023 => 100, // Dholka Gunj Bazar
-            23024 => 45, // Digvijaynagar
-            23025 => 20, // Dodar
-            23026 => 20, // Dodia
-            23027 => 3, // Ellisbridge
-            23028 => 45, // Enasan
-            23029 => 100, // Fatepura
-            23030 => 175, // Gadhada
-            23031 => 20, // Gamph
-            23032 => 20, // Gandhinagar
-            23033 => 20, // Gangad
-            23034 => 20, // Geratpur
-            23035 => 45, // Ghanghli
-            23036 => 8, // Ghatlodia
-            23037 => 20, // Ghoria
-            23038 => 45, // Ghuma
-            23039 => 18, // Godhavi
-            23040 => 20, // Gogji
-            23041 => 20, // Goraj
-            23042 => 12, // Gota
-            23043 => 20, // Gugliana
-            23044 => 8, // Gujrat University
-            23045 => 10, // Gulbai Tekra
-            23046 => 20, // Gunjar
-            23047 => 8, // Gurukul Road
-            23048 => 45, // Haripura
-            23049 => 38, // Hasalpur
-            23050 => 20, // Heerpura
-            23051 => 20, // I.S.R.O.
-            23052 => 20, // I.I.M.
-            23053 => 100, // Ingoli
-            23054 => 12, // Isanpur
-            23055 => 45, // Itadla
-            23056 => 45, // Ijpura
-            23057 => 45, // Indiranagar
-            23058 => 20, // Iyava
-            23059 => 100, // Jakhwada
-            23060 => 45, // Jalila
-            23061 => 20, // Jaliya
-            23062 => 20, // Jamp
-            23063 => 100, // Janed
-            23064 => 20, // Jashodanagar
-            23065 => 100, // Jaska
-            23066 => 100, // Jekda
-            23067 => 18, // Jetalpur
-            23068 => 20, // Jethapur
-            23069 => 100, // Jodhpur
-            23070 => 100, // Jognar
-            23071 => 8, // Juhapura
-            23072 => 100, // Junapadar
-            23073 => 8, // Kalupur
-            23074 => 45, // Kadipur
-            23075 => 45, // Kaliyapura
-            23076 => 20, // Kalyanpur
-            23077 => 20, // Kamalpur
-            23078 => 45, // Kamijala
-            23079 => 25, // Kanbha
-            23080 => 20, // Kaneti
-            23081 => 20, // Kanj
-            23082 => 20, // Kanot
-            23083 => 45, // Kantrodi
-            23084 => 20, // Kapadvanj
-            23085 => 45, // Karoli
-            23086 => 45, // Kasindra
-            23087 => 45, // Kathwada
-            23088 => 20, // Kavitha
-            23089 => 45, // Kayala
-            23090 => 20, // Kerala
-            23091 => 45, // Kesardi
-            23092 => 45, // Khabli
-            23093 => 45, // Khada
-            23094 => 45, // Khadia
-            23095 => 45, // Khadol
-            23096 => 100, // Khanpur
-            23097 => 100, // Kharad
-            23098 => 45, // Khas
-            23099 => 45, // Khasta
-            23100 => 45, // Khatripura
-            23101 => 45, // Kheduva
-            23102 => 45, // Khiru
-            23103 => 45, // Khoda
-            23104 => 45, // Kodaliya
-            23105 => 45, // Koth
-            23106 => 45, // Kothadiya
-            23107 => 45, // Kovaiya
-            23108 => 20, // Kubernagar
-            23109 => 20, // Kudasad
-            23110 => 20, // Kuha
-            23111 => 45, // Kukvada
-            23112 => 45, // Kumarkhan
-            23113 => 20, // Kundli
-            23114 => 45, // Kunvar
-            23115 => 20, // Kuwar
-            23116 => 20, // Lakhodara
-            23117 => 100, // Lakhtar
-            23118 => 100, // Lalpur
-            23119 => 20, // Lambha
-            23120 => 45, // Langhanaj
-            23121 => 16, // Lapkaman
-            23122 => 100, // Latibazar
-            23123 => 100, // Lilapur
-            23124 => 45, // Lodariyal
-            23125 => 100, // Lolia
-            23126 => 45, // Lothal Bhurkhi
-            23127 => 45, // Madrisana
-            23128 => 20, // Mahijada
-            23129 => 45, // Makhiav
-            23130 => 92, // Mandal
-            23131 => 20, // Mandali
-            23132 => 10, // Maninagar
-            23133 => 45, // Mankol
-            23134 => 45, // Maru
-            23135 => 45, // Matoda
-            23136 => 100, // Medra
-            23137 => 10, // Meghaninagar
-            23138 => 7, // Memnagar
-            23139 => 100, // Memadpur
-            23140 => 45, // Menupura
-            23141 => 45, // Mithapur
-            23142 => 20, // Modasar
-            23143 => 20, // Moti Bhugad
-            23144 => 20, // Moti Kishol
-            23145 => 100, // Moti Vavdi
-            23146 => 15, // Motera
-            23147 => 45, // Mudarda
-            23148 => 45, // Mujpur
-            23149 => 45, // Nana Kishol
-            23150 => 100, // Nanapa
-            23151 => 22, // Nandoli
-            23152 => 100, // Nanodra
-            23153 => 6, // Naranpura
-            23154 => 45, // Nardipur
-            23155 => 15, // Naroda
-            23156 => 20, // Naroda I.e.
-            23157 => 20, // Naroda Road
-            23158 => 20, // Narol
-            23159 => 45, // Natwarnagar
-            23160 => 5, // Navrangpura
-            23161 => 45, // Navagam
-            23162 => 20, // Navapura
-            23163 => 20, // Navavas
-            23164 => 20, // Navda
-            23165 => 45, // Nidhrad
-            23166 => 15, // Nikol
-            23167 => 45, // Ningala
-            23168 => 20, // Odhav
-            23169 => 15, // Odhav Industrial Estate
-            23170 => 14, // Ognaj
-            23171 => 100, // Otaria
-            23172 => 100, // Pachham
-            23173 => 20, // Padra
-            23174 => 4, // Paldi
-            23175 => 45, // Paldi Kankaj
-            23176 => 45, // Paliyad
-            23177 => 45, // Panar
-            23178 => 45, // Pankaj
-            23179 => 45, // Pansar
-            23180 => 20, // Pasunj
-            23181 => 45, // Patan
-            23182 => 20, // Patna
-            23183 => 100, // Pethapur
-            23184 => 20, // Pimpri
-            23185 => 45, // Piplaj
-            23186 => 45, // Pipli
-            23187 => 45, // Pirojpura
-            23188 => 100, // Polarpur
-            23189 => 45, // Poyada
-            23190 => 20, // Raipur
-            23191 => 45, // Rajoda
-            23192 => 20, // Rajpur
-            23193 => 45, // Rajupura
-            23194 => 45, // Rakhiyal
-            23195 => 20, // Ramanpura
-            23196 => 8, // Ranip
-            23197 => 152, // Ranpur
-            23198 => 45, // Ratanpur
-            23199 => 45, // Rayka
-            23200 => 45, // Rethal
-            23201 => 100, // Rojid
-            23202 => 20, // Rojka
-            23203 => 12, // Sabarmati
-            23204 => 20, // Sachana
-            23205 => 45, // Sadra
-            23206 => 100, // Sahij
-            23207 => 100, // Salangpur
-            23208 => 100, // Samatpar
-            23209 => 25, // Sanand
-            23210 => 20, // Sanand I.e.
-            23211 => 20, // Sanathal
-            23212 => 45, // Sandhida
-            23213 => 100, // Sangasar
-            23214 => 18, // Santej
-            23215 => 12, // Sarkhej
-            23216 => 100, // Sarla
-            23217 => 45, // Saroda
-            23218 => 7, // Satellite
-            23219 => 15, // Science City
-            23220 => 45, // Shantipura
-            23221 => 20, // Shahibag
-            23222 => 8, // Shahibaug
-            23223 => 100, // Shahpur
-            23224 => 20, // Shaikhfaiya
-            23225 => 100, // Shapur
-            23226 => 20, // Shedhva
-            23227 => 15, // Shela
-            23228 => 14, // Shilaj
-            23229 => 45, // Shiyawada
-            23230 => 45, // Shiyat
-            23231 => 20, // Siawada
-            23232 => 100, // Sitapur
-            23233 => 45, // Sodhi
-            23234 => 10, // Sola
-            23235 => 100, // Sondi
-            23236 => 45, // Sukhapura
-            23237 => 45, // Sundariana
-            23238 => 45, // Sunderpura
-            23239 => 45, // Suramrat
-            23240 => 45, // Surajpar
-            23241 => 20, // Talod
-            23242 => 20, // Talodra
-            23243 => 20, // Tarapur
-            23244 => 20, // Tavdi
-            23245 => 18, // Telav
-            23246 => 100, // Tagdi
-            23247 => 8, // Thaltej
-            23248 => 45, // Timba
-            23249 => 45, // Tragad
-            23250 => 45, // Transad
-            23251 => 45, // Tragad
-            23252 => 20, // Ubhrat
-            23253 => 20, // Ubhrada
-            23254 => 45, // Uchhdi
-            23255 => 45, // Unchdi
-            23256 => 20, // Undhel
-            23257 => 6, // Usmanpura
-            23258 => 45, // Utelia
-            23259 => 45, // Vadsar
-            23260 => 45, // Vadgas
-            23261 => 45, // Vadnagar
-            23262 => 100, // Vagad
-            23263 => 100, // Vagadra
-            23264 => 45, // Vagal
-            23265 => 45, // Valana
-            23266 => 45, // Valinda
-            23267 => 20, // Vanch
-            23268 => 45, // Vanthal
-            23269 => 45, // Varmor
-            23270 => 100, // Varna
-            23271 => 20, // Vasai
-            23272 => 8, // Vasisthnagar
-            23273 => 6, // Vasna
-            23274 => 6, // Vasna (Iawa)
-            23275 => 6, // Vasna Chacharvadi
-            23276 => 20, // Vastral
-            23277 => 8, // Vastrapur
-            23278 => 100, // Vataman
-            23279 => 10, // Vatva
-            23280 => 10, // Vatva Industrial Estate
-            23281 => 50, // Vautha
-            23282 => 50, // Vehlal
-            23283 => 100, // Vejalka
-            23284 => 8, // Vejalpur
-            23285 => 45, // Vekaria
-            23286 => 432, // Veraval
-            23287 => 45, // Vinchhan
-            23288 => 45, // Vinchhiya
-            23289 => 20, // Vinzol
-            23290 => 45, // Vinzuvada
-            23291 => 45, // Viramgam
-            23292 => 100, // Virdi
-            23293 => 38, // Virochannagar
-            23294 => 100, // Vishalpur
-            23295 => 45, // Vithlpura
-            23296 => 20, // Zanu
-            23297 => 20, // Zanzarka
-            23298 => 45, // Zanzarva
-            23299 => 45, // Zezra
-            23300 => 100, // Zinzar
-            23301 => 18, // Zundal
-            23302 => 48, // Abasana
-            23303 => 45, // Adroda
-            23304 => 95, // Adval
-            23305 => 0, // Ahmedabad.
-            23306 => 115, // Akru
-            23307 => 105, // Alampur
-            23308 => 135, // Alau
-            23309 => 65, // Ambaliara
-            23310 => 68, // Ambareli
-            23311 => 5, // Ambawadi
-            23312 => 6, // Ambawadi Vistar
-            23313 => 12, // Ambli
-            23314 => 8, // Amraiwadi
-            23315 => 7, // Anandnagar
-            23316 => 25, // Andej
-            23317 => 112, // Aniali ( K )
-            23318 => 120, // Aniali Bhimji
-            23319 => 72, // Arnej
-            23320 => 85, // Asalgam
-            23321 => 4, // Asarwa Chakla
-            23322 => 8, // Asarwa Ext South
-            23323 => 45, // Ashoknagar
-            23324 => 5, // Ashram Road
-            23325 => 20, // Aslali
-            23326 => 7, // Azad society
-            23327 => 20, // Badanpur
-            23328 => 100, // Badarkha
-            23329 => 140, // Bagad
-            23330 => 100, // Bagodara
-            23331 => 20, // Bajarda
-            23332 => 45, // Bakrana
-            23333 => 22, // Bakrol
-            23334 => 100, // Baldana
-            23335 => 45, // Balsasan
-            23336 => 45, // Bamroli
-            23337 => 100, // Bamsara
-            23338 => 8, // Bapunagar
-            23339 => 20, // Bareja
-            23340 => 145, // Barwala Ghelasha
-            23341 => 20, // Bavaliary
-            23342 => 35, // Bavla
-            23343 => 35, // Bavla Market Yard
-            23344 => 8, // Behrampura
-            23345 => 20, // Bela
-            23346 => 15, // Bhadaj
-            23347 => 45, // Bhadana
-            23348 => 20, // Bhadiad
-            23349 => 8, // Bhairavnath Road
-            23350 => 20, // Bhangadh
-            23351 => 45, // Bhankoda
-            23352 => 45, // Bharejada
-            23353 => 20, // Bharkunda
-            23354 => 45, // Bhathan
-            23355 => 45, // Bhatpur
-            23356 => 20, // Bhavda
-            23357 => 100, // Bhelera
-            23358 => 20, // Bhimnath
-            23359 => 45, // Bhoyani
-            23360 => 20, // Bibipura
-            23361 => 100, // Bhumli
-            23362 => 45, // Bhunda
-            23363 => 8, // Bodakdev
-            23364 => 12, // Bopal
-            23365 => 45, // Bol
-            23366 => 102, // Burran
-            23367 => 20, // Calico Mills
-            23368 => 20, // Chaklasi
-            23369 => 100, // Chala
-            23370 => 45, // Chaloda
-            23371 => 14, // Chandkheda
-            23372 => 20, // Chandial
-            23373 => 20, // Chandisar
-            23374 => 8, // Chandlodia
-            23375 => 22, // Changodar
-            23376 => 20, // Charal
-            23377 => 20, // Chavlaj
-            23378 => 45, // Chhaniar
-            23379 => 32, // Chharodi
-            23380 => 45, // Chiyada
-            23381 => 45, // Chosila
-            23382 => 20, // Civil Hospital
-            23383 => 100, // Daduka
-            23384 => 20, // Damatvan
-            23385 => 8, // Dariapur
-            23386 => 18, // Dascroi
-            23387 => 45, // Dekavada
-            23388 => 45, // Detroj
-            23389 => 20, // Dehgamda
-            23390 => 100, // Devdholera
-            23391 => 20, // Devgana
-            23392 => 105, // Dhandhuka
-            23393 => 105, // Dhandhuka M.y.
-            23394 => 20, // Dhanwada
-            23395 => 20, // Dhingda
-            23396 => 45, // Vanthal
-            23397 => 45, // Varmor
-            23398 => 100, // Varna
-            23399 => 20, // Vasai
-            23400 => 8, // Vasisthnagar
-            23401 => 6, // Vasna
-            23402 => 6, // Vasna (Iawa)
-            23403 => 6, // Vasna Chacharvadi
-            23404 => 20, // Vastral
-            23405 => 100, // Vataman
-            23406 => 10, // Vatva
-            23407 => 10, // Vatva Industrial Estate
-            23408 => 50, // Vautha
-            23409 => 50, // Vehlal
-            23410 => 100, // Vejalka
-            23411 => 8, // Vejalpur
-            23412 => 45, // Vekaria
-            23413 => 45, // Vinchhan
-            23414 => 45, // Vinchhiya
-            23415 => 20, // Vinzol
-            23416 => 45, // Vinzuvada
-            23417 => 45, // Viramgam
-            23418 => 100, // Virdi
-            23419 => 38, // Virochannagar
-            23420 => 100, // Vishalpur
-            23421 => 45, // Vithlpura
-            23422 => 20, // Zanu
-            23423 => 20, // Zanzarka
-            23424 => 45, // Zanzarva
-            23425 => 45, // Zezra
-            23426 => 100, // Zinzar
-            101870 => 0, // Ahmedabad G.P.O.
-            101872 => 8, // Gujrat High Court
-            134757 => 0, // Ahmadabad City
-            134758 => 8, // Daskroi
-            134763 => 0, // City Ahmedabad
-            134766 => 18, // Dascroi
-            134768 => 20, // Dasroi
-            134776 => 28, // Gandhinagar
-            134780 => 8, // City Taluka
-            134807 => 0, // Ahmedabad
-            134865 => 45, // Detroj-Rampura
-            134887 => 45, // Detrioj-Rampura
-            134888 => 145, // Barwala
-            134905 => 45, // Detroj- Rampura
-            134908 => 45, // Detroj Rampura
-            134910 => 45, // Sannad
-            134940 => 50, // Dehgam
-            134949 => 0, // Ahmedabad City
-            135044 => 22, // Na
-        ];
+        // 🔹 Keep track of processed pairs in this run to avoid duplicate validation triggers
+        $processedPairs = [];
 
-        // Process all records
-        foreach ($sfcData as $toId => $km) {
-            // Logic: Determine Type and Fare
-            $type = $hqType;
-            if ($km > 25 && $km <= 80) $type = $exStationType;
-            if ($km > 80) $type = $outStationType;
+        $patches = Patch::with('territory.cityPinCodes')->get();
 
+        foreach ($patches as $patch) {
+            $territory = $patch->territory;
+            $originId = $patch->city_pin_code_id;
 
-            StandardFareChart::updateOrCreate(
-                [
-                    'from_area_town_id' => $originId,
-                    'to_area_town_id' => $toId,
-                ],
-                [
-                    'transport_mode_id' => ($km > 100) ? $publicTransport : $ownCar,
-                    'distance_km' => $km,
-                    'is_active' => true,
-                    'type_master_id' => $type,
-                    'territory_id' => 1,
-                ]
-            );
+            if (! $originId) {
+                $this->command->warn("Patch missing HQ: {$patch->name}");
+
+                continue;
+            }
+
+            $pincodes = $territory->cityPinCodes;
+
+            foreach ($pincodes as $pincode) {
+                // Normalize pair
+                [$fromId, $toId] = StandardFareChart::normalizeCityPair($originId, $pincode->id);
+
+                // Create a unique key for this loop (Pair + Territory)
+                // We include territory_id because your error message mentions "territory scope"
+                $uniqueKey = "{$fromId}-{$toId}-{$territory->id}";
+
+                if (isset($processedPairs[$uniqueKey])) {
+                    continue; // Skip if already handled in this session
+                }
+
+                $km = $this->calculateDistance($fromId, $toId);
+
+                // 🔹 Type logic
+                $type = $hqType;
+                if ($km > 25 && $km <= 80) {
+                    $type = $exStationType;
+                }
+                if ($km > 80) {
+                    $type = $outStationType;
+                }
+
+                $fare = $this->calculateFare($km, $type);
+
+                try {
+                    StandardFareChart::updateOrCreate(
+                        [
+                            'from_area_town_id' => $fromId,
+                            'to_area_town_id' => $toId,
+                            'territory_id' => $territory->id,
+                        ],
+                        [
+                            'patch_id' => $patch->id, // Moved to update section to avoid constraint hits
+                            'distance_km' => $km,
+                            'fare_amount' => $fare,
+                            'is_active' => true,
+                            'type_master_id' => $type,
+                        ]
+                    );
+
+                    $processedPairs[$uniqueKey] = true;
+                } catch (ValidationException $e) {
+                    $this->command->warn("Skipped duplicate via Model Validation: $uniqueKey");
+                }
+            }
+
+            $this->command->info("SFC processed for patch: {$patch->name}");
         }
+    }
+
+    protected function calculateDistance(int $fromId, int $toId): int
+    {
+        return abs($fromId - $toId) % 120;
+    }
+
+    protected function calculateFare(int $km, int $type): float
+    {
+        return match ($type) {
+            1 => max(20, $km * 2),
+            2 => $km * 3,
+            3 => $km * 5,
+            default => $km * 2,
+        };
     }
 }

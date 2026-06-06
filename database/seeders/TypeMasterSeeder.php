@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\TypeMaster;
-use Illuminate\Support\Carbon;
+use Illuminate\Database\Seeder;
 
 class TypeMasterSeeder extends Seeder
 {
@@ -82,6 +80,21 @@ class TypeMasterSeeder extends Seeder
 
         TypeMaster::factory()->subType($branch)->create(['name' => 'Regional Branch']);
         TypeMaster::factory()->subType($warehouse)->create(['name' => 'Cold Storage Warehouse']);
+
+        /* =====================================================
+         | SFC TYPES
+         ===================================================== */
+        $sfcTypes = [
+            'Local / HQ',
+            'Intra-District / Ex-Station / Ex-HQ',
+            'Out-Station',
+        ];
+
+        foreach ($sfcTypes as $typeName) {
+            TypeMaster::factory()
+                ->standardFareChartRoot()
+                ->create(['name' => $typeName]);
+        }
 
     }
 }

@@ -2,17 +2,24 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-
 use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class City extends BaseModel
 {
-    use HasFactory, HasApprovalWorkflow;
+    use HasApprovalWorkflow, HasFactory;
 
-    protected $fillable = ['name', 'state_id', 'country_id'];
+    protected $fillable = ['name', 'state_id', 'country_id', 'city_class_id', 'is_hill_station'];
+
+    protected $casts = [
+        'is_hill_station' => 'boolean',
+    ];
+
+    public function cityClass(): BelongsTo
+    {
+        return $this->belongsTo(CityClass::class, 'city_class_id');
+    }
 
     public function state()
     {

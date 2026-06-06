@@ -2,21 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Builder;
-
-
-use App\Traits\HasApprovalWorkflow;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AccountMaster extends BaseModel
 {
-    use SoftDeletes, HasFactory, HasApprovalWorkflow;
+    use HasApprovalWorkflow, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'owner_id',
@@ -117,9 +114,6 @@ class AccountMaster extends BaseModel
         });
     }
 
-    /**
-     * Get the bank detail associated with the Account Master.
-     */
     public function bankDetail()
     {
         return $this->morphMany(BankDetail::class, 'bankable');
@@ -185,6 +179,8 @@ class AccountMaster extends BaseModel
     public function patches(): BelongsToMany
     {
         return $this->belongsToMany(Patch::class)
+            ->using(AccountMasterPatch::class)
+            ->withPivot(['sequence_no', 'distance_km'])
             ->withTimestamps();
     }
 

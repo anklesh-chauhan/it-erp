@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Position;
+use App\Models\User;
 use Illuminate\Support\Collection;
 
 class PositionService
@@ -12,8 +12,15 @@ class PositionService
     {
         return $user->employee
             ?->positions
-            ?->flatMap(fn ($position) => $position->territories)
-            ?->pluck('id')
+            ?->flatMap(function ($position) {
+                $territoryIds = collect();
+
+                if (! empty($position->hq_territory_id)) {
+                    $territoryIds->push($position->hq_territory_id);
+                }
+
+                return $territoryIds->merge($position->territories->pluck('id'));
+            })
             ?->unique()
             ?->values()
             ?->toArray() ?? [];
@@ -70,5 +77,4 @@ class PositionService
 
         return $depth;
     }
-
 }

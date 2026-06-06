@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('standard_fare_charts', function (Blueprint $table) {
             $table->id();
 
-             /*
+            /*
             |--------------------------------------------------------------------------
             | Route Information
             |--------------------------------------------------------------------------
@@ -26,16 +26,6 @@ return new class extends Migration
             $table->foreignId('to_area_town_id')
                 ->constrained('city_pin_codes')
                 ->cascadeOnDelete();
-
-            /*
-            |--------------------------------------------------------------------------
-            | Transport Mode
-            |--------------------------------------------------------------------------
-            */
-            $table->foreignId('transport_mode_id')
-                ->nullable()
-                ->constrained()
-                ->nullOnDelete();
 
             /*
             |--------------------------------------------------------------------------
@@ -56,7 +46,10 @@ return new class extends Migration
                 ->constrained()
                 ->nullOnDelete();
 
-            $table->string('route_name')->nullable();
+            $table->foreignId('patch_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
 
             $table->foreignId('type_master_id')
                 ->nullable()

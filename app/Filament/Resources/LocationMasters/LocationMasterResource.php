@@ -2,53 +2,46 @@
 
 namespace App\Filament\Resources\LocationMasters;
 
-use App\Filament\Actions\BulkApprovalAction;
-
-use App\Traits\HasSafeGlobalSearch;
-
 use App\Filament\Actions\ApprovalAction;
-
-use Filament\Schemas\Schema;
-use Filament\Tables\Filters\Filter;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\LocationMasters\RelationManagers\ItemsRelationManager;
-use App\Filament\Resources\LocationMasters\Pages\ListLocationMasters;
+use App\Filament\Actions\BulkApprovalAction;
+use App\Filament\Resources\AccountMasters\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\LocationMasters\Pages\CreateLocationMaster;
 use App\Filament\Resources\LocationMasters\Pages\EditLocationMaster;
+use App\Filament\Resources\LocationMasters\Pages\ListLocationMasters;
 use App\Filament\Resources\LocationMasters\Pages\ViewLocationMaster;
-use App\Filament\Resources\LocationMasterResource\Pages;
-use App\Filament\Resources\LocationMasterResource\RelationManagers;
+use App\Filament\Resources\LocationMasters\RelationManagers\ItemsRelationManager;
 use App\Models\LocationMaster;
 use App\Models\NumberSeries;
 use App\Models\TypeMaster;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use App\Filament\Resources\BaseResource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
+use App\Traits\AddressDetailsTrait;
+use App\Traits\HasSafeGlobalSearch;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TextInput\Mask;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Table;
 
 class LocationMasterResource extends BaseResource
 {
-    use HasSafeGlobalSearch;
+    use AddressDetailsTrait, HasSafeGlobalSearch;
+
     protected static ?string $model = LocationMaster::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Contacts & Companies';
+    protected static string|\UnitEnum|null $navigationGroup = 'Contacts & Companies';
+
     protected static ?int $navigationSort = 200;
 
     public static function form(Schema $schema): Schema
@@ -107,27 +100,25 @@ class LocationMasterResource extends BaseResource
                 Select::make('typeable_id')
                     ->label('Location Sub Type')
                     ->searchable()
-                    ->options(fn (Get $get) =>
-                        TypeMaster::where('parent_id', $get('parent_type_id'))
-                            ->pluck('name', 'id')
+                    ->options(fn (Get $get) => TypeMaster::where('parent_id', $get('parent_type_id'))
+                        ->pluck('name', 'id')
                     )
-                    ->visible(fn (Get $get) =>
-                        filled($get('parent_type_id')) &&
+                    ->visible(fn (Get $get) => filled($get('parent_type_id')) &&
                         TypeMaster::where('parent_id', $get('parent_type_id'))->exists()
                     )
-                    ->required(fn (Get $get) =>
-                        TypeMaster::where('parent_id', $get('parent_type_id'))->exists()
+                    ->required(fn (Get $get) => TypeMaster::where('parent_id', $get('parent_type_id'))->exists()
                     )
                     ->live(),
-
-                Select::make('addressable_id')
-                    ->label('Address')
-                    ->relationship('address', 'street')
-                    ->searchable(),
 
                 Select::make('contactable_id')
                     ->label('Contact Detail')
                     ->relationship('contactDetail', 'full_name')
+                    ->searchable(),
+
+                Select::make('territories')
+                    ->relationship(name: 'territories', titleAttribute: 'name')
+                    ->multiple() // This enables the many-to-many logic
+                    ->preload()   // Useful if the territory list isn't massive
                     ->searchable(),
 
                 TextInput::make('latitude')
@@ -177,10 +168,8 @@ class LocationMasterResource extends BaseResource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-
-                        BulkApprovalAction::make(),
-
-DeleteBulkAction::make(),
+                    BulkApprovalAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -189,6 +178,7 @@ DeleteBulkAction::make(),
     {
         return [
             ItemsRelationManager::class,
+            AddressesRelationManager::class,
         ];
     }
 
