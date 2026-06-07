@@ -149,6 +149,21 @@ class TravelSegmentService
         return $dcr;
     }
 
+    public function recalculateDistances(SalesDcr $dcr): void
+    {
+        $dcr->travelSegments()
+            ->orderBy('id')
+            ->get()
+            ->each(function (TravelSegment $segment): void {
+                $resolved = $this->distanceResolutionService->resolve($segment);
+
+                $segment->forceFill([
+                    'distance_km' => $resolved['distance_km'],
+                    'distance_source' => $resolved['distance_source'],
+                ])->saveQuietly();
+            });
+    }
+
     protected function resolveAccountCityId($account): ?int
     {
         $address = $account->addresses

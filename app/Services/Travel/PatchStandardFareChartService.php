@@ -99,6 +99,7 @@ class PatchStandardFareChartService
                 'territory_id' => $patch->territory_id,
                 'patch_id' => $patch->id,
                 'distance_km' => 0,
+                'distance_source' => 'google_routes',
                 'fare_amount' => 0,
                 'is_active' => true,
             ]);

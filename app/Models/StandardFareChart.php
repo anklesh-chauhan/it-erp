@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Travel\SfcDistanceService;
 use App\Traits\HasApprovalWorkflow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,6 +17,7 @@ class StandardFareChart extends BaseModel
         'from_area_town_id',
         'to_area_town_id',
         'distance_km',
+        'distance_source',
         'fare_amount',
         'territory_id',
         'is_active',
@@ -92,6 +94,14 @@ class StandardFareChart extends BaseModel
                     'from_area_town_id' => 'Duplicate SFC route exists for this city pair and territory scope.',
                 ]);
             }
+        });
+
+        static::created(function (self $chart): void {
+            if ((float) ($chart->distance_km ?? 0) > 0) {
+                return;
+            }
+
+            app(SfcDistanceService::class)->populateChartDistance($chart);
         });
     }
 }

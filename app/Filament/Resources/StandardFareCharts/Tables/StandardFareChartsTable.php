@@ -2,21 +2,29 @@
 
 namespace App\Filament\Resources\StandardFareCharts\Tables;
 
+use App\Models\StandardFareChart;
+use App\Services\Travel\SfcDistanceService;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Columns\TextInputColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class StandardFareChartsTable
 {
@@ -59,6 +67,17 @@ class StandardFareChartsTable
                     ->rules(['required', 'numeric', 'min:0'])
                     ->sortable()
                     ->alignEnd(),
+
+                Tables\Columns\TextColumn::make('distance_source')
+                    ->label('Distance Source')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'google_routes' => 'Google Routes',
+                        'manual' => 'Manual',
+                        default => ucfirst((string) $state),
+                    })
+                    ->color(fn (?string $state): string => $state === 'google_routes' ? 'success' : 'gray')
+                    ->toggleable(),
 
                 TextInputColumn::make('fare_amount')
                     ->label('Fare (₹)')
@@ -211,13 +230,51 @@ class StandardFareChartsTable
                             );
                     }),
             ])
-            ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContentCollapsible)
+            ->filtersLayout(FiltersLayout::AboveContentCollapsible)
             ->filtersFormColumns(2)
             ->recordActions([
+                Action::make('refreshGoogleDistance')
+                    ->label('Google Distance')
+                    ->icon(Heroicon::Map)
+                    ->action(function (StandardFareChart $record): void {
+                        $updated = app(SfcDistanceService::class)->populateChartDistance($record, force: true);
+
+                        if (! $updated) {
+                            Notification::make()
+                                ->title('Could not refresh distance from Google Routes')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
+                        Notification::make()
+                            ->title('Distance refreshed from Google Routes')
+                            ->success()
+                            ->send();
+                    }),
                 EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkAction::make('refreshGoogleDistances')
+                        ->label('Refresh Google Distances')
+                        ->icon(Heroicon::Map)
+                        ->action(function (Collection $records): void {
+                            $service = app(SfcDistanceService::class);
+                            $updated = 0;
+
+                            foreach ($records as $record) {
+                                if ($service->populateChartDistance($record, force: true)) {
+                                    $updated++;
+                                }
+                            }
+
+                            Notification::make()
+                                ->title("Updated {$updated} of {$records->count()} routes from Google Routes")
+                                ->success()
+                                ->send();
+                        }),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

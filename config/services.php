@@ -35,4 +35,27 @@ return [
         ],
     ],
 
+    'google_maps' => [
+        'api_key' => env('GOOGLE_MAPS_API_KEY'),
+        'geocode_url' => 'https://maps.googleapis.com/maps/api/geocode/json',
+        'routes_url' => 'https://routes.googleapis.com/directions/v2:computeRoutes',
+    ],
+
+    'meta' => [
+        'app_id' => env('META_APP_ID'),
+        'app_secret' => env('META_APP_SECRET'),
+        'access_token' => env('META_ACCESS_TOKEN'),
+    ],
+
+    'sms' => [
+        'api_key' => env('SMS_API_KEY'),
+        'sender_id' => env('SMS_SENDER_ID'),
+    ],
+
+    'attendance_device' => [
+        'api_url' => env('ATTENDANCE_DEVICE_API_URL'),
+        'api_key' => env('ATTENDANCE_DEVICE_API_KEY'),
+        'device_id' => env('ATTENDANCE_DEVICE_ID'),
+    ],
+
 ];

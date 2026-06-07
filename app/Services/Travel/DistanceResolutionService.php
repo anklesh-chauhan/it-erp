@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 class DistanceResolutionService
 {
     public function __construct(
-        protected SfcLookupService $sfcLookupService
+        protected SfcLookupService $sfcLookupService,
+        protected SfcDistanceService $sfcDistanceService
     ) {}
 
     /**
@@ -45,6 +46,15 @@ class DistanceResolutionService
 
             if ((int) $segment->from_area_town_id === (int) $segment->to_area_town_id) {
                 return ['distance_km' => 5.0, 'distance_source' => 'local'];
+            }
+
+            $googleDistance = $this->sfcDistanceService->resolveDistance(
+                (int) $segment->from_area_town_id,
+                (int) $segment->to_area_town_id
+            );
+
+            if ($googleDistance !== null) {
+                return ['distance_km' => $googleDistance, 'distance_source' => 'google_routes'];
             }
         }
 

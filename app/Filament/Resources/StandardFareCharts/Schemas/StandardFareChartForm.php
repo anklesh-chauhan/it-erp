@@ -5,9 +5,15 @@ namespace App\Filament\Resources\StandardFareCharts\Schemas;
 use App\Models\CityPinCode;
 use App\Models\StandardFareChart;
 use App\Models\TypeMaster;
+use App\Services\Travel\SfcDistanceService;
+use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class StandardFareChartForm
 {
@@ -104,7 +110,58 @@ class StandardFareChartForm
                         Forms\Components\TextInput::make('distance_km')
                             ->numeric()
                             ->suffix('km')
-                            ->required(),
+                            ->required()
+                            ->suffixAction(
+                                Action::make('fetchGoogleDistance')
+                                    ->label('Google Routes')
+                                    ->icon(Heroicon::Map)
+                                    ->action(function (Get $get, Set $set): void {
+                                        $fromId = $get('from_area_town_id');
+                                        $toId = $get('to_area_town_id');
+
+                                        if ($fromId === null || $toId === null) {
+                                            Notification::make()
+                                                ->title('Select both From and To locations first')
+                                                ->warning()
+                                                ->send();
+
+                                            return;
+                                        }
+
+                                        $distance = app(SfcDistanceService::class)->resolveDistance(
+                                            (int) $fromId,
+                                            (int) $toId
+                                        );
+
+                                        if ($distance === null) {
+                                            Notification::make()
+                                                ->title('Could not resolve distance from Google Routes')
+                                                ->body('Configure the API key under Global Configuration → Operational Config → API Integrations.')
+                                                ->danger()
+                                                ->send();
+
+                                            return;
+                                        }
+
+                                        $set('distance_km', $distance);
+                                        $set('distance_source', 'google_routes');
+
+                                        Notification::make()
+                                            ->title('Distance updated from Google Routes')
+                                            ->success()
+                                            ->send();
+                                    })
+                            ),
+
+                        Forms\Components\Select::make('distance_source')
+                            ->label('Distance Source')
+                            ->options([
+                                'manual' => 'Manual',
+                                'google_routes' => 'Google Routes',
+                            ])
+                            ->default('manual')
+                            ->disabled()
+                            ->dehydrated(),
 
                         Forms\Components\TextInput::make('fare_amount')
                             ->numeric()
