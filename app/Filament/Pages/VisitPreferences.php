@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Clusters\GlobalConfiguration\SalesMarketingConfigurationCluster;
 use App\Models\VisitPreference;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
@@ -19,13 +20,15 @@ class VisitPreferences extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-adjustments-horizontal';
-
     protected string $view = 'filament.pages.visit-preferences';
 
     protected static ?string $navigationLabel = 'Visit Preferences';
 
     protected static ?string $title = 'Visit Preferences';
+
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $cluster = SalesMarketingConfigurationCluster::class;
+    protected static ?int $navigationSort = 10;
 
     public ?array $data = [];
 

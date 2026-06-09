@@ -24,6 +24,12 @@ class TravelSegmentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'TravelSegment';
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Marketing & Field Sales';
+
+    protected static ?int $navigationSort = 10;
+
+    protected static ?string $navigationLabel = 'Travel Segments';
+
     public static function form(Schema $schema): Schema
     {
         return TravelSegmentForm::configure($schema);

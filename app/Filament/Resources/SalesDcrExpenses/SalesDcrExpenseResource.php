@@ -24,6 +24,12 @@ class SalesDcrExpenseResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'SalesDcrExpense';
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Marketing & Field Sales';
+
+    protected static ?int $navigationSort = 10;
+
+    protected static ?string $navigationLabel = 'Sales DCR Expenses';
+
     public static function form(Schema $schema): Schema
     {
         return SalesDcrExpenseForm::configure($schema);

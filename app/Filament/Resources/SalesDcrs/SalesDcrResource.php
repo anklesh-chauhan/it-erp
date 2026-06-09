@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SalesDcrs;
 
+use App\Filament\Clusters\GlobalConfiguration\SalesMarketingConfigurationCluster;
 use App\Filament\Resources\SalesDcrs\Pages\CreateSalesDcr;
 use App\Filament\Resources\SalesDcrs\Pages\EditSalesDcr;
 use App\Filament\Resources\SalesDcrs\Pages\ListSalesDcrs;
@@ -27,6 +28,12 @@ class SalesDcrResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'SalesDcr';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Marketing & Field Sales';
+
+    protected static ?int $navigationSort = 10;
+
+    protected static ?string $navigationLabel = 'Sales DCR';
 
     public static function form(Schema $schema): Schema
     {

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ExpenseConfigurations;
 
+use App\Filament\Clusters\GlobalConfiguration\SalesMarketingConfigurationCluster;
 use App\Filament\Resources\ExpenseConfigurations\Pages\CreateExpenseConfiguration;
 use App\Filament\Resources\ExpenseConfigurations\Pages\EditExpenseConfiguration;
 use App\Filament\Resources\ExpenseConfigurations\Pages\ListExpenseConfigurations;
@@ -20,9 +21,12 @@ class ExpenseConfigurationResource extends Resource
 {
     protected static ?string $model = ExpenseConfiguration::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     protected static ?string $recordTitleAttribute = 'ExpenseConfiguration';
+
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $cluster = SalesMarketingConfigurationCluster::class;
+    protected static ?int $navigationSort = 10;
+    protected static ?string $navigationLabel = 'Expense Config';
 
     public static function form(Schema $schema): Schema
     {

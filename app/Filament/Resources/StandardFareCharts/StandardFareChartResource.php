@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StandardFareCharts;
 
+use App\Filament\Clusters\GlobalConfiguration\SalesMarketingConfigurationCluster;
 use App\Filament\Resources\StandardFareCharts\Pages\CreateStandardFareChart;
 use App\Filament\Resources\StandardFareCharts\Pages\EditStandardFareChart;
 use App\Filament\Resources\StandardFareCharts\Pages\ListStandardFareCharts;
@@ -20,9 +21,12 @@ class StandardFareChartResource extends Resource
 {
     protected static ?string $model = StandardFareChart::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
     protected static ?string $recordTitleAttribute = 'StandardFareChart';
+
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $cluster = SalesMarketingConfigurationCluster::class;
+    protected static ?int $navigationSort = 10;
+    protected static ?string $navigationLabel = 'SFC';
 
     public static function form(Schema $schema): Schema
     {
