@@ -157,4 +157,12 @@ class SalesDocument extends BaseModel
             NumberSeries::incrementNextNumber($model::class);
         });
     }
+
+    public function visitLinks()
+    {
+        return $this->morphMany(
+            VisitDocumentLink::class,
+            'documentable'
+        );
+    }
 }

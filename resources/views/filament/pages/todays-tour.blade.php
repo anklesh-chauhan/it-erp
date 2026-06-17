@@ -1,6 +1,7 @@
 <x-filament-panels::page>
-    <div class="mb-6 flex items-center justify-between gap-4">
-        <div class="flex-1 max-w-md">
+    <div class="mb-6 flex items-center justify-between gap-4 w-full relative overflow-hidden h-11 md:h-auto">
+
+        <div class="w-full pr-36 transition-all duration-300 focus-within:pr-0 md:pr-0 md:flex-[3]">
             <x-filament::input.wrapper prefix-icon="heroicon-m-magnifying-glass">
                 <x-filament::input
                     type="text"
@@ -10,10 +11,24 @@
             </x-filament::input.wrapper>
         </div>
 
-        {{-- Optional: Show result count --}}
-        <div class="text-sm text-gray-500 italic">
-            Showing results for today
+        <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-end gap-1 min-w-max transition-all duration-300 pointer-events-auto [div:focus-within~&]:translate-x-full [div:focus-within~&]:opacity-0 md:relative md:top-0 md:translate-y-0 md:flex-[1] md:[div:focus-within~&]:translate-x-0 md:[div:focus-within~&]:opacity-100">
+            <x-filament::icon-button
+                icon="heroicon-m-chevron-left"
+                wire:click="previousDay"
+                color="gray"
+            />
+
+            <div class="px-2 py-2 text-sm font-semibold whitespace-nowrap">
+                {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}
+            </div>
+
+            <x-filament::icon-button
+                icon="heroicon-m-chevron-right"
+                wire:click="nextDay"
+                color="gray"
+            />
         </div>
+
     </div>
 
     @php

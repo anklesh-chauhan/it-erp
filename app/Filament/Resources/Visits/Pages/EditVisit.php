@@ -69,6 +69,9 @@ class EditVisit extends EditRecord
         return [
 
             Action::make('check_in')
+                ->icon('heroicon-m-arrow-left-on-rectangle') // 👈 Adds the Check-In icon
+                ->label('') // 👈 Removes the text label
+                ->tooltip('Check In') // 👈 Shows a clean tooltip on hover
                 ->visible(fn () =>
                     $this->prefs()->enable_check_in
                     && ! $this->record->start_time
@@ -78,6 +81,9 @@ class EditVisit extends EditRecord
                 ])),
 
             Action::make('check_out')
+                ->icon('heroicon-m-arrow-right-on-rectangle') // 👈 Adds the Check-Out icon
+                ->label('') // 👈 Removes the text label
+                ->tooltip('Check Out') // 👈 Shows a clean tooltip on hover
                 ->visible(fn () =>
                     $this->prefs()->enable_check_out
                     && ! $this->record->end_time
@@ -88,7 +94,7 @@ class EditVisit extends EditRecord
 
             // 📞 Call Action
             Action::make('call_customer')
-                ->label('Call')
+                ->label(false)
                 ->icon('heroicon-m-phone')
                 ->color('success')
                 ->url(fn () => $account?->phone_number ? "tel:{$account->phone_number}" : null)
@@ -96,7 +102,7 @@ class EditVisit extends EditRecord
 
             // ✉️ Email Action
             Action::make('email_customer')
-                ->label('Email')
+                ->label(false)
                 ->icon('heroicon-m-envelope')
                 ->color('gray')
                 ->url(fn () => $account?->email ? "mailto:{$account->email}" : null)
@@ -363,5 +369,6 @@ class EditVisit extends EditRecord
     {
         $this->mountAction('uploadCheckOutImage');
     }
+
 
 }

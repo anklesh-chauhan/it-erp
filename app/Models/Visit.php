@@ -152,6 +152,59 @@ class Visit extends BaseModel
     }
 
     /**
+     * visitDocumentLinks related to the visit
+     */
+
+    public function visitDocumentLinks(): HasMany
+    {
+        return $this->hasMany(VisitDocumentLink::class);
+    }
+
+    public function quoteLinks()
+    {
+        return $this->visitDocumentLinks()
+            ->where('documentable_type', Quote::class);
+    }
+
+    public function salesOrderLinks()
+    {
+        return $this->visitDocumentLinks()
+            ->where('documentable_type', SalesOrder::class);
+    }
+
+    public function quoteSummary(): array
+    {
+        $quoteIds = $this->visitDocumentLinks()
+            ->where('documentable_type', Quote::class)
+            ->pluck('documentable_id');
+
+        return [
+            'count' => $quoteIds->count(),
+            'amount' => Quote::whereIn('id', $quoteIds)->sum('total'),
+            'items' => Quote::whereIn('id', $quoteIds)
+                ->withCount('items')
+                ->get()
+                ->sum('items_count'),
+        ];
+    }
+
+    public function salesOrderSummary(): array
+    {
+        $ids = $this->visitDocumentLinks()
+            ->where('documentable_type', SalesOrder::class)
+            ->pluck('documentable_id');
+
+        return [
+            'count' => $ids->count(),
+            'amount' => SalesOrder::whereIn('id', $ids)->sum('total'),
+            'items' => SalesOrder::whereIn('id', $ids)
+                ->withCount('items')
+                ->get()
+                ->sum('items_count'),
+        ];
+    }
+
+    /**
      * 🔁 Link to newly created visit after reschedule approval
      */
     public function rescheduledVisit(): BelongsTo

@@ -88,10 +88,35 @@ trait HasVisibilityScope
                 $ouIds = OrganizationalUnitService::getUserOuIds($user);
 
                 if (! empty($ouIds)) {
-                    $q->orWhereHas(
-                        'creator.employee.employmentDetail.organizationalUnits',
-                        fn ($ou) => $ou->whereIn('organizational_units.id', $ouIds)
-                    );
+                    $modelInstance = $q->getModel();
+                    $usesCustomOuScope = false;
+
+                    if (method_exists($modelInstance, 'scopeApplyOuVisibility')) {
+                        $declaringClass = (new \ReflectionMethod($modelInstance, 'scopeApplyOuVisibility'))
+                            ->getDeclaringClass()
+                            ->getName();
+
+                        $usesCustomOuScope = $declaringClass !== BaseModel::class;
+                    }
+
+                    if ($usesCustomOuScope) {
+                        $q->orWhere(function (Builder $oq) use ($ouIds) {
+                            $oq->applyOuVisibility($ouIds);
+                        });
+                    } else {
+                        $modelInstance = $q->getModel();
+
+                        if (Schema::hasColumn($table, 'territory_id') && method_exists($modelInstance, 'territory')) {
+                            $q->orWhereHas('territory', function (Builder $territoryQuery) use ($ouIds) {
+                                $territoryQuery->whereIn('territories.division_ou_id', $ouIds);
+                            });
+                        } else {
+                            $q->orWhereHas(
+                                'creator.employee.employmentDetail.organizationalUnits',
+                                fn (Builder $ouQuery) => $ouQuery->whereIn('organizational_units.id', $ouIds)
+                            );
+                        }
+                    }
                 }
             }
 

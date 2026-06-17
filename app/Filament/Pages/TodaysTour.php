@@ -2,28 +2,32 @@
 
 namespace App\Filament\Pages;
 
+use App\Helpers\SalesDocumentQuickCreate;
 use App\Models\AccountMaster;
+use App\Models\Quote;
+use App\Models\SalesOrder;
 use App\Models\SalesTourPlanDetail;
 use App\Models\Visit;
 use App\Traits\HasVisitManagement;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Textarea;
-use Filament\Pages\Page;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
-class TodaysTour extends Page implements HasForms, HasActions
+class TodaysTour extends Page implements HasActions, HasForms
 {
-    use InteractsWithForms, InteractsWithActions, HasVisitManagement;
+    use HasVisitManagement, InteractsWithActions, InteractsWithForms;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map';
+
     protected static ?string $navigationLabel = 'Today’s Visits';
 
     protected string $view = 'filament.pages.todays-tour';
@@ -33,29 +37,34 @@ class TodaysTour extends Page implements HasForms, HasActions
      */
     public Collection $todayPlans;
 
+    // Date filter
+    public string $selectedDate;
+
     // Search property
     public ?string $search = '';
 
     public function mount(): void
     {
+        $this->selectedDate = now()->toDateString();
+
         $this->loadPlans();
     }
 
     public function loadPlans(): void
     {
         $this->todayPlans = SalesTourPlanDetail::query()
-            ->whereDate('date', today())
-            ->whereHas('tourPlan', fn($q) => $q->where('user_id', Auth::id()))
+            ->whereDate('date', $this->selectedDate)
+            ->whereHas('tourPlan', fn ($q) => $q->where('user_id', Auth::id()))
             ->with([
                 'territory',
                 'tourPlan',
                 'patches.companies' => function ($query) {
                     // If searching, filter the companies right in the SQL query
                     if (filled($this->search)) {
-                        $query->where('name', 'like', '%' . $this->search . '%');
+                        $query->where('name', 'like', '%'.$this->search.'%');
                     }
                     $query->with(['typeMaster', 'contactDetails']);
-                }
+                },
             ])
             ->get();
     }
@@ -66,6 +75,30 @@ class TodaysTour extends Page implements HasForms, HasActions
         $this->loadPlans();
     }
 
+    // Trigger selected date upadte
+    public function updatedSelectedDate(): void
+    {
+        $this->loadPlans();
+    }
+
+    public function previousDay(): void
+    {
+        $this->selectedDate = Carbon::parse($this->selectedDate)
+            ->subDay()
+            ->toDateString();
+
+        $this->loadPlans();
+    }
+
+    public function nextDay(): void
+    {
+        $this->selectedDate = Carbon::parse($this->selectedDate)
+            ->addDay()
+            ->toDateString();
+
+        $this->loadPlans();
+    }
+
     // The status of a specific company
     public function getVisitStatus(int $companyId, int $detailId, int $patchId): string
     {
@@ -73,8 +106,7 @@ class TodaysTour extends Page implements HasForms, HasActions
             ->where('employee_id', Auth::id())
             ->where('sales_tour_plan_detail_id', $detailId)
             ->where('patch_id', $patchId)
-            ->whereHas('visitables', fn ($q) =>
-                $q->where('visitable_type', AccountMaster::class)
+            ->whereHas('visitables', fn ($q) => $q->where('visitable_type', AccountMaster::class)
                 ->where('visitable_id', $companyId)
             )
             ->first();
@@ -110,6 +142,24 @@ class TodaysTour extends Page implements HasForms, HasActions
         );
     }
 
+    public function createQuote(int $salesTourPlanDetailId, int $patchId, int $companyId)
+    {
+        $visit = $this->ensureVisitExists($salesTourPlanDetailId, $patchId, $companyId);
+
+        $document = SalesDocumentQuickCreate::createFromVisit($visit, Quote::class);
+
+        return redirect()->route('filament.admin.resources.quotes.edit', $document);
+    }
+
+    public function createSalesOrder(int $salesTourPlanDetailId, int $patchId, int $companyId)
+    {
+        $visit = $this->ensureVisitExists($salesTourPlanDetailId, $patchId, $companyId);
+
+        $document = SalesDocumentQuickCreate::createFromVisit($visit, SalesOrder::class);
+
+        return redirect()->route('filament.admin.resources.sales-orders.edit', $document);
+    }
+
     public function cancelAction(): Action
     {
         return Action::make('cancel')
@@ -134,9 +184,9 @@ class TodaysTour extends Page implements HasForms, HasActions
                 );
 
                 $visit->update([
-                    'visit_status'     => 'cancelled',
+                    'visit_status' => 'cancelled',
                     'reschedule_state' => 'none',
-                    'cancel_reason'    => $data['cancel_reason'],
+                    'cancel_reason' => $data['cancel_reason'],
                 ]);
 
                 Notification::make()
@@ -147,7 +197,6 @@ class TodaysTour extends Page implements HasForms, HasActions
                 $this->loadPlans();
             });
     }
-
 
     public function rescheduleAction(): Action
     {
@@ -179,10 +228,10 @@ class TodaysTour extends Page implements HasForms, HasActions
 
                 // 2. Perform the update with safety checks
                 $visit->update([
-                    'visit_status'     => 'cancelled',
+                    'visit_status' => 'cancelled',
                     'reschedule_state' => 'requested',
-                    'rescheduled_for'  => $data['rescheduled_for'] ?? null, // Use null-coalescing
-                    'cancel_reason'    => $data['cancel_reason'] ?? 'No reason provided',
+                    'rescheduled_for' => $data['rescheduled_for'] ?? null, // Use null-coalescing
+                    'cancel_reason' => $data['cancel_reason'] ?? 'No reason provided',
                 ]);
 
                 Notification::make()
@@ -193,5 +242,4 @@ class TodaysTour extends Page implements HasForms, HasActions
                 $this->loadPlans();
             });
     }
-
 }

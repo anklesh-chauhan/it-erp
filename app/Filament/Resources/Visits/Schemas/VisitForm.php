@@ -2,9 +2,13 @@
 
 namespace App\Filament\Resources\Visits\Schemas;
 
+use App\Helpers\SalesDocumentQuickCreate;
+use App\Models\Quote;
+use App\Models\SalesOrder;
 use App\Models\Visit;
 use App\Models\VisitPreference;
 use App\Services\Visit\DcrService;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -14,8 +18,11 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ViewField;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
@@ -218,7 +225,102 @@ class VisitForm
                                     ->columns(2),
 
                             ]),
-                    ])
+
+                            Tabs\Tab::make('Sales Documents')
+                            ->schema([
+
+                                Actions::make([
+
+                                    Action::make('create_quote')
+                                        ->label('Create Quote')
+                                        ->icon('heroicon-o-document-text')
+                                        ->color('success')
+                                        ->visible(fn (?Visit $record) => filled($record))
+                                        ->action(function (Visit $record) {
+
+                                            $quote = SalesDocumentQuickCreate::createFromVisit(
+                                                $record,
+                                                Quote::class,
+                                            );
+
+                                            redirect(
+                                                \App\Filament\Resources\Quotes\QuoteResource::getUrl(
+                                                    'edit',
+                                                    ['record' => $quote]
+                                                )
+                                            );
+                                        }),
+
+                                    Action::make('create_sales_order')
+                                        ->label('Create Sales Order')
+                                        ->icon('heroicon-o-shopping-cart')
+                                        ->color('warning')
+                                        ->action(function (Visit $record) {
+
+                                            $salesOrder = SalesDocumentQuickCreate::createFromVisit(
+                                                $record,
+                                                SalesOrder::class,
+                                            );
+
+                                            redirect(
+                                                \App\Filament\Resources\SalesOrders\SalesOrderResource::getUrl(
+                                                    'edit',
+                                                    ['record' => $salesOrder]
+                                                )
+                                            );
+                                        }),
+
+                                ])->columnSpanFull(),
+
+                                Grid::make(2)
+                                    ->schema([
+
+                                        Section::make('Quotes')
+                                            ->schema([
+                                                TextEntry::make('quote_count')
+                                                    ->label('Total Quotes')
+                                                    ->state(fn ($record) =>
+                                                        $record?->quoteSummary()['count'] ?? 0
+                                                    ),
+
+                                                TextEntry::make('quote_amount')
+                                                    ->label('Quote Amount')
+                                                    ->state(fn ($record) =>
+                                                        $record?->quoteSummary()['amount'] ?? 0
+                                                    )
+                                                    ->money('INR'),
+
+                                                TextEntry::make('quote_items')
+                                                    ->label('Items')
+                                                    ->state(fn ($record) =>
+                                                        $record?->quoteSummary()['items'] ?? 0
+                                                    ),
+                                            ]),
+
+                                        Section::make('Sales Orders')
+                                            ->schema([
+                                                TextEntry::make('so_count')
+                                                    ->label('Total Orders')
+                                                    ->state(fn ($record) =>
+                                                        $record?->salesOrderSummary()['count'] ?? 0
+                                                    ),
+
+                                                TextEntry::make('so_amount')
+                                                    ->label('Order Amount')
+                                                    ->state(fn ($record) =>
+                                                        $record?->salesOrderSummary()['amount'] ?? 0
+                                                    )
+                                                    ->money('INR'),
+
+                                                TextEntry::make('so_items')
+                                                    ->label('Items')
+                                                    ->state(fn ($record) =>
+                                                        $record?->salesOrderSummary()['items'] ?? 0
+                                                    ),
+                                            ]),
+                                    ]),
+                                ]),
+                            ])
                     ->columnSpanFull(),
             ]);
     }

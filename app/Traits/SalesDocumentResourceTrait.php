@@ -826,14 +826,17 @@ trait SalesDocumentResourceTrait
             return false;
         }
 
-        $billingAddress = Address::find($billingAddressId);
-        $organization = Organization::first(); // Or however you get current org
+        $billingAddress = Address::query()->withoutGlobalScopes()->find($billingAddressId);
+        $organization = Organization::query()->withoutGlobalScopes()->first();
 
         if (!$billingAddress || !$organization) {
             return false;
         }
 
-        $organizationAddress = $organization->addresses()->first();
+        $organizationAddress = $organization
+            ->addresses()
+            ->withoutGlobalScopes()
+            ->first();
         $organizationState = $organizationAddress?->state;
         $billingState = $billingAddress->state;
 

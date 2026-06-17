@@ -6,6 +6,7 @@ use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\Visits\Pages\CreateVisit;
 use App\Filament\Resources\Visits\Pages\EditVisit;
 use App\Filament\Resources\Visits\Pages\ListVisits;
+use App\Filament\Resources\Visits\RelationManagers\VisitDocumentLinksRelationManager;
 use App\Filament\Resources\Visits\Schemas\VisitForm;
 use App\Filament\Resources\Visits\Tables\VisitsTable;
 use App\Models\Visit;
@@ -42,7 +43,7 @@ class VisitResource extends BaseResource
     public static function getRelations(): array
     {
         return [
-            //
+            VisitDocumentLinksRelationManager::class,
         ];
     }
 
