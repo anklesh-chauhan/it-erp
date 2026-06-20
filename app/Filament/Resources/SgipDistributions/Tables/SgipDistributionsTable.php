@@ -2,15 +2,16 @@
 
 namespace App\Filament\Resources\SgipDistributions\Tables;
 
+use App\Services\SGIPComplianceService;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Actions\Action;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
 class SgipDistributionsTable
@@ -25,8 +26,7 @@ class SgipDistributionsTable
 
                 Tables\Columns\TextColumn::make('user')
                     ->label('Sales Employee')
-                    ->getStateUsing(fn ($record) =>
-                        $record->user?->employee?->full_name
+                    ->getStateUsing(fn ($record) => $record->user?->employee?->full_name
                     )
                     ->visible(fn () => ! Auth::user()->hasRole('sales_user')),
 
@@ -36,13 +36,13 @@ class SgipDistributionsTable
                 Tables\Columns\TextColumn::make('total_value')
                     ->money('INR'),
 
-                Tables\Columns\TextColumn::make('status')
+                Tables\Columns\TextColumn::make('approval_status')
                     ->badge()
                     ->colors([
                         'warning' => 'draft',
-                        'info'    => 'submitted',
+                        'info' => 'submitted',
                         'success' => 'approved',
-                        'danger'  => 'rejected',
+                        'danger' => 'rejected',
                     ]),
             ])
             ->filters([
@@ -50,17 +50,17 @@ class SgipDistributionsTable
             ])
             ->recordActions([
                 EditAction::make()
-                    ->visible(fn ($record) => $record->status === 'draft'),
+                    ->visible(fn ($record) => $record->approval_status === 'draft'),
 
                 Action::make('submit')
                     ->label('Submit')
                     ->color('primary')
                     ->requiresConfirmation()
-                    ->visible(fn ($record) => $record->status === 'draft')
+                    ->visible(fn ($record) => $record->approval_status === 'draft')
                     ->action(function ($record) {
-                        \App\Services\SGIPComplianceService::validate($record, true);
+                        SGIPComplianceService::validate($record, true);
 
-                        $record->update(['status' => 'submitted']);
+                        $record->update(['approval_status' => 'submitted']);
                     }),
             ])
             ->toolbarActions([

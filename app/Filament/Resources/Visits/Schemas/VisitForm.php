@@ -2,10 +2,15 @@
 
 namespace App\Filament\Resources\Visits\Schemas;
 
+use App\Filament\Resources\Quotes\QuoteResource;
+use App\Filament\Resources\SalesOrders\SalesOrderResource;
+use App\Filament\Resources\SgipDistributions\SgipDistributionResource;
 use App\Helpers\SalesDocumentQuickCreate;
 use App\Models\Quote;
 use App\Models\SalesOrder;
+use App\Models\SgipDistribution;
 use App\Models\Visit;
+use App\Models\VisitOutcome;
 use App\Models\VisitPreference;
 use App\Services\Visit\DcrService;
 use Filament\Actions\Action;
@@ -18,6 +23,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ViewField;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
@@ -25,6 +31,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class VisitForm
@@ -63,10 +70,10 @@ class VisitForm
                                                     ->disabled(fn ($record) => ! VisitPreference::current()->allow_manual_time_edit || $record->isCompleted()),
                                             ])->columns(2),
 
-                                        Forms\Components\Select::make('visit_outcome_id')
+                                        Select::make('visit_outcome_id')
                                             ->label('Outcome')
                                             ->options(
-                                                \App\Models\VisitOutcome::query()
+                                                VisitOutcome::query()
                                                     ->orderBy('label')
                                                     ->pluck('label', 'id')
                                             )
@@ -83,7 +90,7 @@ class VisitForm
                                             ->columnSpanFull(),
                                     ]),
 
-                                Forms\Components\Select::make('visitPurposes')
+                                Select::make('visitPurposes')
                                     ->label('Purposes')
                                     ->relationship('visitPurposes', 'name')
                                     ->multiple()
@@ -103,7 +110,7 @@ class VisitForm
                                     ->label('Is Joint Work?')
                                     ->reactive()
                                     ->afterStateUpdated(fn (callable $set, $state) => ! $state ? $set('jointUsers', []) : null),
-                                Forms\Components\Select::make('jointUsers')
+                                Select::make('jointUsers')
                                     ->hiddenLabel()
                                     ->relationship('jointUsers', 'name')
                                     ->multiple()
@@ -185,7 +192,67 @@ class VisitForm
                                     ->view('filament.visits.expenses-summary'),
                             ]),
 
-                        // --- TAB 5: ATTACHMENTS ---
+                        // --- TAB 5: SGIP ---
+                        Tabs\Tab::make('SGIP')
+                            ->schema([
+                                Actions::make([
+                                    Action::make('create_sgip_distribution')
+                                        ->label(fn (?Visit $record): string => $record?->sgipDistribution ? 'Open SGIP Distribution' : 'Create SGIP Distribution')
+                                        ->icon('heroicon-o-gift')
+                                        ->color('primary')
+                                        ->visible(fn (?Visit $record): bool => filled($record))
+                                        ->action(function (Visit $record): void {
+                                            $account = $record->primaryCompany();
+
+                                            if (! $account) {
+                                                Notification::make()
+                                                    ->title('Select a customer before creating SGIP distribution.')
+                                                    ->danger()
+                                                    ->send();
+
+                                                return;
+                                            }
+
+                                            $distribution = SgipDistribution::query()->firstOrCreate(
+                                                ['visit_id' => $record->id],
+                                                [
+                                                    'user_id' => $record->employee_id ?? Auth::id(),
+                                                    'employee_id' => $record->employee?->employee_id,
+                                                    'account_master_id' => $account->id,
+                                                    'territory_id' => $record->territory_id,
+                                                    'sales_tour_plan_id' => $record->sales_tour_plan_id,
+                                                    'visit_date' => $record->visit_date ?? today(),
+                                                    'approval_status' => 'draft',
+                                                ]
+                                            );
+
+                                            redirect(
+                                                SgipDistributionResource::getUrl('edit', [
+                                                    'record' => $distribution,
+                                                ])
+                                            );
+                                        }),
+                                ])->columnSpanFull(),
+
+                                Grid::make(3)
+                                    ->schema([
+                                        TextEntry::make('sgip_distribution_status')
+                                            ->label('Status')
+                                            ->badge()
+                                            ->state(fn (?Visit $record): string => $record?->sgipDistribution?->approval_status ?? 'Not Created'),
+
+                                        TextEntry::make('sgip_distribution_total')
+                                            ->label('Total Value')
+                                            ->money('INR')
+                                            ->state(fn (?Visit $record): float => (float) ($record?->sgipDistribution?->total_value ?? 0)),
+
+                                        TextEntry::make('sgip_distribution_items')
+                                            ->label('Items')
+                                            ->state(fn (?Visit $record): int => $record?->sgipDistribution?->items()->count() ?? 0),
+                                    ]),
+                            ]),
+
+                        // --- TAB 6: ATTACHMENTS ---
                         Tabs\Tab::make('Attachments')
                             ->schema([
 
@@ -226,7 +293,8 @@ class VisitForm
 
                             ]),
 
-                            Tabs\Tab::make('Sales Documents')
+                        // --- TAB 7: SALES DOCUMENTS ---
+                        Tabs\Tab::make('Sales Documents')
                             ->schema([
 
                                 Actions::make([
@@ -244,7 +312,7 @@ class VisitForm
                                             );
 
                                             redirect(
-                                                \App\Filament\Resources\Quotes\QuoteResource::getUrl(
+                                                QuoteResource::getUrl(
                                                     'edit',
                                                     ['record' => $quote]
                                                 )
@@ -263,7 +331,7 @@ class VisitForm
                                             );
 
                                             redirect(
-                                                \App\Filament\Resources\SalesOrders\SalesOrderResource::getUrl(
+                                                SalesOrderResource::getUrl(
                                                     'edit',
                                                     ['record' => $salesOrder]
                                                 )
@@ -279,21 +347,18 @@ class VisitForm
                                             ->schema([
                                                 TextEntry::make('quote_count')
                                                     ->label('Total Quotes')
-                                                    ->state(fn ($record) =>
-                                                        $record?->quoteSummary()['count'] ?? 0
+                                                    ->state(fn ($record) => $record?->quoteSummary()['count'] ?? 0
                                                     ),
 
                                                 TextEntry::make('quote_amount')
                                                     ->label('Quote Amount')
-                                                    ->state(fn ($record) =>
-                                                        $record?->quoteSummary()['amount'] ?? 0
+                                                    ->state(fn ($record) => $record?->quoteSummary()['amount'] ?? 0
                                                     )
                                                     ->money('INR'),
 
                                                 TextEntry::make('quote_items')
                                                     ->label('Items')
-                                                    ->state(fn ($record) =>
-                                                        $record?->quoteSummary()['items'] ?? 0
+                                                    ->state(fn ($record) => $record?->quoteSummary()['items'] ?? 0
                                                     ),
                                             ]),
 
@@ -301,26 +366,23 @@ class VisitForm
                                             ->schema([
                                                 TextEntry::make('so_count')
                                                     ->label('Total Orders')
-                                                    ->state(fn ($record) =>
-                                                        $record?->salesOrderSummary()['count'] ?? 0
+                                                    ->state(fn ($record) => $record?->salesOrderSummary()['count'] ?? 0
                                                     ),
 
                                                 TextEntry::make('so_amount')
                                                     ->label('Order Amount')
-                                                    ->state(fn ($record) =>
-                                                        $record?->salesOrderSummary()['amount'] ?? 0
+                                                    ->state(fn ($record) => $record?->salesOrderSummary()['amount'] ?? 0
                                                     )
                                                     ->money('INR'),
 
                                                 TextEntry::make('so_items')
                                                     ->label('Items')
-                                                    ->state(fn ($record) =>
-                                                        $record?->salesOrderSummary()['items'] ?? 0
+                                                    ->state(fn ($record) => $record?->salesOrderSummary()['items'] ?? 0
                                                     ),
                                             ]),
                                     ]),
-                                ]),
-                            ])
+                            ]),
+                    ])
                     ->columnSpanFull(),
             ]);
     }

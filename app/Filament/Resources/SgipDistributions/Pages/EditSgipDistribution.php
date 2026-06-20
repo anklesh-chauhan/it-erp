@@ -23,6 +23,6 @@ class EditSgipDistribution extends EditRecord
 
     protected function canEdit(): bool
     {
-        return $this->record->status === 'draft';
+        return $this->record->approval_status === 'draft';
     }
 }

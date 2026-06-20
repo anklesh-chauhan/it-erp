@@ -118,6 +118,11 @@ class Visit extends BaseModel
         return $this->belongsTo(SalesDcr::class);
     }
 
+    public function sgipDistribution(): HasOne
+    {
+        return $this->hasOne(SgipDistribution::class);
+    }
+
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
@@ -154,7 +159,6 @@ class Visit extends BaseModel
     /**
      * visitDocumentLinks related to the visit
      */
-
     public function visitDocumentLinks(): HasMany
     {
         return $this->hasMany(VisitDocumentLink::class);

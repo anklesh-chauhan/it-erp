@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
+use App\Services\SGIPComplianceService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,13 +17,14 @@ class SgipDistribution extends BaseModel
         'account_master_id', // Doctor
         'territory_id',
         'sales_tour_plan_id',
+        'visit_id',
         'visit_date',
         'total_value',
         'approval_status',
     ];
 
     protected $casts = [
-        'visit_date'  => 'date',
+        'visit_date' => 'date',
         'total_value' => 'decimal:2',
     ];
 
@@ -47,6 +48,11 @@ class SgipDistribution extends BaseModel
         return $this->belongsTo(AccountMaster::class, 'account_master_id');
     }
 
+    public function accountMaster()
+    {
+        return $this->belongsTo(AccountMaster::class);
+    }
+
     public function territory(): BelongsTo
     {
         return $this->belongsTo(Territory::class);
@@ -55,6 +61,11 @@ class SgipDistribution extends BaseModel
     public function tourPlan(): BelongsTo
     {
         return $this->belongsTo(SalesTourPlan::class, 'sales_tour_plan_id');
+    }
+
+    public function visit(): BelongsTo
+    {
+        return $this->belongsTo(Visit::class);
     }
 
     public function items(): HasMany
@@ -87,8 +98,8 @@ class SgipDistribution extends BaseModel
             }
 
             // ❌ Do NOT block draft saves
-            if ($distribution->status === 'draft') {
-                \App\Services\SGIPComplianceService::validate($distribution, false);
+            if ($distribution->approval_status === 'draft') {
+                SGIPComplianceService::validate($distribution, false);
             }
         });
     }

@@ -2,19 +2,18 @@
 
 namespace App\Filament\Resources\SgipDistributions\Schemas;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Repeater;
-use Illuminate\Support\Facades\Auth;
 use App\Models\AccountMaster;
 use App\Models\ItemMaster;
+use App\Models\User;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use App\Models\User;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Auth;
 
 class SgipDistributionForm
 {
@@ -29,8 +28,7 @@ class SgipDistributionForm
                             ->label('Sales Employee')
                             ->relationship('user', 'id')
                             ->getOptionLabelFromRecordUsing(
-                                fn (?User $user) =>
-                                    $user
+                                fn (?User $user) => $user
                                         ? ($user->employee?->full_name ?? $user->email)
                                         : '—'
                             )
@@ -38,22 +36,25 @@ class SgipDistributionForm
                             ->disabled()
                             ->dehydrated(),
 
-                        Select::make('account_master_id')
-                            ->label('Customer')
-                            ->options(
-                                AccountMaster::query()
-                                    ->whereHas('typeMaster', fn ($q) => $q->where('name', 'Retail Customer'))
-                                    ->pluck('name', 'id')
-                            )
-                            ->searchable()
-                            ->required(),
-
+                            Select::make('account_master_id')
+    ->options(
+        AccountMaster::query()
+            ->whereHas('typeMaster', fn ($q) => $q->where('name', 'Retail Customer'))
+            ->pluck('name', 'id')
+            ->toArray()
+    )
+    ->searchable()
+    ->getOptionLabelUsing(
+        fn ($value) => AccountMaster::find($value)?->name
+    )
+    ->required(),
                         DatePicker::make('visit_date')
                             ->native(false)
                             ->required(),
 
-                        TextInput::make('status')
+                        TextInput::make('approval_status')
                             ->disabled()
+                            ->dehydrated()
                             ->default('draft'),
                     ])->columnSpanFull(),
 
@@ -117,11 +118,10 @@ class SgipDistributionForm
                                     ->dehydrated(false)
                                     ->reactive()
                                     ->afterStateHydrated(
-                                        fn ($set, Get $get) =>
-                                            $set(
-                                                'total_value',
-                                                ($get('quantity') ?? 0) * ($get('unit_value') ?? 0)
-                                            )
+                                        fn ($set, Get $get) => $set(
+                                            'total_value',
+                                            ($get('quantity') ?? 0) * ($get('unit_value') ?? 0)
+                                        )
                                     ),
                             ]),
                     ])->columnSpanFull(),

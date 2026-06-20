@@ -44,21 +44,18 @@ class SGIPComplianceService
             ->where(function ($q) use ($distribution) {
 
                 $q->where('applies_to', 'global')
-
-                  ->orWhere(function ($q) use ($distribution) {
-                      $q->where('applies_to', 'account')
-                        ->where('applies_to_id', $distribution->account_master_id);
-                  })
-
-                  ->orWhere(function ($q) use ($distribution) {
-                      $q->where('applies_to', 'employee')
-                        ->where('applies_to_id', $distribution->employee_id);
-                  })
-
-                  ->orWhere(function ($q) use ($distribution) {
-                      $q->where('applies_to', 'territory')
-                        ->where('applies_to_id', $distribution->territory_id);
-                  });
+                    ->orWhere(function ($q) use ($distribution) {
+                        $q->where('applies_to', 'account')
+                            ->where('applies_to_id', $distribution->account_master_id);
+                    })
+                    ->orWhere(function ($q) use ($distribution) {
+                        $q->where('applies_to', 'employee')
+                            ->where('applies_to_id', $distribution->employee_id);
+                    })
+                    ->orWhere(function ($q) use ($distribution) {
+                        $q->where('applies_to', 'territory')
+                            ->where('applies_to_id', $distribution->territory_id);
+                    });
             })
             ->get();
     }
@@ -90,7 +87,7 @@ class SGIPComplianceService
         }
 
         // Current distribution totals
-        $currentQty   = $items->sum('quantity');
+        $currentQty = $items->sum('quantity');
         $currentValue = $items->sum('total_value');
 
         // Historical usage
@@ -101,7 +98,7 @@ class SGIPComplianceService
             $to
         );
 
-        $totalQty   = $historical['quantity'] + $currentQty;
+        $totalQty = $historical['quantity'] + $currentQty;
         $totalValue = $historical['value'] + $currentValue;
 
         // Check violations
@@ -142,24 +139,24 @@ class SGIPComplianceService
         $query = SgipDistribution::query()
             ->where('id', '!=', $distribution->id)
             ->whereBetween('visit_date', [$from, $to])
-            ->whereIn('status', ['submitted', 'approved'])
+            ->whereIn('approval_status', ['submitted', 'approved'])
             ->whereHas('items.item', function ($q) use ($limit) {
                 $q->where('category_type', $limit->item_type);
             });
 
         match ($limit->applies_to) {
-            'account'   => $query->where('account_master_id', $distribution->account_master_id),
-            'employee'  => $query->where('employee_id', $distribution->employee_id),
+            'account' => $query->where('account_master_id', $distribution->account_master_id),
+            'employee' => $query->where('employee_id', $distribution->employee_id),
             'territory' => $query->where('territory_id', $distribution->territory_id),
-            default     => null,
+            default => null,
         };
 
         return [
             'quantity' => $query->withSum('items as quantity', 'quantity')
-                                ->value('quantity') ?? 0,
+                ->value('quantity') ?? 0,
 
-            'value'    => $query->withSum('items as value', 'total_value')
-                                ->value('value') ?? 0,
+            'value' => $query->withSum('items as value', 'total_value')
+                ->value('value') ?? 0,
         ];
     }
 
@@ -178,10 +175,10 @@ class SGIPComplianceService
 
         SgipViolation::create([
             'sgip_distribution_id' => $distribution->id,
-            'sgip_limit_id'        => $limit->id,
-            'violation_type'       => $type,
-            'allowed_value'        => $allowed,
-            'actual_value'         => $actual,
+            'sgip_limit_id' => $limit->id,
+            'violation_type' => $type,
+            'allowed_value' => $allowed,
+            'actual_value' => $actual,
         ]);
 
         if ($block) {
@@ -201,10 +198,10 @@ class SGIPComplianceService
     ): array {
 
         return match ($period) {
-            'daily'   => [$date->copy()->startOfDay(),   $date->copy()->endOfDay()],
+            'daily' => [$date->copy()->startOfDay(),   $date->copy()->endOfDay()],
             'monthly' => [$date->copy()->startOfMonth(), $date->copy()->endOfMonth()],
-            'yearly'  => [$date->copy()->startOfYear(),  $date->copy()->endOfYear()],
-            default   => throw new \InvalidArgumentException('Invalid SGIP period'),
+            'yearly' => [$date->copy()->startOfYear(),  $date->copy()->endOfYear()],
+            default => throw new \InvalidArgumentException('Invalid SGIP period'),
         };
     }
 }
