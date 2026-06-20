@@ -2,18 +2,13 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
-
 use App\Traits\HasApprovalWorkflow;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ItemMaster extends BaseModel
 {
-    use HasFactory, SoftDeletes, HasApprovalWorkflow;
+    use HasApprovalWorkflow, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'variant_name',
@@ -76,7 +71,7 @@ class ItemMaster extends BaseModel
     public function suppliers()
     {
         return $this->belongsToMany(AccountMaster::class, 'item_master_account_masters')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     public function attachments()
@@ -102,8 +97,23 @@ class ItemMaster extends BaseModel
     public function locations()
     {
         return $this->belongsToMany(LocationMaster::class, 'item_location')
-                    ->withPivot('quantity') // Include quantity in the pivot table
-                    ->withTimestamps();
+            ->withPivot('quantity') // Include quantity in the pivot table
+            ->withTimestamps();
+    }
+
+    public function inventoryStocks()
+    {
+        return $this->hasMany(InventoryStock::class, 'item_master_id');
+    }
+
+    public function inventoryMovements()
+    {
+        return $this->hasMany(InventoryMovement::class, 'item_master_id');
+    }
+
+    public function purchaseOrderLines()
+    {
+        return $this->hasMany(PurchaseOrderLine::class, 'item_master_id');
     }
 
     public function taxes()
@@ -125,7 +135,7 @@ class ItemMaster extends BaseModel
         });
 
         static::saving(function ($item) {
-            if ($item->category_id && !$item->category_type) {
+            if ($item->category_id && ! $item->category_type) {
                 $item->category_type = Category::class;
             }
         });

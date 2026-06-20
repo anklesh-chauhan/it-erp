@@ -2,62 +2,69 @@
 
 namespace App\Filament\Resources\LocationMasters\RelationManagers;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\AttachAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DetachAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DetachBulkAction;
-use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ItemsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'items';
+    protected static string $relationship = 'inventoryStocks';
+
+    protected static ?string $title = 'Stock On Hand';
+
+    protected static ?string $recordTitleAttribute = 'id';
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('quantity') // Pivot field
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-            ]);
+        return $schema->components([]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('item_name')
             ->columns([
-                TextColumn::make('item_name'),
-                TextColumn::make('pivot.quantity') // Display pivot field
-                    ->label('Quantity'),
+                TextColumn::make('item.item_code')
+                    ->label('Item Code')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('item.item_name')
+                    ->label('Item')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('quantity_on_hand')
+                    ->label('On Hand')
+                    ->numeric(3)
+                    ->alignEnd()
+                    ->sortable(),
+                TextColumn::make('quantity_reserved')
+                    ->label('Reserved')
+                    ->numeric(3)
+                    ->alignEnd()
+                    ->toggleable(),
+                TextColumn::make('quantity_available')
+                    ->label('Available')
+                    ->numeric(3)
+                    ->alignEnd()
+                    ->sortable(),
+                TextColumn::make('average_cost')
+                    ->money('INR')
+                    ->alignEnd()
+                    ->toggleable(),
+                TextColumn::make('last_movement_at')
+                    ->dateTime('d M Y, h:i A')
+                    ->sortable(),
             ])
-            ->filters([
-                //
-            ])
-            ->headerActions([
-                AttachAction::make(),
-            ])
-            ->recordActions([
-                EditAction::make(),
-                DetachAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DetachBulkAction::make(),
-                ]),
-            ]);
+            ->defaultSort('last_movement_at', 'desc')
+            ->emptyStateHeading('No stock at this location')
+            ->emptyStateDescription('Receive stock via GRN or post a stock adjustment.')
+            ->headerActions([])
+            ->recordActions([])
+            ->toolbarActions([]);
+    }
+
+    public function isReadOnly(): bool
+    {
+        return true;
     }
 }

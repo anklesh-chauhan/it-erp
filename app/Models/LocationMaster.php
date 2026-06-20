@@ -67,6 +67,26 @@ class LocationMaster extends BaseModel
             ->withTimestamps();
     }
 
+    public function inventoryStocks()
+    {
+        return $this->hasMany(InventoryStock::class);
+    }
+
+    public function inventoryMovements()
+    {
+        return $this->hasMany(InventoryMovement::class);
+    }
+
+    public function purchaseOrders()
+    {
+        return $this->hasMany(PurchaseOrder::class, 'location_master_id');
+    }
+
+    public function goodsReceiptNotes()
+    {
+        return $this->hasMany(GoodsReceiptNote::class, 'location_master_id');
+    }
+
     public function employmentDetails()
     {
         return $this->hasMany(EmploymentDetail::class, 'work_location_id');

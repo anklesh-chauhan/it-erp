@@ -2,123 +2,68 @@
 
 namespace App\Filament\Resources\ItemMasters\RelationManagers;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\AttachAction;
-use Filament\Forms\Components\Select;
-use Filament\Actions\EditAction;
-use Filament\Actions\DetachAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DetachBulkAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use App\Models\LocationMaster;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LocationsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'locations';
+    protected static string $relationship = 'inventoryStocks';
+
+    protected static ?string $title = 'Stock by Location';
+
+    protected static ?string $recordTitleAttribute = 'id';
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('quantity') // Pivot field
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-            ]);
+        return $schema->components([]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('name')
             ->columns([
-                TextColumn::make('name')
-                    ->label('Location Name'),
-                TextColumn::make('pivot.quantity') // Display pivot field
-                    ->label('Quantity'),
-            ])
-            ->filters([
-                //
-            ])
-            ->headerActions([
-                AttachAction::make()
-                ->recordSelect(function () {
-                    return self::getIndentedLocations();
-                })
-                ->preloadRecordSelect()
-                ->form([
-                    Select::make('recordId')
-                    ->label('Location Name')
-                    ->options(fn () => self::getIndentedLocations())
+                TextColumn::make('location.name')
+                    ->label('Location')
                     ->searchable()
-                    ->required(),
-                    TextInput::make('quantity')
-                        ->numeric()
-                        ->minValue(1)
-                        ->required(),
-                ])
-                ->action(function (array $data, RelationManager $livewire) {
-                    $record = $livewire->getOwnerRecord(); // Get the parent record
-
-                    $record->locations()->attach($data['recordId'], [
-                        'quantity' => $data['quantity'],
-                    ]);
-                }),
+                    ->sortable(),
+                TextColumn::make('location.location_code')
+                    ->label('Code')
+                    ->toggleable(),
+                TextColumn::make('quantity_on_hand')
+                    ->label('On Hand')
+                    ->numeric(3)
+                    ->alignEnd()
+                    ->sortable(),
+                TextColumn::make('quantity_reserved')
+                    ->label('Reserved')
+                    ->numeric(3)
+                    ->alignEnd()
+                    ->toggleable(),
+                TextColumn::make('quantity_available')
+                    ->label('Available')
+                    ->numeric(3)
+                    ->alignEnd()
+                    ->sortable(),
+                TextColumn::make('average_cost')
+                    ->money('INR')
+                    ->alignEnd()
+                    ->toggleable(),
+                TextColumn::make('last_movement_at')
+                    ->dateTime('d M Y, h:i A')
+                    ->sortable(),
             ])
-            ->recordActions([
-                EditAction::make(),
-                DetachAction::make(),
-                // Tables\Actions\DeleteAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DetachBulkAction::make(),
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->defaultSort('last_movement_at', 'desc')
+            ->emptyStateHeading('No stock recorded')
+            ->emptyStateDescription('Receive stock via Purchase Order / GRN or post a stock adjustment.')
+            ->headerActions([])
+            ->recordActions([])
+            ->toolbarActions([]);
     }
 
-    /**
-     * Get a list of active locations with indented sublocations
-     */
-    protected static function getIndentedLocations(): array
+    public function isReadOnly(): bool
     {
-        // Fetch top-level active locations with their sublocations
-        $locations = LocationMaster::with('subLocations')
-            ->whereNull('parent_id')
-            ->where('is_active', true) // Filter active locations
-            ->get();
-
-        $options = [];
-        self::buildLocationOptions($locations, $options);
-
-        return $options;
-    }
-
-    /**
-     * Recursively build the options array with indentation
-     */
-    protected static function buildLocationOptions($locations, &$options, $prefix = '')
-    {
-        foreach ($locations as $location) {
-            $options[$location->id] = $prefix . $location->name . ' [' . $location->location_code . ']';
-
-            // Recursively include sublocations if they exist and are active
-            if ($location->subLocations->isNotEmpty()) {
-                $activeSubLocations = $location->subLocations->where('is_active', true);
-                self::buildLocationOptions($activeSubLocations, $options, $prefix . '— ');
-            }
-        }
+        return true;
     }
 }
