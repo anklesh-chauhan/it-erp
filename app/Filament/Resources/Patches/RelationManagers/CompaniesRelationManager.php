@@ -17,6 +17,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\TextInputColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class CompaniesRelationManager extends RelationManager
 {
@@ -49,8 +50,7 @@ class CompaniesRelationManager extends RelationManager
                 TextColumn::make('typeMaster.name')
                     ->label('Type')
                     ->badge()
-                    ->formatStateUsing(fn ($state, $record) => $record->typeMaster?->parent?->name ?? $record->typeMaster?->name ?? 'Customer'
-                    )
+                    ->formatStateUsing(fn ($state, $record) => $record->typeMaster?->parent?->name ?? $record->typeMaster?->name ?? 'Customer')
                     ->color('primary'),
 
                 TextInputColumn::make('sequence_no')
@@ -58,7 +58,7 @@ class CompaniesRelationManager extends RelationManager
                     ->rules(['nullable', 'integer', 'min:1'])
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false)
-                    ->updateStateUsing(function ($record, $state) {
+                    ->updateStateUsing(function ($record, $state): void {
                         $record->pivot->update([
                             'sequence_no' => $state,
                         ]);
@@ -71,18 +71,16 @@ class CompaniesRelationManager extends RelationManager
 
                 TextColumn::make('addresses.areaTown.area_town')
                     ->label('Primary Area/Town')
-                    ->getStateUsing(function ($record) {
-                        // Locate the primary address record
+                    ->getStateUsing(function ($record): string {
                         $primaryAddress = $record->addresses->firstWhere('is_primary', true);
 
-                        // Return the area/town name or a dash if not found
                         return $primaryAddress?->areaTown?->area_town ?? '-';
                     })
                     ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('addresses.areaTown.pin_code')
                     ->label('Pin Code(s)')
-                    ->getStateUsing(fn ($record) => $record->addresses->pluck('areaTown.pin_code')->unique()->implode(', '))
+                    ->getStateUsing(fn ($record): string => $record->addresses->pluck('areaTown.pin_code')->unique()->implode(', '))
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -96,7 +94,7 @@ class CompaniesRelationManager extends RelationManager
                     ->label('Add All Customers from Territory')
                     ->icon('heroicon-o-plus-circle')
                     ->color('success')
-                    ->action(function () {
+                    ->action(function (): void {
                         $patch = $this->ownerRecord;
 
                         if (! $patch->territory_id) {
@@ -106,7 +104,7 @@ class CompaniesRelationManager extends RelationManager
                         }
 
                         $pinCodes = $patch->city_pin_code_id
-                            ? CityPinCode::where('id', $patch->city_pin_code_id)->pluck('pin_code')
+                            ? CityPinCode::whereKey($patch->city_pin_code_id)->pluck('pin_code')
                             : ($patch->territory?->cityPinCodes?->pluck('pin_code') ?? collect());
 
                         if ($pinCodes->isEmpty()) {
@@ -116,9 +114,10 @@ class CompaniesRelationManager extends RelationManager
                         }
 
                         $companyIds = AccountMaster::query()
-                            ->whereHas('addresses', fn ($q) => $q->whereIn('pin_code', $pinCodes))
-                            ->whereHas('typeMaster', fn ($q) => $q->where('name', 'Customer')
-                                ->orWhereHas('parent', fn ($q) => $q->where('name', 'Customer'))
+                            ->whereHas('addresses', fn (Builder $query): Builder => $query->whereIn('pin_code', $pinCodes))
+                            ->whereHas('typeMaster', fn (Builder $query): Builder => $query
+                                ->where('name', 'Customer')
+                                ->orWhereHas('parent', fn (Builder $query): Builder => $query->where('name', 'Customer'))
                             )
                             ->pluck('id');
 
@@ -138,64 +137,18 @@ class CompaniesRelationManager extends RelationManager
                     ->icon('heroicon-o-plus-circle')
                     ->modalHeading('Attach Customer to Patch')
                     ->modalSubmitActionLabel('Attach')
-                    ->form(fn (AttachAction $action): array => [
-                        Select::make('recordId')
-                            ->label('Customer')
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->options(function () {
-                                // Use $this->ownerRecord instead of trying to access $action
-                                $patch = $this->ownerRecord;
-
-                                if (! $patch?->territory_id) {
-                                    return [];
-                                }
-
-                                // Resolve pin codes
-                                $pinCodes = collect();
-
-                                if ($patch->city_pin_code_id) {
-                                    $pinCodes = CityPinCode::where('id', $patch->city_pin_code_id)
-                                        ->pluck('pin_code');
-                                } else {
-                                    $territory = Territory::with('cityPinCodes')
-                                        ->find($patch->territory_id);
-
-                                    $pinCodes = $territory?->cityPinCodes?->pluck('pin_code') ?? collect();
-                                }
-
-                                if ($pinCodes->isEmpty()) {
-                                    return [];
-                                }
-
-                                return AccountMaster::query()
-                                    ->whereHas('addresses', fn ($q) => $q->whereIn('pin_code', $pinCodes))
-                                    ->whereHas('typeMaster', fn ($q) => $q->where('name', 'Customer')
-                                        ->orWhereHas('parent', fn ($q) => $q->where('name', 'Customer'))
-                                    )
-                                    ->pluck('name', 'id')
-                                    ->toArray();
-                            })
-                            ->getOptionLabelFromRecordUsing(fn (AccountMaster $record) => ($record->typeMaster?->parent?->name ?? $record->typeMaster?->name ?? 'Customer')
-                                .' – '.$record->name
-                            ),
-                    ])
+                    ->recordSelectSearchColumns(['name', 'account_code'])
+                    ->recordSelectOptionsQuery(fn (Builder $query): Builder => $this->eligibleCustomersQuery($query))
+                    ->recordSelect(fn (Select $select): Select => $select->label('Customer'))
                     ->preloadRecordSelect()
-                    ->action(function (array $data, $livewire) {
-                        $livewire->ownerRecord->companies()->attach($data['recordId']);
-                        Notification::make()
-                            ->title('Company attached successfully')
-                            ->success()
-                            ->send();
-                    }),
+                    ->successNotificationTitle('Company attached successfully'),
             ])
             ->actions([
                 DetachAction::make()
                     ->label('Remove')
                     ->icon('heroicon-o-trash')
-                    ->action(function ($record, $livewire) {
-                        $livewire->ownerRecord->companies()->detach($record);
+                    ->action(function ($record, RelationManager $livewire): void {
+                        $livewire->ownerRecord->companies()->detach($record->getKey());
                         Notification::make()
                             ->title('Company removed from patch')
                             ->success()
@@ -205,13 +158,37 @@ class CompaniesRelationManager extends RelationManager
             ->bulkActions([
                 DetachBulkAction::make()
                     ->label('Remove Selected')
-                    ->action(function ($records, $livewire) {
-                        $livewire->ownerRecord->companies()->detach($records);
+                    ->action(function ($records, RelationManager $livewire): void {
+                        $livewire->ownerRecord->companies()->detach($records->pluck('id')->all());
                         Notification::make()
                             ->title('Selected companies removed')
                             ->success()
                             ->send();
                     }),
             ]);
+    }
+
+    protected function eligibleCustomersQuery(Builder $query): Builder
+    {
+        $patch = $this->ownerRecord;
+
+        if (! $patch?->territory_id) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        $pinCodes = $patch->city_pin_code_id
+            ? CityPinCode::whereKey($patch->city_pin_code_id)->pluck('pin_code')
+            : (Territory::with('cityPinCodes')->find($patch->territory_id)?->cityPinCodes?->pluck('pin_code') ?? collect());
+
+        if ($pinCodes->isEmpty()) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query
+            ->whereHas('addresses', fn (Builder $query): Builder => $query->whereIn('pin_code', $pinCodes))
+            ->whereHas('typeMaster', fn (Builder $query): Builder => $query
+                ->where('name', 'Customer')
+                ->orWhereHas('parent', fn (Builder $query): Builder => $query->where('name', 'Customer'))
+            );
     }
 }

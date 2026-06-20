@@ -43,7 +43,7 @@ class VisitResource extends BaseResource
     public static function getRelations(): array
     {
         return [
-            VisitDocumentLinksRelationManager::class,
+            //
         ];
     }
 

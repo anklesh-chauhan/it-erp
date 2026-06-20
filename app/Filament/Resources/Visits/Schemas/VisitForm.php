@@ -22,6 +22,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ViewField;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Actions;
@@ -234,7 +235,7 @@ class VisitForm
                                         }),
                                 ])->columnSpanFull(),
 
-                                Grid::make(3)
+                                Grid::make(4)
                                     ->schema([
                                         TextEntry::make('sgip_distribution_status')
                                             ->label('Status')
@@ -249,6 +250,103 @@ class VisitForm
                                         TextEntry::make('sgip_distribution_items')
                                             ->label('Items')
                                             ->state(fn (?Visit $record): int => $record?->sgipDistribution?->items()->count() ?? 0),
+
+                                        Action::make('view_details')
+                                            ->label('Details')
+                                            ->icon('heroicon-o-document-text')
+                                            ->link()
+                                            ->modalHeading(fn (Visit $record): string => "Sample / Gift / Input Details for {$record->document_number}")
+                                            ->color('info')
+                                            ->modalWidth('4xl')
+                                            ->slideOver()
+                                            ->visible(fn (?Visit $record): bool => ($record?->sgipDistribution?->items()->count() ?? 0) > 0)
+                                            ->modalSubmitAction(false)
+                                            ->modalCancelActionLabel('Close')
+                                            ->schema([
+                                                Section::make('Distribution Summary')
+                                                    ->columns(3)
+                                                    ->compact()
+                                                    ->schema([
+                                                        TextEntry::make('sgipDistribution.doctor.name')
+                                                            ->label('Doctor')
+                                                            ->placeholder('-'),
+
+                                                        TextEntry::make('sgipDistribution.visit_date')
+                                                            ->label('Visit Date')
+                                                            ->date()
+                                                            ->placeholder('-'),
+
+                                                        TextEntry::make('sgipDistribution.approval_status')
+                                                            ->label('Approval Status')
+                                                            ->badge()
+                                                            ->placeholder('-'),
+
+                                                        TextEntry::make('sgipDistribution.user.employee.full_name')
+                                                            ->label('Sales Employee')
+                                                            ->placeholder('-'),
+
+                                                        TextEntry::make('sgipDistribution.territory.name')
+                                                            ->label('Territory')
+                                                            ->placeholder('-'),
+
+                                                        TextEntry::make('sgipDistribution.total_value')
+                                                            ->label('Total Value')
+                                                            ->money('INR')
+                                                            ->placeholder('-'),
+                                                    ]),
+
+                                                RepeatableEntry::make('sgipDistribution.items')
+                                                    ->label('Samples / Gifts / Inputs')
+                                                    ->schema([
+                                                        Section::make(fn ($record): string => $record->item?->item_name ?? 'Item')
+                                                            ->columns(3)
+                                                            ->compact()
+                                                            ->schema([
+                                                                TextEntry::make('item.item_code')
+                                                                    ->label('Item Code')
+                                                                    ->placeholder('-'),
+
+                                                                TextEntry::make('item.item_name')
+                                                                    ->label('Item Name')
+                                                                    ->weight('medium')
+                                                                    ->placeholder('-'),
+
+                                                                TextEntry::make('item.sku')
+                                                                    ->label('SKU')
+                                                                    ->placeholder('-'),
+
+                                                                TextEntry::make('item.brand.name')
+                                                                    ->label('Brand')
+                                                                    ->placeholder('-'),
+
+                                                                TextEntry::make('item.category.name')
+                                                                    ->label('Category')
+                                                                    ->placeholder('-'),
+
+                                                                TextEntry::make('item.unitOfMeasurement.name')
+                                                                    ->label('UOM')
+                                                                    ->placeholder('-'),
+
+                                                                TextEntry::make('quantity')
+                                                                    ->label('Quantity')
+                                                                    ->numeric()
+                                                                    ->placeholder('-'),
+
+                                                                TextEntry::make('unit_value')
+                                                                    ->label('Unit Value')
+                                                                    ->money('INR')
+                                                                    ->placeholder('-'),
+
+                                                                TextEntry::make('total_value')
+                                                                    ->label('Total Value')
+                                                                    ->money('INR')
+                                                                    ->placeholder('-'),
+                                                            ]),
+                                                    ])
+                                                    ->contained()
+                                                    ->columns(1),
+                                            ]),
+
                                     ]),
                             ]),
 
@@ -296,9 +394,7 @@ class VisitForm
                         // --- TAB 7: SALES DOCUMENTS ---
                         Tabs\Tab::make('Sales Documents')
                             ->schema([
-
                                 Actions::make([
-
                                     Action::make('create_quote')
                                         ->label('Create Quote')
                                         ->icon('heroicon-o-document-text')
@@ -380,6 +476,59 @@ class VisitForm
                                                     ->state(fn ($record) => $record?->salesOrderSummary()['items'] ?? 0
                                                     ),
                                             ]),
+
+                                            Section::make('Linked Documents')
+                                            ->schema([
+                                                RepeatableEntry::make('visitDocumentLinks')
+                                                    ->hiddenLabel()
+                                                    ->contained()
+                                                    ->schema([
+
+                                                        TextEntry::make('documentable_type')
+                                                            ->label('Type')
+                                                            ->badge()
+                                                            ->formatStateUsing(
+                                                                fn ($state) => class_basename($state)
+                                                            ),
+
+                                                        TextEntry::make('documentable.document_number')
+                                                            ->label('Document No'),
+
+                                                        TextEntry::make('documentable.status')
+                                                            ->badge(),
+
+                                                        TextEntry::make('documentable.total')
+                                                            ->money('INR')
+                                                            ->label('Amount'),
+
+                                                        Actions::make([
+                                                            Action::make('open')
+                                                                ->link()
+                                                                ->icon('heroicon-o-arrow-top-right-on-square')
+                                                                ->url(function ($record) {
+
+                                                                    $document = $record->documentable;
+
+                                                                    return match (get_class($document)) {
+                                                                        Quote::class =>
+                                                                            QuoteResource::getUrl('edit', [
+                                                                                'record' => $document,
+                                                                            ]),
+
+                                                                        SalesOrder::class =>
+                                                                            SalesOrderResource::getUrl('edit', [
+                                                                                'record' => $document,
+                                                                            ]),
+
+                                                                        default => '#',
+                                                                    };
+                                                                }),
+                                                            ])
+                                                    ])
+                                                    ->columns(5),
+
+                                            ])
+                                            ->columnSpanFull(),
                                     ]),
                             ]),
                     ])
