@@ -34,6 +34,9 @@ return [
             'ItemMasterResource' => 'R',
             'PurchaseOrderResource' => 'C',
             'GoodsReceiptNoteResource' => 'C',
+            'DeliveryChallanResource' => 'C',
+            'SampleRequestResource' => 'C',
+            'SampleIssueResource' => 'C',
             'InventoryAdjustmentResource' => 'C',
             'InventoryStockResource' => 'R',
             'InventoryMovementResource' => 'R',
@@ -48,6 +51,8 @@ return [
             'QuoteResource' => 'C',
             'SalesOrderResource' => 'C',
             'SalesInvoiceResource' => 'R',
+            'SampleRequestResource' => 'C',
+            'SampleIssueResource' => 'R',
         ],
 
         /* ================= HR ================= */
@@ -81,6 +86,9 @@ return [
             'GstPanResource' => 'F',
             'PurchaseOrderResource' => 'F',
             'GoodsReceiptNoteResource' => 'F',
+            'DeliveryChallanResource' => 'F',
+            'SampleRequestResource' => 'F',
+            'SampleIssueResource' => 'F',
             'InventoryAdjustmentResource' => 'F',
             'InventoryStockResource' => 'F',
             'InventoryMovementResource' => 'F',

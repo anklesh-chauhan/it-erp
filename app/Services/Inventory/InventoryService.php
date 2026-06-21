@@ -2,9 +2,13 @@
 
 namespace App\Services\Inventory;
 
+use App\Enums\DeliveryChallanStatus;
 use App\Enums\GoodsReceiptNoteStatus;
 use App\Enums\InventoryAdjustmentType;
 use App\Enums\InventoryDocumentStatus;
+use App\Enums\SampleIssueStatus;
+use App\Enums\SgipStockSource;
+use App\Models\DeliveryChallan;
 use App\Models\GoodsReceiptNote;
 use App\Models\InventoryAdjustment;
 use App\Models\InventoryAudit;
@@ -12,6 +16,11 @@ use App\Models\InventoryMovement;
 use App\Models\InventoryStock;
 use App\Models\InventoryTransfer;
 use App\Models\PurchaseOrderLine;
+use App\Models\SalesDocumentItem;
+use App\Models\SampleIssue;
+use App\Models\SampleRequestLine;
+use App\Models\SgipDistribution;
+use App\Models\VisitPreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -210,6 +219,220 @@ class InventoryService
 
             $grn->purchaseOrder?->refreshReceiptStatus();
         });
+    }
+
+    public function postDeliveryChallan(DeliveryChallan $challan, ?int $userId = null): void
+    {
+        if ($challan->isPosted()) {
+            return;
+        }
+
+        DB::transaction(function () use ($challan, $userId): void {
+            $challan->loadMissing(['lines.salesDocumentItem', 'salesInvoice']);
+
+            if ($challan->lines->isEmpty()) {
+                throw new RuntimeException('Delivery challan must have at least one line before posting.');
+            }
+
+            foreach ($challan->lines as $line) {
+                $quantity = (float) $line->quantity_delivered;
+
+                if ($quantity <= 0) {
+                    throw new RuntimeException('Delivery challan line quantity must be greater than zero.');
+                }
+
+                if ($line->sales_document_item_id !== null) {
+                    $invoiceItem = $line->salesDocumentItem;
+
+                    if ($invoiceItem === null) {
+                        throw new RuntimeException('Linked sales invoice line was not found.');
+                    }
+
+                    $remaining = $invoiceItem->remainingQuantity();
+
+                    if ($quantity > $remaining) {
+                        throw new RuntimeException("Delivered quantity exceeds remaining invoice quantity for {$invoiceItem->itemMaster?->item_name}.");
+                    }
+                }
+
+                $this->postMovement(
+                    itemMasterId: $line->item_master_id,
+                    locationMasterId: $challan->location_master_id,
+                    quantity: -$quantity,
+                    movementType: 'delivery_challan',
+                    reference: $challan,
+                    unitCost: $line->unit_cost !== null ? (float) $line->unit_cost : null,
+                    remarks: $line->remarks ?? $line->batch_number,
+                );
+
+                if ($line->sales_document_item_id !== null) {
+                    $invoiceItem = SalesDocumentItem::query()->lockForUpdate()->find($line->sales_document_item_id);
+
+                    if ($invoiceItem !== null) {
+                        $invoiceItem->forceFill([
+                            'quantity_delivered' => (float) $invoiceItem->quantity_delivered + $quantity,
+                        ])->save();
+                    }
+                }
+            }
+
+            $challan->forceFill([
+                'status' => DeliveryChallanStatus::Posted,
+                'posted_by' => $userId,
+                'posted_at' => now(),
+            ])->save();
+
+            $challan->salesInvoice?->refreshDeliveryStatus();
+        });
+    }
+
+    public function postSampleIssue(SampleIssue $sampleIssue, ?int $userId = null): void
+    {
+        if ($sampleIssue->isPosted()) {
+            return;
+        }
+
+        DB::transaction(function () use ($sampleIssue, $userId): void {
+            $sampleIssue->loadMissing(['lines.sampleRequestLine.item', 'sampleRequest']);
+
+            if ($sampleIssue->lines->isEmpty()) {
+                throw new RuntimeException('Sample issue must have at least one line before posting.');
+            }
+
+            if ((int) $sampleIssue->from_location_id === (int) $sampleIssue->to_location_id) {
+                throw new RuntimeException('Sample issue source and destination locations must be different.');
+            }
+
+            foreach ($sampleIssue->lines as $line) {
+                $quantity = (float) $line->quantity;
+                $requestLine = SampleRequestLine::query()
+                    ->with('item')
+                    ->lockForUpdate()
+                    ->find($line->sample_request_line_id);
+
+                if ($quantity <= 0) {
+                    throw new RuntimeException('Sample issue line quantity must be greater than zero.');
+                }
+
+                if ($requestLine === null || (int) $requestLine->sample_request_id !== (int) $sampleIssue->sample_request_id) {
+                    throw new RuntimeException('Sample issue line must belong to the selected sample request.');
+                }
+
+                if ((int) $requestLine->item_master_id !== (int) $line->item_master_id) {
+                    throw new RuntimeException('Sample issue item must match the approved request line.');
+                }
+
+                if ($quantity > $requestLine->remainingApprovedQuantity()) {
+                    throw new RuntimeException("Issued quantity exceeds the remaining approved quantity for {$requestLine->item?->item_name}.");
+                }
+
+                $this->postMovement(
+                    itemMasterId: $line->item_master_id,
+                    locationMasterId: $sampleIssue->from_location_id,
+                    quantity: -$quantity,
+                    movementType: 'sample_issue_out',
+                    reference: $sampleIssue,
+                    unitCost: $line->unit_cost !== null ? (float) $line->unit_cost : null,
+                    remarks: $line->remarks,
+                );
+
+                $this->postMovement(
+                    itemMasterId: $line->item_master_id,
+                    locationMasterId: $sampleIssue->to_location_id,
+                    quantity: $quantity,
+                    movementType: 'sample_issue_in',
+                    reference: $sampleIssue,
+                    unitCost: $line->unit_cost !== null ? (float) $line->unit_cost : null,
+                    remarks: $line->remarks,
+                );
+
+                $requestLine->forceFill([
+                    'quantity_issued' => (float) $requestLine->quantity_issued + $quantity,
+                ])->save();
+            }
+
+            $sampleIssue->forceFill([
+                'status' => SampleIssueStatus::Posted,
+                'issued_by' => $userId,
+                'posted_at' => now(),
+            ])->save();
+
+            $sampleIssue->sampleRequest->refreshIssueStatus();
+        });
+    }
+
+    public function postSgipDistribution(SgipDistribution $distribution): void
+    {
+        if ($distribution->isInventoryPosted()) {
+            return;
+        }
+
+        DB::transaction(function () use ($distribution): void {
+            $distribution->loadMissing(['items.item', 'sampleIssue.sampleRequest']);
+
+            if ($distribution->items->isEmpty()) {
+                throw new RuntimeException('SGIP distribution must have at least one item.');
+            }
+
+            $preferences = VisitPreference::current();
+            $source = $preferences->sgip_stock_source instanceof SgipStockSource
+                ? $preferences->sgip_stock_source
+                : SgipStockSource::tryFrom((string) $preferences->sgip_stock_source);
+
+            $sourceLocationId = match ($source) {
+                SgipStockSource::SampleIssue => $this->sampleIssueSourceLocation($distribution),
+                SgipStockSource::Headquarters => $preferences->sgip_hq_location_id,
+                default => null,
+            };
+
+            if ($sourceLocationId === null) {
+                throw new RuntimeException('No inventory source location is configured for this SGIP distribution.');
+            }
+
+            foreach ($distribution->items as $item) {
+                $quantity = (float) $item->quantity;
+
+                if ($quantity <= 0) {
+                    throw new RuntimeException('SGIP item quantity must be greater than zero.');
+                }
+
+                if ($item->item?->item_type === null) {
+                    throw new RuntimeException("{$item->item?->item_name} is not classified as an SGIP item.");
+                }
+
+                $this->postMovement(
+                    itemMasterId: $item->item_master_id,
+                    locationMasterId: (int) $sourceLocationId,
+                    quantity: -$quantity,
+                    movementType: 'sgip_distribution',
+                    reference: $distribution,
+                    unitCost: (float) $item->unit_value,
+                    remarks: 'Visit SGIP distribution',
+                );
+            }
+
+            $distribution->forceFill([
+                'approval_status' => 'approved',
+                'inventory_source_location_id' => $sourceLocationId,
+                'inventory_posted_at' => now(),
+            ])->saveQuietly();
+        });
+    }
+
+    private function sampleIssueSourceLocation(SgipDistribution $distribution): int
+    {
+        $sampleIssue = $distribution->sampleIssue;
+
+        if ($sampleIssue === null || ! $sampleIssue->isPosted()) {
+            throw new RuntimeException('A posted Sample Issue is required before distributing SGIP items.');
+        }
+
+        if ($distribution->employee_id !== null
+            && (int) $sampleIssue->sampleRequest?->employee_id !== (int) $distribution->employee_id) {
+            throw new RuntimeException('The selected Sample Issue belongs to a different employee.');
+        }
+
+        return (int) $sampleIssue->to_location_id;
     }
 
     public function stockFor(int $itemMasterId, int $locationMasterId): InventoryStock

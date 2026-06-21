@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\SgipStockSource;
+
 class VisitPreference extends BaseModel
 {
     protected $fillable = [
@@ -26,6 +28,8 @@ class VisitPreference extends BaseModel
         'allow_rescheduling',
         'allow_cancellation',
         'require_visit_outcome',
+        'sgip_stock_source',
+        'sgip_hq_location_id',
     ];
 
     protected $casts = [
@@ -47,6 +51,7 @@ class VisitPreference extends BaseModel
         'allow_rescheduling' => 'boolean',
         'allow_cancellation' => 'boolean',
         'require_visit_outcome' => 'boolean',
+        'sgip_stock_source' => SgipStockSource::class,
     ];
 
     public static function current(): self

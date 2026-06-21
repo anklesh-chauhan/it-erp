@@ -2,9 +2,13 @@
 
 namespace App\Filament\Resources\SgipDistributions\Schemas;
 
+use App\Enums\SampleIssueStatus;
+use App\Enums\SgipStockSource;
 use App\Models\AccountMaster;
 use App\Models\ItemMaster;
+use App\Models\SampleIssue;
 use App\Models\User;
+use App\Models\VisitPreference;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -56,6 +60,22 @@ class SgipDistributionForm
                             ->disabled()
                             ->dehydrated()
                             ->default('draft'),
+
+                        Select::make('sample_issue_id')
+                            ->label('Sample Issue Stock')
+                            ->options(fn (): array => SampleIssue::query()
+                                ->where('status', SampleIssueStatus::Posted)
+                                ->with('sampleRequest.employee')
+                                ->orderByDesc('issue_date')
+                                ->get()
+                                ->mapWithKeys(fn (SampleIssue $issue): array => [
+                                    $issue->id => $issue->document_number.' - '
+                                        .($issue->sampleRequest?->employee?->full_name ?? 'Representative'),
+                                ])
+                                ->all())
+                            ->searchable()
+                            ->required(fn (): bool => VisitPreference::current()->sgip_stock_source === SgipStockSource::SampleIssue)
+                            ->visible(fn (): bool => VisitPreference::current()->sgip_stock_source === SgipStockSource::SampleIssue),
                     ])->columnSpanFull(),
 
                 /* ===============================
@@ -73,6 +93,7 @@ class SgipDistributionForm
                                     ->label('Item')
                                     ->options(
                                         ItemMaster::query()
+                                            ->whereNotNull('item_type')
                                             ->pluck('item_name', 'id')
                                     )
                                     ->columnSpan(2)

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\SgipType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\ItemMaster;
 use App\Models\Category;
@@ -66,6 +67,13 @@ class ItemMasterFactory extends Factory
     {
         return $this->state(fn () => [
             'has_variants' => true,
+        ]);
+    }
+
+    public function sample(): static
+    {
+        return $this->state(fn (): array => [
+            'sgip_type' => SgipType::Sample,
         ]);
     }
 

@@ -26,7 +26,8 @@ class PurchaseOrderForm
         return $schema
             ->components([
                 Section::make('Order Details')
-                    ->columns(4)
+                    ->columns(3)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('document_number')
                             ->label('PO Number')
@@ -79,19 +80,19 @@ class PurchaseOrderForm
                             ->numeric()
                             ->prefix('₹')
                             ->disabled()
-                            ->dehydrated(),
+                            ->dehydrated(false),
 
                         TextInput::make('tax_amount')
                             ->numeric()
                             ->prefix('₹')
                             ->disabled()
-                            ->dehydrated(),
+                            ->dehydrated(false),
 
                         TextInput::make('total_amount')
                             ->numeric()
                             ->prefix('₹')
                             ->disabled()
-                            ->dehydrated(),
+                            ->dehydrated(false),
 
                         Textarea::make('notes')
                             ->columnSpanFull(),
@@ -142,7 +143,7 @@ class PurchaseOrderForm
                                     ->label('Qty Received')
                                     ->numeric()
                                     ->disabled()
-                                    ->dehydrated(),
+                                    ->dehydrated(false),
 
                                 TextInput::make('unit_price')
                                     ->label('Unit Price')

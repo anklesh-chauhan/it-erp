@@ -94,6 +94,7 @@ trait ItemMasterTableTrait
         return [
             TextColumn::make('item_code')->label('Item Code')->sortable()->searchable(),
             TextColumn::make('item_name')->label('Item Name')->sortable()->searchable(),
+            TextColumn::make('item_type')->label('Item Type')->badge()->toggleable(),
             TextColumn::make('variant_name')->label('Variant Name')->sortable()->searchable(),
             TextColumn::make('category.name')
                 ->label('Category')

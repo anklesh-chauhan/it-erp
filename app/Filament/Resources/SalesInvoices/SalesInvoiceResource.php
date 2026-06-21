@@ -2,41 +2,29 @@
 
 namespace App\Filament\Resources\SalesInvoices;
 
-use App\Filament\Actions\BulkApprovalAction;
-
-use App\Traits\HasSafeGlobalSearch;
-
 use App\Filament\Actions\ApprovalAction;
-
-use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\DatePicker;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\SalesInvoices\Pages\ListSalesInvoices;
+use App\Filament\Actions\BulkApprovalAction;
+use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\SalesInvoices\Pages\CreateSalesInvoice;
 use App\Filament\Resources\SalesInvoices\Pages\EditSalesInvoice;
-use App\Filament\Resources\SalesInvoiceResource\Pages;
-use App\Filament\Resources\SalesInvoiceResource\RelationManagers;
+use App\Filament\Resources\SalesInvoices\Pages\ListSalesInvoices;
+use App\Models\Organization;
 use App\Models\SalesInvoice;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use App\Filament\Resources\BaseResource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Traits\HasSafeGlobalSearch;
 use App\Traits\SalesDocumentResourceTrait;
-use Filament\Actions\ActionGroup;
-use Illuminate\Support\Str;
-use Filament\Tables\Enums\RecordActionsPosition;
-use App\Helpers\SalesDocumentHelper;
 use Filament\Actions\Action;
-
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\RecordActionsPosition;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 
 class SalesInvoiceResource extends BaseResource
 {
@@ -45,8 +33,10 @@ class SalesInvoiceResource extends BaseResource
 
     protected static ?string $model = SalesInvoice::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Sales';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Sales';
+
     protected static ?int $navigationSort = 30;
 
     public static function form(Schema $schema): Schema
@@ -142,10 +132,19 @@ class SalesInvoiceResource extends BaseResource
             ])
             ->recordActions([
                 ActionGroup::make([
-                EditAction::make(),
-                ApprovalAction::make(),
+                    EditAction::make(),
+                    ApprovalAction::make(),
 
-                Action::make('previewPdf')
+                    Action::make('createDeliveryChallan')
+                        ->label('Create Delivery Challan')
+                        ->icon('heroicon-o-truck')
+                        ->color('warning')
+                        ->visible(fn (SalesInvoice $record): bool => $record->hasPendingDelivery())
+                        ->url(fn (SalesInvoice $record): string => route('filament.admin.resources.delivery-challans.create', [
+                            'sales_invoice_id' => $record->id,
+                        ])),
+
+                    Action::make('previewPdf')
                         ->icon('heroicon-o-eye')
                         ->label('Preview PDF')
                         ->modalHeading('PDF Preview')
@@ -159,25 +158,25 @@ class SalesInvoiceResource extends BaseResource
 
                             return view('components.pdf-preview', [
                                 'url' => $url,
-                                'organization' => \App\Models\Organization::first(),
+                                'organization' => Organization::first(),
                             ]);
                         }),
 
                     Action::make('downloadPdf')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->label('Download PDF')
-                        ->url(fn($record) => route('sales-documents.download', [
-                            strtolower(class_basename($record)), $record->id
+                        ->url(fn ($record) => route('sales-documents.download', [
+                            strtolower(class_basename($record)), $record->id,
                         ])),
                 ]),
 
             ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
-                    
-                        BulkApprovalAction::make(),
 
-DeleteBulkAction::make(),
+                    BulkApprovalAction::make(),
+
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

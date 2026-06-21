@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
 use App\Traits\HasApprovalWorkflow;
 
 class SalesInvoice extends SalesDocument
@@ -18,7 +16,7 @@ class SalesInvoice extends SalesDocument
         'due_date',
         'payment_status',
         'paid_at',
-        'other_ref'
+        'other_ref',
     ];
 
     protected $casts = [
@@ -45,10 +43,48 @@ class SalesInvoice extends SalesDocument
         return $this->belongsTo(AccountMaster::class);
     }
 
+    public function deliveryChallans()
+    {
+        return $this->hasMany(DeliveryChallan::class);
+    }
+
+    public function hasPendingDelivery(): bool
+    {
+        $this->loadMissing('items');
+
+        return $this->items->contains(
+            fn (SalesDocumentItem $item): bool => $item->item_master_id !== null && $item->remainingQuantity() > 0
+        );
+    }
+
+    public function refreshDeliveryStatus(): void
+    {
+        $this->loadMissing('items');
+
+        if ($this->items->isEmpty()) {
+            return;
+        }
+
+        $stockItems = $this->items->filter(fn (SalesDocumentItem $item): bool => $item->item_master_id !== null);
+
+        if ($stockItems->isEmpty()) {
+            return;
+        }
+
+        $allDelivered = $stockItems->every(
+            fn (SalesDocumentItem $item): bool => (float) $item->quantity_delivered >= (float) $item->quantity
+        );
+
+        if ($allDelivered && $this->status !== 'canceled') {
+            $this->forceFill(['status' => 'accepted'])->save();
+        }
+    }
+
     public function getPaymentStatusAttribute($value)
     {
         return $value === 'paid' ? 'Paid' : ($value === 'unpaid' ? 'Unpaid' : 'Partially Paid');
     }
+
     public function setPaymentStatusAttribute($value)
     {
         $this->attributes['payment_status'] = strtolower($value);

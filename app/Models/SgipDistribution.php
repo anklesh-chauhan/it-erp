@@ -21,12 +21,19 @@ class SgipDistribution extends BaseModel
         'visit_date',
         'total_value',
         'approval_status',
+        'sample_issue_id',
+        'inventory_source_location_id',
+        'inventory_posted_at',
     ];
 
-    protected $casts = [
-        'visit_date' => 'date',
-        'total_value' => 'decimal:2',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'visit_date' => 'date',
+            'total_value' => 'decimal:2',
+            'inventory_posted_at' => 'datetime',
+        ];
+    }
 
     /* ============================
      | Relationships
@@ -68,6 +75,16 @@ class SgipDistribution extends BaseModel
         return $this->belongsTo(Visit::class);
     }
 
+    public function sampleIssue(): BelongsTo
+    {
+        return $this->belongsTo(SampleIssue::class);
+    }
+
+    public function inventorySourceLocation(): BelongsTo
+    {
+        return $this->belongsTo(LocationMaster::class, 'inventory_source_location_id');
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(SgipDistributionItem::class);
@@ -86,6 +103,16 @@ class SgipDistribution extends BaseModel
     {
         $this->total_value = $this->items()->sum('total_value');
         $this->saveQuietly();
+    }
+
+    public function isInventoryPosted(): bool
+    {
+        return $this->inventory_posted_at !== null;
+    }
+
+    public function approve(): void
+    {
+        app(\App\Services\Inventory\InventoryService::class)->postSgipDistribution($this);
     }
 
     protected static function booted(): void

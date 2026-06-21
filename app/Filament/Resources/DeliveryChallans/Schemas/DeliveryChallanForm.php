@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\GoodsReceiptNotes\Schemas;
+namespace App\Filament\Resources\DeliveryChallans\Schemas;
 
-use App\Enums\GoodsReceiptNoteStatus;
-use App\Enums\PurchaseOrderStatus;
+use App\Enums\DeliveryChallanStatus;
 use App\Models\AccountMaster;
-use App\Models\GoodsReceiptNote;
+use App\Models\DeliveryChallan;
 use App\Models\ItemMaster;
 use App\Models\LocationMaster;
 use App\Models\NumberSeries;
-use App\Models\PurchaseOrder;
-use App\Models\PurchaseOrderLine;
+use App\Models\SalesDocumentItem;
+use App\Models\SalesInvoice;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -21,40 +20,40 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
-class GoodsReceiptNoteForm
+class DeliveryChallanForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('Receipt Details')
+                Section::make('Delivery Details')
                     ->columns(4)
                     ->schema([
                         TextInput::make('document_number')
-                            ->label('GRN Number')
-                            ->default(fn (): string => NumberSeries::getNextNumber(GoodsReceiptNote::class))
+                            ->label('Challan Number')
+                            ->default(fn (): string => NumberSeries::getNextNumber(DeliveryChallan::class))
                             ->disabled()
                             ->dehydrated(),
 
-                        DatePicker::make('receipt_date')
-                            ->label('Receipt Date')
+                        DatePicker::make('delivery_date')
+                            ->label('Delivery Date')
                             ->default(now()->toDateString())
                             ->required(),
 
                         Select::make('status')
-                            ->options(GoodsReceiptNoteStatus::class)
-                            ->default(GoodsReceiptNoteStatus::Draft)
+                            ->options(DeliveryChallanStatus::class)
+                            ->default(DeliveryChallanStatus::Draft)
                             ->disabled()
                             ->dehydrated(),
 
-                        Select::make('purchase_order_id')
-                            ->label('Purchase Order')
-                            ->options(fn (): array => PurchaseOrder::query()
-                                ->whereIn('status', [
-                                    PurchaseOrderStatus::Approved,
-                                    PurchaseOrderStatus::PartiallyReceived,
-                                ])
-                                ->orderByDesc('order_date')
+                        Select::make('sales_invoice_id')
+                            ->label('Sales Invoice')
+                            ->options(fn (): array => SalesInvoice::query()
+                                ->whereNotIn('status', ['canceled', 'rejected'])
+                                ->whereHas('items', fn ($query) => $query
+                                    ->whereNotNull('item_master_id')
+                                    ->whereRaw('quantity > COALESCE(quantity_delivered, 0)'))
+                                ->orderByDesc('date')
                                 ->pluck('document_number', 'id')
                                 ->all())
                             ->searchable()
@@ -64,24 +63,23 @@ class GoodsReceiptNoteForm
                                     return;
                                 }
 
-                                $purchaseOrder = PurchaseOrder::query()
-                                    ->with('lines.item')
+                                $invoice = SalesInvoice::query()
+                                    ->with(['items.itemMaster', 'accountMaster'])
                                     ->find($state);
 
-                                if ($purchaseOrder === null) {
+                                if ($invoice === null) {
                                     return;
                                 }
 
-                                $set('supplier_id', $purchaseOrder->supplier_id);
-                                $set('location_master_id', $purchaseOrder->location_master_id);
+                                $set('customer_id', $invoice->account_master_id);
 
-                                $lines = $purchaseOrder->lines
-                                    ->filter(fn (PurchaseOrderLine $line): bool => $line->remainingQuantity() > 0)
-                                    ->map(fn (PurchaseOrderLine $line): array => [
-                                        'purchase_order_line_id' => $line->id,
-                                        'item_master_id' => $line->item_master_id,
-                                        'quantity_received' => $line->remainingQuantity(),
-                                        'unit_cost' => $line->unit_price,
+                                $lines = $invoice->items
+                                    ->filter(fn (SalesDocumentItem $item): bool => $item->item_master_id !== null && $item->remainingQuantity() > 0)
+                                    ->map(fn (SalesDocumentItem $item): array => [
+                                        'sales_document_item_id' => $item->id,
+                                        'item_master_id' => $item->item_master_id,
+                                        'quantity_delivered' => $item->remainingQuantity(),
+                                        'unit_cost' => $item->unit_price ?? $item->itemMaster?->selling_price ?? 0,
                                     ])
                                     ->values()
                                     ->all();
@@ -89,11 +87,9 @@ class GoodsReceiptNoteForm
                                 $set('lines', $lines);
                             }),
 
-                        Select::make('supplier_id')
-                            ->label('Supplier')
+                        Select::make('customer_id')
+                            ->label('Customer')
                             ->options(fn (): array => AccountMaster::query()
-                                ->whereHas('typeMaster', fn ($query) => $query->where('name', 'Vendor')
-                                    ->orWhereHas('parent', fn ($parentQuery) => $parentQuery->where('name', 'Vendor')))
                                 ->orderBy('name')
                                 ->pluck('name', 'id')
                                 ->all())
@@ -101,7 +97,7 @@ class GoodsReceiptNoteForm
                             ->required(),
 
                         Select::make('location_master_id')
-                            ->label('Receiving Location')
+                            ->label('Dispatch Location')
                             ->options(fn (): array => self::locationOptions())
                             ->searchable()
                             ->required(),
@@ -110,27 +106,29 @@ class GoodsReceiptNoteForm
                             ->columnSpanFull(),
                     ])->columnSpanFull(),
 
-                Section::make('Received Items')
+                Section::make('Items to Deliver')
                     ->schema([
                         Repeater::make('lines')
                             ->relationship()
                             ->columns(5)
                             ->schema([
-                                Select::make('purchase_order_line_id')
-                                    ->label('PO Line')
+                                Select::make('sales_document_item_id')
+                                    ->label('Invoice Line')
                                     ->options(function (Get $get): array {
-                                        $purchaseOrderId = $get('../../purchase_order_id');
+                                        $salesInvoiceId = $get('../../sales_invoice_id');
 
-                                        if (! $purchaseOrderId) {
+                                        if (! $salesInvoiceId) {
                                             return [];
                                         }
 
-                                        return PurchaseOrderLine::query()
-                                            ->where('purchase_order_id', $purchaseOrderId)
-                                            ->with('item')
+                                        return SalesDocumentItem::query()
+                                            ->where('document_type', SalesInvoice::class)
+                                            ->where('document_id', $salesInvoiceId)
+                                            ->whereNotNull('item_master_id')
+                                            ->with('itemMaster')
                                             ->get()
-                                            ->mapWithKeys(fn (PurchaseOrderLine $line): array => [
-                                                $line->id => ($line->item?->item_name ?? 'Item').' (Remaining: '.$line->remainingQuantity().')',
+                                            ->mapWithKeys(fn (SalesDocumentItem $item): array => [
+                                                $item->id => ($item->itemMaster?->item_name ?? 'Item').' (Remaining: '.$item->remainingQuantity().')',
                                             ])
                                             ->all();
                                     })
@@ -141,15 +139,15 @@ class GoodsReceiptNoteForm
                                             return;
                                         }
 
-                                        $line = PurchaseOrderLine::query()->find($state);
+                                        $item = SalesDocumentItem::query()->with('itemMaster')->find($state);
 
-                                        if ($line === null) {
+                                        if ($item === null) {
                                             return;
                                         }
 
-                                        $set('item_master_id', $line->item_master_id);
-                                        $set('quantity_received', $line->remainingQuantity());
-                                        $set('unit_cost', $line->unit_price);
+                                        $set('item_master_id', $item->item_master_id);
+                                        $set('quantity_delivered', $item->remainingQuantity());
+                                        $set('unit_cost', $item->unit_price ?? $item->itemMaster?->selling_price ?? 0);
                                     }),
 
                                 Select::make('item_master_id')
@@ -161,24 +159,10 @@ class GoodsReceiptNoteForm
                                         ->all())
                                     ->searchable()
                                     ->required()
-                                    ->columnSpan(2)
-                                    ->live()
-                                    ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        if (! $state) {
-                                            return;
-                                        }
+                                    ->columnSpan(2),
 
-                                        $item = ItemMaster::query()->find($state);
-
-                                        if ($item === null) {
-                                            return;
-                                        }
-
-                                        $set('unit_cost', $item->purchase_price ?? 0);
-                                    }),
-
-                                TextInput::make('quantity_received')
-                                    ->label('Qty Received')
+                                TextInput::make('quantity_delivered')
+                                    ->label('Qty Delivered')
                                     ->numeric()
                                     ->minValue(0.001)
                                     ->step(0.001)
@@ -186,8 +170,7 @@ class GoodsReceiptNoteForm
 
                                 TextInput::make('unit_cost')
                                     ->label('Unit Cost')
-                                    ->numeric()
-                                    ->required(),
+                                    ->numeric(),
 
                                 TextInput::make('batch_number')
                                     ->label('Batch / Lot'),

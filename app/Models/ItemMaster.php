@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ItemType;
 use App\Traits\HasApprovalWorkflow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,6 +17,7 @@ class ItemMaster extends BaseModel
         'sku',
         'item_code',
         'item_name',
+        'item_type',
         'description',
         'category_id',
         'category_type', // For polymorphic relationship
@@ -37,6 +39,13 @@ class ItemMaster extends BaseModel
         'per_packing_qty',
         'has_variants',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'item_type' => ItemType::class,
+        ];
+    }
 
     public function customerPrices()
     {

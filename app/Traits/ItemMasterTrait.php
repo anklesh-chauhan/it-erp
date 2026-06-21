@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Enums\ItemType;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Forms;
@@ -58,7 +59,12 @@ trait ItemMasterTrait
                         ->default(fn () => $isVariant ? $parentItem->item_name : null) // Inherit name from parent
                         ->readOnly($isVariant)
                         ->dehydrateStateUsing(fn ($state) => $state ?? ($parentItem->item_name ?? null)),
-                    
+
+                    Select::make('item_type')
+                        ->label('Item Type')
+                        ->options(ItemType::class)
+                        ->helperText('Set this for samples, gifts, and promotional inputs used in field distribution.'),
+
                     TextInput::make('variant_name')
                         ->label('Variant Name')
                         ->required($isVariant),
@@ -69,7 +75,7 @@ trait ItemMasterTrait
                     Select::make('unit_of_measurement_id')
                         ->relationship('unitOfMeasurement', 'name')
                         ->label('Unit of Measurement'),
-                        
+
                     Select::make('taxes')
                         ->label('Applicable Taxes')
                         ->relationship('taxes', 'name')

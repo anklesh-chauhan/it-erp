@@ -71,7 +71,7 @@ class InventoryAdjustmentForm
 
                         Textarea::make('remarks')
                             ->columnSpanFull(),
-                    ]),
+                    ])->columnSpanFull(),
             ]);
     }
 

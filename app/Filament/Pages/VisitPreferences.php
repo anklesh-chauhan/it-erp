@@ -2,8 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\SgipStockSource;
 use App\Filament\Clusters\GlobalConfiguration\SalesMarketingConfigurationCluster;
 use App\Models\VisitPreference;
+use App\Models\LocationMaster;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -149,6 +151,28 @@ class VisitPreferences extends Page implements HasForms
                     ->schema([
                         Forms\Components\Toggle::make('allow_rescheduling'),
                         Forms\Components\Toggle::make('allow_cancellation'),
+                    ])
+                    ->columns(2),
+
+                Section::make('SGIP Inventory')
+                    ->schema([
+                        Select::make('sgip_stock_source')
+                            ->label('Visit Distribution Stock Source')
+                            ->options(SgipStockSource::class)
+                            ->default(SgipStockSource::SampleIssue)
+                            ->live()
+                            ->required(),
+
+                        Select::make('sgip_hq_location_id')
+                            ->label('HQ Stock Location')
+                            ->options(fn (): array => LocationMaster::query()
+                                ->where('is_active', true)
+                                ->orderBy('name')
+                                ->pluck('name', 'id')
+                                ->all())
+                            ->searchable()
+                            ->required(fn ($get): bool => $get('sgip_stock_source') === SgipStockSource::Headquarters->value)
+                            ->visible(fn ($get): bool => $get('sgip_stock_source') === SgipStockSource::Headquarters->value),
                     ])
                     ->columns(2),
             ])
@@ -420,6 +444,8 @@ class VisitPreferences extends Page implements HasForms
             'allow_rescheduling' => true,
             'allow_cancellation' => true,
             'require_visit_outcome' => false,
+            'sgip_stock_source' => SgipStockSource::SampleIssue,
+            'sgip_hq_location_id' => null,
 
             /* Field Rules */
             'field_rules' => collect($this->visitFieldOptions())

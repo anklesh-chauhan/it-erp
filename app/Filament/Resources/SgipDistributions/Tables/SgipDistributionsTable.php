@@ -9,10 +9,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Notifications\Notification;
 use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class SgipDistributionsTable
 {
@@ -61,6 +63,29 @@ class SgipDistributionsTable
                         SGIPComplianceService::validate($record, true);
 
                         $record->update(['approval_status' => 'submitted']);
+                    }),
+
+                Action::make('approve')
+                    ->label('Approve & Deduct Stock')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn ($record): bool => $record->approval_status === 'submitted' && ! $record->isInventoryPosted())
+                    ->action(function ($record): void {
+                        try {
+                            SGIPComplianceService::validate($record, true);
+                            $record->approve();
+
+                            Notification::make()
+                                ->title('SGIP approved and stock deducted')
+                                ->success()
+                                ->send();
+                        } catch (Throwable $exception) {
+                            Notification::make()
+                                ->title('Unable to approve SGIP distribution')
+                                ->body($exception->getMessage())
+                                ->danger()
+                                ->send();
+                        }
                     }),
             ])
             ->toolbarActions([

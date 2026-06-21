@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
 use App\Traits\HasApprovalWorkflow;
 
 class SalesDocumentItem extends BaseModel
@@ -17,6 +15,7 @@ class SalesDocumentItem extends BaseModel
         'document_type',
         'item_master_id',
         'quantity',
+        'quantity_delivered',
         'price',
         'discount',
         'unit',
@@ -29,7 +28,8 @@ class SalesDocumentItem extends BaseModel
     ];
 
     protected $casts = [
-        'quantity' => 'integer',
+        'quantity' => 'decimal:3',
+        'quantity_delivered' => 'decimal:3',
         'price' => 'decimal:2',
         'subtotal' => 'decimal:2',
     ];
@@ -42,5 +42,15 @@ class SalesDocumentItem extends BaseModel
     public function itemMaster()
     {
         return $this->belongsTo(ItemMaster::class);
+    }
+
+    public function deliveryChallanLines()
+    {
+        return $this->hasMany(DeliveryChallanLine::class);
+    }
+
+    public function remainingQuantity(): float
+    {
+        return max(0, (float) $this->quantity - (float) $this->quantity_delivered);
     }
 }
