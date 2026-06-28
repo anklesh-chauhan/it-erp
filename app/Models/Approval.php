@@ -2,30 +2,48 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use App\Enums\ApprovalStatus;
+use App\Enums\ApprovalStepStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Auth;
-
-use App\Traits\HasApprovalWorkflow;
 
 class Approval extends BaseModel
 {
-    use HasApprovalWorkflow;
-
     protected $table = 'approvals';
 
     protected $fillable = [
         'approvable_type',
         'approvable_id',
         'approval_flow_id',
+        'module',
+        'record_type',
+        'record_id',
         'requested_by',
+        'requested_amount',
+        'territory_id',
+        'flow_version',
+        'selected_steps',
+        'selected_approvers',
+        'submitted_record_summary',
         'approval_status',
-        'completed_at'
+        'completed_at',
+        'finalized_at',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'requested_amount' => 'decimal:2',
+            'selected_steps' => 'array',
+            'selected_approvers' => 'array',
+            'submitted_record_summary' => 'array',
+            'completed_at' => 'datetime',
+            'finalized_at' => 'datetime',
         ];
+    }
 
     public function approvable(): MorphTo
     {
@@ -34,10 +52,10 @@ class Approval extends BaseModel
 
     public function requester(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'requested_by');
+        return $this->belongsTo(User::class, 'requested_by');
     }
 
-    public function requestedBy()
+    public function requestedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'requested_by');
     }
@@ -47,33 +65,52 @@ class Approval extends BaseModel
         return $this->hasMany(ApprovalStep::class)->orderBy('step_order');
     }
 
-    public function flow()
+    public function activities(): HasMany
     {
-        return $this->belongsTo(ApprovalFlow::class);
+        return $this->hasMany(ApprovalActivity::class)->latest();
     }
 
-    public function currentStep()
+    public function flow(): BelongsTo
     {
-        return $this->steps()->where('status', 'draft')->orderBy('level')->first();
+        return $this->belongsTo(ApprovalFlow::class, 'approval_flow_id');
+    }
+
+    public function territory(): BelongsTo
+    {
+        return $this->belongsTo(Territory::class);
+    }
+
+    public function currentStep(): ?ApprovalStep
+    {
+        return $this->steps()
+            ->where('status', ApprovalStepStatus::Pending->value)
+            ->orderBy('step_order')
+            ->first();
     }
 
     public function isFullyApproved(): bool
     {
-        return $this->steps()->where('status', '!=', 'approved')->count() === 0;
+        return ! $this->steps()
+            ->whereIn('status', [ApprovalStepStatus::Pending->value, ApprovalStepStatus::Rejected->value])
+            ->exists();
+    }
+
+    public function isFinalized(): bool
+    {
+        return $this->finalized_at !== null;
     }
 
     public function scopeDraftForUser(Builder $query): Builder
     {
         $userId = Auth::id();
 
-        return $query->where('approval_status', 'draft')
-                     ->whereHas('steps', function (Builder $stepQuery) use ($userId) {
-                         // Find a step that is draft and assigned to the current user
-                         $stepQuery->where('approval_status', 'draft')
-                                   ->where('approver_id', $userId)
-                                   ->orderBy('level')
-                                   ->limit(1); // Optimize the subquery
-                     });
+        return $query->where('approval_status', ApprovalStatus::Pending->value)
+            ->whereHas('steps', function (Builder $stepQuery) use ($userId) {
+                $stepQuery->where('status', ApprovalStepStatus::Pending->value)
+                    ->where('assigned_user_id', $userId)
+                    ->orderBy('step_order')
+                    ->limit(1);
+            });
     }
 
     public function getDocumentNumber(): ?string

@@ -4,8 +4,9 @@ namespace App\Filament\Pages;
 
 use App\Enums\SgipStockSource;
 use App\Filament\Clusters\GlobalConfiguration\SalesMarketingConfigurationCluster;
-use App\Models\VisitPreference;
 use App\Models\LocationMaster;
+use App\Models\VisitPreference;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -28,8 +29,10 @@ class VisitPreferences extends Page implements HasForms
 
     protected static ?string $title = 'Visit Preferences';
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?string $cluster = SalesMarketingConfigurationCluster::class;
+
     protected static ?int $navigationSort = 10;
 
     public ?array $data = [];
@@ -62,15 +65,15 @@ class VisitPreferences extends Page implements HasForms
             ->schema([
                 Section::make('Visit Flow')
                     ->schema([
-                        Forms\Components\Toggle::make('enable_check_in')
+                        Toggle::make('enable_check_in')
                             ->label('Enable Check-in'),
-                        Forms\Components\Toggle::make('enable_check_out')
+                        Toggle::make('enable_check_out')
                             ->label('Enable Check-out'),
-                        Forms\Components\Toggle::make('enforce_check_in_before_check_out')
+                        Toggle::make('enforce_check_in_before_check_out')
                             ->label('Enforce Check-in before Check-out'),
-                        Forms\Components\Toggle::make('allow_manual_time_edit')
+                        Toggle::make('allow_manual_time_edit')
                             ->label('Allow Manual Time Edit'),
-                        Forms\Components\Toggle::make('enable_auto_checkout')
+                        Toggle::make('enable_auto_checkout')
                             ->label('Auto Checkout')
                             ->live(),
                         Forms\Components\TimePicker::make('auto_checkout_time')
@@ -84,7 +87,7 @@ class VisitPreferences extends Page implements HasForms
                     ->schema([
                         Group::make()
                             ->schema([
-                                Forms\Components\Toggle::make('require_gps')
+                                Toggle::make('require_gps')
                                     ->label('Require GPS Location')
                                     ->live(),
                                 Forms\Components\TextInput::make('geo_fence_radius_meters')
@@ -98,11 +101,11 @@ class VisitPreferences extends Page implements HasForms
 
                         Group::make()
                             ->schema([
-                                Forms\Components\Toggle::make('require_check_in_image')
+                                Toggle::make('require_check_in_image')
                                     ->label('Require Check-in Image'),
-                                Forms\Components\Toggle::make('require_check_out_image')
+                                Toggle::make('require_check_out_image')
                                     ->label('Require Check-out Image'),
-                                Forms\Components\Toggle::make('require_general_visit_image')
+                                Toggle::make('require_general_visit_image')
                                     ->label('Require General Visit Image'),
                             ])
                             ->columns(3)
@@ -110,7 +113,7 @@ class VisitPreferences extends Page implements HasForms
 
                         Group::make()
                             ->schema([
-                                Forms\Components\Toggle::make('enforce_minimum_duration')
+                                Toggle::make('enforce_minimum_duration')
                                     ->label('Enforce Minimum Visit Duration')
                                     ->live(),
                                 Forms\Components\TextInput::make('minimum_duration_minutes')
@@ -149,8 +152,8 @@ class VisitPreferences extends Page implements HasForms
 
                 Section::make('Other Rules')
                     ->schema([
-                        Forms\Components\Toggle::make('allow_rescheduling'),
-                        Forms\Components\Toggle::make('allow_cancellation'),
+                        Toggle::make('allow_rescheduling'),
+                        Toggle::make('allow_cancellation'),
                     ])
                     ->columns(2),
 
@@ -171,8 +174,7 @@ class VisitPreferences extends Page implements HasForms
                                 ->pluck('name', 'id')
                                 ->all())
                             ->searchable()
-                            ->required(fn ($get): bool => $get('sgip_stock_source') === SgipStockSource::Headquarters->value)
-                            ->visible(fn ($get): bool => $get('sgip_stock_source') === SgipStockSource::Headquarters->value),
+                            ->required(fn ($get): bool => $get('sgip_stock_source') === SgipStockSource::Headquarters->value),
                     ])
                     ->columns(2),
             ])
@@ -208,7 +210,7 @@ class VisitPreferences extends Page implements HasForms
     {
         return [
 
-            \Filament\Actions\Action::make('reset')
+            Action::make('reset')
                 ->label('Reset to Default')
                 ->color('gray')
                 ->icon('heroicon-o-arrow-path')
@@ -217,21 +219,21 @@ class VisitPreferences extends Page implements HasForms
                 ->modalDescription('This will restore the original default configuration.')
                 ->action(fn () => $this->resetToDefault()),
 
-            \Filament\Actions\Action::make('pharma')
+            Action::make('pharma')
                 ->label('Pharma Preset')
                 ->color('danger')
                 ->icon('heroicon-o-beaker')
                 ->requiresConfirmation()
                 ->action(fn () => $this->applyPreset('pharma')),
 
-            \Filament\Actions\Action::make('fmcg')
+            Action::make('fmcg')
                 ->label('FMCG Preset')
                 ->color('success')
                 ->icon('heroicon-o-shopping-cart')
                 ->requiresConfirmation()
                 ->action(fn () => $this->applyPreset('fmcg')),
 
-            \Filament\Actions\Action::make('machinery')
+            Action::make('machinery')
                 ->label('Machinery Preset')
                 ->color('warning')
                 ->icon('heroicon-o-cog-6-tooth')
@@ -254,7 +256,7 @@ class VisitPreferences extends Page implements HasForms
         // Refill form so UI updates immediately
         $this->form->fill($preference->fresh()->toArray());
 
-        \Filament\Notifications\Notification::make()
+        Notification::make()
             ->title(ucfirst($industry).' preset applied')
             ->success()
             ->send();
@@ -412,7 +414,7 @@ class VisitPreferences extends Page implements HasForms
             $preference->fresh()->toArray()
         );
 
-        \Filament\Notifications\Notification::make()
+        Notification::make()
             ->title('Visit preferences reset to default')
             ->success()
             ->send();

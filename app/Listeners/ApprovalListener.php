@@ -10,6 +10,6 @@ class ApprovalListener
     public function handle(ApprovalStatusChanged $event): void
     {
         app(ApprovalDomainDispatcher::class)
-            ->dispatch($event->approval, $event->approval_status);
+            ->dispatch($event->approval, $event->approvalStatus);
     }
 }

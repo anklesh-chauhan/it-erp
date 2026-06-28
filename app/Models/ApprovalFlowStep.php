@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
-
 class ApprovalFlowStep extends BaseModel
 {
     protected $fillable = [
@@ -12,7 +10,16 @@ class ApprovalFlowStep extends BaseModel
         'job_role_id',
         'territory_scope',
         'can_skip',
+        'sla_hours',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'can_skip' => 'boolean',
+            'sla_hours' => 'integer',
+        ];
+    }
 
     public function flow()
     {

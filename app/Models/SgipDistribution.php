@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Inventory\InventoryService;
 use App\Services\SGIPComplianceService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +15,7 @@ class SgipDistribution extends BaseModel
     protected $fillable = [
         'user_id',
         'employee_id',
-        'account_master_id', // Doctor
+        'account_master_id',
         'territory_id',
         'sales_tour_plan_id',
         'visit_id',
@@ -22,6 +23,7 @@ class SgipDistribution extends BaseModel
         'total_value',
         'approval_status',
         'sample_issue_id',
+        'marketing_campaign_id',
         'inventory_source_location_id',
         'inventory_posted_at',
     ];
@@ -49,13 +51,12 @@ class SgipDistribution extends BaseModel
         return $this->belongsTo(Employee::class);
     }
 
-    // Doctor
     public function doctor(): BelongsTo
     {
         return $this->belongsTo(AccountMaster::class, 'account_master_id');
     }
 
-    public function accountMaster()
+    public function accountMaster(): BelongsTo
     {
         return $this->belongsTo(AccountMaster::class);
     }
@@ -78,6 +79,11 @@ class SgipDistribution extends BaseModel
     public function sampleIssue(): BelongsTo
     {
         return $this->belongsTo(SampleIssue::class);
+    }
+
+    public function marketingCampaign(): BelongsTo
+    {
+        return $this->belongsTo(MarketingCampaign::class);
     }
 
     public function inventorySourceLocation(): BelongsTo
@@ -112,19 +118,17 @@ class SgipDistribution extends BaseModel
 
     public function approve(): void
     {
-        app(\App\Services\Inventory\InventoryService::class)->postSgipDistribution($this);
+        app(InventoryService::class)->postSgipDistribution($this);
     }
 
     protected static function booted(): void
     {
-        static::saving(function (SgipDistribution $distribution) {
+        static::saving(function (SgipDistribution $distribution): void {
 
-            // Only validate if date & items exist
             if (! $distribution->visit_date || ! $distribution->exists) {
                 return;
             }
 
-            // ❌ Do NOT block draft saves
             if ($distribution->approval_status === 'draft') {
                 SGIPComplianceService::validate($distribution, false);
             }

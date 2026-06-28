@@ -37,6 +37,8 @@ return [
             'DeliveryChallanResource' => 'C',
             'SampleRequestResource' => 'C',
             'SampleIssueResource' => 'C',
+            'PromotionalSchemeResource' => 'F',
+            'MarketingCampaignResource' => 'F',
             'InventoryAdjustmentResource' => 'C',
             'InventoryStockResource' => 'R',
             'InventoryMovementResource' => 'R',

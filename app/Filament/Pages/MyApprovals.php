@@ -28,6 +28,16 @@ class MyApprovals extends Page implements HasTable
                 ApprovalStep::query()
                     ->where('assigned_user_id', Auth::id())
                     ->where('status', 'pending')
+                    ->whereRaw(
+                        'approval_steps.step_order = (
+                            select min(current_steps.step_order)
+                            from approval_steps as current_steps
+                            where current_steps.approval_id = approval_steps.approval_id
+                            and current_steps.status = ?
+                            and current_steps.deleted_at is null
+                        )',
+                        ['pending']
+                    )
                     ->with([
                         'approval.approvable',
                         'approval.requestedBy',

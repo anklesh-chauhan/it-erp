@@ -18,16 +18,24 @@ class ApprovalsTable
     {
         return $table
             ->columns([
-                TextColumn::make('approvable_type')->label('Module'),
-                TextColumn::make('requester.employee.full_name')->label('Requested By'),
-                TextColumn ::make('approval_status')
+                TextColumn::make('module')->badge(),
+                TextColumn::make('record_type')
+                    ->formatStateUsing(fn (?string $state): ?string => $state ? class_basename($state) : null),
+                TextColumn::make('record_id'),
+                TextColumn::make('requested_amount')->numeric(),
+                TextColumn::make('territory.name')->label('Territory'),
+                TextColumn::make('requester.name')->label('Requested By'),
+                TextColumn::make('flow_version')->label('Version'),
+                TextColumn::make('approval_status')
                     ->badge()
                     ->colors([
                         'secondary' => 'draft',
                         'warning' => 'pending',
                         'success' => 'approved',
                         'danger' => 'rejected',
+                        'gray' => 'cancelled',
                     ]),
+                TextColumn::make('finalized_at')->dateTime(),
                 TextColumn::make('created_at')->dateTime(),
             ])
             ->filters([

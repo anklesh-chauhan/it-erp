@@ -36,10 +36,13 @@ class ApprovalFlowStepsRelationManager extends RelationManager
             ->components([
                 TextInput::make('step_order')
                     ->numeric()
+                    ->minValue(1)
                     ->required(),
 
                 Select::make('job_role_id')
                     ->relationship('jobRole', 'name')
+                    ->searchable()
+                    ->preload()
                     ->required(),
 
                 Select::make('territory_scope')
@@ -48,10 +51,19 @@ class ApprovalFlowStepsRelationManager extends RelationManager
                         'children' => 'Child Territories',
                         'all' => 'All Territories',
                     ])
+                    ->default('self')
+                    ->required(),
+
+                TextInput::make('sla_hours')
+                    ->label('SLA Hours')
+                    ->numeric()
+                    ->minValue(1)
+                    ->default(24)
                     ->required(),
 
                 Toggle::make('can_skip')->default(false),
-            ]);
+            ])
+            ->columns(2);
     }
 
     public function table(Table $table): Table
@@ -62,6 +74,7 @@ class ApprovalFlowStepsRelationManager extends RelationManager
                 TextColumn::make('step_order'),
                 TextColumn::make('jobRole.name')->label('Job Role'),
                 TextColumn::make('territory_scope')->badge(),
+                TextColumn::make('sla_hours')->label('SLA Hours'),
                 IconColumn::make('can_skip')->boolean(),
             ])
             ->defaultSort('step_order')

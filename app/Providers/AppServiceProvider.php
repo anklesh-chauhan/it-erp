@@ -7,17 +7,18 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Multitenancy\Commands\TenantsArtisanCommand;
 use App\Filament\Support\GlobalApprovalActionInjector;
+use App\Events\ApprovalStatusChanged;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Tables\Table;
 use Filament\Support\Facades\FilamentView;
 use App\Database\Macros\BlueprintMacros;
-use App\Models\Approval;
+use App\Listeners\ApprovalListener;
 use App\Models\Media;
 use App\Models\Visit;
-use App\Observers\ApprovalObserver;
 use App\Observers\MediaObserver;
 use App\Observers\VisitObserver;
+use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         BlueprintMacros::register();
-        Approval::observe(ApprovalObserver::class);
+        Event::listen(ApprovalStatusChanged::class, ApprovalListener::class);
         Media::observe(MediaObserver::class);
         Visit::observe(VisitObserver::class);
     }

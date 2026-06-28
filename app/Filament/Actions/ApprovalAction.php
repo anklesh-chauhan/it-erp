@@ -16,8 +16,7 @@ class ApprovalAction extends Action
         $this->icon('heroicon-o-arrow-up-tray');
         $this->color('primary');
 
-        $this->visible(fn ($record) =>
-            method_exists($record, 'canSendForApproval')
+        $this->visible(fn ($record) => method_exists($record, 'canSendForApproval')
             && $record->canSendForApproval()
         );
 
@@ -27,6 +26,16 @@ class ApprovalAction extends Action
                     ->title('Model does not support approval.')
                     ->danger()
                     ->send();
+
+                return;
+            }
+
+            if (method_exists($record, 'canStartApproval') && ! $record->canStartApproval()) {
+                Notification::make()
+                    ->title('Approval workflow is not available for this record.')
+                    ->warning()
+                    ->send();
+
                 return;
             }
 

@@ -2,16 +2,12 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
+use App\Enums\ApprovalStepStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-use App\Traits\HasApprovalWorkflow;
+use LogicException;
 
 class ApprovalStep extends BaseModel
 {
-    use HasApprovalWorkflow;
-
     protected $table = 'approval_steps';
 
     protected $fillable = [
@@ -19,20 +15,39 @@ class ApprovalStep extends BaseModel
         'step_order',
         'job_role_id',
         'assigned_user_id',
+        'reassigned_from_user_id',
         'status',
         'comments',
         'approved_at',
+        'due_at',
+        'reminded_at',
+        'escalated_at',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => ApprovalStepStatus::class,
+            'approved_at' => 'datetime',
+            'due_at' => 'datetime',
+            'reminded_at' => 'datetime',
+            'escalated_at' => 'datetime',
         ];
+    }
 
     public function approval(): BelongsTo
     {
         return $this->belongsTo(Approval::class);
     }
 
-
     public function approver(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'approver_id');
+        return $this->belongsTo(User::class, 'assigned_user_id');
+    }
+
+    public function previousApprover(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reassigned_from_user_id');
     }
 
     public function jobRole()
@@ -40,4 +55,18 @@ class ApprovalStep extends BaseModel
         return $this->belongsTo(JobRole::class);
     }
 
+    public function transitionTo(ApprovalStepStatus $status, ?string $comments = null): void
+    {
+        if (! $this->status instanceof ApprovalStepStatus) {
+            throw new LogicException('Approval step status is not cast to ApprovalStepStatus.');
+        }
+
+        $this->status->assertCanTransitionTo($status);
+
+        $this->forceFill([
+            'status' => $status,
+            'comments' => $comments,
+            'approved_at' => in_array($status, [ApprovalStepStatus::Approved, ApprovalStepStatus::Rejected], true) ? now() : $this->approved_at,
+        ])->save();
+    }
 }

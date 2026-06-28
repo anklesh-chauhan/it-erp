@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\SgipDistributions\Schemas;
 
+use App\Enums\MarketingCampaignStatus;
 use App\Enums\SampleIssueStatus;
 use App\Enums\SgipStockSource;
 use App\Models\AccountMaster;
 use App\Models\ItemMaster;
+use App\Models\MarketingCampaign;
 use App\Models\SampleIssue;
+use App\Models\Territory;
 use App\Models\User;
 use App\Models\VisitPreference;
 use Filament\Forms\Components\DatePicker;
@@ -40,18 +43,18 @@ class SgipDistributionForm
                             ->disabled()
                             ->dehydrated(),
 
-                            Select::make('account_master_id')
-    ->options(
-        AccountMaster::query()
-            ->whereHas('typeMaster', fn ($q) => $q->where('name', 'Retail Customer'))
-            ->pluck('name', 'id')
-            ->toArray()
-    )
-    ->searchable()
-    ->getOptionLabelUsing(
-        fn ($value) => AccountMaster::find($value)?->name
-    )
-    ->required(),
+                        Select::make('account_master_id')
+                            ->options(
+                                AccountMaster::query()
+                                    ->whereHas('typeMaster', fn ($q) => $q->where('name', 'Retail Customer'))
+                                    ->pluck('name', 'id')
+                                    ->toArray()
+                            )
+                            ->searchable()
+                            ->getOptionLabelUsing(
+                                fn ($value) => AccountMaster::find($value)?->name
+                            )
+                            ->required(),
                         DatePicker::make('visit_date')
                             ->native(false)
                             ->required(),
@@ -76,6 +79,22 @@ class SgipDistributionForm
                             ->searchable()
                             ->required(fn (): bool => VisitPreference::current()->sgip_stock_source === SgipStockSource::SampleIssue)
                             ->visible(fn (): bool => VisitPreference::current()->sgip_stock_source === SgipStockSource::SampleIssue),
+
+                        Select::make('territory_id')
+                            ->label('Territory')
+                            ->options(fn (): array => Territory::query()->orderBy('name')->pluck('name', 'id')->all())
+                            ->searchable()
+                            ->required(fn (Get $get): bool => filled($get('marketing_campaign_id'))),
+
+                        Select::make('marketing_campaign_id')
+                            ->label('Marketing Campaign')
+                            ->options(fn (): array => MarketingCampaign::query()
+                                ->where('status', MarketingCampaignStatus::Active)
+                                ->orderByDesc('start_date')
+                                ->pluck('name', 'id')
+                                ->all())
+                            ->searchable()
+                            ->live(),
                     ])->columnSpanFull(),
 
                 /* ===============================

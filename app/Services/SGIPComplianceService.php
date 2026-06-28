@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\SgipDistribution;
 use App\Models\SgipLimit;
 use App\Models\SgipViolation;
+use App\Services\Marketing\MarketingCampaignQuotaService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -30,6 +31,8 @@ class SGIPComplianceService
             foreach ($limits as $limit) {
                 self::validateLimit($distribution, $limit, $blockOnViolation);
             }
+
+            app(MarketingCampaignQuotaService::class)->validate($distribution, $blockOnViolation);
         });
     }
 

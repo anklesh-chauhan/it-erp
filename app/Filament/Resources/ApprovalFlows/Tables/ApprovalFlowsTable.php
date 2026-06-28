@@ -19,9 +19,14 @@ class ApprovalFlowsTable
         return $table
             ->columns([
                 TextColumn::make('module')->badge(),
+                TextColumn::make('condition_type')->badge(),
+                TextColumn::make('priority')->sortable(),
+                TextColumn::make('version')->sortable(),
                 TextColumn::make('territory.name')->label('Territory'),
-                TextColumn::make('min_amount'),
-                TextColumn::make('max_amount'),
+                TextColumn::make('min_amount')->numeric(),
+                TextColumn::make('max_amount')->numeric(),
+                TextColumn::make('effective_from')->date(),
+                TextColumn::make('effective_to')->date(),
                 IconColumn::make('active')->boolean(),
             ])
             ->filters([

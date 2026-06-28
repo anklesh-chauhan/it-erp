@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class SgipDistributionsTable
@@ -59,10 +60,37 @@ class SgipDistributionsTable
                     ->color('primary')
                     ->requiresConfirmation()
                     ->visible(fn ($record) => $record->approval_status === 'draft')
-                    ->action(function ($record) {
-                        SGIPComplianceService::validate($record, true);
+                    ->action(function ($record): void {
+                        if (! $record->items()->exists()) {
+                            Notification::make()
+                                ->title('Add at least one item before submitting.')
+                                ->danger()
+                                ->send();
 
-                        $record->update(['approval_status' => 'submitted']);
+                            return;
+                        }
+
+                        try {
+                            SGIPComplianceService::validate($record, true);
+                            $record->update(['approval_status' => 'submitted']);
+
+                            Notification::make()
+                                ->title('SGIP distribution submitted')
+                                ->success()
+                                ->send();
+                        } catch (ValidationException $exception) {
+                            Notification::make()
+                                ->title('Unable to submit SGIP distribution')
+                                ->body(collect($exception->errors())->flatten()->implode(' '))
+                                ->danger()
+                                ->send();
+                        } catch (Throwable $exception) {
+                            Notification::make()
+                                ->title('Unable to submit SGIP distribution')
+                                ->body($exception->getMessage())
+                                ->danger()
+                                ->send();
+                        }
                     }),
 
                 Action::make('approve')
@@ -78,6 +106,12 @@ class SgipDistributionsTable
                             Notification::make()
                                 ->title('SGIP approved and stock deducted')
                                 ->success()
+                                ->send();
+                        } catch (ValidationException $exception) {
+                            Notification::make()
+                                ->title('Unable to approve SGIP distribution')
+                                ->body(collect($exception->errors())->flatten()->implode(' '))
+                                ->danger()
                                 ->send();
                         } catch (Throwable $exception) {
                             Notification::make()

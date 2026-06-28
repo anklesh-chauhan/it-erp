@@ -12,6 +12,6 @@ class ApprovalStatusChanged
 
     public function __construct(
         public Approval $approval,
-        public string $approval_status
+        public string $approvalStatus
     ) {}
 }

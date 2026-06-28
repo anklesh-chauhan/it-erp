@@ -2,14 +2,10 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
-use App\Traits\HasApprovalWorkflow;
+use App\Helpers\ModelHelper;
 
 class ApprovalSetting extends BaseModel
 {
-    use HasApprovalWorkflow;
-
     protected $table = 'approval_settings';
 
     protected $fillable = ['enabled_modules'];
@@ -18,7 +14,7 @@ class ApprovalSetting extends BaseModel
         'enabled_modules' => 'array',
     ];
 
-    public static function instance()
+    public static function instance(): ?self
     {
         return static::first();
     }
@@ -30,31 +26,23 @@ class ApprovalSetting extends BaseModel
 
     public static function moduleRequiresApproval(string $module): bool
     {
-        return in_array($module, static::enabledModules());
+        $moduleBasename = class_basename($module);
+
+        return collect(static::enabledModules())
+            ->contains(fn (string $enabledModule): bool => $enabledModule === $module || class_basename($enabledModule) === $moduleBasename);
     }
 
-    public function getEnabledModulesAttribute($value)
+    public function getEnabledModulesAttribute($value): array
     {
-        if (is_array($value)) {
-            return $value;
-        }
-
-        if (is_string($value)) {
-            return json_decode($value, true) ?: [];
-        }
-
-        return [];
+        return is_array($value) ? $value : (json_decode($value ?? '[]', true) ?: []);
     }
 
     public static function approvedModuleOptions(): array
     {
-        $modules = static::enabledModules(); // always returns array
-
-        return collect($modules)
-            ->mapWithKeys(fn ($class) => [
-                class_basename($class) => class_basename($class),
+        return collect(static::enabledModules())
+            ->mapWithKeys(fn (string $class): array => [
+                class_basename($class) => ModelHelper::labelFromClass($class),
             ])
             ->toArray();
     }
-
 }

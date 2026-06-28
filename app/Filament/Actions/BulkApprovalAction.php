@@ -28,8 +28,9 @@ class BulkApprovalAction extends BulkAction
                 // ---------------------------
                 // 1. Model does not support workflow
                 // ---------------------------
-                if (!method_exists($record, 'startApprovalFromRules')) {
+                if (! method_exists($record, 'startApprovalFromRules')) {
                     $unsupported++;
+
                     continue;
                 }
 
@@ -37,8 +38,9 @@ class BulkApprovalAction extends BulkAction
                 // 2. If model provides canStartApproval() → use it
                 // ---------------------------
                 if (method_exists($record, 'canStartApproval')) {
-                    if (!$record->canStartApproval()) {
+                    if (! $record->canStartApproval()) {
                         $skipped++;
+
                         continue;
                     }
                 }
@@ -47,8 +49,9 @@ class BulkApprovalAction extends BulkAction
                 // 3. Safety Check — approval_status column exists
                 // ---------------------------
                 if (isset($record->approval_status)) {
-                    if (!in_array($record->approval_status, ['draft', 'created', 'pending'])) {
+                    if (! in_array($record->approval_status, ['draft', 'created', 'pending', 'submitted'], true)) {
                         $skipped++;
+
                         continue;
                     }
                 }
@@ -56,8 +59,9 @@ class BulkApprovalAction extends BulkAction
                 // ---------------------------
                 // 4. Safety Check — approval_started_at timestamp
                 // ---------------------------
-                if (isset($record->approval_started_at) && !empty($record->approval_started_at)) {
+                if (isset($record->approval_started_at) && ! empty($record->approval_started_at)) {
                     $skipped++;
+
                     continue;
                 }
 

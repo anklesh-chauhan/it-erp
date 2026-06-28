@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\SampleRequests\Schemas;
 
+use App\Enums\MarketingCampaignStatus;
 use App\Enums\SampleRequestStatus;
 use App\Models\Employee;
 use App\Models\ItemMaster;
 use App\Models\LocationMaster;
+use App\Models\MarketingCampaign;
 use App\Models\NumberSeries;
 use App\Models\SampleRequest;
 use App\Models\Territory;
@@ -68,6 +70,15 @@ class SampleRequestForm
                                 ->all())
                             ->searchable()
                             ->required(),
+
+                        Select::make('campaign_id')
+                            ->label('Marketing Campaign')
+                            ->options(fn (): array => MarketingCampaign::query()
+                                ->where('status', MarketingCampaignStatus::Active)
+                                ->orderByDesc('start_date')
+                                ->pluck('name', 'id')
+                                ->all())
+                            ->searchable(),
 
                         Textarea::make('purpose')
                             ->required()

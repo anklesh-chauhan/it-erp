@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Enums\SampleRequestStatus;
+use Database\Factories\SampleRequestFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SampleRequest extends BaseModel
 {
-    /** @use HasFactory<\Database\Factories\SampleRequestFactory> */
+    /** @use HasFactory<SampleRequestFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -54,6 +55,11 @@ class SampleRequest extends BaseModel
     public function issues(): HasMany
     {
         return $this->hasMany(SampleIssue::class);
+    }
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(MarketingCampaign::class, 'campaign_id');
     }
 
     public function isEditable(): bool

@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\Approval;
 use App\Models\ApprovalFlow;
+use App\Models\ApprovalSetting;
 use App\Services\Approval\ApprovalService;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use LogicException;
@@ -40,8 +41,12 @@ trait HasApprovalWorkflow
      */
     public static function moduleHasApprovalFlow(): bool
     {
+        if (! ApprovalSetting::moduleRequiresApproval(static::approvalModule())) {
+            return false;
+        }
+
         return cache()->remember(
-            'approval:module:' . static::approvalModule(),
+            'approval:module:'.static::approvalModule(),
             now()->addMinutes(10),
             fn () => ApprovalFlow::query()
                 ->where('module', static::approvalModule())
@@ -56,20 +61,21 @@ trait HasApprovalWorkflow
      */
     public function hasApplicableApprovalFlow(): bool
     {
+        if (! ApprovalSetting::moduleRequiresApproval(static::approvalModule())) {
+            return false;
+        }
+
         return ApprovalFlow::query()
             ->where('module', static::approvalModule())
             ->where('active', true)
-            ->where(fn ($q) =>
-                $q->whereNull('territory_id')
-                  ->orWhere('territory_id', $this->resolveApprovalTerritoryId())
+            ->where(fn ($q) => $q->whereNull('territory_id')
+                ->orWhere('territory_id', $this->resolveApprovalTerritoryId())
             )
-            ->where(fn ($q) =>
-                $q->whereNull('min_amount')
-                  ->orWhere('min_amount', '<=', $this->resolveApprovalAmount())
+            ->where(fn ($q) => $q->whereNull('min_amount')
+                ->orWhere('min_amount', '<=', $this->resolveApprovalAmount())
             )
-            ->where(fn ($q) =>
-                $q->whereNull('max_amount')
-                  ->orWhere('max_amount', '>=', $this->resolveApprovalAmount())
+            ->where(fn ($q) => $q->whereNull('max_amount')
+                ->orWhere('max_amount', '>=', $this->resolveApprovalAmount())
             )
             ->exists();
     }
@@ -114,6 +120,33 @@ trait HasApprovalWorkflow
             territoryId: $territoryId ?? $this->resolveApprovalTerritoryId(),
             amount: $amount ?? $this->resolveApprovalAmount()
         );
+    }
+
+    public function startApprovalFromRules(): Approval
+    {
+        return $this->startApproval();
+    }
+
+    public function canStartApproval(): bool
+    {
+        if (! $this->approvalApplies()) {
+            return false;
+        }
+
+        if ($this->approval !== null) {
+            return false;
+        }
+
+        if (isset($this->approval_status)) {
+            return in_array($this->approval_status, ['draft', 'created', 'pending', 'submitted'], true);
+        }
+
+        return true;
+    }
+
+    public function canSendForApproval(): bool
+    {
+        return $this->canStartApproval();
     }
 
     /* =====================================================

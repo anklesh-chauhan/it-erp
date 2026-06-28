@@ -21,6 +21,8 @@ use App\Models\SampleIssue;
 use App\Models\SampleRequestLine;
 use App\Models\SgipDistribution;
 use App\Models\VisitPreference;
+use App\Services\Marketing\MarketingCampaignQuotaService;
+use App\Services\SGIPComplianceService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -370,6 +372,8 @@ class InventoryService
         DB::transaction(function () use ($distribution): void {
             $distribution->loadMissing(['items.item', 'sampleIssue.sampleRequest']);
 
+            SGIPComplianceService::validate($distribution, true);
+
             if ($distribution->items->isEmpty()) {
                 throw new RuntimeException('SGIP distribution must have at least one item.');
             }
@@ -416,6 +420,8 @@ class InventoryService
                 'inventory_source_location_id' => $sourceLocationId,
                 'inventory_posted_at' => now(),
             ])->saveQuietly();
+
+            app(MarketingCampaignQuotaService::class)->consumeQuota($distribution);
         });
     }
 

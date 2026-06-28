@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Enums\SgipType;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\ItemMaster;
+use App\Enums\ItemType;
 use App\Models\Category;
 use App\Models\ItemBrand;
-use App\Models\UnitOfMeasurement;
+use App\Models\ItemMaster;
 use App\Models\PackagingType;
+use App\Models\UnitOfMeasurement;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ItemMasterFactory extends Factory
 {
@@ -73,7 +73,7 @@ class ItemMasterFactory extends Factory
     public function sample(): static
     {
         return $this->state(fn (): array => [
-            'sgip_type' => SgipType::Sample,
+            'item_type' => ItemType::Sample,
         ]);
     }
 

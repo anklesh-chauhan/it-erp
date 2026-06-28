@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
 use ReflectionClass;
@@ -17,8 +18,8 @@ class ModelHelper
         }
 
         foreach (File::allFiles($modelPath) as $file) {
-            $namespace = "App\\Models\\";
-            $class = $namespace . $file->getFilenameWithoutExtension();
+            $namespace = 'App\\Models\\';
+            $class = $namespace.$file->getFilenameWithoutExtension();
 
             if (! class_exists($class)) {
                 continue;
@@ -36,9 +37,11 @@ class ModelHelper
     /**
      * Convert model class into label — e.g. "App\Models\SalesOrder" → "Sales Order"
      */
-    private static function labelFromClass(string $class): string
+    public static function labelFromClass(string $class): string
     {
-        $short = (new ReflectionClass($class))->getShortName();
+        $short = class_exists($class)
+            ? (new ReflectionClass($class))->getShortName()
+            : class_basename($class);
 
         return trim(preg_replace('/(?<!^)[A-Z]/', ' $0', $short));
     }
