@@ -4,6 +4,7 @@ namespace App\Filament\Resources\CityPinCodes;
 
 use App\Filament\Actions\ApprovalAction;
 use App\Filament\Actions\BulkApprovalAction;
+use App\Filament\Exports\CityPinCodeExporter;
 use App\Filament\Clusters\GlobalConfiguration\AddressConfigurationCluster;
 use App\Filament\Resources\BaseResource;
 use App\Filament\Resources\CityPinCodes\Pages\CreateCityPinCode;
@@ -15,6 +16,7 @@ use App\Traits\HasSafeGlobalSearch;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
@@ -144,6 +146,12 @@ class CityPinCodeResource extends BaseResource
                     ->searchable()
                     ->preload(),
 
+            ])
+            ->headerActions([
+                // Button to export all/filtered records
+                ExportAction::make()
+                    ->exporter(CityPinCodeExporter::class)
+                    ->label('Export'),
             ])
             ->recordActions([
                 EditAction::make(),
