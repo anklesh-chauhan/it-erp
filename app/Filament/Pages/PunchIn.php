@@ -2,23 +2,24 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
-use Filament\Actions\Action;
-use Illuminate\Support\Facades\Auth;
-use Filament\Notifications\Notification;
+use App\Jobs\ProcessDailyAttendanceJob;
+use App\Models\AttendancePunch;
 use App\Models\DailyAttendance;
 use App\Models\EmployeeAttendanceStatus;
-use App\Models\AttendancePunch;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
-use Filament\Facades\Filament;
-use Filament\Support\Enums\Alignment;
 
 class PunchIn extends Page
 {
     protected string $view = 'filament.pages.punch-in';
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+
     protected static ?string $title = 'Punch In/Out';
+
     protected static ?string $navigationLabel = 'Punch In/Out';
 
     public static function shouldRegisterNavigation(): bool
@@ -31,7 +32,7 @@ class PunchIn extends Page
 
     protected function getHeaderActions(): array
     {
-        $employee = Auth::user()->employee;
+        $employee = Auth::user()?->employee;
 
         // If user is not an employee, hide attendance actions
         if (! $employee) {
@@ -53,8 +54,8 @@ class PunchIn extends Page
                     ->modal(false)
                     ->requiresConfirmation(false)
                     ->extraAttributes([
-                        'x-on:click.prevent' => "startPunchIn(\$wire)"
-                    ])
+                        'x-on:click.prevent' => 'startPunchIn($wire)',
+                    ]),
             ];
         }
 
@@ -69,8 +70,8 @@ class PunchIn extends Page
                     ->button()
                     ->requiresConfirmation(false)
                     ->extraAttributes([
-                        'x-on:click.prevent' => "startPunchOut(\$wire)"
-                    ])
+                        'x-on:click.prevent' => 'startPunchOut($wire)',
+                    ]),
             ];
         }
 
@@ -93,6 +94,7 @@ class PunchIn extends Page
                 ->title('Location permission not allowed')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -101,6 +103,7 @@ class PunchIn extends Page
                 ->title('Employee not linked')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -112,6 +115,7 @@ class PunchIn extends Page
                 ->body('No active shift is assigned for today. Please contact HR.')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -153,6 +157,7 @@ class PunchIn extends Page
                 ->title('Location permission not allowed')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -165,6 +170,7 @@ class PunchIn extends Page
                 ->title('No attendance record found for today')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -183,7 +189,7 @@ class PunchIn extends Page
         ]);
 
         // Process attendance (calculate hours, status, etc.)
-        dispatch_sync(new \App\Jobs\ProcessDailyAttendanceJob($todayAttendance->id));
+        dispatch_sync(new ProcessDailyAttendanceJob($todayAttendance->id));
 
         Notification::make()
             ->title('Checked Out Successfully!')
@@ -193,5 +199,4 @@ class PunchIn extends Page
         // Refresh the dashboard to update button state
         $this->dispatch('$refresh');
     }
-
 }

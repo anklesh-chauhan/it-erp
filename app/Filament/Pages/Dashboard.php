@@ -2,18 +2,31 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\DailyAttendance;
+use App\Filament\Widgets\FieldActivityStatsWidget;
+use App\Jobs\ProcessDailyAttendanceJob;
 use App\Models\AttendancePunch;
+use App\Models\DailyAttendance;
 use App\Models\EmployeeAttendanceStatus;
-use Filament\Pages\Dashboard as BaseDashboard;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Pages\Dashboard as BaseDashboard;
+use Filament\Widgets\Widget;
+use Filament\Widgets\WidgetConfiguration;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
-use Filament\Actions\Action;
-use Spatie\Multitenancy\Models\Tenant;
 
 class Dashboard extends BaseDashboard
 {
+    /**
+     * @return array<class-string<Widget>|WidgetConfiguration>
+     */
+    public function getWidgets(): array
+    {
+        return [
+            FieldActivityStatsWidget::class,
+        ];
+    }
+
     protected function getHeaderActions(): array
     {
         $employee = Auth::user()->employee;
@@ -38,8 +51,8 @@ class Dashboard extends BaseDashboard
                     ->modal(false)
                     ->requiresConfirmation(false)
                     ->extraAttributes([
-                        'x-on:click.prevent' => "startPunchIn(\$wire)"
-                    ])
+                        'x-on:click.prevent' => 'startPunchIn($wire)',
+                    ]),
             ];
         }
 
@@ -54,8 +67,8 @@ class Dashboard extends BaseDashboard
                     ->button()
                     ->requiresConfirmation(false)
                     ->extraAttributes([
-                        'x-on:click.prevent' => "startPunchOut(\$wire)"
-                    ])
+                        'x-on:click.prevent' => 'startPunchOut($wire)',
+                    ]),
             ];
         }
 
@@ -78,6 +91,7 @@ class Dashboard extends BaseDashboard
                 ->title('Location permission not allowed')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -86,6 +100,7 @@ class Dashboard extends BaseDashboard
                 ->title('Employee not linked')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -97,6 +112,7 @@ class Dashboard extends BaseDashboard
                 ->body('No active shift is assigned for today. Please contact HR.')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -138,6 +154,7 @@ class Dashboard extends BaseDashboard
                 ->title('Location permission not allowed')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -150,6 +167,7 @@ class Dashboard extends BaseDashboard
                 ->title('No attendance record found for today')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -168,7 +186,7 @@ class Dashboard extends BaseDashboard
         ]);
 
         // Process attendance (calculate hours, status, etc.)
-        dispatch_sync(new \App\Jobs\ProcessDailyAttendanceJob($todayAttendance->id));
+        dispatch_sync(new ProcessDailyAttendanceJob($todayAttendance->id));
 
         Notification::make()
             ->title('Checked Out Successfully!')

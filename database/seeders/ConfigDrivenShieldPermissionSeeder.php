@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Filament\Facades\Filament;
 use BezhanSalleh\FilamentShield\Support\Utils;
+use Filament\Facades\Filament;
+use Illuminate\Database\Seeder;
 use Spatie\Permission\PermissionRegistrar;
 
 class ConfigDrivenShieldPermissionSeeder extends Seeder
@@ -13,7 +13,7 @@ class ConfigDrivenShieldPermissionSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $roleModel       = Utils::getRoleModel();
+        $roleModel = Utils::getRoleModel();
         $permissionModel = Utils::getPermissionModel();
 
         // 🔹 Discover ALL resources from ALL panels
@@ -22,13 +22,14 @@ class ConfigDrivenShieldPermissionSeeder extends Seeder
             ->unique()
             ->mapWithKeys(function ($resource) {
                 $model = class_basename($resource::getModel());
+
                 return [class_basename($resource) => $model];
             });
 
         foreach (config('permission-map.roles') as $roleName => $rules) {
 
             $role = $roleModel::firstOrCreate([
-                'name'       => $roleName,
+                'name' => $roleName,
                 'guard_name' => 'web',
             ]);
 
@@ -44,6 +45,7 @@ class ConfigDrivenShieldPermissionSeeder extends Seeder
 
                 if (! $resources->has($resourceClass)) {
                     logger()->warning("Permission map resource not found: {$resourceClass}");
+
                     continue;
                 }
 
@@ -52,7 +54,7 @@ class ConfigDrivenShieldPermissionSeeder extends Seeder
                 foreach ($this->permissionsForLevel($level, $model) as $perm) {
                     $permissions->push(
                         $permissionModel::firstOrCreate([
-                            'name'       => $perm,
+                            'name' => $perm,
                             'guard_name' => 'web',
                         ])
                     );
@@ -72,8 +74,8 @@ class ConfigDrivenShieldPermissionSeeder extends Seeder
                 "ViewAny:{$model}",
                 "View:{$model}",
                 "ViewOwnTerritory:{$model}",
-                "viewOwnOU:{$model}",
-                "viewOwn:{$model}",
+                "ViewOwnOU:{$model}",
+                "ViewOwn:{$model}",
             ],
             'C' => [
                 "ViewAny:{$model}",
@@ -81,8 +83,8 @@ class ConfigDrivenShieldPermissionSeeder extends Seeder
                 "Create:{$model}",
                 "Update:{$model}",
                 "ViewOwnTerritory:{$model}",
-                "viewOwnOU:{$model}",
-                "viewOwn:{$model}",
+                "ViewOwnOU:{$model}",
+                "ViewOwn:{$model}",
             ],
             'F' => [
                 "ViewAny:{$model}",
@@ -97,8 +99,8 @@ class ConfigDrivenShieldPermissionSeeder extends Seeder
                 "Replicate:{$model}",
                 "Reorder:{$model}",
                 "ViewOwnTerritory:{$model}",
-                "viewOwnOU:{$model}",
-                "viewOwn:{$model}",
+                "ViewOwnOU:{$model}",
+                "ViewOwn:{$model}",
             ],
             default => [],
         };

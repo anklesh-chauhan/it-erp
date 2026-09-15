@@ -2,19 +2,15 @@
 
 namespace App\Models;
 
-
-use App\Models\BaseModel;
+use App\Traits\HasApprovalWorkflow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Carbon\Carbon;
-
-use App\Traits\HasApprovalWorkflow;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SalesTourPlanDetail extends BaseModel
 {
-    use HasFactory, HasApprovalWorkflow;
+    use HasApprovalWorkflow, HasFactory;
 
     protected $fillable = [
         'sales_tour_plan_id',
@@ -74,11 +70,15 @@ class SalesTourPlanDetail extends BaseModel
     /**
      * Retrieve patches related to this tour plan detail.
      */
-
     public function patches(): BelongsToMany
     {
         // Point to the pivot table we just created
         return $this->belongsToMany(Patch::class, 'patch_sales_tour_plan_detail');
+    }
+
+    public function visits(): HasMany
+    {
+        return $this->hasMany(Visit::class);
     }
 
     /**

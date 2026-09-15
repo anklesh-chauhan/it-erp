@@ -25,8 +25,8 @@ trait BuildsExpenseContext
             'distance_source' => $distanceContext['source'],
 
             'travel_type' => $this->resolveTravelType($dcr),
-            'is_hill_station' => $areaTown?->is_hill_station ?? false,
-            'city_class' => $areaTown?->cityClass?->name,
+            'is_hill_station' => $areaTown?->city?->is_hill_station ?? false,
+            'city_class' => $areaTown?->city?->cityClass?->name,
 
             'territory_id' => $dcr->territory_id,
             'joint_work' => $dcr->visits->where('is_joint_work', true)->isNotEmpty(),

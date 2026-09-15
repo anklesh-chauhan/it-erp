@@ -39,9 +39,9 @@ class ExpensePolicySeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $this->createFlatRule($da->id, 'HQ', 300, 100);
-        $this->createFlatRule($da->id, 'EX_STATION', 330, 100);
-        $this->createFlatRule($da->id, 'OUTSTATION', 650, 100);
+        $this->createFlatRule($da->id, 'hq', 300, 100);
+        $this->createFlatRule($da->id, 'ex_hq', 330, 100);
+        $this->createFlatRule($da->id, 'outstation', 650, 100);
 
         /*
         |--------------------------------------------------------------------------
@@ -100,7 +100,7 @@ class ExpensePolicySeeder extends Seeder
 
         // Conditions
         $this->addCondition($travelRule, 'distance', '>=', 20);
-        $this->addCondition($travelRule, 'travel_type', '!=', 'HQ');
+        $this->addCondition($travelRule, 'travel_type', '!=', 'hq');
 
         // Slabs
         $this->addSlab($travelRule, 1, 200, 3.5);

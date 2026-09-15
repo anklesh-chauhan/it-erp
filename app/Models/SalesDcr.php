@@ -52,6 +52,16 @@ class SalesDcr extends BaseModel
         return $this->belongsTo(User::class);
     }
 
+    public function territory(): BelongsTo
+    {
+        return $this->belongsTo(Territory::class);
+    }
+
+    public function tourPlan(): BelongsTo
+    {
+        return $this->belongsTo(SalesTourPlan::class, 'sales_tour_plan_id');
+    }
+
     public function visits(): HasMany
     {
         return $this->hasMany(Visit::class);

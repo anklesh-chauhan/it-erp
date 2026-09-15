@@ -2,15 +2,13 @@
 
 namespace App\Services\Attendance;
 
+use App\Models\LeaveAdjustment;
+use App\Models\LeaveBalance;
+use App\Models\LeaveEncashment;
+use App\Models\LeaveInstance;
+use App\Models\LeaveLapseRecord;
+use App\Models\PayrollLeaveSnapshot;
 use Carbon\Carbon;
-use App\Models\{
-    LeaveBalance,
-    LeaveInstance,
-    LeaveAdjustment,
-    LeaveEncashment,
-    PayrollLeaveSnapshot,
-    LeaveLapseRecord
-};
 
 class LeaveBalanceCalculator
 {
@@ -52,6 +50,7 @@ class LeaveBalanceCalculator
             [
                 'opening_balance' => 0,
                 'year_start_date' => now()->startOfYear(),
+                'year_end_date' => now()->endOfYear(),
             ]
         );
 
@@ -97,7 +96,6 @@ class LeaveBalanceCalculator
             'closing'
         );
     }
-
 
     protected function calculateFromPayrollSnapshot(
         int $employeeId,

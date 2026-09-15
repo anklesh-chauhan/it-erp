@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -20,7 +19,7 @@ class SgipViolation extends BaseModel
 
     protected $casts = [
         'allowed_value' => 'decimal:2',
-        'actual_value'  => 'decimal:2',
+        'actual_value' => 'decimal:2',
     ];
 
     /* ============================
@@ -29,7 +28,7 @@ class SgipViolation extends BaseModel
 
     public function distribution(): BelongsTo
     {
-        return $this->belongsTo(SgipDistribution::class);
+        return $this->belongsTo(SgipDistribution::class, 'sgip_distribution_id');
     }
 
     public function limit(): BelongsTo

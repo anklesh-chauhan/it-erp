@@ -1,5 +1,22 @@
 <?php
 
+use App\Enums\ItemType;
+use App\Models\AccountMaster;
+use App\Models\ContactDetail;
+use App\Models\DealStage;
+use App\Models\Employee;
+use App\Models\EmployeeAttendanceStatus;
+use App\Models\ItemMaster;
+use App\Models\LeadStatus;
+use App\Models\LeaveType;
+use App\Models\LocationMaster;
+use App\Models\Patch;
+use App\Models\ShiftMaster;
+use App\Models\Territory;
+use App\Models\TypeMaster;
+use App\Models\User;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,7 +28,7 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
+pest()->extend(TestCase::class)
  // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
@@ -41,7 +58,128 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function reportingUser(string $name): User
 {
-    // ..
+    $user = User::factory()->create([
+        'name' => $name,
+        'email' => str($name)->slug().'-'.fake()->unique()->numberBetween(1000, 9999).'@example.test',
+    ]);
+
+    $employee = Employee::query()->create([
+        'employee_id' => fake()->unique()->numerify('EMP###'),
+        'first_name' => $name,
+        'last_name' => 'Rep',
+        'email' => $user->email,
+        'mobile_number' => fake()->unique()->numerify('90000#####'),
+        'login_id' => $user->id,
+        'is_active' => true,
+    ]);
+
+    $user->forceFill(['employee_id' => $employee->id])->save();
+
+    return $user->fresh();
+}
+
+function reportingTerritory(string $name): Territory
+{
+    return Territory::query()->create([
+        'name' => $name,
+        'code' => fake()->unique()->bothify('T###'),
+    ]);
+}
+
+function reportingDoctor(User $owner, string $name): AccountMaster
+{
+    $type = TypeMaster::query()->firstOrCreate(
+        ['name' => 'Doctor', 'typeable_type' => AccountMaster::class],
+        ['parent_id' => null],
+    );
+
+    return AccountMaster::query()->create([
+        'name' => $name,
+        'owner_id' => $owner->id,
+        'type_master_id' => $type->id,
+    ]);
+}
+
+function reportingSampleItem(string $code, string $name): ItemMaster
+{
+    return ItemMaster::query()->create([
+        'item_code' => $code.'-'.fake()->unique()->numerify('###'),
+        'item_name' => $name,
+        'item_type' => ItemType::Sample,
+    ]);
+}
+
+function reportingLocation(string $name): LocationMaster
+{
+    return LocationMaster::query()->create([
+        'name' => $name,
+        'location_code' => fake()->unique()->bothify('LOC###'),
+        'is_active' => true,
+    ]);
+}
+
+function reportingLeadStatus(string $name): LeadStatus
+{
+    return LeadStatus::query()->create([
+        'name' => $name.' '.fake()->unique()->numerify('###'),
+    ]);
+}
+
+function reportingDealStage(string $name): DealStage
+{
+    return DealStage::query()->create([
+        'name' => $name.' '.fake()->unique()->numerify('###'),
+    ]);
+}
+
+function reportingContact(string $firstName, string $lastName): ContactDetail
+{
+    return ContactDetail::query()->create([
+        'first_name' => $firstName,
+        'last_name' => $lastName,
+    ]);
+}
+
+function reportingAttendanceStatus(string $label): EmployeeAttendanceStatus
+{
+    return EmployeeAttendanceStatus::query()->create([
+        'status_code' => strtoupper(str($label)->slug('_')).'_'.fake()->unique()->numerify('##'),
+        'status' => $label,
+        'is_system' => false,
+    ]);
+}
+
+function reportingShift(string $name): ShiftMaster
+{
+    return ShiftMaster::withoutEvents(fn (): ShiftMaster => ShiftMaster::query()->create([
+        'code' => strtoupper(str($name)->slug('_')).'_'.fake()->unique()->numerify('##'),
+        'name' => $name,
+        'start_time' => '09:00:00',
+        'end_time' => '18:00:00',
+        'shift_type' => 'fixed',
+        'week_off_type' => 'none',
+    ]));
+}
+
+function reportingPatch(Territory $territory, string $name): Patch
+{
+    return Patch::query()->create([
+        'name' => $name.' '.fake()->unique()->numerify('###'),
+        'code' => fake()->unique()->bothify('P###'),
+        'territory_id' => $territory->id,
+    ]);
+}
+
+function reportingLeaveType(string $name, ?EmployeeAttendanceStatus $status = null): LeaveType
+{
+    $status ??= reportingAttendanceStatus($name.' Status');
+
+    return LeaveType::query()->create([
+        'code' => strtoupper(str($name)->substr(0, 2)).fake()->unique()->numerify('##'),
+        'name' => $name.' '.fake()->unique()->numerify('###'),
+        'is_active' => true,
+        'employee_attendance_status_id' => $status->id,
+    ]);
 }

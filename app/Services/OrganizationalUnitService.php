@@ -11,8 +11,10 @@ class OrganizationalUnitService
         $primaryOuIds = $user->employee
             ?->employmentDetail
             ?->organizationalUnits
-            ?->pluck('organizational_units.id')
-            ?->toArray() ?? [];
+            ?->pluck('id')
+            ?->filter()
+            ?->values()
+            ?->all() ?? [];
 
         if (empty($primaryOuIds)) {
             return [];

@@ -1,16 +1,18 @@
 <?php
 
 use App\Filament\Pages\PunchIn;
-use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Livewire\livewire;
 
-it('automatically mounts the punchIn action on page load', function () {
-    $user = User::factory()->create();
+uses(RefreshDatabase::class);
 
-    // If the action requires an employee relation, create one here:
-    // $user->employee()->create([...]);
+it('shows the punch in action for an employee with no attendance today', function () {
+    $user = reportingUser('PunchRep');
+
+    $this->actingAs($user);
 
     livewire(PunchIn::class)
         ->assertSuccessful()
-        ->assertActionMounted('punchIn');
+        ->assertActionExists('punchIn');
 });

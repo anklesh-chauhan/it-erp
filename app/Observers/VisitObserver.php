@@ -48,18 +48,10 @@ class VisitObserver
         |--------------------------------------------------------------------------
         */
         if ($visit->isDirty('visit_date') && $visit->visit_date !== null) {
-
-            $oldDcrId = $visit->getOriginal('sales_dcr_id');
-
             $dcrService = app(DcrService::class);
             $newDcr = $dcrService->getOrCreateForDate($visit->visit_date);
 
             $visit->sales_dcr_id = $newDcr->id;
-
-            // Update old DCR count
-            if ($oldDcrId && $oldDcrId !== $newDcr->id) {
-                SalesDcr::find($oldDcrId)?->updateVisitCount();
-            }
         }
     }
 
@@ -70,8 +62,16 @@ class VisitObserver
     */
     public function updated(Visit $visit): void
     {
-        // Update current DCR visit count
+        $visit->unsetRelation('salesDcr');
         $visit->salesDcr?->updateVisitCount();
+
+        if ($visit->wasChanged('sales_dcr_id')) {
+            $previousDcrId = $visit->getPrevious()['sales_dcr_id'] ?? null;
+
+            if ($previousDcrId && (int) $previousDcrId !== (int) $visit->sales_dcr_id) {
+                SalesDcr::query()->find($previousDcrId)?->updateVisitCount();
+            }
+        }
 
         /*
         |--------------------------------------------------------------------------
