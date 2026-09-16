@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Media;
+use App\Models\Visit;
 use App\Services\ImageWatermarkService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,9 +11,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Spatie\Multitenancy\Jobs\TenantAware;
-use Spatie\Multitenancy\Concerns\UsesMultitenancyConfig;
-use Spatie\Multitenancy\Contracts\IsTenant;
-
 
 class ProcessMediaUploadJob implements ShouldQueue, TenantAware
 {
@@ -39,6 +37,7 @@ class ProcessMediaUploadJob implements ShouldQueue, TenantAware
 
         if (! file_exists($fullPath)) {
             $media->update(['processing_status' => 'failed']);
+
             return;
         }
 
@@ -47,18 +46,19 @@ class ProcessMediaUploadJob implements ShouldQueue, TenantAware
         $media->mime_type = mime_content_type($fullPath);
         $media->size = filesize($fullPath);
 
-        // 2️⃣ Extract EXIF GPS (if exists)
-        $exif = @exif_read_data($fullPath);
+        // 2️⃣ Prefer client-provided GPS; fall back to EXIF, then visit check-in
+        if ($media->latitude === null || $media->longitude === null) {
+            $exif = @exif_read_data($fullPath);
 
-        if ($exif && isset($exif['GPSLatitude'], $exif['GPSLongitude'])) {
-            $media->latitude = $this->convertGps($exif['GPSLatitude']);
-            $media->longitude = $this->convertGps($exif['GPSLongitude']);
+            if ($exif && isset($exif['GPSLatitude'], $exif['GPSLongitude'])) {
+                $media->latitude ??= $this->convertGps($exif['GPSLatitude']);
+                $media->longitude ??= $this->convertGps($exif['GPSLongitude']);
+            }
         }
 
-        // Fallback: use Visit GPS
-        if (! $media->latitude && $media->model instanceof \App\Models\Visit) {
-            $media->latitude = $media->model->checkin_latitude;
-            $media->longitude = $media->model->checkin_longitude;
+        if (($media->latitude === null || $media->longitude === null) && $media->model instanceof Visit) {
+            $media->latitude ??= $media->model->checkin_latitude;
+            $media->longitude ??= $media->model->checkin_longitude;
         }
 
         // 3️⃣ Apply watermark
@@ -91,6 +91,7 @@ class ProcessMediaUploadJob implements ShouldQueue, TenantAware
     protected function gpsToNumber($coordPart)
     {
         $parts = explode('/', $coordPart);
+
         return count($parts) === 1
             ? (float) $parts[0]
             : (float) $parts[0] / (float) $parts[1];

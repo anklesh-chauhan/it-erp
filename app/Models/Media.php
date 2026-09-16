@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
 use Illuminate\Support\Facades\Storage;
 
 class Media extends BaseModel
@@ -20,9 +19,10 @@ class Media extends BaseModel
         'size',
         'latitude',
         'longitude',
+        'captured_at',
         'is_processed',
         'processed_at',
-        'processing_status'
+        'processing_status',
     ];
 
     /*
@@ -33,6 +33,9 @@ class Media extends BaseModel
     protected $casts = [
         'is_processed' => 'boolean',
         'processed_at' => 'datetime',
+        'captured_at' => 'datetime',
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     public function model()
@@ -56,7 +59,7 @@ class Media extends BaseModel
 
     public function attachTagBySlug(string $slug): void
     {
-        $tag = \App\Models\ImageTag::where('slug', $slug)->first();
+        $tag = ImageTag::where('slug', $slug)->first();
 
         if ($tag) {
             $this->tags()->syncWithoutDetaching([$tag->id]);

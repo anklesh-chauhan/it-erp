@@ -6,6 +6,7 @@ use App\Models\ContactDetail;
 use App\Models\DealStage;
 use App\Models\Employee;
 use App\Models\EmployeeAttendanceStatus;
+use App\Models\EmployeeShift;
 use App\Models\ItemMaster;
 use App\Models\LeadStatus;
 use App\Models\LeaveType;
@@ -182,4 +183,24 @@ function reportingLeaveType(string $name, ?EmployeeAttendanceStatus $status = nu
         'is_active' => true,
         'employee_attendance_status_id' => $status->id,
     ]);
+}
+
+function reportingAssignShift(User $user, ShiftMaster $shift): void
+{
+    $employee = $user->employee;
+
+    expect($employee)->not->toBeNull();
+
+    EmployeeShift::query()->create([
+        'employee_id' => $employee->id,
+        'shift_master_id' => $shift->id,
+        'effective_from' => today()->subDay()->toDateString(),
+        'effective_to' => null,
+        'is_current' => true,
+    ]);
+}
+
+function reportingApiToken(User $user, string $name = 'field-api'): string
+{
+    return $user->createToken($name)->plainTextToken;
 }

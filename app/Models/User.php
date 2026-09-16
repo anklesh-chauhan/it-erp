@@ -3,25 +3,23 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Spatie\Multitenancy\Models\Tenant;
+use App\Traits\HasApprovalWorkflow;
 use Database\Factories\UserFactory;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Multitenancy\Models\Tenant;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Filament\Panel;
-use App\Models\OrganizationalUnit;
-use Filament\Models\Contracts\FilamentUser;
-
-use App\Traits\HasApprovalWorkflow;
 
 class User extends Authenticatable
 {
-    use HasApprovalWorkflow;
-
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
+
+    use HasApprovalWorkflow;
 
     /**
      * The attributes that are mass assignable.
@@ -119,7 +117,6 @@ class User extends Authenticatable
     public function canAccessPanel(Panel $panel): bool
     {
         // Allow access if user is linked to an active, non-deleted employee via employee_id
-        return $this->employeeViaId && $this->employeeViaId->is_active && !$this->employeeViaId->is_deleted;
+        return $this->employeeViaId && $this->employeeViaId->is_active && ! $this->employeeViaId->is_deleted;
     }
-
 }
